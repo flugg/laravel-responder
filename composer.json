@@ -1,0 +1,41 @@
+{
+    "name": "mangopixel/laravel-responder",
+    "description": "A Laravel package for APIs, wrapping the Fractal library behind an elegant Laravel API.",
+    "keywords": [
+        "laravel",
+        "responder",
+        "api",
+        "response",
+        "fractal",
+        "transformers"
+    ],
+    "homepage": "https://github.com/mangopixel/laravel-responder",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexander Tømmerås",
+            "email": "flugged@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "illuminate/support": "5.1.* || 5.2.* || 5.3.*",
+        "league/fractal": "^0.13.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.4",
+        "orchestra/testbench": "~3.0",
+        "mockery/mockery": "^0.9.5",
+        "fzaninotto/faker": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mangopixel\\Responder\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mangopixel\\Responder\\Tests\\": "tests"
+        }
+    }
+}
