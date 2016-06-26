@@ -41,16 +41,56 @@ class Responder implements ResponderContract
     /**
      * Generate an error JSON response.
      *
-     * @param  string $error
+     * @param  string $errorCode
+     * @param  int    $statusCode
+     * @param  string $message
+     * @return JsonResponse
+     */
+    public function error( string $errorCode, int $statusCode = 404, $message = null ):JsonResponse
+    {
+        $response = $this->makeErrorResponse( $statusCode );
+
+        $response[ 'error' ] = [
+            'code' => $errorCode,
+            'message' => $message ?: trans( "errors.$errorCode" )
+        ];
+
+        return response()->json( $response );
+    }
+
+    /**
+     * Generate an error JSON response with multiple errors.
+     *
+     * @param  arrays $errors
      * @param  int    $statusCode
      * @return JsonResponse
      */
-    public function error( string $error, int $statusCode = 404 ):JsonResponse
+    public function errors( array $errors, int $statusCode = 404 ):JsonResponse
     {
-        return response()->json( [
-            'error' => $error,
+        $response = $this->makeErrorResponse( $statusCode );
+
+        foreach ( $errors as $errorCode => $message ) {
+            $response[ 'errors' ][] = [
+                'code' => $errorCode,
+                'message' => $message ?: trans( "errors.$errorCode" )
+            ];
+        }
+
+        return response()->json( $response );
+    }
+
+    /**
+     * Make the structure for an error response.
+     *
+     * @param int $statusCode
+     * @return array
+     */
+    protected function makeErrorResponse( int $statusCode ):array
+    {
+        return [
+            'success' => false,
             'status' => $statusCode
-        ], $statusCode );
+        ];
     }
 
     /**

@@ -31,10 +31,11 @@ trait RespondsWithJson
      *
      * @param  string $error
      * @param  int    $statusCode
+     * @param  string $message
      * @return JsonResponse
      */
-    public function errorResponse( string $error, int $statusCode = 404 ):JsonResponse
+    public function errorResponse( string $error, int $statusCode = 404, $message = null ):JsonResponse
     {
-        return app( Responder::class )->error( $error, $statusCode );
+        return app( Responder::class )->error( $error, $statusCode, $message );
     }
 }
