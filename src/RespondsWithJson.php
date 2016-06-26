@@ -3,7 +3,7 @@
 namespace Mangopixel\Responder;
 
 use Illuminate\Http\JsonResponse;
-use Mangopixel\Responder\Contracts\Respondable;
+use Mangopixel\Responder\Contracts\Responder;
 
 /**
  *
@@ -23,7 +23,7 @@ trait RespondsWithJson
      */
     public function successResponse( $data, int $statusCode = 200 ):JsonResponse
     {
-        return app( Respondable::class )->success( $data, $statusCode );
+        return app( Responder::class )->success( $data, $statusCode );
     }
 
     /**
@@ -35,6 +35,6 @@ trait RespondsWithJson
      */
     public function errorResponse( string $error, int $statusCode = 404 ):JsonResponse
     {
-        return app( Respondable::class )->error( $error, $statusCode );
+        return app( Responder::class )->error( $error, $statusCode );
     }
 }

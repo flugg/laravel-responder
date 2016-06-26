@@ -50,7 +50,7 @@ class Responder implements ResponderContract
         return response()->json( [
             'error' => $error,
             'status' => $statusCode
-        ], 404 );
+        ], $statusCode );
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Mangopixel\Responder\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Mangopixel\Responder\Contracts\Respondable;
+use Mangopixel\Responder\Contracts\Responder;
 
 /**
  *
@@ -21,6 +21,6 @@ class ApiResponse extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return Respondable::class;
+        return Responder::class;
     }
 }
