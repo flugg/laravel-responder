@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Mangopixel\Responder\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;

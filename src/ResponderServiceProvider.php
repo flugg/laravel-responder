@@ -2,9 +2,9 @@
 
 namespace Mangopixel\Responder;
 
-use App\Console\Commands\MakeTransformer;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use League\Fractal\Manager;
+use Mangopixel\Responder\Console\MakeTransformer;
 use Mangopixel\Responder\Contracts\Manageable;
 use Mangopixel\Responder\Contracts\Respondable;
 
