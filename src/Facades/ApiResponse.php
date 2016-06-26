@@ -2,6 +2,7 @@
 
 namespace Mangopixel\Responder\Facades;
 
+use Illuminate\Support\Facades\Facade;
 use Mangopixel\Responder\Contracts\Respondable;
 
 /**
