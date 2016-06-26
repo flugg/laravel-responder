@@ -23,18 +23,18 @@ trait RespondsWithJson
      */
     public function successResponse( $data, int $statusCode = 200 ):JsonResponse
     {
-        return app( Respondable::class )->generateResponse( $data, $statusCode );
+        return app( Respondable::class )->success( $data, $statusCode );
     }
 
     /**
      *
      *
-     * @param  string $errorCode
+     * @param  string $error
      * @param  int    $statusCode
      * @return JsonResponse
      */
-    public function errorResponse( string $errorCode, int $statusCode = 404 ):JsonResponse
+    public function errorResponse( string $error, int $statusCode = 404 ):JsonResponse
     {
-        return app( Respondable::class )->generateResponse( $data, $statusCode );
+        return app( Respondable::class )->error( $error, $statusCode );
     }
 }

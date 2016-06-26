@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Support\Facades;
+namespace Mangopixel\Responder\Facades;
 
 use Mangopixel\Responder\Contracts\Respondable;
 
