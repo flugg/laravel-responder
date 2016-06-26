@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use InvalidArgumentException;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
+use Mangopixel\Responder\Contracts\Manageable;
 use Mangopixel\Responder\Contracts\Respondable;
 use Mangopixel\Responder\Contracts\Transformable;
 
@@ -91,6 +92,6 @@ class Responder implements Respondable
         $class = $data instanceof Transformable ? Item::class : Collection::class;
         $resource = new $class( $data, new $transformer );
 
-        return app( 'responder.fractal' )->createData( $resource )->toArray();
+        return app( Manageable::class )->createData( $resource )->toArray();
     }
 }
