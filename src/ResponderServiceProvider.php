@@ -42,6 +42,10 @@ class ResponderServiceProvider extends BaseServiceProvider
             __DIR__ . '/../resources/config/responder.php' => config_path( 'responder.php' )
         ], 'config' );
 
+        $this->publishes( [
+            __DIR__ . '/../resources/lang/en/errors.php' => resource_path( 'lang/en/errors.php' )
+        ], 'lang' );
+
         $this->commands( [
             MakeTransformer::class
         ] );

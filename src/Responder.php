@@ -43,53 +43,41 @@ class Responder implements ResponderContract
      *
      * @param  string $errorCode
      * @param  int    $statusCode
-     * @param  string $message
+     * @param  mixed  $message
      * @return JsonResponse
      */
     public function error( string $errorCode, int $statusCode = 404, $message = null ):JsonResponse
     {
-        $response = $this->makeErrorResponse( $statusCode );
+        $response = $this->getErrorResponse( $errorCode, $statusCode );
 
-        $response[ 'error' ] = [
-            'code' => $errorCode,
-            'message' => $message ?: trans( "errors.$errorCode" )
-        ];
+        if ( is_array( $message ) ) {
+            $response[ 'error' ][ 'messages' ] = $message;
 
-        return response()->json( $response );
-    }
+        } elseif ( is_string( $message ) && ! empty( $message ) ) {
+            $response[ 'error' ][ 'message' ] = $message;
 
-    /**
-     * Generate an error JSON response with multiple errors.
-     *
-     * @param  arrays $errors
-     * @param  int    $statusCode
-     * @return JsonResponse
-     */
-    public function errors( array $errors, int $statusCode = 404 ):JsonResponse
-    {
-        $response = $this->makeErrorResponse( $statusCode );
-
-        foreach ( $errors as $errorCode => $message ) {
-            $response[ 'errors' ][] = [
-                'code' => $errorCode,
-                'message' => $message ?: trans( "errors.$errorCode" )
-            ];
+        } elseif ( app( 'translator' )->has( "errors.$errorCode" ) ) {
+            $response[ 'error' ][ 'message' ] = app( 'translator' )->trans( "errors.$errorCode" );
         }
 
         return response()->json( $response );
     }
 
     /**
-     * Make the structure for an error response.
+     * Get the skeleton for an error response.
      *
-     * @param int $statusCode
+     * @param string $errorCode
+     * @param int    $statusCode
      * @return array
      */
-    protected function makeErrorResponse( int $statusCode ):array
+    private function getErrorResponse( string $errorCode, int $statusCode ):array
     {
         return [
             'success' => false,
-            'status' => $statusCode
+            'status' => $statusCode,
+            'error' => [
+                'code' => $errorCode
+            ]
         ];
     }
 

@@ -1,0 +1,43 @@
+<?php
+
+namespace Mangopixel\Responder\Traits;
+
+use Illuminate\Contracts\Validation\Validator;
+use Mangopixel\Responder\Exceptions\UnauthorizedException;
+use Mangopixel\Responder\Exceptions\ValidationFailedException;
+
+
+/**
+ * Use this trait in your base form request to override the exceptions thrown when
+ * validation or authorization fails. This allows the package to render proper
+ * API responses through the HandlesApiErrors trait.
+ *
+ * @package Laravel Responder
+ * @author  Alexander Tømmerås <flugged@gmail.com>
+ * @license The MIT License
+ */
+trait ThrowsApiErrors
+{
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator $validator
+     * @return void
+     * @throws ValidationFailedException
+     */
+    protected function failedValidation( Validator $validator )
+    {
+        throw new ValidationFailedException( $validator );
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return void
+     * @throws UnauthorizedException
+     */
+    protected function failedAuthorization()
+    {
+        throw new UnauthorizedException();
+    }
+}

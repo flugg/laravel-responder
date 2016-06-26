@@ -27,7 +27,7 @@ abstract class ApiException extends HttpException
      */
     public function __construct( $message = null )
     {
-        parent::__construct( $this->statusCode, $message ?: config( 'errors.' . $this->errorCode ) );
+        parent::__construct( $this->statusCode, $message );
     }
 
     /**
