@@ -12,7 +12,7 @@ use League\Fractal\Scope;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-interface Manageable
+interface Manager
 {
     /**
      * Main method to kick this all off. Make a resource then pass it over, and use toArray().

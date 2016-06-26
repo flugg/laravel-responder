@@ -8,7 +8,7 @@ use Mangopixel\Responder\Transformer;
 class DummyClass extends Transformer
 {
     /**
-     * Transform the model data.
+     * Transform the model data into a generic array.
      *
      * @param  DummyModelClass $DummyModelVariable
      * @return array

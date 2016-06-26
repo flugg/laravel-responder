@@ -7,8 +7,8 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\Resource\Item as FractalItem;
-use Mangopixel\Responder\Contracts\Manageable;
-use Mangopixel\Responder\Contracts\Respondable;
+use Mangopixel\Responder\Contracts\Manager;
+use Mangopixel\Responder\Contracts\Responder as ResponderContract;
 use Mangopixel\Responder\Contracts\Transformable;
 
 /**
@@ -18,7 +18,7 @@ use Mangopixel\Responder\Contracts\Transformable;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class Responder implements Respondable
+class Responder implements ResponderContract
 {
     /**
      *
@@ -107,6 +107,6 @@ class Responder implements Respondable
         $class = $data instanceof Transformable ? FractalItem::class : FractalCollection::class;
         $resource = new $class( $data, new $transformer );
 
-        return app( Manageable::class )->createData( $resource )->toArray();
+        return app( Manager::class )->createData( $resource )->toArray();
     }
 }

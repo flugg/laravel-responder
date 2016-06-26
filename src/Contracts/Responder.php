@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-interface Respondable
+interface Responder
 {
     /**
      *

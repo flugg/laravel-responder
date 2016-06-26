@@ -5,8 +5,8 @@ namespace Mangopixel\Responder;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use League\Fractal\Manager;
 use Mangopixel\Responder\Console\MakeTransformer;
-use Mangopixel\Responder\Contracts\Manageable;
-use Mangopixel\Responder\Contracts\Respondable;
+use Mangopixel\Responder\Contracts\Manager as ManagerContract;
+use Mangopixel\Responder\Contracts\Responder as ResponderContract;
 
 /**
  * The Laravel Responder service provider, which is where the package is bootstrapped.
@@ -57,11 +57,11 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->mergeConfigFrom( __DIR__ . '/../resources/config/responder.php', 'responder' );
         $this->config = $this->app[ 'config' ]->get( 'responder' );
 
-        $this->app->singleton( Respondable::class, function () {
+        $this->app->singleton( ResponderContract::class, function () {
             return new Responder();
         } );
 
-        $this->app->singleton( Manageable::class, function () {
+        $this->app->singleton( ManagerContract::class, function () {
             return ( new Manager() )->setSerializer( new $this->config[ 'serializer' ] );
         } );
     }
