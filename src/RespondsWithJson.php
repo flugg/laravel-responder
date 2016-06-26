@@ -25,4 +25,16 @@ trait RespondsWithJson
     {
         return app( Respondable::class )->generateResponse( $data, $statusCode );
     }
+
+    /**
+     *
+     *
+     * @param  string $errorCode
+     * @param  int    $statusCode
+     * @return JsonResponse
+     */
+    public function errorResponse( string $errorCode, int $statusCode = 404 ):JsonResponse
+    {
+        return app( Respondable::class )->generateResponse( $data, $statusCode );
+    }
 }

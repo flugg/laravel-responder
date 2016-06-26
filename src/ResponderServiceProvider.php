@@ -2,6 +2,7 @@
 
 namespace Mangopixel\Responder;
 
+use App\Console\Commands\MakeTransformer;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use League\Fractal\Manager;
 use Mangopixel\Responder\Contracts\Manageable;
@@ -40,6 +41,10 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->publishes( [
             __DIR__ . '/../resources/config/responder.php' => config_path( 'responder.php' )
         ], 'config' );
+
+        $this->commands( [
+            MakeTransformer::class
+        ] );
     }
 
     /**

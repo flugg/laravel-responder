@@ -1,0 +1,22 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyModelNamespace;
+use Mangopixel\Responder\Transformer;
+
+class DummyClass extends Transformer
+{
+    /**
+     * Transform the model data.
+     *
+     * @param  DummyModelClass $DummyModelVariable
+     * @return array
+     */
+    public function transform(DummyModelClass $DummyModelVariable):array
+    {
+        return [
+            'id' => (int) $DummyModelVariable->id
+        ];
+    }
+}
