@@ -1,12 +1,12 @@
 <?php
 
-namespace Mangopixel\Responder;
+namespace Mangopixel\Responder\Traits;
 
 use Illuminate\Http\JsonResponse;
 use Mangopixel\Responder\Contracts\Responder;
 
 /**
- *
+ * A trait you may apply to your controllers for quick access to the responder.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -15,7 +15,7 @@ use Mangopixel\Responder\Contracts\Responder;
 trait RespondsWithJson
 {
     /**
-     *
+     * Generate a successful JSON response.
      *
      * @param  mixed $data
      * @param  int   $statusCode
@@ -27,7 +27,7 @@ trait RespondsWithJson
     }
 
     /**
-     *
+     * Generate an error JSON response.
      *
      * @param  string $error
      * @param  int    $statusCode

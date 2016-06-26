@@ -6,7 +6,7 @@ use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Scope;
 
 /**
- *
+ * A Manager contract used to abstract and bind Fractal to the service container.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

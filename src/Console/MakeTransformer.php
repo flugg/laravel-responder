@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
 /**
- *
+ * An Artisan command generating a new transformer class into app/Transformers.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

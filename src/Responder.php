@@ -12,7 +12,7 @@ use Mangopixel\Responder\Contracts\Responder as ResponderContract;
 use Mangopixel\Responder\Contracts\Transformable;
 
 /**
- *
+ * The responder service. This class is responsible for generating the API responses.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -21,7 +21,7 @@ use Mangopixel\Responder\Contracts\Transformable;
 class Responder implements ResponderContract
 {
     /**
-     *
+     * Generate a successful JSON response.
      *
      * @param  mixed $data
      * @param  int   $statusCode
@@ -39,7 +39,7 @@ class Responder implements ResponderContract
     }
 
     /**
-     *
+     * Generate an error JSON response.
      *
      * @param  string $error
      * @param  int    $statusCode
@@ -54,7 +54,7 @@ class Responder implements ResponderContract
     }
 
     /**
-     *
+     * Resolves model class path from the data.
      *
      * @param  mixed $data
      * @return string
@@ -72,7 +72,7 @@ class Responder implements ResponderContract
     }
 
     /**
-     *
+     * Resolves model class path from a collection of models.
      *
      * @param  Collection $collection
      * @return string
@@ -96,7 +96,7 @@ class Responder implements ResponderContract
     }
 
     /**
-     *
+     * Transforms and serializes the data using Fractal.
      *
      * @param  mixed  $data
      * @param  string $transformer

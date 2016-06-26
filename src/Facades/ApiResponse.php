@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Facade;
 use Mangopixel\Responder\Contracts\Responder;
 
 /**
- *
+ * A optional facade you can register to create API responses.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

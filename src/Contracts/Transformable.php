@@ -3,7 +3,7 @@
 namespace Mangopixel\Responder\Contracts;
 
 /**
- *
+ * A contract you can apply to your models to map a specific transformer to a model.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -12,7 +12,7 @@ namespace Mangopixel\Responder\Contracts;
 interface Transformable
 {
     /**
-     *
+     * The path to the transformer class.
      *
      * @return string
      */
