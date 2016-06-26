@@ -27,7 +27,7 @@ class Responder implements Respondable
      * @param  int   $statusCode
      * @return JsonResponse
      */
-    public function success( $data, int $statusCode ):JsonResponse
+    public function success( $data, int $statusCode = 200 ):JsonResponse
     {
         if ( is_array( $data ) ) {
             $data = collect( $data );
@@ -45,7 +45,7 @@ class Responder implements Respondable
      * @param  int    $statusCode
      * @return JsonResponse
      */
-    public function error( string $error, int $statusCode ):JsonResponse
+    public function error( string $error, int $statusCode = 404 ):JsonResponse
     {
         return response()->json( [
             'error' => $error,
