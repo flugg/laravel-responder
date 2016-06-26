@@ -5,6 +5,13 @@ namespace Mangopixel\Responder\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
+/**
+ *
+ *
+ * @package Laravel Responder
+ * @author  Alexander Tømmerås <flugged@gmail.com>
+ * @license The MIT License
+ */
 class MakeTransformer extends Command
 {
     /**

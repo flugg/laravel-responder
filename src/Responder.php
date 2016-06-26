@@ -2,11 +2,11 @@
 
 namespace Mangopixel\Responder;
 
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
+use League\Fractal\Resource\Collection as FractalCollection;
+use League\Fractal\Resource\Item as FractalItem;
 use Mangopixel\Responder\Contracts\Manageable;
 use Mangopixel\Responder\Contracts\Respondable;
 use Mangopixel\Responder\Contracts\Transformable;
@@ -27,7 +27,7 @@ class Responder implements Respondable
      * @param  int   $statusCode
      * @return JsonResponse
      */
-    public function generateResponse( $data, int $statusCode ):JsonResponse
+    public function success( $data, int $statusCode ):JsonResponse
     {
         if ( is_array( $data ) ) {
             $data = collect( $data );
@@ -41,6 +41,21 @@ class Responder implements Respondable
     /**
      *
      *
+     * @param  string $error
+     * @param  int    $statusCode
+     * @return JsonResponse
+     */
+    public function error( string $error, int $statusCode ):JsonResponse
+    {
+        return response()->json( [
+            'error' => $error,
+            'status' => $statusCode
+        ], 404 );
+    }
+
+    /**
+     *
+     *
      * @param  mixed $data
      * @return string
      * @throws InvalidArgumentException
@@ -49,7 +64,7 @@ class Responder implements Respondable
     {
         if ( $data instanceof Transformable ) {
             return get_class( $data );
-        } elseif ( $data instanceof EloquentCollection ) {
+        } elseif ( $data instanceof Collection ) {
             return $this->resolveModelFromCollection( $data );
         } else {
             throw new InvalidArgumentException( 'Data must be one or multiple models implementing the Transformable contract.' );
@@ -59,11 +74,11 @@ class Responder implements Respondable
     /**
      *
      *
-     * @param  EloquentCollection $collection
+     * @param  Collection $collection
      * @return string
      * @throws InvalidArgumentException
      */
-    protected function resolveModelFromCollection( EloquentCollection $collection ):string
+    protected function resolveModelFromCollection( Collection $collection ):string
     {
         $first = $collection->first();
         if ( ! $first instanceof Transformable ) {
@@ -89,7 +104,7 @@ class Responder implements Respondable
      */
     protected function transform( $data, string $transformer ):array
     {
-        $class = $data instanceof Transformable ? Item::class : Collection::class;
+        $class = $data instanceof Transformable ? FractalItem::class : FractalCollection::class;
         $resource = new $class( $data, new $transformer );
 
         return app( Manageable::class )->createData( $resource )->toArray();

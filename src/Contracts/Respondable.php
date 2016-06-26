@@ -20,5 +20,14 @@ interface Respondable
      * @param  int   $statusCode
      * @return JsonResponse
      */
-    public function generateResponse( $data, int $statusCode ):JsonResponse;
+    public function success( $data, int $statusCode ):JsonResponse;
+
+    /**
+     *
+     *
+     * @param  string $error
+     * @param  int    $statusCode
+     * @return JsonResponse
+     */
+    public function error( string $error, int $statusCode ):JsonResponse;
 }
