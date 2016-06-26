@@ -94,7 +94,7 @@ class MakeTransformer extends Command
      */
     protected function makeClass( string $name ):string
     {
-        $stub = $this->files->get( __DIR__ . '../../resources/stubs/transformer.stub' );
+        $stub = $this->files->get( __DIR__ . '/../../resources/stubs/transformer.stub' );
 
         $stub = $this->replaceNamespace( $stub );
         $stub = $this->replaceClass( $stub, $name );
