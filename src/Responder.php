@@ -1,15 +1,14 @@
 <?php
 
-namespace Mangopixel\Adjuster;
+namespace Mangopixel\Responder;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use InvalidArgumentException;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use LogicException;
-use Mangopixel\Responder\Exceptions\TransformerNotFoundException;
+use Mangopixel\Responder\Contracts\Respondable;
+use Mangopixel\Responder\Contracts\Transformable;
 
 /**
  *
@@ -18,7 +17,7 @@ use Mangopixel\Responder\Exceptions\TransformerNotFoundException;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-trait Responder
+class Responder implements Respondable
 {
     /**
      *
@@ -27,16 +26,15 @@ trait Responder
      * @param  int   $statusCode
      * @return JsonResponse
      */
-    public function successResponse( $data, int $statusCode = 200 ):JsonResponse
+    public function generateResponse( $data, int $statusCode ):JsonResponse
     {
         if ( is_array( $data ) ) {
             $data = collect( $data );
         }
 
         $model = $this->resolveModel( $data );
-        $transformer = $this->getTransformer( $model );
 
-        return response()->json( $this->transform( $data, $transformer ), $statusCode );
+        return response()->json( $this->transform( $data, $model::transformer() ), $statusCode );
     }
 
     /**
@@ -48,12 +46,12 @@ trait Responder
      */
     protected function resolveModel( $data ):string
     {
-        if ( $data instanceof EloquentCollection ) {
-            return $this->resolveModelFromCollection( $data );
-        } elseif ( $data instanceof Model ) {
+        if ( $data instanceof Transformable ) {
             return get_class( $data );
+        } elseif ( $data instanceof EloquentCollection ) {
+            return $this->resolveModelFromCollection( $data );
         } else {
-            throw new InvalidArgumentException( 'Data must be an Eloquent model, an Eloquent collection or an array.' );
+            throw new InvalidArgumentException( 'Data must be one or multiple models implementing the Transformable contract.' );
         }
     }
 
@@ -62,37 +60,23 @@ trait Responder
      *
      * @param  EloquentCollection $collection
      * @return string
-     * @throws LogicException
+     * @throws InvalidArgumentException
      */
     protected function resolveModelFromCollection( EloquentCollection $collection ):string
     {
-        $class = $collection->first();
+        $first = $collection->first();
+        if ( ! $first instanceof Transformable ) {
+            throw new InvalidArgumentException( 'Data must only contain models implementing the Transformable contract.' );
+        }
 
+        $class = get_class( $first );
         $collection->each( function ( $model ) use ( $class ) {
             if ( get_class( $model ) !== $class ) {
-                throw new LogicException( 'You cannot transform arrays or collections with multiple model types.' );
+                throw new InvalidArgumentException( 'You cannot transform arrays or collections with multiple model types.' );
             }
         } );
 
         return $class;
-    }
-
-    /**
-     *
-     *
-     * @param  string $key
-     * @return string
-     * @throws TransformerNotFoundException
-     */
-    protected function getTransformer( string $key ):string
-    {
-        $transformers = app( ResponderServiceProvider::class )->getTransformers();
-
-        if ( ! array_has( $transformers, $key ) ) {
-            throw new TransformerNotFoundException( "No transformer mapping for $key could be found." );
-        }
-
-        return $transformers[ $key ];
     }
 
     /**
@@ -104,8 +88,8 @@ trait Responder
      */
     protected function transform( $data, string $transformer ):array
     {
-        $class = $data instanceof Model ? Item::class : Collection::class;
-        $resource = new $class( $data->toArray(), new $transformer );
+        $class = $data instanceof Transformable ? Item::class : Collection::class;
+        $resource = new $class( $data, new $transformer );
 
         return app( 'responder.fractal' )->createData( $resource )->toArray();
     }

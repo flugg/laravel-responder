@@ -1,9 +1,11 @@
 <?php
 
-namespace Mangopixel\Adjuster;
+namespace Mangopixel\Responder;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use League\Fractal\Manager;
+use Mangopixel\Responder\Contracts\Manageable;
+use Mangopixel\Responder\Contracts\Respondable;
 
 /**
  * The Laravel Responder service provider, which is where the package is bootstrapped.
@@ -14,6 +16,13 @@ use League\Fractal\Manager;
  */
 class ResponderServiceProvider extends BaseServiceProvider
 {
+    /**
+     * Keeps a short reference to the package configurations.
+     *
+     * @var array
+     */
+    protected $config;
+
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -41,9 +50,14 @@ class ResponderServiceProvider extends BaseServiceProvider
     public function register()
     {
         $this->mergeConfigFrom( __DIR__ . '/../resources/config/responder.php', 'responder' );
+        $this->config = $this->app[ 'config' ]->get( 'responder' );
 
-        $this->app->singleton( 'responder.fractal', function () {
-            return new Manager();
+        $this->app->singleton( Respondable::class, function () {
+            return new Responder();
+        } );
+
+        $this->app->singleton( Manageable::class, function () {
+            return ( new Manager() )->setSerializer( new $this->config[ 'serializer' ] );
         } );
     }
 }
