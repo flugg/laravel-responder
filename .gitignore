@@ -1,6 +1,5 @@
 /.idea
 /vendor
-composer.lock
 .DS_STORE
 .*.swo
 .*.swp
