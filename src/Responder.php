@@ -53,8 +53,10 @@ class Responder implements ResponderContract
         if ( is_array( $message ) ) {
             $response[ 'error' ][ 'messages' ] = $message;
 
-        } elseif ( is_string( $message ) && ! empty( $message ) ) {
-            $response[ 'error' ][ 'message' ] = $message;
+        } elseif ( is_string( $message ) ) {
+            if ( ! empty( $message ) ) {
+                $response[ 'error' ][ 'message' ] = $message;
+            }
 
         } elseif ( app( 'translator' )->has( "errors.$errorCode" ) ) {
             $response[ 'error' ][ 'message' ] = app( 'translator' )->trans( "errors.$errorCode" );
@@ -114,7 +116,7 @@ class Responder implements ResponderContract
         }
 
         $class = get_class( $first );
-        $collection->each( function ( $model ) use ( $class ) {
+        $collection->each( function ( $model ) use ($class) {
             if ( get_class( $model ) !== $class ) {
                 throw new InvalidArgumentException( 'You cannot transform arrays or collections with multiple model types.' );
             }

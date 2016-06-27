@@ -66,7 +66,7 @@ class ResponderServiceProvider extends BaseServiceProvider
         } );
 
         $this->app->singleton( ManagerContract::class, function () {
-            return ( new Manager() )->setSerializer( new $this->config[ 'serializer' ] );
+            return (new Manager())->setSerializer( new $this->config[ 'serializer' ] );
         } );
     }
 }

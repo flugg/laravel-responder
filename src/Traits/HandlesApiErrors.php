@@ -114,7 +114,7 @@ trait HandlesApiErrors
     /**
      * Render an exception to the console.
      *
-     * 
+     *
      */
     abstract public function renderForConsole( $output, Exception $e );
 }
