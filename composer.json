@@ -23,6 +23,7 @@
         "league/fractal": "^0.13.0"
     },
     "require-dev": {
+        "phpunit/phpunit": "^5.4"
     },
     "autoload": {
         "psr-4": {
