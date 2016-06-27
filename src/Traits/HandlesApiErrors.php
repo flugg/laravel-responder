@@ -11,6 +11,7 @@ use Mangopixel\Responder\Exceptions\ApiException;
 use Mangopixel\Responder\Exceptions\ResourceNotFoundException;
 use Mangopixel\Responder\Exceptions\UnauthorizedException;
 use Mangopixel\Responder\Exceptions\ValidationFailedException;
+use Mangopixel\Responder\Responder;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
