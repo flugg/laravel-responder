@@ -43,7 +43,7 @@ abstract class ApiException extends HttpException
     /**
      * Get the error code.
      *
-     * @return int
+     * @return string
      */
     public function getErrorCode()
     {

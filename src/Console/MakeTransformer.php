@@ -33,7 +33,7 @@ class MakeTransformer extends Command
     /**
      * The file system instance.
      *
-     * @var string
+     * @var Filesystem
      */
     protected $files;
 
@@ -41,7 +41,6 @@ class MakeTransformer extends Command
      * Create a new command instance.
      *
      * @param  Filesystem $files
-     * @return void
      */
     public function __construct( Filesystem $files )
     {
@@ -67,7 +66,7 @@ class MakeTransformer extends Command
      */
     protected function generateTransformer()
     {
-        $name = $this->argument( 'name' );
+        $name = (string) $this->argument( 'name' );
         $path = app_path() . "/Transformers/$name.php";
 
         if ( $this->files->exists( $path ) ) {
@@ -114,7 +113,6 @@ class MakeTransformer extends Command
      * Replace the namespace for the given stub.
      *
      * @param  string $stub
-     * @param  string $name
      * @return string
      */
     protected function replaceNamespace( string $stub ):string
@@ -177,7 +175,7 @@ class MakeTransformer extends Command
     /**
      * Get the class name for the transformer.
      *
-     * @param  string $name
+     * @param  string $namespace
      * @return string
      */
     protected function getClassFromNamespace( string $namespace ):string

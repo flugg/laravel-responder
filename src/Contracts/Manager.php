@@ -18,8 +18,8 @@ interface Manager
      * Main method to kick this all off. Make a resource then pass it over, and use toArray().
      *
      * @param  ResourceInterface $resource
-     * @param  string            $scopeIdentifier
-     * @param  Scope             $parentScopeInstance
+     * @param  string|null       $scopeIdentifier
+     * @param  Scope|null        $parentScopeInstance
      * @return Scope
      */
     public function createData( ResourceInterface $resource, $scopeIdentifier = null, Scope $parentScopeInstance = null );
