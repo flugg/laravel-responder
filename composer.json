@@ -18,10 +18,16 @@
         }
     ],
     "require": {
-        "php": "^7.0"
+        "php": "^7.0",
+        "illuminate/database": "5.1.* || 5.2.* || 5.3.*",
+        "illuminate/support": "5.1.* || 5.2.* || 5.3.*",
+        "league/fractal": "^0.13.0"
     },
     "require-dev": {
-        "orchestra/testbench": "~3.0"
+        "phpunit/phpunit": "^5.4",
+        "orchestra/testbench": "~3.0",
+        "mockery/mockery": "^0.9.5",
+        "fzaninotto/faker": "^1.6"
     },
     "autoload": {
         "psr-4": {
