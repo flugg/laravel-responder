@@ -38,13 +38,13 @@ trait HandlesApiErrors
      * Transforms and renders api responses.
      *
      * @param  Exception $e
-     * @return JsonResponse
+     * @return JsonRespons
      */
     protected function renderApiErrors( Exception $e ):JsonResponse
     {
         $this->transformExceptions( $e );
 
-        if ( $this->isApiError() ) {
+        if ( $e instanceof ApiException ) {
             return $this->renderApiResponse( $e );
         }
     }
