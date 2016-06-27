@@ -31,7 +31,7 @@ trait RespondsWithJson
      *
      * @param  string $error
      * @param  int    $statusCode
-     * @param  string $message
+     * @param  mixed  $message
      * @return JsonResponse
      */
     public function errorResponse( string $error, int $statusCode = 404, $message = null ):JsonResponse

@@ -1,7 +1,5 @@
 <?php
 
 return [
-
-    'serializer' => \League\Fractal\Serializer\ArraySerializer::class
-
+    'serializer' => \League\Fractal\Serializer\ArraySerializer::class,
 ];

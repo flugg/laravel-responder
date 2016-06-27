@@ -44,7 +44,9 @@ trait HandlesApiErrors
     {
         $this->transformExceptions( $e );
 
-        return $this->renderApiResponse( $e );
+        if ( $this->isApiError() ) {
+            return $this->renderApiResponse( $e );
+        }
     }
 
     /**
@@ -90,10 +92,10 @@ trait HandlesApiErrors
     /**
      * Render an exception into an API response.
      *
-     * @param  Exception $e
+     * @param  ApiException $e
      * @return JsonResponse
      */
-    protected function renderApiResponse( Exception $e ):JsonResponse
+    protected function renderApiResponse( ApiException $e ):JsonResponse
     {
         $message = $e instanceof ValidationFailedException ? $e->getValidationMessages() : $e->getMessage();
 
