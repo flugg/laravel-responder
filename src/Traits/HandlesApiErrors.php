@@ -40,7 +40,7 @@ trait HandlesApiErrors
      * @param  Exception $e
      * @return $this
      */
-    protected function handleApiErrors( Exception $e )
+    protected function renderApiErrors( Exception $e )
     {
         $this->transformExceptions( $e );
 
@@ -69,7 +69,7 @@ trait HandlesApiErrors
      * @param  Exception $e
      * @return $this
      */
-    protected function handleTestErrors( Exception $e ):Handler
+    protected function renderTestErrors( Exception $e ):Handler
     {
         if ( ! $e instanceof ApiException && app()->runningInConsole() ) {
             $this->renderConsoleResponse( $e );
