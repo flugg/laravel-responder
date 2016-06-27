@@ -5,7 +5,6 @@ namespace Mangopixel\Responder\Traits;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Http\JsonResponse;
 use Mangopixel\Responder\Exceptions\ApiException;
 use Mangopixel\Responder\Exceptions\ResourceNotFoundException;
@@ -64,7 +63,7 @@ trait HandlesApiErrors
      * @param  Exception $e
      * @return void
      */
-    protected function renderTestErrors( Exception $e ):Handler
+    protected function renderTestErrors( Exception $e )
     {
         $this->renderConsoleResponse( $e );
     }
@@ -91,10 +90,10 @@ trait HandlesApiErrors
     /**
      * Render an exception into an API response.
      *
-     * @param  ApiException $e
+     * @param  Exception $e
      * @return JsonResponse
      */
-    protected function renderApiResponse( ApiException $e ):JsonResponse
+    protected function renderApiResponse( Exception $e ):JsonResponse
     {
         $message = $e instanceof ValidationFailedException ? $e->getValidationMessages() : $e->getMessage();
 
@@ -114,6 +113,8 @@ trait HandlesApiErrors
 
     /**
      * Render an exception to the console.
+     *
+     * 
      */
     abstract public function renderForConsole( $output, Exception $e );
 }
