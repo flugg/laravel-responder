@@ -23,10 +23,6 @@
         "league/fractal": "^0.13.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.4",
-        "orchestra/testbench": "~3.0",
-        "mockery/mockery": "^0.9.5",
-        "fzaninotto/faker": "^1.6"
     },
     "autoload": {
         "psr-4": {
