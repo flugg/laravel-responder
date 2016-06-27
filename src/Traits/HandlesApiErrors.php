@@ -2,10 +2,16 @@
 
 namespace Mangopixel\Responder\Traits;
 
+use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Http\JsonResponse;
+use Mangopixel\Responder\Exceptions\ApiException;
+use Mangopixel\Responder\Exceptions\ResourceNotFoundException;
 use Mangopixel\Responder\Exceptions\UnauthorizedException;
 use Mangopixel\Responder\Exceptions\ValidationFailedException;
-
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
  * You may apply this trait to your exceptions handler to give you access to methods
@@ -15,15 +21,26 @@ use Mangopixel\Responder\Exceptions\ValidationFailedException;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-trait CatchesApiErrors
+trait HandlesApiErrors
 {
+    /**
+     * Checks if the exception extends from the package API exception.
+     *
+     * @param  Exception $e
+     * @return bool
+     */
+    protected function isApiError( Exception $e ):bool
+    {
+        return $e instanceof ApiException;
+    }
+
     /**
      * Transforms and renders api responses.
      *
-     * @param  \Exception $e
+     * @param  Exception $e
      * @return $this
      */
-    protected function handleApiErrors( Exception $e ):Handler
+    protected function handleApiErrors( Exception $e )
     {
         $this->transformExceptions( $e );
 
@@ -37,9 +54,19 @@ trait CatchesApiErrors
     }
 
     /**
+     * Checks if the application is currently in testing mode.
+     *
+     * @return bool
+     */
+    protected function isRunningTests():bool
+    {
+        return app()->runningUnitTests();
+    }
+
+    /**
      * Renders readable responses for console, useful for testing.
      *
-     * @param  \Exception $e
+     * @param  Exception $e
      * @return $this
      */
     protected function handleTestErrors( Exception $e ):Handler
@@ -54,7 +81,7 @@ trait CatchesApiErrors
     /**
      * Transform Laravel exceptions into API exceptions.
      *
-     * @param  \Exception $e
+     * @param  Exception $e
      * @return void
      * @throws ResourceNotFoundException
      * @throws UnauthorizedException
@@ -80,7 +107,7 @@ trait CatchesApiErrors
     {
         $message = $e instanceof ValidationFailedException ? $e->getValidationMessages() : $e->getMessage();
 
-        return ApiResponse::error( $e->getErrorCode(), $e->getStatusCode(), $message );
+        return app( Responder::class )->error( $e->getErrorCode(), $e->getStatusCode(), $message );
     }
 
     /**
