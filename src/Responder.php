@@ -146,18 +146,17 @@ class Responder implements ResponderContract
      */
     private function getErrorMessages( $message, string $errorCode ):array
     {
-        $translator = app( 'translator' );
-
         if ( is_array( $message ) ) {
             return $message;
 
-        } elseif ( is_string( $message ) && strlen( $message ) ) {
-            return [ $message ];
+        } elseif ( is_string( $message ) ) {
+            if ( strlen( $message ) === 0 ) {
+                return [ ];
+            }
 
-        } elseif ( $translator->has( $key = 'errors.' . $errorCode ) ) {
-            return [ $translator->trans( $key ) ];
+            return [ $message ];
         }
 
-        return [ ];
+        return [ app( 'translator' )->trans( 'errors.' . $errorCode ) ];
     }
 }
