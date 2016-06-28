@@ -49,38 +49,9 @@ class Responder implements ResponderContract
     public function error( string $errorCode, int $statusCode = 404, $message = null ):JsonResponse
     {
         $response = $this->getErrorResponse( $errorCode, $statusCode );
-
-        if ( is_array( $message ) ) {
-            $response[ 'error' ][ 'messages' ] = $message;
-
-        } elseif ( is_string( $message ) ) {
-            if ( ! empty( $message ) ) {
-                $response[ 'error' ][ 'message' ] = $message;
-            }
-
-        } elseif ( app( 'translator' )->has( "errors.$errorCode" ) ) {
-            $response[ 'error' ][ 'message' ] = app( 'translator' )->trans( "errors.$errorCode" );
-        }
+        $response = $this->setMessageToErrorResponse( $response, $message, $errorCode );
 
         return response()->json( $response );
-    }
-
-    /**
-     * Get the skeleton for an error response.
-     *
-     * @param string $errorCode
-     * @param int    $statusCode
-     * @return array
-     */
-    private function getErrorResponse( string $errorCode, int $statusCode ):array
-    {
-        return [
-            'success' => false,
-            'status' => $statusCode,
-            'error' => [
-                'code' => $errorCode
-            ]
-        ];
     }
 
     /**
@@ -116,7 +87,7 @@ class Responder implements ResponderContract
         }
 
         $class = get_class( $first );
-        $collection->each( function ( $model ) use ($class) {
+        $collection->each( function ( $model ) use ( $class ) {
             if ( get_class( $model ) !== $class ) {
                 throw new InvalidArgumentException( 'You cannot transform arrays or collections with multiple model types.' );
             }
@@ -138,5 +109,50 @@ class Responder implements ResponderContract
         $resource = new $class( $data, new $transformer );
 
         return app( Manager::class )->createData( $resource )->toArray();
+    }
+
+    /**
+     * Get the skeleton for an error response.
+     *
+     * @param string $errorCode
+     * @param int    $statusCode
+     * @return array
+     */
+    private function getErrorResponse( string $errorCode, int $statusCode ):array
+    {
+        return [
+            'success' => false,
+            'status' => $statusCode,
+            'error' => [
+                'code' => $errorCode
+            ]
+        ];
+    }
+
+    /**
+     * Set an error message field to an existing response array. If message is an array,
+     * we will set the field 'messages' instead of 'message'. If no messages can be
+     * found, we will not set any fields to the response array.
+     *
+     * @param  array  $response
+     * @param  mixed  $message
+     * @param  string $errorCode
+     * @return array
+     */
+    private function setMessageToErrorResponse( array $response, $message, $errorCode ):array
+    {
+        $translator = app( 'translator' );
+
+        if ( is_array( $message ) ) {
+            $response[ 'error' ][ 'messages' ] = $message;
+
+        } elseif ( is_string( $message ) && strlen( $message ) ) {
+            $response[ 'error' ][ 'message' ] = $message;
+
+        } elseif ( $translator->has( "errors.$errorCode" ) ) {
+            $response[ 'error' ][ 'message' ] = $translator->trans( "errors.$errorCode" );
+        }
+
+        return $response;
     }
 }

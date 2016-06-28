@@ -38,7 +38,7 @@ trait HandlesApiErrors
      * Transforms and renders api responses.
      *
      * @param  Exception $e
-     * @return JsonRespons
+     * @return JsonResponse
      */
     protected function renderApiErrors( Exception $e ):JsonResponse
     {
