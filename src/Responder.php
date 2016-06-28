@@ -93,7 +93,7 @@ class Responder implements ResponderContract
         }
 
         $class = get_class( $first );
-        $collection->each( function ( $model ) use ($class) {
+        $collection->each( function ( $model ) use ( $class ) {
             if ( get_class( $model ) !== $class ) {
                 throw new InvalidArgumentException( 'You cannot transform arrays or collections with multiple model types.' );
             }
@@ -149,10 +149,10 @@ class Responder implements ResponderContract
         $translator = app( 'translator' );
 
         if ( is_array( $message ) ) {
-            return $messages;
+            return $message;
 
         } elseif ( is_string( $message ) && strlen( $message ) ) {
-            return [ $messages ];
+            return [ $message ];
 
         } elseif ( $translator->has( $key = 'errors.' . $errorCode ) ) {
             return [ $translator->trans( $key ) ];
