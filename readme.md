@@ -309,22 +309,22 @@ Let's take a look at how an example response with our `Mangopixel\Responder\Seri
     "success": true,
     "status": 200,
     "data": {
-        'id': 1,
-        'email': 'example@email.com',
-        'fullName': 'John Doe'
+        "id": 1,
+        "email": "example@email.com",
+        "fullName": "John Doe"
     }
 }
 ```
 
 ##### Array serializer
 
-Let's take a look at the simplest serializer from Fractal, `League\Fractal\Serializer\ArraySerializer`:
+Let"s take a look at the simplest serializer from Fractal, `League\Fractal\Serializer\ArraySerializer`:
 
 ```json
 {
-    'id': 1,
-    'email': 'example@email.com',
-    'fullName': 'John Doe'
+    "id": 1,
+    "email": "example@email.com",
+    "fullName": "John Doe"
 }
 ```
 
