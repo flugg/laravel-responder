@@ -29,7 +29,8 @@ interface Responder
      *
      * @param  string $error
      * @param  int    $statusCode
+     * @param  mixed  $message
      * @return JsonResponse
      */
-    public function error( string $error, int $statusCode = 404 ):JsonResponse;
+    public function error( string $error, int $statusCode = 404, $message = null ):JsonResponse;
 }

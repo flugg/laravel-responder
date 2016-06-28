@@ -1,5 +1,16 @@
 <?php
 
 return [
-    'serializer' => \League\Fractal\Serializer\ArraySerializer::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Serializer Class Path
+    |--------------------------------------------------------------------------
+    |
+    |
+    |
+    */
+
+    'serializer' => League\Fractal\Serializer\ArraySerializer::class
+
 ];

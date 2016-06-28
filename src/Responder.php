@@ -49,7 +49,13 @@ class Responder implements ResponderContract
     public function error( string $errorCode, int $statusCode = 404, $message = null ):JsonResponse
     {
         $response = $this->getErrorResponse( $errorCode, $statusCode );
-        $response = $this->setMessageToErrorResponse( $response, $message, $errorCode );
+        $messages = $this->getErrorMessages( $message, $errorCode );
+
+        if ( count( $messages ) === 1 ) {
+            $response[ 'error' ][ 'message' ] = $messages;
+        } else if ( count( $messages ) > 1 ) {
+            $response[ 'error' ][ 'messages' ] = $messages;
+        }
 
         return response()->json( $response );
     }
@@ -87,7 +93,7 @@ class Responder implements ResponderContract
         }
 
         $class = get_class( $first );
-        $collection->each( function ( $model ) use ( $class ) {
+        $collection->each( function ( $model ) use ($class) {
             if ( get_class( $model ) !== $class ) {
                 throw new InvalidArgumentException( 'You cannot transform arrays or collections with multiple model types.' );
             }
@@ -134,25 +140,24 @@ class Responder implements ResponderContract
      * we will set the field 'messages' instead of 'message'. If no messages can be
      * found, we will not set any fields to the response array.
      *
-     * @param  array  $response
      * @param  mixed  $message
      * @param  string $errorCode
      * @return array
      */
-    private function setMessageToErrorResponse( array $response, $message, $errorCode ):array
+    private function getErrorMessages( $message, string $errorCode ):array
     {
         $translator = app( 'translator' );
 
         if ( is_array( $message ) ) {
-            $response[ 'error' ][ 'messages' ] = $message;
+            return $messages;
 
         } elseif ( is_string( $message ) && strlen( $message ) ) {
-            $response[ 'error' ][ 'message' ] = $message;
+            return [ $messages ];
 
-        } elseif ( $translator->has( "errors.$errorCode" ) ) {
-            $response[ 'error' ][ 'message' ] = $translator->trans( "errors.$errorCode" );
+        } elseif ( $translator->has( $key = 'errors.' . $errorCode ) ) {
+            return [ $translator->trans( $key ) ];
         }
 
-        return $response;
+        return [ ];
     }
 }

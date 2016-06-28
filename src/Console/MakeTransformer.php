@@ -67,10 +67,10 @@ class MakeTransformer extends Command
     protected function generateTransformer()
     {
         $name = (string) $this->argument( 'name' );
-        $path = app_path() . "/Transformers/$name.php";
+        $path = app_path() . '/Transformers/' . $name . '.php';
 
         if ( $this->files->exists( $path ) ) {
-            return $this->error( "$name already exists!" );
+            return $this->error( $name . 'already exists!' );
         }
 
         $this->makeDirectory( $path );
