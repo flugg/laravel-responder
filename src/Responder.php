@@ -136,9 +136,8 @@ class Responder implements ResponderContract
     }
 
     /**
-     * Set an error message field to an existing response array. If message is an array,
-     * we will set the field 'messages' instead of 'message'. If no messages can be
-     * found, we will not set any fields to the response array.
+     * Get any error messages for the response. If no message can be found it will
+     * try to resolve a set message from the translator.
      *
      * @param  mixed  $message
      * @param  string $errorCode

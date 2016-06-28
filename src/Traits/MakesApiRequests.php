@@ -12,5 +12,5 @@ namespace Mangopixel\Responder\Traits;
  */
 trait MakesApiRequests
 {
-    //
+
 }
