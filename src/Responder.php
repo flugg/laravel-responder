@@ -93,7 +93,7 @@ class Responder implements ResponderContract
         }
 
         $class = get_class( $first );
-        $collection->each( function ( $model ) use ( $class ) {
+        $collection->each( function ( $model ) use ($class) {
             if ( get_class( $model ) !== $class ) {
                 throw new InvalidArgumentException( 'You cannot transform arrays or collections with multiple model types.' );
             }
