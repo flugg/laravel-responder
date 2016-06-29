@@ -76,7 +76,7 @@ Well, with this package you can! It will automatically call Fractal behind the s
 
 TTransformers are classes which only responsibility is to transform one set of data to another. You may use a transformer to cast your fields to a certain type or only return a limited set of fields back, ou could also create entirely new fields. Here is an example:
 
-```
+```php
 <?php
 
 namespace App\Transformer;
