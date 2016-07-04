@@ -67,6 +67,8 @@ trait ConvertToSnakeCase
      */
     public function only( $keys )
     {
+        $keys = is_array( $keys ) ? $keys : func_get_args();
+
         return parent::only( $this->convertToSnakeCase( $keys ) );
     }
 
@@ -78,6 +80,8 @@ trait ConvertToSnakeCase
      */
     public function except( $keys )
     {
+        $keys = is_array( $keys ) ? $keys : func_get_args();
+
         return parent::except( $this->convertToSnakeCase( $keys ) );
     }
 
@@ -90,7 +94,7 @@ trait ConvertToSnakeCase
      */
     public function query( $key = null, $default = null )
     {
-        return parent::query( snake_case( $key ) );
+        return parent::query( snake_case( $key ), $default );
     }
 
     /**
@@ -112,7 +116,7 @@ trait ConvertToSnakeCase
      */
     public function file( $key = null, $default = null )
     {
-        return parent::file( snake_case( $key ) );
+        return parent::file( snake_case( $key ), $default );
     }
 
     /**
