@@ -70,7 +70,7 @@ class MakeTransformer extends Command
         $path = app_path() . '/Transformers/' . $name . '.php';
 
         if ( $this->files->exists( $path ) ) {
-            return $this->error( $name . 'already exists!' );
+            return $this->error( $name . ' already exists!' );
         }
 
         $this->makeDirectory( $path );
