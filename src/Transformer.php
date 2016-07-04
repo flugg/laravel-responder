@@ -2,6 +2,7 @@
 
 namespace Mangopixel\Responder;
 
+use Illuminate\Database\Eloquent\Model;
 use League\Fractal\TransformerAbstract;
 
 /**
@@ -14,4 +15,11 @@ use League\Fractal\TransformerAbstract;
  */
 abstract class Transformer extends TransformerAbstract
 {
+    /**
+     * Transform the model data into a generic array.
+     *
+     * @param  Model $model
+     * @return array
+     */
+    abstract public function transform( $model ):array;
 }

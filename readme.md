@@ -309,22 +309,22 @@ Let's take a look at how an example response with our `Mangopixel\Responder\Seri
     "success": true,
     "status": 200,
     "data": {
-        "id": 1,
-        "email": "example@email.com",
-        "fullName": "John Doe"
+        "id': 1,
+        "email': 'example@email.com',
+        'fullName': 'John Doe'
     }
 }
 ```
 
 ##### Array serializer
 
-Let"s take a look at the simplest serializer from Fractal, `League\Fractal\Serializer\ArraySerializer`:
+Let's take a look at the simplest serializer from Fractal, `League\Fractal\Serializer\ArraySerializer`:
 
 ```json
 {
-    "id": 1,
-    "email": "example@email.com",
-    "fullName": "John Doe"
+    'id': 1,
+    'email': 'example@email.com',
+    'fullName': 'John Doe'
 }
 ```
 
@@ -438,7 +438,7 @@ public function index()
 
 Just like shown in the examples with the success responses above you can also inject it through the constructor or resolve it from the service container.
 
-### Adding error messages
+#### Adding error messages
 
 An error code is useful for many reasons, but it might not give enough clues to the user about what the error is. Therefore you might want to add a more descriptive error message to the response, you can pass along a message as the third parameter:
 
@@ -480,7 +480,7 @@ There will usually only be one message per error, however, validation errors are
 }
 ```
 
-#### Language file
+##### Language file
 
 Instead of writing the error messages on the fly when you create the response, you can use the `errors.php` language file which should be in your `resources/lang/en` folder if you published vendor assets. The default language file looks like this:
 
