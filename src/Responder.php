@@ -57,7 +57,7 @@ class Responder implements ResponderContract
             $response[ 'error' ][ 'messages' ] = $messages;
         }
 
-        return response()->json( $response );
+        return response()->json( $response, $statusCode );
     }
 
     /**
