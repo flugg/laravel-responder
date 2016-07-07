@@ -14,20 +14,6 @@ namespace Mangopixel\Responder\Traits;
 trait ConvertsParameters
 {
     /**
-     * Cast boolean strings in parameters to PHP booleans.
-     *
-     * @var bool
-     */
-    protected $castBooleans = true;
-
-    /**
-     * Enable automatic conversion to snake case of parameter keys.
-     *
-     * @var bool
-     */
-    protected $convertToSnakeCase = true;
-
-    /**
      * Check if an input element is set on the request.
      *
      * @param  string $key
@@ -70,11 +56,11 @@ trait ConvertsParameters
     {
         $parameters = $this->all();
 
-        if ( $this->castBooleans ) {
+        if ( isset( $this->castBooleans ) && $this->castBooleans ) {
             $parameters = $this->castBooleans( $parameters );
         }
 
-        if ( $this->convertToSnakeCase ) {
+        if ( isset( $this->convertToSnakeCase ) && $this->convertToSnakeCase ) {
             $parameters = $this->convertToSnakeCase( $parameters );
         }
 
