@@ -27,7 +27,8 @@
         "illuminate/database": "5.1.* || 5.2.* || 5.3.*",
         "orchestra/testbench": "~3.0",
         "mockery/mockery": "^0.9.5",
-        "fzaninotto/faker": "^1.6"
+        "fzaninotto/faker": "^1.6",
+        "doctrine/dbal": "^2.5"
     },
     "autoload": {
         "psr-4": {

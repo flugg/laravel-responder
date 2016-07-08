@@ -58,7 +58,7 @@ class Responder implements ResponderContract
         $messages = $this->getErrorMessages( $message, $errorCode );
 
         if ( count( $messages ) === 1 ) {
-            $response[ 'error' ][ 'message' ] = $messages;
+            $response[ 'error' ][ 'message' ] = $messages[ 0 ];
         } else if ( count( $messages ) > 1 ) {
             $response[ 'error' ][ 'messages' ] = $messages;
         }
@@ -139,7 +139,7 @@ class Responder implements ResponderContract
      * @param int    $statusCode
      * @return array
      */
-    private function getErrorResponse( string $errorCode, int $statusCode ):array
+    protected function getErrorResponse( string $errorCode, int $statusCode ):array
     {
         return [
             'success' => false,
@@ -158,7 +158,7 @@ class Responder implements ResponderContract
      * @param  string $errorCode
      * @return array
      */
-    private function getErrorMessages( $message, string $errorCode ):array
+    protected function getErrorMessages( $message, string $errorCode ):array
     {
         if ( is_array( $message ) ) {
             return $message;

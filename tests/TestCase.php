@@ -1,11 +1,16 @@
 <?php
 
-namespace Mangopixel\Adjuster\Tests;
+namespace Mangopixel\Responder\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
-use Mangopixel\Adjuster\ResponderServiceProvider;
+use Illuminate\Routing\Controller;
+use Mangopixel\Responder\Contracts\Responder;
+use Mangopixel\Responder\Contracts\Transformable;
+use Mangopixel\Responder\ResponderServiceProvider;
+use Mangopixel\Responder\Traits\RespondsWithJson;
+use Mangopixel\Responder\Transformer;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 /**
@@ -26,6 +31,13 @@ abstract class TestCase extends BaseTestCase
     protected $schema;
 
     /**
+     * An instance of the responder service responsible for generating API responses.
+     *
+     * @var Responder
+     */
+    protected $responder;
+
+    /**
      * Setup the test environment.
      *
      * @return void
@@ -33,6 +45,10 @@ abstract class TestCase extends BaseTestCase
     public function setUp()
     {
         parent::setUp();
+
+        $this->responder = $this->app[ Responder::class ];
+
+        $this->createTestTransformer();
 
         $this->schema = $this->app[ 'db' ]->connection()->getSchemaBuilder();
         $this->runTestMigrations();
@@ -81,6 +97,7 @@ abstract class TestCase extends BaseTestCase
                 $table->increments( 'id' );
                 $table->string( 'name' );
                 $table->integer( 'price' );
+                $table->boolean( 'is_rotten' );
                 $table->timestamps();
             } );
         }
@@ -97,6 +114,53 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Creates a controller class with the RespondsWithJson trait.
+     *
+     * @return Controller
+     */
+    protected function createTestController()
+    {
+        return new class extends Controller
+        {
+            use RespondsWithJson;
+
+            public function successMethod( $fruit )
+            {
+                return $this->successResponse( $fruit );
+            }
+
+            public function errorMethod()
+            {
+                return $this->errorResponse( 'test_error', 400, 'Test error.' );
+            }
+        };
+    }
+
+    /**
+     * Creates a new transformer for testing purposes.
+     *
+     * @return void
+     */
+    protected function createTestTransformer()
+    {
+        $transformer = new class extends Transformer
+        {
+            public function transform( $model ):array
+            {
+                return [
+                    'name' => (string) $model->name,
+                    'price' => (int) $model->price,
+                    'isRotten' => (bool) false
+                ];
+            }
+        };
+
+        $this->app->bind( 'test.transformer', function () use ($transformer) {
+            return new $transformer;
+        } );
+    }
+
+    /**
      * Creates a new adjustable model for testing purposes.
      *
      * @param  array $attributes
@@ -104,13 +168,18 @@ abstract class TestCase extends BaseTestCase
      */
     protected function createTestModel( array $attributes = [ ] ):Model
     {
-        $model = new class extends Model
+        $model = new class extends Model implements Transformable
         {
-            protected $fillable = [ 'name', 'price' ];
+            protected $fillable = [ 'name', 'price', 'is_rotten' ];
             protected $table = 'fruits';
+
+            public static function transformer():string
+            {
+                return get_class( app( 'test.transformer' ) );
+            }
         };
 
-        return $this->storeAdjustableModel( $model, $attributes );
+        return $this->storeModel( $model, $attributes );
     }
 
     /**
@@ -120,11 +189,12 @@ abstract class TestCase extends BaseTestCase
      * @param  array $attributes
      * @return Model
      */
-    protected function storeAdjustableModel( Model $model, array $attributes = [ ] ):Model
+    protected function storeModel( Model $model, array $attributes = [ ] ):Model
     {
         return $model->create( array_merge( [
             'name' => 'Mango',
-            'price' => 10
+            'price' => 10,
+            'is_rotten' => false
         ], $attributes ) );
     }
 }

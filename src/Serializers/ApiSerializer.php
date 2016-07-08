@@ -16,7 +16,7 @@ class ApiSerializer extends ArraySerializer
      */
     public function collection( $resourceKey, array $data )
     {
-        return $this->item( $data );
+        return $this->item( $resourceKey, $data );
     }
 
     /**
