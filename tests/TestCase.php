@@ -156,7 +156,7 @@ abstract class TestCase extends BaseTestCase
         };
 
         $this->app->bind( 'test.transformer', function () use ($transformer) {
-            return new $transformer;
+            return new $transformer();
         } );
     }
 

@@ -2,6 +2,7 @@
 
 namespace Mangopixel\Responder;
 
+use League\Fractal\Scope;
 use League\Fractal\TransformerAbstract;
 use Mangopixel\Responder\Contracts\Transformable;
 
@@ -17,7 +18,7 @@ abstract class Transformer extends TransformerAbstract
 {
     protected $model;
 
-    public function __construct( Transformable $model )
+    public function __construct( Transformable $model = null )
     {
         $this->model = $model;
     }
