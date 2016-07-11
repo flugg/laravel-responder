@@ -2,7 +2,6 @@
 
 namespace Mangopixel\Responder;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -34,10 +33,6 @@ class Responder implements ResponderContract
     {
         if ( is_integer( $data ) ) {
             list( $statusCode, $data ) = [ $data, null ];
-        }
-
-        if ( is_null( $data ) ) {
-            return response()->json( $this->transform( $data, $model::transformer() ), $statusCode );
         }
 
         $resource = $this->transform( $data );
@@ -72,10 +67,10 @@ class Responder implements ResponderContract
      * Resolves model class path from the data.
      *
      * @param  mixed $data
-     * @return string
-     * @throws Model|null
+     * @return Transformable
+     * @throws InvalidArgumentException
      */
-    protected function resolveModel( $data ):string
+    protected function resolveModel( $data ):Transformable
     {
         if ( is_null( $data ) ) {
             return null;
@@ -92,10 +87,10 @@ class Responder implements ResponderContract
      * Resolves model class path from a collection of models.
      *
      * @param  Collection $collection
-     * @return string
+     * @return Transformable
      * @throws InvalidArgumentException
      */
-    protected function resolveModelFromCollection( Collection $collection ):string
+    protected function resolveModelFromCollection( Collection $collection ):Transformable
     {
         $class = $collection->first();
 
