@@ -2,12 +2,14 @@
 
 namespace Mangopixel\Responder;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\NullResource as FractalNull;
+use League\Fractal\Resource\ResourceInterface;
 use Mangopixel\Responder\Contracts\Manager;
 use Mangopixel\Responder\Contracts\Responder as ResponderContract;
 use Mangopixel\Responder\Contracts\Transformable;
@@ -31,17 +33,17 @@ class Responder implements ResponderContract
     public function success( $data = null, int $statusCode = 200 ):JsonResponse
     {
         if ( is_integer( $data ) ) {
-            $statusCode = $data;
-            $data = null;
+            list( $statusCode, $data ) = [ $data, null ];
         }
 
         if ( is_null( $data ) ) {
             return response()->json( $this->transform( $data, $model::transformer() ), $statusCode );
         }
 
-        $model = $this->resolveModel( is_array( $data ) ? collect( $data ) : $data );
+        $resource = $this->transform( $data );
+        $data = $this->serialize( $resource );
 
-        return response()->json( $this->transform( $data, $model::transformer() ), $statusCode );
+        return response()->json( $data, $statusCode );
     }
 
     /**
@@ -71,12 +73,14 @@ class Responder implements ResponderContract
      *
      * @param  mixed $data
      * @return string
-     * @throws InvalidArgumentException
+     * @throws Model|null
      */
     protected function resolveModel( $data ):string
     {
-        if ( $data instanceof Transformable ) {
-            return get_class( $data );
+        if ( is_null( $data ) ) {
+            return null;
+        } elseif ( $data instanceof Transformable ) {
+            return $data;
         } elseif ( $data instanceof Collection ) {
             return $this->resolveModelFromCollection( $data );
         } else {
@@ -93,14 +97,14 @@ class Responder implements ResponderContract
      */
     protected function resolveModelFromCollection( Collection $collection ):string
     {
-        $first = $collection->first();
-        if ( ! $first instanceof Transformable ) {
+        $class = $collection->first();
+
+        if ( ! $class instanceof Transformable ) {
             throw new InvalidArgumentException( 'Data must only contain models implementing the Transformable contract.' );
         }
 
-        $class = get_class( $first );
         $collection->each( function ( $model ) use ( $class ) {
-            if ( get_class( $model ) !== $class ) {
+            if ( get_class( $model ) !== get_class( $class ) ) {
                 throw new InvalidArgumentException( 'You cannot transform arrays or collections with multiple model types.' );
             }
         } );
@@ -109,27 +113,38 @@ class Responder implements ResponderContract
     }
 
     /**
-     * Transforms and serializes the data using Fractal.
+     * Transforms the data using Fractal.
      *
      * @param  mixed  $data
      * @param  string $transformer
      * @param  int    $statusCode
-     * @return array
+     * @return ResourceInterface
      */
-    protected function transform( $data = null, $transformer = null, int $statusCode = 200 ):array
+    public function transform( $data = null, TransformerAbstract $transformer = null ):ResourceInterface
     {
         if ( is_null( $data ) ) {
-            $class = FractalNull::class;
-            $resource = new $class( $data );
-
-        } else {
-            $class = $data instanceof Transformable ? FractalItem::class : FractalCollection::class;
-            $resource = new $class( $data, new $transformer );
+            return new FractalNull( $data );
         }
 
-        $serializedData = app( Manager::class )->createData( $resource )->toArray();
+        $model = $this->resolveModel( $data );
+        if ( is_null( $transformer ) ) {
+            $transformer = $model::transformer();
+        }
 
-        return [ 'status' => $statusCode ] + $serializedData;
+        $class = $data instanceof Transformable ? FractalItem::class : FractalCollection::class;
+        $resource = new $class( $data, new $transformer( $model ) );
+        $resource->setResourceKey( $model->getTable() );
+
+        return $resource;
+    }
+
+    public function serialize( ResourceInterface $resource ):array
+    {
+        $model = $this->resolveModel( $resource->getData() );
+        $transformer = $model::transformer();
+        $includes = ( new $transformer( $model ) )->getAvailableIncludes();
+
+        return app( Manager::class )->parseIncludes( $includes )->createData( $resource )->toArray();
     }
 
     /**

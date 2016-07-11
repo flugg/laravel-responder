@@ -2,7 +2,6 @@
 
 namespace Mangopixel\Responder;
 
-use Illuminate\Database\Eloquent\Model;
 use League\Fractal\TransformerAbstract;
 
 /**
@@ -15,11 +14,69 @@ use League\Fractal\TransformerAbstract;
  */
 abstract class Transformer extends TransformerAbstract
 {
+    protected $model;
+
+    public function __construct( Model $model )
+    {
+        $this->model = $model;
+    }
+
+    public function processIncludedResources( Scope $scope, $data )
+    {
+        $includedData = [ ];
+        $includes = array_merge( $this->getDefaultIncludes(), $this->getAvailableIncludes() );
+
+        foreach ( $includes as $include ) {
+            $includedData = $this->includeResourceIfAvailable( $scope, $data, $includedData, $include );
+        }
+
+        return $includedData === [ ] ? false : $includedData;
+    }
+
+    protected function includeResourceIfAvailable( Scope $scope, $data, $includedData, $include )
+    {
+        if ( $resource = $this->callIncludeMethod( $scope, $include, $data ) ) {
+            $childScope = $scope->embedChildScope( $include, $resource );
+
+            $includedData[ $include ] = $childScope->toArray();
+        }
+
+        return $includedData;
+    }
+
+    protected function callIncludeMethod( Scope $scope, $includeName, $data )
+    {
+        $responder = new UsersController();
+
+        if ( ! $data->relationLoaded( $includeName ) ) {
+            return false;
+        }
+
+        $data = $data->$includeName;
+
+        if ( $data instanceof Transformable ) {
+            $transformer = $data::transformer();
+            $resource = $responder->transform( $data, new $transformer( $data ) );
+
+        } elseif ( $data instanceof Collection && $data->count() > 0 ) {
+            $model = get_class( $data->first() );
+            $transformer = $model::transformer();
+            $resource = $responder->transform( $data, new $transformer( $model ) );
+
+        } else {
+            $resource = $responder->transform();
+        }
+
+        return $resource;
+    }
+
     /**
-     * Transform the model data into a generic array.
+     * Getter for availableIncludes.
      *
-     * @param  Model $model
      * @return array
      */
-    abstract public function transform( $model ):array;
+    public function getAvailableIncludes()
+    {
+        return array_keys( $this->model->getRelations() );
+    }
 }
