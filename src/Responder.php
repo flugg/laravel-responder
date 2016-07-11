@@ -38,6 +38,12 @@ class Responder implements ResponderContract
         $resource = $this->transform( $data );
         $data = $this->serialize( $resource );
 
+        if ( config( 'responder.status_code' ) ) {
+            $data = array_merge( [
+                'status' => $statusCode
+            ], $data );
+        }
+
         return response()->json( $data, $statusCode );
     }
 
@@ -67,10 +73,10 @@ class Responder implements ResponderContract
      * Resolves model class path from the data.
      *
      * @param  mixed $data
-     * @return Transformable
+     * @return Transformable|null
      * @throws InvalidArgumentException
      */
-    protected function resolveModel( $data ):Transformable
+    protected function resolveModel( $data )
     {
         if ( is_null( $data ) ) {
             return null;
@@ -135,11 +141,16 @@ class Responder implements ResponderContract
 
     public function serialize( ResourceInterface $resource ):array
     {
+        $manager = app( Manager::class );
         $model = $this->resolveModel( $resource->getData() );
-        $transformer = $model::transformer();
-        $includes = ( new $transformer( $model ) )->getAvailableIncludes();
 
-        return app( Manager::class )->parseIncludes( $includes )->createData( $resource )->toArray();
+        if ( $model instanceof Transformable ) {
+            $transformer = $model::transformer();
+            $includes = ( new $transformer( $model ) )->getAvailableIncludes();
+            $manager = $manager->parseIncludes( $includes );
+        }
+
+        return $manager->createData( $resource )->toArray();
     }
 
     /**

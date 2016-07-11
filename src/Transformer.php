@@ -3,6 +3,7 @@
 namespace Mangopixel\Responder;
 
 use League\Fractal\TransformerAbstract;
+use Mangopixel\Responder\Contracts\Transformable;
 
 /**
  * An abstract base transformer. All transformers should extend this, and this class
@@ -16,7 +17,7 @@ abstract class Transformer extends TransformerAbstract
 {
     protected $model;
 
-    public function __construct( Model $model )
+    public function __construct( Transformable $model )
     {
         $this->model = $model;
     }
@@ -46,12 +47,11 @@ abstract class Transformer extends TransformerAbstract
 
     protected function callIncludeMethod( Scope $scope, $includeName, $data )
     {
-        $responder = new UsersController();
-
         if ( ! $data->relationLoaded( $includeName ) ) {
             return false;
         }
 
+        $responder = app( Responder::class );
         $data = $data->$includeName;
 
         if ( $data instanceof Transformable ) {

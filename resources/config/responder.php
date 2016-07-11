@@ -26,9 +26,6 @@ return [
     |
     */
 
-    'statusCode' => [
-        'errors' => true,
-        'success' => true
-    ]
-    
+    'status_code' => true
+
 ];
