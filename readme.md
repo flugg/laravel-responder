@@ -39,7 +39,6 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
         - [Fractal Serializers](#fractal-serializers)
         - [Custom Serializers](#custom-serializers)
     - [Error Responses](#error-responses)
-        - [Setting Status Codes](#setting-status-codes)
         - [Setting Error Messages](#setting-error-messages)
         - [Using Language File](#using-language-file)
     - [Exception Handling](#exception-handling)
@@ -501,7 +500,7 @@ The example above will return the following JSON response:
 
 ```json
 {
-    "status": 400,
+    "status": 500,
     "success": false,
     "error": {
         "code": "bomb_found"
@@ -509,8 +508,7 @@ The example above will return the following JSON response:
 }
 ```
 
-#### Setting Status Codes
-The default status code for error responses is `500`. You can change the status code by passing in a second argument:
+The default status code for error responses is `500`. However, you can change the status code by passing in a second argument:
 
 ```php
 return Responder::error( 'bomb_found', 400 );
