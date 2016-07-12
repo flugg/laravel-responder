@@ -19,7 +19,7 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
     - [Publishing Package Assets]()
 - [Philosophy](#success-responses)
 - [Usage](#usage)
-    - [Accessing the Responder](#success-responses)
+    - [Accessing the Responder](#accessing-the-responder)
         - [Using Dependency Injection](#using-dependency-injection)
         - [Using the Facade](#using-the-facade)
         - [Using the Helper Method](#using-the-helper-method)
@@ -99,9 +99,11 @@ It will also publish an `errors.php` file inside your `lang/en` folder which is 
 
 ## Usage
 
-The package has a `Flugg\Responder\Responder` service class which is responsible for generating success and error JSON responses for your API. 
+The package has a `Flugg\Responder\Responder` service class which is responsible for generating success and error JSON responses for your API. The service has a `success()` and `error()` method which returns an `Illuminate\Http\JsonResponse` instance. 
 
-The service has a `success()` and `error()` method which returns an `Illuminate\Http\JsonResponse` instance. In good Laravel spirit you have multiple ways of doing the same thing:
+### Accessing the Responder
+
+To begin creating API responses, you need to access the responder service. In good Laravel spirit you have multiple ways of doing the same thing.
 
 #### Inject the Responder
 
