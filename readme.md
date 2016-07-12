@@ -38,7 +38,6 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
         - [Default Serializer](#default-serializer)
         - [Fractal Serializers](#fractal-serializers)
         - [Custom Serializers](#custom-serializers)
-        - [Including Status Code](#including-status-code)
     - [Error Responses](#error-responses)
         - [Setting Status Codes](#setting-status-codes)
         - [Setting Error Messages](#setting-error-messages)
@@ -388,19 +387,218 @@ When all responses are serialized with the same serializer, you end up with a co
 
 #### Default Serializer
 
+The package brings its own serializer `Flugg\Responder\Serializers\ApiSerailizer` which is the default serializer. An example response with a user model with a related role model:
+
+```json
+{
+    "status": 200,
+    "success": true,
+    "data": {
+        "id": 1,
+        "email": "example@email.com",
+        "fullName": "John Doe",
+        "role": {
+            "name": "admin"
+        }
+    }
+}
+```
+
+The response output is quite similar to Laravel's default, except it wraps the data inside a `data` field. It also includes a `success` field to quickly tell the user if the request was successful or not.
+
+__Note:__ the `status` field is actually not part of the default serializer, but instead added by the package after serializing the data. You can disable this in the [configurations](#configurations).
+
 #### Fractal Serializers
+
+If the default serializer is not your cup of tea, you can easily swap it out with one of the three serializers included with Fractal.
+
+The above example would look like following using Fractal's `League\Fractal\Serializers\ArraySerializer`:
+
+```json
+{
+    "id": 1,
+    "email": "example@email.com",
+    "fullName": "John Doe",
+    "role": {
+        "name": "admin"
+    }
+}
+```
+
+You can also add the `data` field using `League\Fractal\Serializers\DataArraySerializer`:
+
+```json
+{
+    "data": {
+        "id": 1,
+        "email": "example@email.com",
+        "fullName": "John Doe",
+        "role": {
+            "data": {
+                "name": "admin"
+            }
+        }
+    }
+}
+```
+
+Do note how the `data` field applies to every relation as well in this case, unlike the default package serializer.
+
+Fractal also has a representation of the [JSON-API](http://jsonapi.org/) standard using `League\Fractal\Serializers\JsonApiSerializer`:
+
+```json
+{
+    "data": {
+        "type": "users",
+        "id": 1,
+        "attributes": {
+            "email": "example@email.com",
+            "fullName": "John Doe"
+        }
+        "relationships": {
+            "role": {
+                "data": {
+                    "type": "roles",
+                    "id": 1
+                }
+            }
+        }
+    },
+    "included": {
+        "role": {
+            "type": "roles",
+            "id": 1,
+            "attributes": {
+                "name": "admin"
+            }
+        }
+    }
+}
+```
+
+As you can see, quite more verbose, but it definitiely has its uses.
 
 #### Custom Serializers
 
-#### Including Status Code
+If none of the above serializers suit your taste, feel free to create your own and set the `serializer` key in the configuration file to point to your serializer class. You can read more about how to create your own serializer at [Fractal's documentation](http://fractal.thephpleague.com/serializers/).
 
 ### Error Responses
 
+Just like we've been generating success responses, you can equally easy generate error responses when something does not go as planned:
+
+```php
+public function index()
+{
+    if ( request()->has( 'bomb ) ) {
+        return Responder::error( 'bomb_found' );
+    }
+}
+```
+
+The only required argument to the `error()` method is an error code. You can use any string as you like as the error code, later on we will map these to corresponding error messages.
+
+The example above will return the following JSON response:
+
+```json
+{
+    "status": 400,
+    "success": false,
+    "error": {
+        "code": "bomb_found"
+    }
+}
+```
+
 #### Setting Status Codes
+The default status code for error responses is `500`. You can change the status code by passing in a second argument:
+
+```php
+return Responder::error( 'bomb_found', 400 );
+```
 
 #### Setting Error Messages
+An error code is useful for many reasons, but it might not give enough clues to the user about what caused the error. So you might want to add a more descriptive error message to the response. You can do so by passing in a third argument to the `error()` method:
 
-#### Using Language File
+```php
+return Responder::error( 'bomb_found', 400, 'No explosives allowed in this request.' );
+```
+
+Which will output the following JSON:
+
+```json
+{
+    "success": false,
+    "status": 400,
+    "error": {
+        "code": "bomb_found",
+        "message": "No explosives allowed in this request."
+    }
+}
+```
+
+Notice how a `message` field was added inside the `error` field.
+
+There will in most cases only be one error message per error. However, validation errors are an exception to this rule. Since there can be multiple error messages after validation, all messages are put inside a `messages` field, instead of the singular `message`.
+
+An example response from a user registration request, where multiple validation rules failed:
+
+```json
+{
+    "success": false,
+    "status": 422,
+    "error": {
+        "code": "validation_failed",
+        "messages": [
+            "Username is required.",
+            "Password must be at least 8 characters long.",
+        ]
+    }
+}
+```
+
+#### Language File
+
+Instead of adding the error messages on the fly when you create the error responses, you can instead use the `errors.php` language file, which should be in your `resources/lang/en` folder if you published package assets. 
+
+The default language file looks like this:
+
+```php
+<?php
+
+return [
+
+    'resource_not_found' => 'The requested resource does not exist.',
+    'unauthorized' => 'You are not authorized for this request.',
+
+];
+```
+
+These messages are for the default Laravel exceptions thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next chapter on [exception handling]().
+
+The error messages keys map up to an error code. So if you add the following line to the language file:
+
+```php
+'bomb_found' => 'No explosives allowed in this request.',
+```
+
+And return the following error response:
+
+```php
+return $this->errorResponse( 'bomb_found', 400 );
+```
+
+The following JSON will be generated:
+
+```json
+{
+    "success": false,
+    "status": 400,
+    "error": {
+        "code": "bomb_found",
+        "message": "No explosives allowed in this request."
+    }
+}
+```
 
 ### Exception Handling
 
