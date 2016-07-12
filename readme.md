@@ -99,7 +99,7 @@ It will also publish an `errors.php` file inside your `lang/en` folder which is 
 
 ## Usage
 
-The package has a `Flugg\Responder\Responder` service class which is responsible for generating success and error JSON responses for your API. The service has a `success()` and `error()` method which returns an `Illuminate\Http\JsonResponse` instance. 
+The package has a `Flugg\Responder\Responder` service class which is responsible for generating success and error JSON responses for your API. The service has a `success()` and `error()` method which returns an instance of `Illuminate\Http\JsonResponse`.
 
 ### Accessing the Responder
 
