@@ -8,7 +8,7 @@
 
 __Work in progress, do not use in production!__
 
-Laravel Responder is a package that integrates [Fractal](https://github.com/thephpleague/fractal) into Laravel. It will automatically transforms your Eloquent models and sanitize your API responses using a simple and elegant syntax. You can use it to send both success and error responses, and traits you can use to handle exceptions and integrate test your responses.
+Laravel Responder is a package that integrates [Fractal](https://github.com/thephpleague/fractal) into Laravel. It will automatically transform your Eloquent models and serialize your API responses using a simple and elegant syntax. You can use it to send both success and error responses, and it gives you tools to handle exceptions and integration test your responses.
 
 ## Table of Contents
 
