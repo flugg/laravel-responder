@@ -2,6 +2,7 @@
 
 namespace Mangopixel\Responder\Traits;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Mangopixel\Responder\Contracts\Responder;
 
@@ -24,10 +25,9 @@ trait MakesApiRequests
      */
     protected function seeSuccess( $data = null, $status = 200 )
     {
-        $response = app( Responder::class )->success( $data, $status );
+        $response = $this->createSuccessResponse( $data, $status );
 
-        $this->seeStatusCode( $status );
-        $this->seeSuccessBaseStructure( $response );
+        $this->seeSuccessResponse( $response );
         $this->seeSuccessData( $response->getData( true )[ 'data' ] );
 
         return $this;
@@ -42,10 +42,9 @@ trait MakesApiRequests
      */
     protected function seeSuccessEquals( $data = null, $status = 200 )
     {
-        $response = app( Responder::class )->success( $data, $status );
+        $response = $this->createSuccessResponse( $data, $status );
 
-        $this->seeStatusCode( $status );
-        $this->seeSuccessBaseStructure( $response );
+        $this->seeSuccessResponse( $response );
         $this->seeJsonEquals( $response->getData( true ) );
 
         return $this;
@@ -54,12 +53,12 @@ trait MakesApiRequests
     /**
      * Assert that the response is a valid success response.
      *
-     * @param  Response $data
+     * @param  Response $response
      * @return $this
      */
-    protected function seeSuccessBaseStructure( Response $response )
+    protected function seeSuccessResponse( Response $response )
     {
-        $this->seeJson( [
+        $this->seeStatusCode( $response->getStatusCode() )->seeJson( [
             'success' => true,
             'status' => $response->getStatusCode()
         ] )->seeJsonStructure( [ 'data' ] );
@@ -97,10 +96,22 @@ trait MakesApiRequests
     }
 
     /**
+     * Creates a new success response by transforming and serializing the data.
+     *
+     * @param  mixed $data
+     * @param  int   $status
+     * @return JsonResponse
+     */
+    protected function createSuccessResponse( $data = null, $status = 200 ):JsonResponse
+    {
+        return app( Responder::class )->success( $data, $status );
+    }
+
+    /**
      * Assert that the response is a valid error response.
      *
-     * @param  string $error
-     * @param  int    $status
+     * @param  string   $error
+     * @param  int|null $status
      * @return $this
      */
     protected function seeError( string $error, int $status = null )
