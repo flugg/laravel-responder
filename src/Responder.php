@@ -3,7 +3,6 @@
 namespace Mangopixel\Responder;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -12,13 +11,12 @@ use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\NullResource as FractalNull;
 use League\Fractal\Resource\ResourceInterface;
-use League\Fractal\TransformerAbstract;
 use Mangopixel\Responder\Contracts\Manager;
 use Mangopixel\Responder\Contracts\Responder as ResponderContract;
 use Mangopixel\Responder\Contracts\Transformable;
 
 /**
- * The responder service. This class is responsible for generating the API responses.
+ * The responder service. This class is responsible for generating JSON API responses.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -76,12 +74,11 @@ class Responder implements ResponderContract
     /**
      * Transforms the data using Fractal.
      *
-     * @param  mixed  $data
-     * @param  string $transformer
-     * @param  int    $statusCode
+     * @param  mixed            $data
+     * @param  Transformer|null $transformer
      * @return ResourceInterface
      */
-    public function transform( $data = null, TransformerAbstract $transformer = null ):ResourceInterface
+    public function transform( $data = null, Transformer $transformer = null ):ResourceInterface
     {
         if ( is_null( $data ) ) {
             return new FractalNull();
@@ -97,20 +94,17 @@ class Responder implements ResponderContract
     }
 
     /**
-     * Transform an Eloquent model.
+     * Transform a transformable Eloquent model.
      *
-     * @param  Model            $data
+     * @param  Transformable    $data
      * @param  Transformer|null $transformer
      * @return FractalItem
      */
-    protected function transformModel( Model $data, Transformer $transformer = null ):FractalItem
+    protected function transformModel( Transformable $data, Transformer $transformer = null ):FractalItem
     {
         $transformer = $transformer ?: $data::transformer();
 
-        $resource = new FractalItem( $data, new $transformer( $data ) );
-        $resource->setResourceKey( $data->getTable() );
-
-        return $resource;
+        return $this->transformData( $data, new $transformer( $model ), $model->getTable() );
     }
 
     /**
@@ -125,10 +119,7 @@ class Responder implements ResponderContract
         $model = $this->resolveModel( $data );
         $transformer = $transformer ?: $model::transformer();
 
-        $resource = new FractalCollection( $data, new $transformer( $model ) );
-        $resource->setResourceKey( $model->getTable() );
-
-        return $resource;
+        return $this->transformData( $data, new $transformer( $model ), $model->getTable() );
     }
 
     /**
@@ -140,8 +131,30 @@ class Responder implements ResponderContract
      */
     protected function transformPaginator( LengthAwarePaginator $data, Transformer $transformer = null ):FractalCollection
     {
-        $resource = $this->transformCollection( $data->getCollection() );
+        $resource = $this->transformCollection( $data->getCollection(), $transformer );
         $resource->setPaginator( new IlluminatePaginatorAdapter( $data ) );
+
+        return $resource;
+    }
+
+    /**
+     * Transform the data using the given transformer.
+     *
+     * @param  Collection       $data
+     * @param  Transformer|null $transformer
+     * @param  string           $resourceKey
+     * @return FractalCollection
+     */
+    protected function transformData( $data, Transformer $transformer, string $resourceKey ):FractalCollection
+    {
+        if ( $data instanceof Transformable ) {
+            $class = FractalItem::class;
+        } elseif ( $data instanceof Collection ) {
+            $class = FractalCollection::class;
+        }
+
+        $resource = new $class( $data, $transformer );
+        $resource->setResourceKey( $resourceKey );
 
         return $resource;
     }
