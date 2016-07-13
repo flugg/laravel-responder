@@ -21,7 +21,7 @@ trait RespondsWithJson
      * @param  int   $statusCode
      * @return JsonResponse
      */
-    public function successResponse( $data, int $statusCode = 200 ):JsonResponse
+    public function successResponse( $data = null, int $statusCode = 200 ):JsonResponse
     {
         return app( Responder::class )->success( $data, $statusCode );
     }

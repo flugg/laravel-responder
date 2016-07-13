@@ -2,13 +2,17 @@
 
 namespace Mangopixel\Responder;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\NullResource as FractalNull;
 use League\Fractal\Resource\ResourceInterface;
+use League\Fractal\TransformerAbstract;
 use Mangopixel\Responder\Contracts\Manager;
 use Mangopixel\Responder\Contracts\Responder as ResponderContract;
 use Mangopixel\Responder\Contracts\Transformable;
@@ -70,23 +74,76 @@ class Responder implements ResponderContract
     }
 
     /**
-     * Resolves model class path from the data.
+     * Transforms the data using Fractal.
      *
-     * @param  mixed $data
-     * @return Transformable|null
-     * @throws InvalidArgumentException
+     * @param  mixed  $data
+     * @param  string $transformer
+     * @param  int    $statusCode
+     * @return ResourceInterface
      */
-    protected function resolveModel( $data )
+    public function transform( $data = null, TransformerAbstract $transformer = null ):ResourceInterface
     {
         if ( is_null( $data ) ) {
-            return null;
+            return new FractalNull();
         } elseif ( $data instanceof Transformable ) {
-            return $data;
+            return $this->transformModel( $data, $transformer );
         } elseif ( $data instanceof Collection ) {
-            return $this->resolveModelFromCollection( $data );
-        } else {
-            throw new InvalidArgumentException( 'Data must be one or multiple models implementing the Transformable contract.' );
+            return $this->transformCollection( $data, $transformer );
+        } elseif ( $data instanceof LengthAwarePaginator ) {
+            return $this->transformPaginator( $data, $transformer );
         }
+
+        throw new InvalidArgumentException( 'Data must be one or multiple models implementing the Transformable contract.' );
+    }
+
+    /**
+     * Transform an Eloquent model.
+     *
+     * @param  Model            $data
+     * @param  Transformer|null $transformer
+     * @return FractalItem
+     */
+    protected function transformModel( Model $data, Transformer $transformer = null ):FractalItem
+    {
+        $transformer = $transformer ?: $data::transformer();
+
+        $resource = new FractalItem( $data, new $transformer( $data ) );
+        $resource->setResourceKey( $data->getTable() );
+
+        return $resource;
+    }
+
+    /**
+     * Transform a collection of Eloquent models.
+     *
+     * @param  Collection       $data
+     * @param  Transformer|null $transformer
+     * @return FractalCollection
+     */
+    protected function transformCollection( Collection $data, Transformer $transformer = null ):FractalCollection
+    {
+        $model = $this->resolveModel( $data );
+        $transformer = $transformer ?: $model::transformer();
+
+        $resource = new FractalCollection( $data, new $transformer( $model ) );
+        $resource->setResourceKey( $model->getTable() );
+
+        return $resource;
+    }
+
+    /**
+     * Transform paginated data using Laravel's paginator.
+     *
+     * @param LengthAwarePaginator $data
+     * @param Transformer|null     $transformer
+     * @return FractalCollection
+     */
+    protected function transformPaginator( LengthAwarePaginator $data, Transformer $transformer = null ):FractalCollection
+    {
+        $resource = $this->transformCollection( $data->getCollection() );
+        $resource->setPaginator( new IlluminatePaginatorAdapter( $data ) );
+
+        return $resource;
     }
 
     /**
@@ -96,7 +153,7 @@ class Responder implements ResponderContract
      * @return Transformable
      * @throws InvalidArgumentException
      */
-    protected function resolveModelFromCollection( Collection $collection ):Transformable
+    protected function resolveModel( Collection $collection ):Transformable
     {
         $class = $collection->first();
 
@@ -113,38 +170,14 @@ class Responder implements ResponderContract
         return $class;
     }
 
-    /**
-     * Transforms the data using Fractal.
-     *
-     * @param  mixed  $data
-     * @param  string $transformer
-     * @param  int    $statusCode
-     * @return ResourceInterface
-     */
-    public function transform( $data = null, TransformerAbstract $transformer = null ):ResourceInterface
-    {
-        if ( is_null( $data ) ) {
-            return new FractalNull( $data );
-        }
-
-        $model = $this->resolveModel( $data );
-        if ( is_null( $transformer ) ) {
-            $transformer = $model::transformer();
-        }
-
-        $class = $data instanceof Transformable ? FractalItem::class : FractalCollection::class;
-        $resource = new $class( $data, new $transformer( $model ) );
-        $resource->setResourceKey( $model->getTable() );
-
-        return $resource;
-    }
-
     public function serialize( ResourceInterface $resource ):array
     {
         $manager = app( Manager::class );
-        $model = $this->resolveModel( $resource->getData() );
 
-        if ( $model instanceof Transformable ) {
+        $data = $resource->getData();
+        $model = $data instanceof Collection ? $this->resolveModel( $data ) : $data;
+
+        if ( ! is_null( $data ) ) {
             $transformer = $model::transformer();
             $includes = ( new $transformer( $model ) )->getAvailableIncludes();
             $manager = $manager->parseIncludes( $includes );

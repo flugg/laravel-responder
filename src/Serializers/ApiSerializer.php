@@ -28,10 +28,9 @@ class ApiSerializer extends ArraySerializer
      */
     public function item( $resourceKey, array $data )
     {
-        return [
-            'success' => true,
+        return array_merge( $this->null(), [
             'data' => $data
-        ];
+        ] );
     }
 
     /**
@@ -41,7 +40,10 @@ class ApiSerializer extends ArraySerializer
      */
     public function null()
     {
-        return [ ];
+        return [
+            'success' => true,
+            'data' => null
+        ];
     }
 
     /**
