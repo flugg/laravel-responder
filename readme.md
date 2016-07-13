@@ -658,7 +658,7 @@ Contributions are more than welcome and you're free to create a pull request on 
 vendor/bin/phpunit
 ```
 
-If you find bugs or have suggestions for improvements, feel free to submit an issue on Github. However, if the issue is a security related issue, please send an email to [flugged@gmail.com]() instead.
+If you find bugs or have suggestions for improvements, feel free to submit an issue on Github. However, if it's a security related issue, please send an email to flugged@gmail.com instead.
 
 ## License
 
