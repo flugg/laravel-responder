@@ -8,48 +8,23 @@
 
 __Work in progress, do not use in production!__
 
-Laravel Responder is a package that integrates [Fractal](https://github.com/thephpleague/fractal) into Laravel. It will automatically transform your Eloquent models and serialize your API responses using a simple and elegant syntax. You can use it to send both success and error responses, and it gives you tools to handle exceptions and integration test your responses.
+Laravel Responder is a package that integrates [Fractal](https://github.com/thephpleague/fractal) into Laravel. It will automatically transform your Eloquent models and serialize your API responses using a simple and elegant syntax. You can use it to send both success- and error responses, and it gives you tools to handle exceptions and integration test your responses.
 
 ## Table of Contents
 
 - [Requirements](#requirements)
 - [Installation](#installation)
-    - [Registering Service Provider]()
-    - [Registering Facade]()
-    - [Publishing Package Assets]()
 - [Philosophy](#success-responses)
 - [Usage](#usage)
     - [Accessing the Responder](#accessing-the-responder)
-        - [Using Dependency Injection](#using-dependency-injection)
-        - [Using the Facade](#using-the-facade)
-        - [Using the Helper Method](#using-the-helper-method)
-        - [Using the Trait](#using-the-trait)
     - [Success Responses](#success-responses)
-        - [Setting Status Codes](#setting-status-codes)
-        - [Relationships](#relationships)
-        - [Adding Meta Data](#adding-meta-data)
-        - [Pagination](#pagination)
-        - [Cursors](#cursors)
     - [Transformers](#transformers)
-        - [Creating Transformers](#creating-transformers)
-        - [Mapping Transformers to Models](#mapping-transformers-to-models)
-        - [Converting to Camel Case](#convert-to-camel-case)
     - [Serializers](#transformers)
-        - [Default Serializer](#default-serializer)
-        - [Fractal Serializers](#fractal-serializers)
-        - [Custom Serializers](#custom-serializers)
     - [Error Responses](#error-responses)
-        - [Setting Error Messages](#setting-error-messages)
-        - [Using Language File](#using-language-file)
     - [Exception Handling](#exception-handling)
-        - [Extending the Handler](#extending-the-handler)
-        - [Using the Trait](#using-trait)
-        - [Catching Laravel Exceptions](#creating-custon-exceptions)
-        - [Creating Custom Exceptions](#creating-custon-exceptions)
     - [Testing Helpers](#testing-helpers)
 - [Configuration](#installation)
 - [Extension](#extension)
-    - [Customizing error responses](#customizing error responses)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -97,13 +72,13 @@ It will also publish an `errors.php` file inside your `lang/en` folder which is 
 
 ## Usage
 
-The package has a `Flugg\Responder\Responder` service class which is responsible for generating success and error JSON responses for your API. The service has a `success()` and `error()` method which returns an instance of `Illuminate\Http\JsonResponse`.
+The package has a `Flugg\Responder\Responder` service class which is responsible for generating success- and error JSON responses for your API. The service has a `success()` and `error()` method which returns an instance of `Illuminate\Http\JsonResponse`.
 
 ### Accessing the Responder
 
 To begin creating API responses, you need to access the responder service. In good Laravel spirit you have multiple ways of doing the same thing.
 
-#### Inject the Responder
+#### Option 1: Dependency Injection
 
 You may inject the service directly into your controller to create success responses:
 
@@ -122,7 +97,7 @@ You may also create error responses:
 return $responder->error( 'invalid_user' );
 ```
 
-#### Using the Facade
+#### Option 2: Facade
 
 Optionally, you may use the `ApiResponse` facade to create responses:
 
@@ -133,7 +108,7 @@ return Responder::success( $users );
 return Responder::error( 'invalid_user' );
 ```
 
-#### Using the Helper Method
+#### Option 3: Helper Method
 
 You can also use the `responder()` helper method if you're fan of Laravel's `response()` helper method:
 
@@ -146,7 +121,7 @@ return responder()->error( 'invalid_user' );
 
 Both the helper method and the facade are just different ways of accessing the responder service, so you have access to the same methods.
 
-#### Using the Trait
+#### Option 4: Trait
 
 The package also has a `Flugg\Responder\Traits\RespondsWithJson` trait you can use in your base controller.
 
@@ -621,8 +596,6 @@ The full class path to the serializer class you would like the package to use wh
 Wether or not you want to include status codes in your JSON responses. You may choose to include it for error responses, success responses or both, just by changing the configuration values listed below.
 
 ## Extension
-
-#### Customizing error responses
 
 ## Contribution
 
