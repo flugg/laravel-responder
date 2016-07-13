@@ -11,7 +11,7 @@ namespace Mangopixel\Responder\Traits;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-trait ConvertsParameters
+trait ConvertsToSnakeCase
 {
     /**
      * Check if an input element is set on the request.

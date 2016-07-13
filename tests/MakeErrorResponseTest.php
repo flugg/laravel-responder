@@ -57,7 +57,7 @@ class MakeErrorResponseTest extends TestCase
         $responder->shouldReceive( 'error' )->with( 'test_error', 400, 'Test error.' )->once();
 
         // Act...
-        ( new $controller )->errorMethod();
+        ( new $controller )->errorAction();
     }
 
     /**
