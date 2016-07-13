@@ -652,7 +652,11 @@ Wether or not you want to include status codes in your JSON responses. You may c
 
 ## Contribution
 
-Contributions are more than welcome and you're free to create a pull request on Github. Please see [contributing.md]() for more details.
+Contributions are more than welcome and you're free to create a pull request on Github. You can run tests with the following command:
+
+```shell
+vendor/bin/phpunit
+```
 
 If you find bugs or have suggestions for improvements, feel free to submit an issue on Github. However, if the issue is a security related issue, please send an email to [flugged@gmail.com]() instead.
 
