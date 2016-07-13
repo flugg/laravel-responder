@@ -1,10 +1,10 @@
 # Laravel Responder
 
-[![Latest Stable Version](https://poser.pugx.org/mangopixel/laravel-responder/v/stable?format=flat-square)](https://github.com/mangopixel/laravel-responder)
-[![Packagist Downloads](https://img.shields.io/packagist/dt/mangopixel/laravel-responder.svg?style=flat-square)](https://packagist.org/packages/mangopixel/laravel-responder)
+[![Latest Stable Version](https://poser.pugx.org/flugger/laravel-responder/v/stable?format=flat-square)](https://github.com/flugger/laravel-responder)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/flugger/laravel-responder.svg?style=flat-square)](https://packagist.org/packages/flugger/laravel-responder)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](license.md)
-[![Build Status](https://img.shields.io/travis/mangopixel/laravel-responder/master.svg?style=flat-square)](https://travis-ci.org/mangopixel/laravel-responder)
-[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/mangopixel/laravel-responder.svg?style=flat-square)](https://scrutinizer-ci.com/g/mangopixel/laravel-responder/?branch=master)
+[![Build Status](https://img.shields.io/travis/flugger/laravel-responder/master.svg?style=flat-square)](https://travis-ci.org/flugger/laravel-responder)
+[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/flugger/laravel-responder.svg?style=flat-square)](https://scrutinizer-ci.com/g/flugger/laravel-responder/?branch=master)
 
 __Work in progress, do not use in production!__
 
@@ -21,7 +21,7 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
     - [Transformers](#transformers)
     - [Serializers](#transformers)
     - [Error Responses](#error-responses)
-    - [Exception Handling](#exception-handling)
+    - [Exceptions](#exceptions)
     - [Testing Helpers](#testing-helpers)
 - [Configuration](#installation)
 - [Extension](#extension)
@@ -599,7 +599,7 @@ return [
 ];
 ```
 
-These messages are for the default Laravel exceptions, thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exception handling]().
+These messages are for the default Laravel exceptions, thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exceptions]().
 
 The error messages keys map up to an error code. So if you add the following line to the language file...
 
@@ -626,15 +626,107 @@ return $this->errorResponse( 'bomb_found', 400 );
 }
 ```
 
-### Exception Handling
+### Exceptions
 
-#### Extending the Handler
+When something bad happens, you might prefer to throw an actual exception instead of using the `error()` method. And even if you don't, you might want the package to catch Laravel's own exceptions, to convert them to proper JSON error responses for your API. 
 
-#### Using the Trait
+#### Handle Exceptions
+
+If you let the package handle exceptions, the package will catch all exceptions that extend `Flugg\Responder\Exceptions\ApiException` and turn them into informative JSON error responses.
+
+To let the package handle exceptions you need to add some code to `app/Exceptions/Handler.php`. You have two options: extend the package exceptions handler or use a trait and add a code snippet.
+
+##### Option 1: Extend Package Handler
+
+You may let the package handle your exceptions by extending the package exception handler instead of the Laravel one. 
+
+To do so, replace the following import in your exceptions handler...
+
+```php
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+```
+
+...with this one:
+
+```php
+use Flugg\Responder\Exceptions\Handler as ExceptionHandler;
+```
+
+##### Option 2: Use Trait
+
+There exists other packages where you also need to extend their exception handlers. Since you can not extend more than one class at once, this quickly turns problematic. Which is why we provide an alternative way of adding the handler.
+
+Just add the `Flugg\Responder\Traits\HandlesApiErrors` trait to your exceptions handler, and add the following code to your render method:
+
+```php
+public function render( $request, Exception $e )
+{
+    if ( $e instanceof Flugg\Responder\Exceptions\ApiException ) {
+        return $this->renderApiErrors( $e );
+    }
+
+    return parent::render( $request, $e );
+}`
+```
 
 #### Catching Laravel Exceptions
 
+Laravel throws a few exceptions when things go wrong. For instance, if no model could be found during route model binding, an `Illuminate\Database\Eloquent\ModelNotFoundException` exception will be thrown. This exception is handled by the package if you added the package exception handling, as explained in the previous section.
+
+However, when validation or authorization fails, a more generic `Illuminate\Http\Exception\HttpResponseException` is thrown. Since this exception is thrown from multiple sources, the package wont be able to distinct a validation error from an authorization error.
+
+Luckily, Laravel allows you to override the `failedValidation()` and `failedAuthorization()` methods in your request files to throw your own exception. The package has a trait, `Flugg\Responder\Traits\ThrowsApiErrors`, which does just that.
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Flugg\Responder\Traits\ThrowsApiErrors;
+
+abstract class Request extends FormRequest
+{
+    use ThrowsApiErrors;
+}
+```
+
+The exceptions thrown by this trait extends `Flugg\Responder\Exceptions\ApiException`, so they are picked up by the package exceptions handler.
+
+***
+_As discussed in the [Transformers](#converting-to-camel-case) section, you can also use the `Flugg\Responder\Traits\ConvertsToSnakeCase` trait in your base request class to convert incoming parameters to snake case._
+***
+
 #### Creating Custom Exceptions
+
+The package provides a few exceptions to handle default Laravel exceptions. However, you may want to create your own exceptions to handle custom errors. You are free to create as many exceptions as you like, but if you want them to be automatically caught and converted to a JSON response by the package, they will need to extend `Flugg\Responder\Exceptions\ApiException`.
+
+When creating exceptions that extend `Flugg\Responder\Exceptions\ApiException`, you will get access to two protected properties you can declare to set status code and error code. The package will use these properties when converting the exception to a JSON response. Below is an example exception:
+
+```php
+<?php
+
+namespace App\Exceptions;
+
+use Flugg\Responder\Exceptions\ApiException;
+
+class CustomException extends ApiException
+{
+    /**
+     * The HTTP status code.
+     *
+     * @var int
+     */
+    protected $statusCode = 400;
+
+    /**
+     * The error code used for API responses.
+     *
+     * @var string
+     */
+    protected $errorCode = 'custom_error';
+}
+```
 
 ### Testing Helpers
 
@@ -652,10 +744,14 @@ Wether or not you want to include status codes in your JSON responses. You may c
 
 ## Contribution
 
-Contributions are more than welcome and you're free to create a pull request on Github. Please see [contributing.md]() for more details.
+Contributions are more than welcome and you're free to create a pull request on Github. You can run tests with the following command:
 
-If you find bugs or have suggestions for improvements, feel free to submit an issue on Github. However, if the issue is a security related issue, please send an email to [flugged@gmail.com]() instead.
+```shell
+vendor/bin/phpunit
+```
+
+If you find bugs or have suggestions for improvements, feel free to submit an issue on Github. However, if it's a security related issue, please send an email to flugged@gmail.com instead.
 
 ## License
 
-Laravel Responder is free software distributed under the terms of the MIT license. See [license.md]() for more details.
+Laravel Responder is free software distributed under the terms of the MIT license. See [license.md](license.md) for more details.
