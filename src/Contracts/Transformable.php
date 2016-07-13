@@ -38,5 +38,5 @@ interface Transformable
      * @param  string $key
      * @return bool
      */
-    public function relationLoaded();
+    public function relationLoaded( $key );
 }

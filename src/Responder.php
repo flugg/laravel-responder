@@ -82,18 +82,15 @@ class Responder implements ResponderContract
     {
         if ( is_null( $data ) ) {
             return new FractalNull();
+        } elseif ( $data instanceof Transformable ) {
+            return $this->transformModel( $data, $transformer );
+        } elseif ( $data instanceof Collection ) {
+            return $this->transformCollection( $data, $transformer );
+        } elseif ( $data instanceof LengthAwarePaginator ) {
+            return $this->transformPaginator( $data, $transformer );
         }
 
-        switch ( true ) {
-            case $data instanceof Transformable:
-                return $this->transformModel( $data, $transformer );
-            case $data instanceof Collection:
-                return $this->transformCollection( $data, $transformer );
-            case $data instanceof LengthAwarePaginator:
-                return $this->transformPaginator( $data, $transformer );
-            default:
-                throw new InvalidArgumentException( 'Data must be one or multiple models implementing the Transformable contract.' );
-        }
+        throw new InvalidArgumentException( 'Data must be one or multiple models implementing the Transformable contract.' );
     }
 
     /**
