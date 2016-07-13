@@ -2,7 +2,6 @@
 
 namespace Mangopixel\Responder;
 
-use Illuminate\Support\Collection;
 use League\Fractal\Scope;
 use League\Fractal\TransformerAbstract;
 use Mangopixel\Responder\Contracts\Transformable;
@@ -17,13 +16,41 @@ use Mangopixel\Responder\Contracts\Transformable;
  */
 abstract class Transformer extends TransformerAbstract
 {
+    /**
+     * The transformable model associated with the transformer.
+     *
+     * @var Transformable
+     */
     protected $model;
 
+    /**
+     * Constructor.
+     *
+     * @param Transformable $model
+     */
     public function __construct( Transformable $model = null )
     {
         $this->model = $model;
     }
 
+    /**
+     * Get avilable includes.
+     *
+     * @return array
+     */
+    public function getAvailableIncludes()
+    {
+        return array_keys( $this->model->getRelations() );
+    }
+
+    /**
+     * This method is fired to loop through available includes, see if any of
+     * them are requested and permitted for this scope.
+     *
+     * @param  Scope $scope
+     * @param  mixed $data
+     * @return array
+     */
     public function processIncludedResources( Scope $scope, $data )
     {
         $includedData = [ ];
@@ -36,6 +63,15 @@ abstract class Transformer extends TransformerAbstract
         return $includedData === [ ] ? false : $includedData;
     }
 
+    /**
+     * Include a resource only if it is available on the method.
+     *
+     * @param  Scope  $scope
+     * @param  mixed  $data
+     * @param  array  $includedData
+     * @param  string $include
+     * @return array
+     */
     protected function includeResourceIfAvailable( Scope $scope, $data, $includedData, $include )
     {
         if ( $resource = $this->callIncludeMethod( $scope, $include, $data ) ) {
@@ -47,38 +83,23 @@ abstract class Transformer extends TransformerAbstract
         return $includedData;
     }
 
+    /**
+     * Call Include Method.
+     *
+     * @param  Scope  $scope
+     * @param  string $includeName
+     * @param  mixed  $data
+     * @return \League\Fractal\Resource\ResourceInterface
+     * @throws \Exception
+     */
     protected function callIncludeMethod( Scope $scope, $includeName, $data )
     {
-        if ( ! $data->relationLoaded( $includeName ) ) {
+        if ( ! $data instanceof Transformable || ! $data->relationLoaded( $includeName ) ) {
             return false;
         }
 
-        $responder = app( Responder::class );
         $data = $data->$includeName;
 
-        if ( $data instanceof Transformable ) {
-            $transformer = $data::transformer();
-            $resource = $responder->transform( $data, new $transformer( $data ) );
-
-        } elseif ( $data instanceof Collection && $data->count() > 0 ) {
-            $model = get_class( $data->first() );
-            $transformer = $model::transformer();
-            $resource = $responder->transform( $data, new $transformer( $model ) );
-
-        } else {
-            $resource = $responder->transform();
-        }
-
-        return $resource;
-    }
-
-    /**
-     * Getter for availableIncludes.
-     *
-     * @return array
-     */
-    public function getAvailableIncludes()
-    {
-        return array_keys( $this->model->getRelations() );
+        return app( Responder::class )->transform( $data );
     }
 }
