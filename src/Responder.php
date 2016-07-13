@@ -140,9 +140,9 @@ class Responder implements ResponderContract
     /**
      * Transform the data using the given transformer.
      *
-     * @param  Collection       $data
-     * @param  Transformer|null $transformer
-     * @param  string           $resourceKey
+     * @param  Transformable|Collection $data
+     * @param  Transformer|null         $transformer
+     * @param  string                   $resourceKey
      * @return FractalCollection
      */
     protected function transformData( $data, Transformer $transformer, string $resourceKey ):FractalCollection
