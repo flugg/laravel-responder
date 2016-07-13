@@ -13,8 +13,8 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
 ## Table of Contents
 
 - [Requirements](#requirements)
+- [Philosophy](#philosophy)
 - [Installation](#installation)
-- [Philosophy](#success-responses)
 - [Usage](#usage)
     - [Accessing the Responder](#accessing-the-responder)
     - [Success Responses](#success-responses)
@@ -33,6 +33,38 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
 This package requires:
 - PHP __7.0__+
 - Laravel __5.0__+
+
+## Philosophy
+
+When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/league/fractal) has som great tools for building powerful APIs. Among other things, it gives you a transformation layer to make sure you expose the right data and serializers which structures your responses in a consistent manner.
+
+While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate it into the framework. Here is an example response using Fractal in a Laravel controller:
+
+```php
+ public function index()
+ {
+    $users = User::all();
+    $fractal = new Manager();
+    $resource = new Collection( $users, new UserTransformer() );
+
+    return response()->json( $fractal->createData( $resource )->toArray() );
+ }
+```
+
+I admit, the Fractal manager could be moved outside the controller. You could also return the array directly, however, as soon as you want to return a different status code than `200`, you probably want to use `response()->json()` anyway.
+
+The point is, we all get a little spoiled by Laravel's magic. Wouldn't it be sweet if the above could be rewritten as:
+
+```php
+public function index()
+{
+    $users = User::all();
+
+    return $this->successResponse( $users );
+}
+```
+
+By calling on Fractal behind the scenes, the package will automatically transform your models and related models. It will also serialize the data with a serializer of your choice and wrap the data in an `Illuminate\Http\JsonResponse` instance. No longer will you have to call on different Fractal methods depending on if you're dealing with a model or a collection, the package deals with all of it automatically under the hood.
 
 ## Installation
 
@@ -60,7 +92,7 @@ If you like facades you may also append the `ApiResponse` facade to the `aliases
 
 #### Publishing Package Assets
 
-You should also publish the package configuration and language file using the Artisan command:
+You also need to publish the package configuration and language file using the Artisan command:
 
 ```shell
 php artisan vendor:publish
@@ -270,7 +302,7 @@ _Note how we're converting snake case fields to camel case. You can read more ab
 
 The package gives you an Artisan command you can use to quickly generate new transformers:
 
-```bash
+```shell
 php artisan make:transformer UserTransformer
 ```
 
@@ -280,7 +312,7 @@ It will automatically resolve what model to inject from the name. For instance, 
 
 If you store your models somewhere else you may also use the `--model` option to specify model path:
 
-```bash
+```shell
 php artisan make:transformer UserTransformer --model="App\Models\User"
 ```
 
