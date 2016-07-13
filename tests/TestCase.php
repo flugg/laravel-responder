@@ -124,12 +124,12 @@ abstract class TestCase extends BaseTestCase
         {
             use RespondsWithJson;
 
-            public function successMethod( $fruit )
+            public function successAction( $fruit )
             {
                 return $this->successResponse( $fruit );
             }
 
-            public function errorMethod()
+            public function errorAction()
             {
                 return $this->errorResponse( 'test_error', 400, 'Test error.' );
             }

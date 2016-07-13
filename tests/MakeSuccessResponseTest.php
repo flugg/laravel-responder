@@ -61,7 +61,7 @@ class MakeSuccessResponseTest extends TestCase
         $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
 
         // Act...
-        (new $controller)->successMethod( $fruit );
+        (new $controller)->successAction( $fruit );
     }
 
     /**
