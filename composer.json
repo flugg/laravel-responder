@@ -1,5 +1,5 @@
 {
-    "name": "mangopixel/laravel-responder",
+    "name": "flugger/laravel-responder",
     "description": "A Laravel package for APIs, wrapping the Fractal library behind an elegant Laravel API.",
     "keywords": [
         "laravel",
@@ -9,7 +9,7 @@
         "fractal",
         "transformers"
     ],
-    "homepage": "https://github.com/mangopixel/laravel-responder",
+    "homepage": "https://github.com/flugger/laravel-responder",
     "license": "MIT",
     "authors": [
         {
