@@ -8,73 +8,230 @@
 
 __Work in progress, do not use in production!__
 
+Laravel Responder is a package that integrates [Fractal](https://github.com/thephpleague/fractal) into Laravel. It will automatically transform your Eloquent models and serialize your API responses using a simple and elegant syntax. You can use it to send both success- and error responses, and it gives you tools to handle exceptions and integration test your responses.
+
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Philosophy](#success-responses)
+- [Usage](#usage)
+    - [Accessing the Responder](#accessing-the-responder)
+    - [Success Responses](#success-responses)
+    - [Transformers](#transformers)
+    - [Serializers](#transformers)
+    - [Error Responses](#error-responses)
+    - [Exception Handling](#exception-handling)
+    - [Testing Helpers](#testing-helpers)
+- [Configuration](#installation)
+- [Extension](#extension)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Requirements
 
 This package requires:
-- PHP 7.0+
-- Laravel 5.0+
+- PHP __7.0__+
+- Laravel __5.0__+
 
 ## Installation
 
 Install the package through Composer:
 
 ```shell
-composer require mangopixel/laravel-responder
+composer require flugg/laravel-responder
 ```
+
+#### Registering Service Provider
 
 After updating Composer, append the following service provider to the `providers` key in `config/app.php`:
 
 ```php
-Mangopixel\Responder\ResponderServiceProvider::class
+Flugg\Responder\ResponderServiceProvider::class
 ```
+
+#### Registering Facade
 
 If you like facades you may also append the `ApiResponse` facade to the `aliases` key:
 
 ```php
-'ApiResponse' => Mangopixel\Responder\Facades\ApiResponse::class
+'ApiResponse' => Flugg\Responder\Facades\ApiResponse::class
 ```
 
-You may also publish the package configuration file using the following Artisan command:
+#### Publishing Package Assets
+
+You should also publish the package configuration and language file using the Artisan command:
 
 ```shell
-php artisan vendor:publish --provider="Mangopixel\Responder\ResponderServiceProvider"
+php artisan vendor:publish
 ```
 
-This will add a `responder.php` configuration file in your `config` folder you can use to customize how the package behaves. It will also publish an `errors.php` file inside your `lang/en` folder which is used to convert error codes to specific messages. You may publish only the configuration or language file using the `config` and `lang` tags respectively.
+This will publish a `responder.php` configuration file in your `config` folder. 
+
+It will also publish an `errors.php` file inside your `lang/en` folder which is used to store your error messages.
 
 ## Usage
 
-...So why not use Fractal directly? Well, here is an example response using Fractal:
+The package has a `Flugg\Responder\Responder` service class which is responsible for generating success- and error JSON responses for your API. The service has a `success()` and `error()` method which returns an instance of `Illuminate\Http\JsonResponse`.
+
+### Accessing the Responder
+
+To begin creating API responses, you need to access the responder service. In good Laravel spirit you have multiple ways of doing the same thing.
+
+#### Option 1: Dependency Injection
+
+You may inject the service directly into your controller to create success responses:
 
 ```php
- public function index()
- {
+public function index( Responder $responder )
+{
     $users = User::all();
-    $fractal = new Manager();
-    $resource = new Collection( $users->toArray(), new UserTransformer() );
-
-    return response()->json( $fractal->createData( $resource )->toArray() );
- }
+    
+    return $responder->success( $users );
+}
 ```
 
-I admit, the fractal manager could be refactored away. You could also return the array directly, but as soon as you want to return a different status code than 200, you need to wrap it in `response()->json()` anyway.
+You may also create error responses:
 
-The point is, we all get a little spoiled by Laravel's magic. Wouldn't it be sweet if the above could be rewritten as:
+```php
+return $responder->error( 'invalid_user' );
+```
+
+#### Option 2: Facade
+
+Optionally, you may use the `ApiResponse` facade to create responses:
+
+```php
+return Responder::success( $users );
+```
+```php
+return Responder::error( 'invalid_user' );
+```
+
+#### Option 3: Helper Method
+
+Additionally, you can use the `responder()` helper method if you're fan of Laravel's `response()` helper method:
+
+```php
+return responder()->success( $users );
+```
+```php
+return responder()->error( 'invalid_user' );
+```
+
+Both the helper method and the facade are just different ways of accessing the responder service, so you have access to the same methods.
+
+#### Option 4: Trait
+
+Lastly, the package also has a `Flugg\Responder\Traits\RespondsWithJson` trait you can use in your base controller.
+
+The trait gives you access to `successResponse()` and `errorResponse()` methods in your controllers: 
+
+```php
+return $this->successResponse( $users );
+```
+```php
+return $this->errorResponse( 'invalid_user' );
+```
+
+These methods call on the service behind the scene.
+
+***
+_As described above, you may generate responses in multiple ways. Which way you choose is up to you, the important thing is to stay consistent. We will use the facade for the remaining of the documentation for simplicity sake._
+***
+
+### Success Responses
+
+When a user makes a valid request to your API you probably want to provide an informative response in return to let the user know the request succeeded. You may use the `success()` method for this:
 
 ```php
 public function index()
 {
     $users = User::all();
-
-    return $this->successResponse( $users )
+    
+    return Responder::success( $users );
 }
 ```
 
-Well, with this package you can! It will automatically call Fractal behind the scenes and calls the `UserTransformer` magically because you're returning a collection of `User` models. It will also create a Fractal resource or item depending on if you pass in a single model instance or a collection of models. Interested? Read on!
+The first argument is the data you want to transform, and should be an Eloquent model or a collection of Eloquent models. You may also pass in an `Illuminate\Paginator\LengthAwarePaginator` instance when using Laravel's paginator.
+
+***
+_If you try to run the above code you will get an exception saying the given model is not transformable. This is because all models you pass into the `success()` method must implement the `Flugg\Responder\Contracts\Transformable` contract and have a corresponding transformer. More on this in the [Transformers section](#transformers)._
+***
+
+#### Setting Status Codes
+
+The status code is `200` by default, but can easily be changed by adding an optional second argument to the `success()` method:
+
+```php
+return Responder::success( $user, 201 );
+```
+
+Sometimes you may not want to return anything, but still notify the user that the request was successful. In that case you may pass in the status code as the first argument and omit the data parameter:
+
+```php
+return Responder::success( 204 );
+```
+
+#### Adding Meta Data
+
+You may want to pass in additional data to the response, you may do so by adding an additional third argument:
+
+```php
+return Responder::success( $user, 200, [ 'foo' => 'bar' ] );
+```
+
+You may also omit the status code if you want to send a default `200` response:
+
+```php
+return Responder::success( $user, [ 'foo' => 'bar' ] );
+```
+
+You may even omit the data parameter if you pass in a status code as the first argument:
+
+```php
+return Responder::success( 204, [ 'foo' => 'bar' ] );
+```
+
+#### Relationships
+
+Using Fractal, you can include relationships to your responses using the `parseIncludes()` method on the manager instance, and add the available relationship as an `$availableIncludes` array in your transformers.
+
+With Laravel Responder you don't have to do any of these things. It integrates neatly with Eloquent and automatically parses relationships:
+
+```php
+public function index()
+{
+    $users = User::with( 'profile', 'roles.permissions' )->all();
+    
+    return Responder::success( $users );
+}
+```
+
+#### Pagination
+
+Adding pagination to your responses is equally easy. You can simply use Laravel's `paginate()` method on the query builder:
+
+```php
+public function index()
+{
+    $users = User::paginate( 15 );
+    
+    return Responder::success( $users );
+}
+```
+
+The package will then automatically add info about the paginated results in the response data, depending on which [serializer](#serializer) you use.
+
+#### Cursors
+
+__TODO__
 
 ### Transformers
 
-TTransformers are classes which only responsibility is to transform one set of data to another. You may use a transformer to cast your fields to a certain type or only return a limited set of fields back, ou could also create entirely new fields. Here is an example:
+Transformers are classes which only have one responsibility; to transform one set of data to another. In our case we want to transform an Eloquent model into an array. The package provides its own abstract transformer, `Flugg\Responder\Transformer`. This transformer extends `League\Fractal\Transformer` and adds integration with Eloquent.
+
+Your transformers should extend the package transformer as follows:
 
 ```php
 <?php
@@ -82,9 +239,9 @@ TTransformers are classes which only responsibility is to transform one set of d
 namespace App\Transformer;
 
 use App\User;
-use Mangopixel\Responder\Transformer;
+use Flugg\Responder\Transformer;
 
-class BookTransformer extends Transformer
+class UserTransformer extends Transformer
 {
     /**
      * Transform the model data into a generic array.
@@ -92,30 +249,34 @@ class BookTransformer extends Transformer
      * @param  User $user
      * @return array
      */
-	public function transform( User $user )
-	{
-	    return [
-	        'id'       => (int) $user->id,
-	        'email'    => $user->email,
-	        'fullName' => $user->first_name . ' ' . $user->last_name
-	    ];
-	}
+    public function transform( User $user )
+    {
+        return [
+            'id'       => (int) $user->id,
+            'email'    => $user->email,
+            'fullName' => $user->first_name . ' ' . $user->last_name
+        ];
+    }
 }
 ```
 
-It basically gives you a way to abstract your database logic away from your API design. As you can see from the example above, we cast the id to an integer to make sure it's not returned as a string. We also create a new field `fullName` which concatenates `first_name` and `last_name` attributes from the model. Also notice how this allows us to convert fields to camelcase in your JSON responses.
+Transformers basically give you a way to abstract your database logic from your API design, and transforms all values to the correct type. As seen in the example above, we cast the user id to an integer. Then we concatenate the first- and last name together, and only expose a `fullName` field to the API.
 
-#### Creating transformers
+***
+_Note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case]() section._
+***
 
-The package gives you an Artisan command you can use to quickly generate new transformers. After installing the package you may call the following Artisan command in the terminal:
+#### Creating Transformers
+
+The package gives you an Artisan command you can use to quickly generate new transformers:
 
 ```bash
 php artisan make:transformer UserTransformer
 ```
 
-This will create a new `UserTransformer.php` in a new `app/Transformers` folder.
+This will create a new `UserTransformer.php` in an `app/Transformers` folder.
 
-It will automatically resolve what model the template should include from the name. For instance, in the example above the package will extract `User` from `UserTransformer` and assume the models live directly in the app folder (as per Laravel's default). This means the model inside the transformer will be `User\App`.
+It will automatically resolve what model to inject from the name. For instance, in the example above the package will extract `User` from `UserTransformer` and assume the models live directly in the app folder (as per Laravel's default).
 
 If you store your models somewhere else you may also use the `--model` option to specify model path:
 
@@ -123,21 +284,20 @@ If you store your models somewhere else you may also use the `--model` option to
 php artisan make:transformer UserTransformer --model="App\Models\User"
 ```
 
-Do note that the transformer class extends from the `Mangopixel\Responder\Transformer` abstract class, which again extends Fractal's `League\FractalTransformerAbstract`.
+#### Mapping Transformers to Models
 
-#### Mapping transformer to model
+When you pass in a model or a collection of models into the `success` method, the package will automatically transform the models. However, because you're free to place your transformers anywhere you want, the package has no way of knowing which transformer to use for each model. 
 
-Remember what I said earlier about the package magically finding the correct transformer when you pass in a model to the `successResponse` method? Well, I wasn't completely honest with you.
-
-You're not bound to placing the transformers inside the `app/Transformers` folder, you can place them wherever you want. So, we need a way to find the correct transformer. What if, instead of applying the transformer to the response each time you respond with a user resource, you can instead specify what transformer to use in your models:
+To map a transformer to a model, you need to implement `Flugg\Responder\Contract\Transformable` in your models. The interface requires you to create a static `transformer()` method, which should return the path to the corresponding transformer:
 
 ```php
 <?php
 
 namespace App;
 
+use App\Transformers\FruitTransformer;
 use Illuminate\Database\Eloquent\Model;
-use Mangopixel\Responder\Contracts\Transformable;
+use Flugg\Responder\Contracts\Transformable;
 
 class Fruit extends Model implements Transformable
 {
@@ -148,207 +308,133 @@ class Fruit extends Model implements Transformable
      */
     public static function transformer()
     {
-        return \App\Transformers\UserTransformer::class;
+        return FruitTransformer::class;
     }
 }
 ```
 
-Here we implement a `Mangopixel\Responder\Contracts\Transformable` interface which requires you to create a transformer method which returns the path to the transformer.
+All models you expose to the API should implement the `Flugg\Responder\Contract\Transformable` contract. If you don't want to transform a given model, you can simply return `null`:
 
-Each model you want to pass into the `successResponse` method must implement the contract. If you don't want to transform a given method you may just return `null` from the `transformer` method:
+```php
+public static function transformer()
+{
+    return null;
+}
+```
+
+#### Converting to Camel Case
+
+You may want to expose all fields in your API in camel case, however, Eloquent uses snake case attributes by default. A transformer is one of the last things that take place before the data is returned to the API, and is a perfect location to do the conversion to camel casing:
+
+```php
+public function transform( User $user )
+{
+    return [
+        'id'        => (int) $user->id,
+        'roleId'    => (int) $user->permission_id,
+        'isAdmin'   => (bool) $user->is_admin,
+        'createdAt' => (string) $user->created_at,
+        'updatedAt' => (string) $user->updated_at
+    ];
+}
+```
+
+This is great, but only works for API responses, and not for request parameters. Imagine you create a user from the request input with camel case fields:
+
+```php
+User::create( request()->all() );
+```
+
+That wont work because the user model expects snake case fields. However, the package has a `Flugg\Responder\Traits\ConvertToSnakeCase` trait, which you can use in your `app/Http/Requests/Request.php` file to automatically convert all incoming parameters to snake case:
 
 ```php
 <?php
 
-namespace App;
+namespace App\Http\Requests;
 
-use Illuminate\Database\Eloquent\Model;
-use Mangopixel\Responder\Contracts\Transformable;
+use Illuminate\Foundation\Http\FormRequest;
+use Mangopixel\Responder\Traits\ConvertToSnakeCase;
 
-class Fruit extends Model implements Transformable
+abstract class Request extends FormRequest
 {
-    /**
-     * The path to the transformer class.
-     *
-     * @return string|null
-     */
-    public static function transformer()
-    {
-        return null;
-    }
+    use ConvertToSnakeCase;
 }
 ```
 
-The idea is, every model you return from your API should be transformable, wether you apply a transformer or not is up to you.
+### Serializers
 
-Now we know about transformers, but how do we use them in practice?
+After your models have been transformed, the data will be serialized using the serializer set in the configuration file. The serializer structures your data output in a certain way. It can also add additional data like pagination information and meta data.
 
-### Success responses
+When all responses are serialized with the same serializer, you end up with a consistent API, and if you want to change the structure in the future, you can simply change the serializer in the configurations.
 
-When a user makes a valid request to your API you will want to provide an informative response in return to let the user know the request succeeded. You usually want to uniform all these responses to make sure the structure of the response is the same for all requests. You may also want to transform your responses with a transformer to ensure all data returned from the API is of correct type.
+#### Default Serializer
 
-#### Making success responses
-
-There are multiple ways you can generate success responses with the package.
-
-##### Using trait
-
-One way to create JSON API responses is to use the `Mangopixel\Responder\Traits\RespondsWithJson` trait in your controllers. You may use the trait in your `app/Http/Controller.php` file to get access to the methods from all controllers.
-
-The trait give you access to two methods: `successResponse` and `errorResponse`. Let's look closer at the `successResponse` trait, we will look more at error responses later on. To create a success response you may return the method from any controller method:
-
-```php
-public function create()
-{
-    $user = User::create( request()->all() );
-
-    return $this->successResponse( $user, 201 );
-}
-```
-
-Here we're creating a new user and returning the created user back to the user with a status code of 201 (created). The status code defaults to 200.
-
-Since we're only operating with a single model instance, the package will create a new `League\Fractal\Resource\Item` instance behind the scenes. It will also serialize the response using the serializer provided in the configurations. Then it will return back the response as a `Illuminate\Http\JsonResponse`.
-
-This means you can modify the response like you would to a regular `response()->json()` call:
-
-```php
-public function create()
-{
-    $user = User::create( request()->all() );
-
-    return $this->successResponse( $user, 201 )->withHeaders( [ 'X-Example', 'value' ] );
-}
-```
-
-##### Using facade
-
-_Make sure you register the facade as explained in the installation guide above before you embark on this chapter._
-
-An optional way to create responses is to use the `ApiResponse` facade, in good company of Laravel's own `Response` facade. Creating a successful response using the facade is just as easy as with the trait:
-
-```php
-public function create()
-{
-    $user = User::create( request()->all() );
-
-    return ApiResponse::success( $user, 201 );
-}
-```
-
-Make sure you also import the facade with `use ApiResponse` in the top. Also do note the only difference is the facade does not use suffix the method name with Response, the response will be identical and they call on the same method behind the scenes.
-
-##### Using dependency injection
-
-You may also access the API responder through dependency injection:
-
-```php
-public function create( Responder $responder )
-{
-    $user = User::create( request()->all() );
-
-    return $responder->success( $user, 201 );
-}
-```
-
-The responder injected here is the actual responder service which does all the hard work behind the scenes. Both the trait and facade uses this service internally.
-
-You may of course also inject it in the constructor to have access to it from multiple methods:
-
-```php
-<?php
-
-namespace App\Http\Controllers;
-
-use App\User;
-use Mangopixel\Responder\Contract\Responder;
-
-class TestsController extends Controller
-{
-    protected $responder;
-
-    public function __construct( Responder $responder ) {
-        $this->responder = $responder;
-    }
-
-    public function create()
-    {
-        $user = User::create( request()->all() );
-
-        return $this->responder->success( $user, 201 );
-    }
-}
-
-```
-
-The service can also be retrieved from the service container using the `Mangopixel\Responder\Contract\Responder` contract:
-
-```php
-public function create()
-{
-    $user = User::create( request()->all() );
-
-    return app( Responder::class )->success( $user, 201 );
-}
-```
-
-However, whichever option you choose, I suggest you to stick to one for consistency sake.
-
-#### Serializing responses
-
-All success responses will be serialized using the same serializer to make sure all responses from your API remain in the same style.
-
-All serializing is done through Fractal and it provides three serializers you can use out of the box. We've also created our own opinionated serializer which is the default serializer used. You can change which serializer you want to use through the `serializer` key in the configurations.
-
-##### Default serializer
-
-Let's take a look at how an example response with our `Mangopixel\Responder\Serializers\ApiSerializer` looks like:
+The package brings its own serializer `Flugg\Responder\Serializers\ApiSerailizer`, which is the default serializer. Below is an example response with a user model, with a related role model:
 
 ```json
 {
-    "success": true,
     "status": 200,
+    "success": true,
     "data": {
-        "id': 1,
-        "email': 'example@email.com',
-        'fullName': 'John Doe'
+        "id": 1,
+        "email": "example@email.com",
+        "fullName": "John Doe",
+        "role": {
+            "name": "admin"
+        }
     }
 }
 ```
 
-##### Array serializer
+The response output is quite similar to Laravel's default, except it wraps the data inside a `data` field. It also includes a `success` field to quickly tell the user if the request was successful or not.
 
-Let's take a look at the simplest serializer from Fractal, `League\Fractal\Serializer\ArraySerializer`:
+***
+_The `status` field is actually not part of the default serializer, but instead added by the package after serializing the data. You can disable this in the [configurations](#configurations)._
+***
+
+#### Fractal Serializers
+
+If the default serializer is not your cup of tea, you can easily swap it out with one of the three serializers included with Fractal.
+
+##### ArraySerializer
+
+The above example would look like the following using `League\Fractal\Serializers\ArraySerializer`:
 
 ```json
 {
-    'id': 1,
-    'email': 'example@email.com',
-    'fullName': 'John Doe'
+    "id": 1,
+    "email": "example@email.com",
+    "fullName": "John Doe",
+    "role": {
+        "name": "admin"
+    }
 }
 ```
 
-As you see this is the same as what you would normally get from a JSON response in Laravel. However, putting the data in its own `data` field can be useful when we want to attach meta data.
+##### DataArraySerializer
 
-##### Data array serializer
-
-A slightly more advanced serializer from Fractal is the `League\Fractal\Serializer\DataArraySerializer`:
+You can also add the `data` field using `League\Fractal\Serializers\DataArraySerializer`:
 
 ```json
 {
     "data": {
         "id": 1,
         "email": "example@email.com",
-        "fullName": "John Doe"
+        "fullName": "John Doe",
+        "role": {
+            "data": {
+                "name": "admin"
+            }
+        }
     }
 }
 ```
 
-It"s basically the same as the array serializer, but with data in its own field.
+Do note how the `data` field applies to every relation as well in this case, unlike the default package serializer.
 
-##### JSON API serializer
+##### JsonApiSerializer
 
-The `League\Fractal\Serializer\JsonApiSerializer` serializer is the most sophisticated serializer from Fractal and follows the JSON-API standard:
+Fractal also has a representation of the [JSON-API](http://jsonapi.org/) standard, using `League\Fractal\Serializers\JsonApiSerializer`:
 
 ```json
 {
@@ -359,99 +445,74 @@ The `League\Fractal\Serializer\JsonApiSerializer` serializer is the most sophist
             "email": "example@email.com",
             "fullName": "John Doe"
         },
+        "relationships": {
+            "role": {
+                "data": {
+                    "type": "roles",
+                    "id": 1
+                }
+            }
+        }
+    },
+    "included": {
+        "role": {
+            "type": "roles",
+            "id": 1,
+            "attributes": {
+                "name": "admin"
+            }
+        }
     }
 }
 ```
 
-##### Creating a custom serializer
+As you can see, quite more verbose, but it definitiely has its uses.
 
-If you want to create a custom serializer or find out more about the Fractal serializers you can read more at [http://fractal.thephpleague.com/serializers/](http://fractal.thephpleague.com/serializers/). Just make sure to set the `serializer` key to your custom serializer in the configuration and the rest should go automatically:
+#### Custom Serializers
 
-```php
-'serializer' => App\Serializers\CustomSerializer::class
-```
+If none of the above serializers suit your taste, feel free to create your own and set the `serializer` key in the configuration file to point to your serializer class. You can read more about how to create your own serializer at [Fractal's documentation](http://fractal.thephpleague.com/serializers/).
 
-### Error responses
+### Error Responses
 
-Just like you can generate success responses on the fly, you may of course also generate some error responses. They shouldn't happen, but they do, let's figure out how to best handle them.
-
-#### Making error responses
-
-Just like with success responses above you have multiple choices when it comes to generating error responses.
-
-##### Using trait
-
-As with success reponses you may use the `Mangopixel\Responder\Traits\RespondsWithJson` trait in your `app/Http/Controller.php` file to get access to the `errorResponse` method:
+Just like we've been generating success responses, you can equally easy generate error responses when something does not go as planned:
 
 ```php
 public function index()
 {
-    if ( response()->has( 'bomb ) ) {
-        return $this->errorResponse( 'bomb_found', 400 );
+    if ( request()->has( 'bomb ) ) {
+        return Responder::error( 'bomb_found' );
     }
 }
 ```
 
-Here we're checking if the response has an input named 'bomb', if so we abort with an error code of 'bomb_found' and status code of `400 (Bad Request)`.
+The only required argument to the `error()` method is an error code. You can use any string as you like as the error code, later on we will map these to corresponding error messages.
 
 The example above will return the following JSON response:
 
 ```json
 {
+    "status": 500,
     "success": false,
-    "status": 400,
     "error": {
         "code": "bomb_found"
     }
 }
 ```
 
-Why do we have an `error` field with just a single field `code`? The `error` field will also include a `message` field if any message corresponding to the error code is found. More on this later.
-
-##### Using facade
-
-If you have registered the `ApiResponse` facade and follow the ways of the facades, you may also return an error response in the following way:
+The default status code for error responses is `500`. However, you can change the status code by passing in a second argument:
 
 ```php
-public function index()
-{
-    if ( response()->has( 'bomb ) ) {
-        return ApiResponse::error( 'bomb_found', 400 );
-    }
-}
+return Responder::error( 'bomb_found', 400 );
 ```
 
-Make sure you also import the facade with `use ApiResponse` in the top.
-
-##### Using dependency injection
-
-As with success responses, you may also access the API responder through dependency injection to make error responses:
+#### Setting Error Messages
+An error code is useful for many reasons, but it might not give enough clues to the user about what caused the error. So you might want to add a more descriptive error message to the response. You can do so by passing in a third argument to the `error()` method:
 
 ```php
-public function index()
-{
-    if ( response()->has( 'bomb ) ) {
-        return $responder->error( 'bomb_found', 400 );
-    }
-}
+return Responder::error( 'bomb_found', 400, 'No explosives allowed in this request.' );
 ```
 
-Just like shown in the examples with the success responses above you can also inject it through the constructor or resolve it from the service container.
-
-#### Adding error messages
-
-An error code is useful for many reasons, but it might not give enough clues to the user about what the error is. Therefore you might want to add a more descriptive error message to the response, you can pass along a message as the third parameter:
-
-```php
-public function create()
-{
-    if ( response()->has( 'bomb ) ) {
-        return $this->errorResponse( 'bomb_found', 400, 'No bombs allowed in this request' );
-    }
-}
-```
-
-The JSON response will then be the following:
+Which will output the following JSON:
 
 ```json
 {
@@ -459,12 +520,16 @@ The JSON response will then be the following:
     "status": 400,
     "error": {
         "code": "bomb_found",
-        "message": "No bombs allowed in this request."
+        "message": "No explosives allowed in this request."
     }
 }
 ```
 
-There will usually only be one message per error, however, validation errors are an exception to this rule. As there can be multiple error messages after validation all messages are put inside a `messages` field, note the plural form. An example:
+Notice how a `message` field was added inside the `error` field.
+
+There will in most cases only be one error message per error. However, validation errors are an exception to this rule. Since there can be multiple error messages after validation, all messages are put inside a `messages` field, instead of the singular `message`.
+
+An example response from a user registration request, where multiple validation rules failed:
 
 ```json
 {
@@ -480,9 +545,11 @@ There will usually only be one message per error, however, validation errors are
 }
 ```
 
-##### Language file
+#### Language File
 
-Instead of writing the error messages on the fly when you create the response, you can use the `errors.php` language file which should be in your `resources/lang/en` folder if you published vendor assets. The default language file looks like this:
+Instead of adding the error messages on the fly when you create the error responses, you can instead use the `errors.php` language file, which should be in your `resources/lang/en` folder if you published package assets. 
+
+The default language file looks like this:
 
 ```php
 <?php
@@ -495,21 +562,21 @@ return [
 ];
 ```
 
-These messages are for the default Laravel exceptions thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next chapter on exception handling.
+These messages are for the default Laravel exceptions thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exception handling]().
 
-The error messages keys map up to an error code, so if you add the following line to the language file:
+The error messages keys map up to an error code. So if you add the following line to the language file:
 
 ```php
-'bomb_found' => 'No bombs allowed in this request.',
-````
+'bomb_found' => 'No explosives allowed in this request.',
+```
 
-And create the following error response:
+And return the following error response:
 
 ```php
 return $this->errorResponse( 'bomb_found', 400 );
-````
+```
 
-It will return the same JSON as above:
+The following JSON will be generated:
 
 ```json
 {
@@ -517,106 +584,41 @@ It will return the same JSON as above:
     "status": 400,
     "error": {
         "code": "bomb_found",
-        "message": "No bombs allowed in this request."
+        "message": "No explosives allowed in this request."
     }
 }
 ```
 
-### Exception handling
+### Exception Handling
 
-When errors occour in your code you might prefer to throw an exception instead of using the `errorResponse` method. Even if you prefer the `errorResponse` method, you might be interested in letting the package catch exceptions thrown by Laravel and convert these to JSON responses. If so, read on!
+#### Extending the Handler
 
-#### Catching exceptions
+#### Using the Trait
 
-To allow the package to catch exceptions to convert them to JSON error responses we need to add some code to your application exception handler found in `app/Exceptions/Handler.php`. There are two ways you can let the package handle exceptions.
+#### Catching Laravel Exceptions
 
-##### Extending exception handler
+#### Creating Custom Exceptions
 
-You may let the package handle your exceptions by extending the package exception handler instead of the Laravel one. So, basically, make the following change to`app/Exceptions/Handler.php`:
+### Testing Helpers
 
-```php
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-```
+## Configuration
 
-With:
+#### Serializer Class Path
 
-```php
-use Mangopixel\Responder\Exceptions\Handler as ExceptionHandler;
-```
+The full class path to the serializer class you would like the package to use when generating successful JSON responses. You may change it to one of Fractal's serializers or create a custom one yourself.
 
-The package exception handler extends Laravel's exception handler.
+#### Include Status Code
 
-##### Using trait
+Wether or not you want to include status codes in your JSON responses. You may choose to include it for error responses, success responses or both, just by changing the configuration values listed below.
 
-There are other packages where you need to extend their exception handler in order for the package to work. Which is why we provide an alternative way of adding the handler.
+## Extension
 
-Just add the `Mangopixel\Responder\Traits\HandlesApiErrors` trait to your `app/Exceptions/Handler.php` file, and add the following code in the `render` method:
+## Contribution
 
-```php
-public function render( $request, Exception $e )
-{
-    if ( $e instanceof ApiException ) {
-        return $this->renderApiErrors( $e );
-    }
+Contributions are more than welcome and you're free to create a pull request on Github. Please see [contributing.md]() for more details.
 
-    return parent::render( $request, $e );
-}`
-```
-
-Make sure to import `ApiException` in the top: `use Mangopixel\Responder\Exceptions\ApiException`.
-
-That's all you need to do, now the package will catch all exceptions that extend `ApiException` and convert them to JSON responses. It will also catch some of the Laravel's built in Exceptions and convert them to package exceptions that extend `ApiException`, you can see a list of which exceptions further down.
-
-#### Creating your own exceptions
-
-
-
-### Extension
-
-#### Customizing the error response
-
-There is currently no similar idea to error responses as there is with serializers to success responses. However, you can customize the error response by creating your own `Responder` service that extends `Mangopixel\Responder\Responder` and binding it to the service container:
-
-```php
-$this->app->bind( \Mangopixel\Responder\Contracts\Responder::class, \App\Services\CustomResponder::class );
-```
-
-A good file to place this would be in your `app/Providers/AppServiceProvider.php`.
-
-The custom responder service would then need to override the `getErrorResponse` method:
-
-
-```php
-<?php
-
-namespace App\Services;
-
-use Mangopixel\Responder\Responder as BaseResponder;
-
-class CustomResponder extends BaseResponder
-{
-    /**
-     * Get the skeleton for an error response.
-     *
-     * @param string $errorCode
-     * @param int    $statusCode
-     * @return array
-     */
-    private function getErrorResponse( string $errorCode, int $statusCode ):array
-    {
-        return [
-            'success' => false,
-            'status' => $statusCode,
-            'error' => [
-                'code' => $errorCode
-            ]
-        ];
-    }
-}
-```
-
-You may change it whatever you like, however, the error message expects an `error` field to add messages to.
+If you find bugs or have suggestions for improvements, feel free to submit an issue on Github. However, if the issue is a security related issue, please send an email to [flugged@gmail.com]() instead.
 
 ## License
 
-Laravel Responder is free software distributed under the terms of the MIT license.
+Laravel Responder is free software distributed under the terms of the MIT license. See [license.md]() for more details.
