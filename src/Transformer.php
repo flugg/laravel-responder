@@ -2,6 +2,7 @@
 
 namespace Mangopixel\Responder;
 
+use Illuminate\Support\Collection;
 use League\Fractal\Scope;
 use League\Fractal\TransformerAbstract;
 use Mangopixel\Responder\Contracts\Transformable;

@@ -24,4 +24,11 @@ interface Transformable
      * @return string
      */
     public function getTable();
+
+    /**
+     * Get the table associated with the model.
+     *
+     * @return string
+     */
+    public function getRelations();
 }

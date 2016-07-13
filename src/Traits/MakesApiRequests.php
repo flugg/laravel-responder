@@ -115,4 +115,37 @@ trait MakesApiRequests
             ]
         ] );
     }
+
+    /**
+     * Asserts that the status code of the response matches the given code.
+     *
+     * @param  int $status
+     * @return $this
+     */
+    abstract protected function seeStatusCode( $status );
+
+    /**
+     * Assert that the response contains JSON.
+     *
+     * @param  array|null $data
+     * @param  bool       $negate
+     * @return $this
+     */
+    abstract public function seeJson( array $data = null, $negate = false );
+
+
+    /**
+     * Assert that the response contains an exact JSON array.
+     *
+     * @param  array $data
+     * @return $this
+     */
+    abstract public function seeJsonEquals( array $data );
+
+    /**
+     * Validate and return the decoded response JSON.
+     *
+     * @return array
+     */
+    abstract protected function decodeResponseJson();
 }
