@@ -55,37 +55,46 @@ trait ConvertsToSnakeCase
     protected function getConvertedParameters():array
     {
         $parameters = $this->all();
-
-        if ( isset( $this->castBooleans ) && $this->castBooleans ) {
-            $parameters = $this->castBooleans( $parameters );
-        }
-
-        if ( isset( $this->convertToSnakeCase ) && $this->convertToSnakeCase ) {
-            $parameters = $this->convertToSnakeCase( $parameters );
-        }
+        $parameters = $this->castBooleans( $parameters );
+        $parameters = $this->convertToSnakeCase( $parameters );
 
         return $parameters;
     }
 
     /**
-     * Cast all string booleans to PHP booleans.
+     * Cast all string booleans to real boolean values.
      *
      * @param  mixed $input
      * @return array
      */
     protected function castBooleans( $input ):array
     {
+        if ( isset( $this->convertToSnakeCase ) && ! $this->convertToSnakeCase ) {
+            return;
+        }
+
         $casted = [ ];
 
         foreach ( $input as $key => $value ) {
-            if ( $value === 'true' || $value === 'false' ) {
-                $casted[ $key ] = filter_var( $value, FILTER_VALIDATE_BOOLEAN );
-            } else {
-                $casted[ $key ] = $value;
-            }
+            $casted[ $key ] = $this->castValueToBoolean( $value );
         }
 
         return $casted;
+    }
+
+    /**
+     * Cast a given value to a boolean if it is in fact a boolean.
+     *
+     * @param  mixed $value
+     * @return mixed
+     */
+    protected function castValueToBoolean( $value ):array
+    {
+        if ( $value === 'true' || $value === 'false' ) {
+            return filter_var( $value, FILTER_VALIDATE_BOOLEAN );
+        }
+
+        return $casted[ $key ] = $value;
     }
 
     /**
@@ -121,4 +130,18 @@ trait ConvertsToSnakeCase
 
         return $converted;
     }
+
+    /**
+     * Get all of the input and files for the request.
+     *
+     * @return array
+     */
+    abstract public function all();
+
+    /**
+     * Get the input source for the request.
+     *
+     * @return \Symfony\Component\HttpFoundation\ParameterBag
+     */
+    abstract protected function getInputSource();
 }
