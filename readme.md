@@ -385,7 +385,7 @@ That wont work because the user model expects snake case fields. However, the pa
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Mangopixel\Responder\Traits\ConvertToSnakeCase;
+use Flugg\Responder\Traits\ConvertToSnakeCase;
 
 abstract class Request extends FormRequest
 {
