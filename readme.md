@@ -13,8 +13,8 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
 ## Table of Contents
 
 - [Requirements](#requirements)
+- [Philosophy](#philosophy)
 - [Installation](#installation)
-- [Philosophy](#success-responses)
 - [Usage](#usage)
     - [Accessing the Responder](#accessing-the-responder)
     - [Success Responses](#success-responses)
@@ -33,6 +33,38 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
 This package requires:
 - PHP __7.0__+
 - Laravel __5.0__+
+
+## Philosophy
+
+When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/league/fractal) has som great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
+
+While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Here is an example response using Fractal in a Laravel controller:
+
+```php
+ public function index()
+ {
+    $users = User::all();
+    $fractal = new Manager();
+    $resource = new Collection( $users, new UserTransformer() );
+
+    return response()->json( $fractal->createData( $resource )->toArray() );
+ }
+```
+
+I admit, the Fractal manager could be moved outside the controller. You could also return the array directly, however, as soon as you want to return a different status code than `200`, you probably want to use `response()->json()` anyway.
+
+The point is, we all get a little spoiled by Laravel's magic. Wouldn't it be sweet if the above could be rewritten as:
+
+```php
+public function index()
+{
+    $users = User::all();
+
+    return $this->successResponse( $users );
+}
+```
+
+By calling on Fractal behind the scenes, the package will automatically transform your models and related models. It will also serialize the data with a serializer of your choice and wrap the data in an `Illuminate\Http\JsonResponse` instance. No longer will you have to call on different Fractal methods depending on if you're dealing with a model or a collection, the package deals with all of it automatically under the hood.
 
 ## Installation
 
@@ -60,7 +92,7 @@ If you like facades you may also append the `ApiResponse` facade to the `aliases
 
 #### Publishing Package Assets
 
-You should also publish the package configuration and language file using the Artisan command:
+You also need to publish the package configuration and language file using the Artisan command:
 
 ```shell
 php artisan vendor:publish
@@ -137,7 +169,7 @@ return $this->errorResponse( 'invalid_user' );
 These methods call on the service behind the scene.
 
 ***
-_As described above, you may generate responses in multiple ways. Which way you choose is up to you, the important thing is to stay consistent. We will use the facade for the remaining of the documentation for simplicity sake._
+_As described above, you may generate responses in multiple ways. Which way you choose is up to you, the important thing is to stay consistent. We will use the facade for the remaining of the documentation for simplicity's sake._
 ***
 
 ### Success Responses
@@ -153,10 +185,10 @@ public function index()
 }
 ```
 
-The first argument is the data you want to transform, and should be an Eloquent model or a collection of Eloquent models. You may also pass in an `Illuminate\Paginator\LengthAwarePaginator` instance when using Laravel's paginator.
+The first argument is the data you want to transform, and should be an Eloquent model or a collection of Eloquent models. It can also be a paginator, we will get to that soon.
 
 ***
-_If you try to run the above code you will get an exception saying the given model is not transformable. This is because all models you pass into the `success()` method must implement the `Flugg\Responder\Contracts\Transformable` contract and have a corresponding transformer. More on this in the [Transformers section](#transformers)._
+_If you try to run the above code you will get an exception saying the given model is not transformable. This is because all models you pass into the `success()` method must implement the `Flugg\Responder\Contracts\Transformable` contract and have a corresponding transformer. More on this in the [Transformers](#transformers) section._
 ***
 
 #### Setting Status Codes
@@ -270,7 +302,7 @@ _Note how we're converting snake case fields to camel case. You can read more ab
 
 The package gives you an Artisan command you can use to quickly generate new transformers:
 
-```bash
+```shell
 php artisan make:transformer UserTransformer
 ```
 
@@ -280,7 +312,7 @@ It will automatically resolve what model to inject from the name. For instance, 
 
 If you store your models somewhere else you may also use the `--model` option to specify model path:
 
-```bash
+```shell
 php artisan make:transformer UserTransformer --model="App\Models\User"
 ```
 
@@ -353,7 +385,7 @@ That wont work because the user model expects snake case fields. However, the pa
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Mangopixel\Responder\Traits\ConvertToSnakeCase;
+use Flugg\Responder\Traits\ConvertToSnakeCase;
 
 abstract class Request extends FormRequest
 {
@@ -363,9 +395,9 @@ abstract class Request extends FormRequest
 
 ### Serializers
 
-After your models have been transformed, the data will be serialized using the serializer set in the configuration file. The serializer structures your data output in a certain way. It can also add additional data like pagination information and meta data.
+After your models have been transformed, the data will be serialized using the serializer set in the `responder.php` configuration file. The serializer structures your data output in a certain way. It can also add additional data like pagination information and meta data.
 
-When all responses are serialized with the same serializer, you end up with a consistent API, and if you want to change the structure in the future, you can simply change the serializer in the configurations.
+When all responses are serialized with the same serializer, you end up with a consistent API, and if you want to change the structure in the future, you can simply swap out the serializer.
 
 #### Default Serializer
 
@@ -430,7 +462,9 @@ You can also add the `data` field using `League\Fractal\Serializers\DataArraySer
 }
 ```
 
-Do note how the `data` field applies to every relation as well in this case, unlike the default package serializer.
+***
+_Note how the `data` field applies to every relation as well in this case, unlike the default package serializer._
+***
 
 ##### JsonApiSerializer
 
@@ -470,7 +504,7 @@ As you can see, quite more verbose, but it definitiely has its uses.
 
 #### Custom Serializers
 
-If none of the above serializers suit your taste, feel free to create your own and set the `serializer` key in the configuration file to point to your serializer class. You can read more about how to create your own serializer at [Fractal's documentation](http://fractal.thephpleague.com/serializers/).
+If none of the above serializers suit your taste, feel free to create your own and set the `serializer` key in the configuration file to point to your serializer class. You can read more about how to create your own serializer in [Fractal's documentation](http://fractal.thephpleague.com/serializers/).
 
 ### Error Responses
 
@@ -485,7 +519,7 @@ public function index()
 }
 ```
 
-The only required argument to the `error()` method is an error code. You can use any string as you like as the error code, later on we will map these to corresponding error messages.
+The only required argument to the `error()` method is an error code. You can use any string you like for the error code, and later on we will map these to corresponding error messages.
 
 The example above will return the following JSON response:
 
@@ -506,6 +540,7 @@ return Responder::error( 'bomb_found', 400 );
 ```
 
 #### Setting Error Messages
+
 An error code is useful for many reasons, but it might not give enough clues to the user about what caused the error. So you might want to add a more descriptive error message to the response. You can do so by passing in a third argument to the `error()` method:
 
 ```php
@@ -525,11 +560,13 @@ Which will output the following JSON:
 }
 ```
 
-Notice how a `message` field was added inside the `error` field.
+***
+_Notice how a `message` field was added inside the `error` field._
+***
 
-There will in most cases only be one error message per error. However, validation errors are an exception to this rule. Since there can be multiple error messages after validation, all messages are put inside a `messages` field, instead of the singular `message`.
+There will in most cases only be one error message per error. However, validation errors are an exception to this rule. Since there can be multiple error messages after validation, all messages are put inside a `messages` field, instead of the singular `message` field.
 
-An example response from a user registration request, where multiple validation rules failed:
+Below is an example response from a user registration request, where multiple validation rules failed:
 
 ```json
 {
@@ -547,7 +584,7 @@ An example response from a user registration request, where multiple validation 
 
 #### Language File
 
-Instead of adding the error messages on the fly when you create the error responses, you can instead use the `errors.php` language file, which should be in your `resources/lang/en` folder if you published package assets. 
+Instead of adding the error messages on the fly when you create the error responses, you can instead use the `errors.php` language file. The file should be in your `resources/lang/en` folder if you [published package assets](#publish-package-assets). 
 
 The default language file looks like this:
 
@@ -562,21 +599,21 @@ return [
 ];
 ```
 
-These messages are for the default Laravel exceptions thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exception handling]().
+These messages are for the default Laravel exceptions, thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exception handling]().
 
-The error messages keys map up to an error code. So if you add the following line to the language file:
+The error messages keys map up to an error code. So if you add the following line to the language file...
 
 ```php
 'bomb_found' => 'No explosives allowed in this request.',
 ```
 
-And return the following error response:
+...and return the following error response...
 
 ```php
 return $this->errorResponse( 'bomb_found', 400 );
 ```
 
-The following JSON will be generated:
+...the JSON below will be generated:
 
 ```json
 {
