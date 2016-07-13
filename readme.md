@@ -19,11 +19,11 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
     - [Accessing the Responder](#accessing-the-responder)
     - [Success Responses](#success-responses)
     - [Transformers](#transformers)
-    - [Serializers](#transformers)
+    - [Serializers](#serializers)
     - [Error Responses](#error-responses)
     - [Exceptions](#exceptions)
     - [Testing Helpers](#testing-helpers)
-- [Configuration](#installation)
+- [Configuration](#configuration)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -35,7 +35,7 @@ This package requires:
 
 ## Philosophy
 
-When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/league/fractal) has som great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
+When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/thephpleague/fractal) has som great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
 
 While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Here is an example response using Fractal in a Laravel controller:
 
@@ -252,7 +252,7 @@ public function index()
 }
 ```
 
-The package will then automatically add info about the paginated results in the response data, depending on which [serializer](#serializer) you use.
+The package will then automatically add info about the paginated results in the response data, depending on which [serializer](#serializes) you use.
 
 #### Cursors
 
@@ -294,7 +294,7 @@ class UserTransformer extends Transformer
 Transformers basically give you a way to abstract your database logic from your API design, and transforms all values to the correct type. As seen in the example above, we cast the user id to an integer. Then we concatenate the first- and last name together, and only expose a `fullName` field to the API.
 
 ***
-_Note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case]() section._
+_Note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case](#converting-to-camel-case) section._
 ***
 
 #### Creating Transformers
@@ -420,7 +420,7 @@ The package brings its own serializer `Flugg\Responder\Serializers\ApiSerailizer
 The response output is quite similar to Laravel's default, except it wraps the data inside a `data` field. It also includes a `success` field to quickly tell the user if the request was successful or not.
 
 ***
-_The `status` field is actually not part of the default serializer, but instead added by the package after serializing the data. You can disable this in the [configurations](#configurations)._
+_The `status` field is actually not part of the default serializer, but instead added by the package after serializing the data. You can disable this in the [configuration file](#configuration)._
 ***
 
 #### Fractal Serializers
@@ -583,7 +583,7 @@ Below is an example response from a user registration request, where multiple va
 
 #### Language File
 
-Instead of adding the error messages on the fly when you create the error responses, you can instead use the `errors.php` language file. The file should be in your `resources/lang/en` folder if you [published package assets](#publish-package-assets). 
+Instead of adding the error messages on the fly when you create the error responses, you can instead use the `errors.php` language file. The file should be in your `resources/lang/en` folder if you [published package assets](#publishing-package-assets).
 
 The default language file looks like this:
 
@@ -598,7 +598,7 @@ return [
 ];
 ```
 
-These messages are for the default Laravel exceptions, thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exceptions]().
+These messages are for the default Laravel exceptions, thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exceptions](#exceptions).
 
 The error messages keys map up to an error code. So if you add the following line to the language file...
 
@@ -741,7 +741,7 @@ This key represents the full class path to the serializer class you would like t
 
 The package will include a status code for both success- and error responses. You can disable this by setting this key to `false`.
 
-## Contribution
+## Contributing
 
 Contributions are more than welcome and you're free to create a pull request on Github. You can run tests with the following command:
 
