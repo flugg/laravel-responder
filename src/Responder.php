@@ -146,9 +146,9 @@ class Responder implements ResponderContract
      * @param  Transformable|Collection $data
      * @param  Transformer|null         $transformer
      * @param  string                   $resourceKey
-     * @return FractalCollection
+     * @return ResourceInterface
      */
-    protected function transformData( $data, Transformer $transformer, string $resourceKey ):FractalCollection
+    protected function transformData( $data, Transformer $transformer, string $resourceKey ):ResourceInterface
     {
         if ( $data instanceof Transformable ) {
             $class = FractalItem::class;
