@@ -24,7 +24,6 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
     - [Exceptions](#exceptions)
     - [Testing Helpers](#testing-helpers)
 - [Configuration](#installation)
-- [Extension](#extension)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -732,15 +731,15 @@ class CustomException extends ApiException
 
 ## Configuration
 
+If you've published vendor assets as explained in the [installation guide](#installation), you will have access to a `config/responder.php` file. You may change the values in this file to change how the package should operate. We'll go through each configuration key.
+
 #### Serializer Class Path
 
-The full class path to the serializer class you would like the package to use when generating successful JSON responses. You may change it to one of Fractal's serializers or create a custom one yourself.
+This key represents the full class path to the serializer class you would like the package to use when generating successful JSON responses. You may leave it with the default `Flugg\Responder\Serializers\ApiSerializer`, change it to one of [Fractal's serializers](http://fractal.thephpleague.com/serializers/), or create a [custom one yourself](#custom-serializers).
 
 #### Include Status Code
 
-Wether or not you want to include status codes in your JSON responses. You may choose to include it for error responses, success responses or both, just by changing the configuration values listed below.
-
-## Extension
+The package will include a status code for both success- and error responses. You can disable this by setting this key to `false`.
 
 ## Contribution
 
