@@ -1,6 +1,6 @@
 <?php
 
-namespace Mangopixel\Responder\Exceptions;
+namespace Flugg\Responder\Exceptions;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 

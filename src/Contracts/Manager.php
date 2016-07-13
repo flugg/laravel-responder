@@ -1,6 +1,6 @@
 <?php
 
-namespace Mangopixel\Responder\Contracts;
+namespace Flugg\Responder\Contracts;
 
 use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Scope;

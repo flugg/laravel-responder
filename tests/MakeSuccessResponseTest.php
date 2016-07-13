@@ -1,10 +1,10 @@
 <?php
 
-namespace Mangopixel\Responder\Tests;
+namespace Flugg\Responder\Tests;
 
 use Illuminate\Http\JsonResponse;
-use Mangopixel\Responder\Contracts\Responder;
-use Mangopixel\Responder\Facades\ApiResponse;
+use Flugg\Responder\Contracts\Responder;
+use Flugg\Responder\Facades\ApiResponse;
 use Mockery;
 
 /**

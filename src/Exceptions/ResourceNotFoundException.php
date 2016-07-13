@@ -1,6 +1,6 @@
 <?php
 
-namespace Mangopixel\Responder\Exceptions;
+namespace Flugg\Responder\Exceptions;
 
 class ResourceNotFoundException extends ApiException
 {

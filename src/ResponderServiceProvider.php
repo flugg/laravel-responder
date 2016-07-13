@@ -1,12 +1,12 @@
 <?php
 
-namespace Mangopixel\Responder;
+namespace Flugg\Responder;
 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use League\Fractal\Manager;
-use Mangopixel\Responder\Console\MakeTransformer;
-use Mangopixel\Responder\Contracts\Manager as ManagerContract;
-use Mangopixel\Responder\Contracts\Responder as ResponderContract;
+use Flugg\Responder\Console\MakeTransformer;
+use Flugg\Responder\Contracts\Manager as ManagerContract;
+use Flugg\Responder\Contracts\Responder as ResponderContract;
 
 /**
  * The Laravel Responder service provider, which is where the package is bootstrapped.

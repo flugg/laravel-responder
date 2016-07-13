@@ -1,16 +1,16 @@
 <?php
 
-namespace Mangopixel\Responder\Traits;
+namespace Flugg\Responder\Traits;
 
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Mangopixel\Responder\Exceptions\ApiException;
-use Mangopixel\Responder\Exceptions\ResourceNotFoundException;
-use Mangopixel\Responder\Exceptions\UnauthorizedException;
-use Mangopixel\Responder\Exceptions\ValidationFailedException;
-use Mangopixel\Responder\Responder;
+use Flugg\Responder\Exceptions\ApiException;
+use Flugg\Responder\Exceptions\ResourceNotFoundException;
+use Flugg\Responder\Exceptions\UnauthorizedException;
+use Flugg\Responder\Exceptions\ValidationFailedException;
+use Flugg\Responder\Responder;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**

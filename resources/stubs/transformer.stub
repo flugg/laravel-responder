@@ -3,7 +3,7 @@
 namespace DummyNamespace;
 
 use DummyModelNamespace;
-use Mangopixel\Responder\Transformer;
+use Flugg\Responder\Transformer;
 
 class DummyClass extends Transformer
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mangopixel\Responder;
+namespace Flugg\Responder;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -11,9 +11,9 @@ use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\NullResource as FractalNull;
 use League\Fractal\Resource\ResourceInterface;
-use Mangopixel\Responder\Contracts\Manager;
-use Mangopixel\Responder\Contracts\Responder as ResponderContract;
-use Mangopixel\Responder\Contracts\Transformable;
+use Flugg\Responder\Contracts\Manager;
+use Flugg\Responder\Contracts\Responder as ResponderContract;
+use Flugg\Responder\Contracts\Transformable;
 
 /**
  * The responder service. This class is responsible for generating JSON API responses.

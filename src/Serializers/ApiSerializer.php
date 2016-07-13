@@ -1,6 +1,6 @@
 <?php
 
-namespace Mangopixel\Responder\Serializers;
+namespace Flugg\Responder\Serializers;
 
 use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Serializer\ArraySerializer;

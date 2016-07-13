@@ -1,6 +1,6 @@
 <?php
 
-namespace Mangopixel\Responder\Contracts;
+namespace Flugg\Responder\Contracts;
 
 use Illuminate\Http\JsonResponse;
 

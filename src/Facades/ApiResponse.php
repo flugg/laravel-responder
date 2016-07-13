@@ -1,9 +1,9 @@
 <?php
 
-namespace Mangopixel\Responder\Facades;
+namespace Flugg\Responder\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Mangopixel\Responder\Contracts\Responder;
+use Flugg\Responder\Contracts\Responder;
 
 /**
  * A optional facade you can register to create API responses.

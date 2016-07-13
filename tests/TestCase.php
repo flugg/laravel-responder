@@ -1,16 +1,16 @@
 <?php
 
-namespace Mangopixel\Responder\Tests;
+namespace Flugg\Responder\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Routing\Controller;
-use Mangopixel\Responder\Contracts\Responder;
-use Mangopixel\Responder\Contracts\Transformable;
-use Mangopixel\Responder\ResponderServiceProvider;
-use Mangopixel\Responder\Traits\RespondsWithJson;
-use Mangopixel\Responder\Transformer;
+use Flugg\Responder\Contracts\Responder;
+use Flugg\Responder\Contracts\Transformable;
+use Flugg\Responder\ResponderServiceProvider;
+use Flugg\Responder\Traits\RespondsWithJson;
+use Flugg\Responder\Transformer;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 /**

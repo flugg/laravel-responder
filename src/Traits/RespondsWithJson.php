@@ -1,9 +1,9 @@
 <?php
 
-namespace Mangopixel\Responder\Traits;
+namespace Flugg\Responder\Traits;
 
 use Illuminate\Http\JsonResponse;
-use Mangopixel\Responder\Contracts\Responder;
+use Flugg\Responder\Contracts\Responder;
 
 /**
  * A trait you may apply to your controllers for quick access to the responder.

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'serializer' => Mangopixel\Responder\Serializers\ApiSerializer::class,
+    'serializer' => Flugg\Responder\Serializers\ApiSerializer::class,
 
     /*
     |--------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mangopixel\Responder\Traits;
+namespace Flugg\Responder\Traits;
 
 /**
  * Use this trait in your base form request to convert all camel cased parameters to

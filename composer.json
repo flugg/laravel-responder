@@ -32,12 +32,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Mangopixel\\Responder\\": "src"
+            "Flugg\\Responder\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Mangopixel\\Responder\\Tests\\": "tests"
+            "Flugg\\Responder\\Tests\\": "tests"
         }
     }
 }

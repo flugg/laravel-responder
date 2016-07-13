@@ -1,6 +1,6 @@
 <?php
 
-namespace Mangopixel\Responder\Console;
+namespace Flugg\Responder\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;

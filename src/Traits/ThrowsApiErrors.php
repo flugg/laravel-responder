@@ -1,10 +1,10 @@
 <?php
 
-namespace Mangopixel\Responder\Traits;
+namespace Flugg\Responder\Traits;
 
 use Illuminate\Contracts\Validation\Validator;
-use Mangopixel\Responder\Exceptions\UnauthorizedException;
-use Mangopixel\Responder\Exceptions\ValidationFailedException;
+use Flugg\Responder\Exceptions\UnauthorizedException;
+use Flugg\Responder\Exceptions\ValidationFailedException;
 
 
 /**

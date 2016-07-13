@@ -1,10 +1,10 @@
 <?php
 
-namespace Mangopixel\Responder;
+namespace Flugg\Responder;
 
 use League\Fractal\Scope;
 use League\Fractal\TransformerAbstract;
-use Mangopixel\Responder\Contracts\Transformable;
+use Flugg\Responder\Contracts\Transformable;
 
 /**
  * An abstract base transformer. All transformers should extend this, and this class

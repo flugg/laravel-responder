@@ -1,6 +1,6 @@
 <?php
 
-namespace Mangopixel\Responder\Contracts;
+namespace Flugg\Responder\Contracts;
 
 /**
  * A contract you can apply to your models to map a specific transformer to a model.
