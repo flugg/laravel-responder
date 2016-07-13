@@ -96,43 +96,43 @@ class Responder implements ResponderContract
     /**
      * Transform a transformable Eloquent model.
      *
-     * @param  Transformable    $data
+     * @param  Transformable    $model
      * @param  Transformer|null $transformer
      * @return FractalItem
      */
-    protected function transformModel( Transformable $data, Transformer $transformer = null ):FractalItem
+    protected function transformModel( Transformable $model, Transformer $transformer = null ):FractalItem
     {
-        $transformer = $transformer ?: $data::transformer();
+        $transformer = $transformer ?: $model::transformer();
 
-        return $this->transformData( $data, new $transformer( $model ), $model->getTable() );
+        return $this->transformData( $model, new $transformer( $model ), $model->getTable() );
     }
 
     /**
      * Transform a collection of Eloquent models.
      *
-     * @param  Collection       $data
+     * @param  Collection       $collection
      * @param  Transformer|null $transformer
      * @return FractalCollection
      */
-    protected function transformCollection( Collection $data, Transformer $transformer = null ):FractalCollection
+    protected function transformCollection( Collection $collection, Transformer $transformer = null ):FractalCollection
     {
-        $model = $this->resolveModel( $data );
+        $model = $this->resolveModel( $collection );
         $transformer = $transformer ?: $model::transformer();
 
-        return $this->transformData( $data, new $transformer( $model ), $model->getTable() );
+        return $this->transformData( $collection, new $transformer( $model ), $model->getTable() );
     }
 
     /**
      * Transform paginated data using Laravel's paginator.
      *
-     * @param LengthAwarePaginator $data
+     * @param LengthAwarePaginator $paginator
      * @param Transformer|null     $transformer
      * @return FractalCollection
      */
-    protected function transformPaginator( LengthAwarePaginator $data, Transformer $transformer = null ):FractalCollection
+    protected function transformPaginator( LengthAwarePaginator $paginator, Transformer $transformer = null ):FractalCollection
     {
-        $resource = $this->transformCollection( $data->getCollection(), $transformer );
-        $resource->setPaginator( new IlluminatePaginatorAdapter( $data ) );
+        $resource = $this->transformCollection( $paginator->getCollection(), $transformer );
+        $resource->setPaginator( new IlluminatePaginatorAdapter( $paginator ) );
 
         return $resource;
     }
