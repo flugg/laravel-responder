@@ -260,7 +260,7 @@ class UserTransformer extends Transformer
 }
 ```
 
-Transformers basically give you a way to abstract your database logic from your API design, and transforms all values to the correct type. As seen in the example above, we cast the user id to an integer. Then we concatenate the first and last name together, and only expose a `fullName` field to the API.
+Transformers basically give you a way to abstract your database logic from your API design, and transforms all values to the correct type. As seen in the example above, we cast the user id to an integer. Then we concatenate the first- and last name together, and only expose a `fullName` field to the API.
 
 ***
 _Note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case section]()._
