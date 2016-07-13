@@ -110,7 +110,7 @@ return Responder::error( 'invalid_user' );
 
 #### Option 3: Helper Method
 
-You can also use the `responder()` helper method if you're fan of Laravel's `response()` helper method:
+Additionally, you can use the `responder()` helper method if you're fan of Laravel's `response()` helper method:
 
 ```php
 return responder()->success( $users );
@@ -123,7 +123,7 @@ Both the helper method and the facade are just different ways of accessing the r
 
 #### Option 4: Trait
 
-The package also has a `Flugg\Responder\Traits\RespondsWithJson` trait you can use in your base controller.
+Lastly, the package also has a `Flugg\Responder\Traits\RespondsWithJson` trait you can use in your base controller.
 
 The trait gives you access to `successResponse()` and `errorResponse()` methods in your controllers: 
 
@@ -153,6 +153,8 @@ public function index()
 }
 ```
 
+The first argument is the data you want to transform, and should be an Eloquent model or a collection of Eloquent models. You may also pass in an `Illuminate\Paginator\LengthAwarePaginator` instance when using Laravel's paginator.
+
 ***
 _If you try to run the above code you will get an exception saying the given model is not transformable. This is because all models you pass into the `success()` method must implement the `Flugg\Responder\Contracts\Transformable` contract and have a corresponding transformer. More on this in the [Transformers section](#transformers)._
 ***
@@ -169,21 +171,6 @@ Sometimes you may not want to return anything, but still notify the user that th
 
 ```php
 return Responder::success( 204 );
-```
-
-#### Relationships
-
-Using Fractal you can include relationships to your response using the `parseIncludes()` method on the manager instance and add the available relationship as an `$availableIncludes` array in your transformers.
-
-With Laravel Responder you don't have to do any of these things. It integrates neatly with Eloquent and automatically parses relationships:
-
-```php
-public function index()
-{
-    $users = User::with( 'profile', 'roles.permissions' )->all();
-    
-    return Responder::success( $users );
-}
 ```
 
 #### Adding Meta Data
@@ -206,6 +193,21 @@ You may even omit the data parameter if you pass in a status code as the first a
 return Responder::success( 204, [ 'foo' => 'bar' ] );
 ```
 
+#### Relationships
+
+Using Fractal, you can include relationships to your responses using the `parseIncludes()` method on the manager instance, and add the available relationship as an `$availableIncludes` array in your transformers.
+
+With Laravel Responder you don't have to do any of these things. It integrates neatly with Eloquent and automatically parses relationships:
+
+```php
+public function index()
+{
+    $users = User::with( 'profile', 'roles.permissions' )->all();
+    
+    return Responder::success( $users );
+}
+```
+
 #### Pagination
 
 Adding pagination to your responses is equally easy. You can simply use Laravel's `paginate()` method on the query builder:
@@ -219,7 +221,7 @@ public function index()
 }
 ```
 
-The package will then automatically add info about the paginated results in the response data depending on which [serializer](#serializer) you use.
+The package will then automatically add info about the paginated results in the response data, depending on which [serializer](#serializer) you use.
 
 #### Cursors
 
@@ -227,9 +229,9 @@ __TODO__
 
 ### Transformers
 
-Transformers are classes which only responsibility is to transform one set of data to another. Laravel Responder provides its own abstract transformer `Flugg\Responder\Transformer`. This transformer extends Fractal's `League\Fractal\Transformer` and adds integration with Eloquent. 
+Transformers are classes which only have one responsibility; to transform one set of data to another. In our case we want to transform an Eloquent model into an array. The package provides its own abstract transformer, `Flugg\Responder\Transformer`. This transformer extends `League\Fractal\Transformer` and adds integration with Eloquent.
 
-Your transformers should extend the package transformer as follow:
+Your transformers should extend the package transformer as follows:
 
 ```php
 <?php
@@ -258,9 +260,11 @@ class UserTransformer extends Transformer
 }
 ```
 
-Transformers basically give you a way to abstract your database logic from your API design, and _transforms_ all values to the correct type. As seen in the example above, we cast the user id to an integer and concatenate the first and last name together and only expose a `fullName` field to the API.
+Transformers basically give you a way to abstract your database logic from your API design, and transforms all values to the correct type. As seen in the example above, we cast the user id to an integer. Then we concatenate the first and last name together, and only expose a `fullName` field to the API.
 
-Also note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case section]().
+***
+_Note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case section]()._
+***
 
 #### Creating Transformers
 
