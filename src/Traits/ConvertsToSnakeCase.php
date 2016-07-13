@@ -94,14 +94,14 @@ trait ConvertsToSnakeCase
             return filter_var( $value, FILTER_VALIDATE_BOOLEAN );
         }
 
-        return $casted[ $key ] = $value;
+        return $value;
     }
 
     /**
      * Convert a string or array to snake case.
      *
      * @param  mixed $input
-     * @return array|null
+     * @return mixed
      */
     protected function convertToSnakeCase( $input )
     {

@@ -3,7 +3,6 @@
 namespace Mangopixel\Responder\Traits;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use Mangopixel\Responder\Contracts\Responder;
 
 /**
@@ -25,9 +24,7 @@ trait MakesApiRequests
      */
     protected function seeSuccess( $data = null, $status = 200 )
     {
-        $response = $this->createSuccessResponse( $data, $status );
-
-        $this->seeSuccessResponse( $response );
+        $response = $this->seeSuccessResponse( $data, $status );
         $this->seeSuccessData( $response->getData( true )[ 'data' ] );
 
         return $this;
@@ -42,9 +39,7 @@ trait MakesApiRequests
      */
     protected function seeSuccessEquals( $data = null, $status = 200 )
     {
-        $response = $this->createSuccessResponse( $data, $status );
-
-        $this->seeSuccessResponse( $response );
+        $response = $this->seeSuccessResponsee( $data, $status );
         $this->seeJsonEquals( $response->getData( true ) );
 
         return $this;
@@ -53,17 +48,20 @@ trait MakesApiRequests
     /**
      * Assert that the response is a valid success response.
      *
-     * @param  Response $response
+     * @param  mixed $data
+     * @param  int   $status
      * @return $this
      */
-    protected function seeSuccessResponse( Response $response )
+    protected function seeSuccessResponse( $data = null, $status = 200 ):JsonResponse
     {
+        $response = app( Responder::class )->success( $data, $status );
+
         $this->seeStatusCode( $response->getStatusCode() )->seeJson( [
             'success' => true,
             'status' => $response->getStatusCode()
         ] )->seeJsonStructure( [ 'data' ] );
 
-        return $this;
+        return $response;
     }
 
     /**
@@ -93,18 +91,6 @@ trait MakesApiRequests
     protected function getSuccessData()
     {
         return $this->decodeResponseJson()[ 'data' ];
-    }
-
-    /**
-     * Creates a new success response by transforming and serializing the data.
-     *
-     * @param  mixed $data
-     * @param  int   $status
-     * @return JsonResponse
-     */
-    protected function createSuccessResponse( $data = null, $status = 200 ):JsonResponse
-    {
-        return app( Responder::class )->success( $data, $status );
     }
 
     /**
