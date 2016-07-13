@@ -263,7 +263,7 @@ class UserTransformer extends Transformer
 Transformers basically give you a way to abstract your database logic from your API design, and transforms all values to the correct type. As seen in the example above, we cast the user id to an integer. Then we concatenate the first- and last name together, and only expose a `fullName` field to the API.
 
 ***
-_Note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case section]()._
+_Note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case]() section._
 ***
 
 #### Creating Transformers
@@ -324,7 +324,7 @@ public static function transformer()
 
 #### Converting to Camel Case
 
-You may want to expose all fields in your API in camel case. However, Eloquent uses snake case attributes by default. A transformer is one of the last things that take place before the data is returned to the API, and is a perfect location to do the conversion:
+You may want to expose all fields in your API in camel case, however, Eloquent uses snake case attributes by default. A transformer is one of the last things that take place before the data is returned to the API, and is a perfect location to do the conversion to camel casing:
 
 ```php
 public function transform( User $user )
@@ -339,13 +339,13 @@ public function transform( User $user )
 }
 ```
 
-This is great, but only works for API responses, not for request parameters. Imagine you create a user from the request input with camel case fields:
+This is great, but only works for API responses, and not for request parameters. Imagine you create a user from the request input with camel case fields:
 
 ```php
 User::create( request()->all() );
 ```
 
-That wont work because the user model expects snake case fields. However, the package has a `Flugg\Responder\Traits\ConvertToSnakeCase` trait you can use in your `app/Http/Requests/Request.php` file to automatically convert all parameters to snake case:
+That wont work because the user model expects snake case fields. However, the package has a `Flugg\Responder\Traits\ConvertToSnakeCase` trait, which you can use in your `app/Http/Requests/Request.php` file to automatically convert all incoming parameters to snake case:
 
 ```php
 <?php
@@ -363,13 +363,13 @@ abstract class Request extends FormRequest
 
 ### Serializers
 
-After your models have been transformed, the data will be serialized using the serializer set in the configuration file. A serializer structures your data output in a certain way. It can also add additional data like pagination information or meta data.
+After your models have been transformed, the data will be serialized using the serializer set in the configuration file. The serializer structures your data output in a certain way. It can also add additional data like pagination information and meta data.
 
 When all responses are serialized with the same serializer, you end up with a consistent API, and if you want to change the structure in the future, you can simply change the serializer in the configurations.
 
 #### Default Serializer
 
-The package brings its own serializer `Flugg\Responder\Serializers\ApiSerailizer` which is the default serializer. An example response with a user model with a related role model:
+The package brings its own serializer `Flugg\Responder\Serializers\ApiSerailizer`, which is the default serializer. Below is an example response with a user model, with a related role model:
 
 ```json
 {
@@ -388,13 +388,17 @@ The package brings its own serializer `Flugg\Responder\Serializers\ApiSerailizer
 
 The response output is quite similar to Laravel's default, except it wraps the data inside a `data` field. It also includes a `success` field to quickly tell the user if the request was successful or not.
 
-__Note:__ the `status` field is actually not part of the default serializer, but instead added by the package after serializing the data. You can disable this in the [configurations](#configurations).
+***
+_The `status` field is actually not part of the default serializer, but instead added by the package after serializing the data. You can disable this in the [configurations](#configurations)._
+***
 
 #### Fractal Serializers
 
 If the default serializer is not your cup of tea, you can easily swap it out with one of the three serializers included with Fractal.
 
-The above example would look like following using Fractal's `League\Fractal\Serializers\ArraySerializer`:
+##### ArraySerializer
+
+The above example would look like the following using `League\Fractal\Serializers\ArraySerializer`:
 
 ```json
 {
@@ -406,6 +410,8 @@ The above example would look like following using Fractal's `League\Fractal\Seri
     }
 }
 ```
+
+##### DataArraySerializer
 
 You can also add the `data` field using `League\Fractal\Serializers\DataArraySerializer`:
 
@@ -426,7 +432,9 @@ You can also add the `data` field using `League\Fractal\Serializers\DataArraySer
 
 Do note how the `data` field applies to every relation as well in this case, unlike the default package serializer.
 
-Fractal also has a representation of the [JSON-API](http://jsonapi.org/) standard using `League\Fractal\Serializers\JsonApiSerializer`:
+##### JsonApiSerializer
+
+Fractal also has a representation of the [JSON-API](http://jsonapi.org/) standard, using `League\Fractal\Serializers\JsonApiSerializer`:
 
 ```json
 {
@@ -436,7 +444,7 @@ Fractal also has a representation of the [JSON-API](http://jsonapi.org/) standar
         "attributes": {
             "email": "example@email.com",
             "fullName": "John Doe"
-        }
+        },
         "relationships": {
             "role": {
                 "data": {
@@ -554,7 +562,7 @@ return [
 ];
 ```
 
-These messages are for the default Laravel exceptions thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next chapter on [exception handling]().
+These messages are for the default Laravel exceptions thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exception handling]().
 
 The error messages keys map up to an error code. So if you add the following line to the language file:
 
