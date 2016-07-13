@@ -136,7 +136,9 @@ return $this->errorResponse( 'invalid_user' );
 
 These methods call on the service behind the scene.
 
+***
 _As described above, you may generate responses in multiple ways. Which way you choose is up to you, the important thing is to stay consistent. We will use the facade for the remaining of the documentation for simplicity sake._
+***
 
 ### Success Responses
 
@@ -151,7 +153,9 @@ public function index()
 }
 ```
 
-__Note:__ If you try to run the above code you will get an exception saying the given model is not transformable. This is because all models you pass into the `success()` method must implement the `Flugg\Responder\Contracts\Transformable` contract and have a corresponding transformer. More on this in the [Transformers section](#transformers).
+***
+_If you try to run the above code you will get an exception saying the given model is not transformable. This is because all models you pass into the `success()` method must implement the `Flugg\Responder\Contracts\Transformable` contract and have a corresponding transformer. More on this in the [Transformers section](#transformers)._
+***
 
 #### Setting Status Codes
 
