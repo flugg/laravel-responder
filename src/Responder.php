@@ -150,12 +150,7 @@ class Responder implements ResponderContract
      */
     protected function transformData( $data, Transformer $transformer, string $resourceKey ):ResourceInterface
     {
-        if ( $data instanceof Transformable ) {
-            $class = FractalItem::class;
-        } elseif ( $data instanceof Collection ) {
-            $class = FractalCollection::class;
-        }
-
+        $class = $data instanceof Transformable ? FractalItem::class : FractalCollection::class;
         $resource = new $class( $data, $transformer );
         $resource->setResourceKey( $resourceKey );
 

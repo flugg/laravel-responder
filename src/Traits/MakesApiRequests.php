@@ -39,7 +39,7 @@ trait MakesApiRequests
      */
     protected function seeSuccessEquals( $data = null, $status = 200 )
     {
-        $response = $this->seeSuccessResponsee( $data, $status );
+        $response = $this->seeSuccessResponse( $data, $status );
         $this->seeJsonEquals( $response->getData( true ) );
 
         return $this;
@@ -50,7 +50,7 @@ trait MakesApiRequests
      *
      * @param  mixed $data
      * @param  int   $status
-     * @return $this
+     * @return JsonResponse
      */
     protected function seeSuccessResponse( $data = null, $status = 200 ):JsonResponse
     {
@@ -74,7 +74,7 @@ trait MakesApiRequests
     {
         collect( $data )->each( function ( $value, $key ) {
             if ( is_array( $value ) ) {
-                $this->seeSuccessDataResponse( $value );
+                $this->seeSuccessData( $value );
             } else {
                 $this->seeJson( [ $key => $value ] );
             }
@@ -141,6 +141,14 @@ trait MakesApiRequests
      * @return $this
      */
     abstract public function seeJsonStructure( array $structure = null, $responseData = null );
+
+    /**
+     * Assert that the response is a superset of the given JSON.
+     *
+     * @param  array $data
+     * @return $this
+     */
+    abstract protected function seeJsonSubset( array $data );
 
     /**
      * Assert that the response contains an exact JSON array.
