@@ -662,4 +662,4 @@ If you find bugs or have suggestions for improvements, feel free to submit an is
 
 ## License
 
-Laravel Responder is free software distributed under the terms of the MIT license. See [license.md]() for more details.
+Laravel Responder is free software distributed under the terms of the MIT license. See [license.md](license.md) for more details.
