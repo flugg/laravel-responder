@@ -36,7 +36,7 @@ This package requires:
 
 ## Philosophy
 
-When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/league/fractal) has som great tools for building powerful APIs. Among other things, it gives you a transformation layer to make sure you expose the right data and serializers which structures your responses in a consistent manner.
+When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/league/fractal) has som great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
 
 While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate it into the framework. Here is an example response using Fractal in a Laravel controller:
 
