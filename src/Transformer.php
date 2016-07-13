@@ -26,7 +26,7 @@ abstract class Transformer extends TransformerAbstract
     /**
      * Constructor.
      *
-     * @param Transformable $model
+     * @param Transformable|null $model
      */
     public function __construct( Transformable $model = null )
     {

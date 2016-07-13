@@ -31,4 +31,12 @@ interface Transformable
      * @return string
      */
     public function getRelations();
+
+    /**
+     * Determine if the given relation is loaded.
+     *
+     * @param  string $key
+     * @return bool
+     */
+    public function relationLoaded();
 }
