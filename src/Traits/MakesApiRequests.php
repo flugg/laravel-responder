@@ -133,6 +133,14 @@ trait MakesApiRequests
      */
     abstract public function seeJson( array $data = null, $negate = false );
 
+    /**
+     * Assert that the JSON response has a given structure.
+     *
+     * @param  array|null $structure
+     * @param  array|null $responseData
+     * @return $this
+     */
+    abstract public function seeJsonStructure( array $structure = null, $responseData = null );
 
     /**
      * Assert that the response contains an exact JSON array.
