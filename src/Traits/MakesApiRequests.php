@@ -106,9 +106,12 @@ trait MakesApiRequests
             $this->seeStatusCode( $status );
         }
 
+        if ( config( 'responder.status_code' ) ) {
+            $this->seeJson( 'status' => $status );
+        }
+
         return $this->seeJson( [
-            'success' => false,
-            'status' => $status
+            'success' => false
         ] )->seeJsonSubset( [
             'error' => [
                 'code' => $error
