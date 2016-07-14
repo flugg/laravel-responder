@@ -6,8 +6,6 @@
 [![Build Status](https://img.shields.io/travis/flugger/laravel-responder/master.svg?style=flat-square)](https://travis-ci.org/flugger/laravel-responder)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/flugger/laravel-responder.svg?style=flat-square)](https://scrutinizer-ci.com/g/flugger/laravel-responder/?branch=master)
 
-__Work in progress, do not use in production!__
-
 Laravel Responder is a package that integrates [Fractal](https://github.com/thephpleague/fractal) into Laravel. It will automatically transform your Eloquent models and serialize your API responses using a simple and elegant syntax. You can use it to send both success- and error responses, and it gives you tools to handle exceptions and integration test your responses.
 
 ## Table of Contents
@@ -739,6 +737,53 @@ class CustomException extends ApiException
 ```
 
 ### Testing Helpers
+
+Once you start transforming your data, writing tests to test the data becomes increasingly more difficult. You could use methods like Laravel's `seeJson` or `seeJsonEquals`, however, because the data wont be transformed (or serialized) you need to hardcode every value.
+
+The package provides a `Flugg\Responder\Traits\MakesApiRequests` trait you can use in your `tests/TestCase.php` file, to get access to some helper methods to easily test the responses.
+
+***
+_Currently, the success response methods only work if you use the default serializer, `Flugg\Responder\Serializers\ApiSerializer`. In the future you can test using all serializers._
+***
+
+#### Assert Success Responses
+
+The testing trait provides a `seeSuccess()` method you can use to assert that the success response was successful:
+
+```php
+$this->seeSuccess( $user, 201 );
+```
+
+This will transform and serialize your data, just like the `success()` method on the responder. It will run a `seeStatusCode()` on the status code and assert that the response has the right base structure and contains the given data. You may also pass in any meta data as the third parameter.
+
+While the above method only checks if any part of the success data has the values you specified, you can also assert for an exact match:
+
+```php
+$this->seeSuccessEquals( $user, 201 );
+```
+
+This works much in the same way as Laravel's `seeJsonEquals`.
+
+#### Assert Error Responses
+
+In the same way as you can assert for success responses, you may also verify that your application sends the right error responses using the `seeError()` method:
+
+```php
+$this->seeError( 'invalid_user', 400 );
+```
+
+This checks the status code and error response structure. You may also pass in a message as third parameter.
+
+#### Fetch Success Data
+
+You can also easily fetch the data from the response:
+
+```php
+$this->json( 'post', 'sessions', $credentials );
+$data = $this->getSuccessData();
+```
+
+This will decode the response JSON and return the data as an array.
 
 ## Configuration
 
