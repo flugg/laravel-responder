@@ -424,7 +424,13 @@ abstract class Request extends FormRequest
 You may also convert any parameters manually using the `convertParameters()` method in your request:
 
 ```php
-protected method convertParameters( array $parameters )
+/**
+ * Convert incoming parameters.
+ *
+ * @param  array $parameters
+ * @return array
+ */
+protected function convertParameters( array $parameters )
 {
     $parameters[ 'included' ] = (array) $parameters[ 'included' ];
     
