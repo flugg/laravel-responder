@@ -374,7 +374,7 @@ This is great, but only works for API responses, and not for request parameters.
 User::create( request()->all() );
 ```
 
-That wont work because the user model expects snake case fields. However, the package has a `Flugg\Responder\Traits\ConvertToSnakeCase` trait, which you can use in your `app/Http/Requests/Request.php` file to automatically convert all incoming parameters to snake case:
+That wont work because the user model expects snake case fields. However, the package has a `Flugg\Responder\Traits\ConvertsParameters` trait, which you can use in your `app/Http/Requests/Request.php` file to automatically convert all incoming parameters to snake case before reaching the controller:
 
 ```php
 <?php
@@ -386,9 +386,53 @@ use Flugg\Responder\Traits\ConvertToSnakeCase;
 
 abstract class Request extends FormRequest
 {
-    use ConvertToSnakeCase;
+    use ConvertsParameters;
 }
 ```
+
+This trait will not only convert all incoming parameters to snake case, it will also convert all `'true'` and `'false'` values to actual booleans. If you only want one of the conversions, you may set the following variables on the request:
+
+```php
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Flugg\Responder\Traits\ConvertToSnakeCase;
+
+abstract class Request extends FormRequest
+{
+    use ConvertsParameters;
+    
+    /**
+     * Automatically cast all string booleans to booleans.
+     *
+     * @var bool
+     */
+    protected $castBooleans = false;
+    
+    
+    /**
+     * Automatically convert all parameter keys to snake case.
+     *
+     * @var bool
+     */
+    protected $convertToSnakeCase = false;
+}
+```
+
+You may also convert any parameters manually using the `convertParameters()` method in your request:
+
+```php
+protected method convertParameters( array $parameters )
+{
+    $parameters[ 'included' ] = (array) $parameters[ 'included' ];
+    
+    return $parameters;
+}
+```
+
+The method takes in an array of all incoming parameters, which you may modify to your liking before returning it again. In the example above, we convert the `included` parameter to an array. This way we can use it as an argument in Eloquent's `with()` and `load()` methods, as these methods require the first parameter to be an array.
 
 ### Serializers
 
@@ -702,7 +746,7 @@ abstract class Request extends FormRequest
 The exceptions thrown by this trait extends `Flugg\Responder\Exceptions\ApiException`, so they are picked up by the package exceptions handler.
 
 ***
-_As discussed in the [Transformers](#converting-to-camel-case) section, you can also use the `Flugg\Responder\Traits\ConvertsToSnakeCase` trait in your base request class to convert incoming parameters to snake case._
+_As discussed in the [Transformers](#converting-to-camel-case) section, you can also use the `Flugg\Responder\Traits\ConvertsParameters` trait in your base request class to convert incoming parameters to snake case._
 ***
 
 #### Creating Custom Exceptions
