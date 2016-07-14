@@ -68,7 +68,7 @@ By calling on Fractal behind the scenes, the package will automatically transfor
 Install the package through Composer:
 
 ```shell
-composer require flugg/laravel-responder
+composer require flugger/laravel-responder
 ```
 
 #### Registering Service Provider
