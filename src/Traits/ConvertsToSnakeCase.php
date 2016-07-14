@@ -102,7 +102,7 @@ trait ConvertsToSnakeCase
      * @param  mixed $value
      * @return mixed
      */
-    protected function castValueToBoolean( $value ):array
+    protected function castValueToBoolean( $value )
     {
         if ( $value === 'true' || $value === 'false' ) {
             return filter_var( $value, FILTER_VALIDATE_BOOLEAN );
