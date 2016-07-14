@@ -22,10 +22,10 @@ interface Responder
      * @param  int   $statusCode
      * @return JsonResponse
      */
-    public function success( $data, int $statusCode = 200 ):JsonResponse;
+    public function success( $data = null, int $statusCode = 200 ):JsonResponse;
 
     /**
-     * Generate an error JSON response.
+     * Generate an unsuccessful JSON response.
      *
      * @param  string $error
      * @param  int    $statusCode
@@ -33,4 +33,21 @@ interface Responder
      * @return JsonResponse
      */
     public function error( string $error, int $statusCode = 404, $message = null ):JsonResponse;
+
+    /**
+     * Transforms the data.
+     *
+     * @param  mixed            $data
+     * @param  Transformer|null $transformer
+     * @return ResourceInterface
+     */
+    public function transform( $data = null, Transformer $transformer = null ):ResourceInterface;
+
+    /**
+     * Serializes the data.
+     *
+     * @param  ResourceInterface $resource
+     * @return array
+     */
+    public function serialize( ResourceInterface $resource ):array;
 }

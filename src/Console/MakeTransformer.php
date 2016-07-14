@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
 /**
- * An Artisan command generating a new transformer class into app/Transformers.
+ * An Artisan command for generating a new transformer class.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -139,7 +139,7 @@ class MakeTransformer extends Command
     }
 
     /**
-     * Replace the class name for the given stub.
+     * Replace the model for the given stub.
      *
      * @param  string $stub
      * @param  string $name
@@ -158,7 +158,7 @@ class MakeTransformer extends Command
     }
 
     /**
-     * Get the class name for the transformer.
+     * Get the full class path for the model.
      *
      * @param  string $name
      * @return string
@@ -173,7 +173,7 @@ class MakeTransformer extends Command
     }
 
     /**
-     * Get the class name for the transformer.
+     * Get the full class path for the transformer.
      *
      * @param  string $namespace
      * @return string

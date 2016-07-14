@@ -2,13 +2,13 @@
 
 namespace Flugg\Responder\Tests;
 
-use Illuminate\Http\JsonResponse;
 use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Facades\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Mockery;
 
 /**
- *
+ * This file is a collection of tests, testing that you can generate success responses.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -17,7 +17,7 @@ use Mockery;
 class MakeSuccessResponseTest extends TestCase
 {
     /**
-     *
+     * Test that you can generate success responses using the responder service.
      *
      * @test
      */
@@ -44,28 +44,7 @@ class MakeSuccessResponseTest extends TestCase
     }
 
     /**
-     *
-     *
-     * @test
-     */
-    public function youCanMakeSuccessResponsesUsingTrait()
-    {
-        // Arrange...
-        $fruit = $this->createTestModel();
-        $controller = $this->createTestController();
-
-        $responder = Mockery::mock( Responder::class );
-        $this->app->instance( Responder::class, $responder );
-        
-        // Assert...
-        $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
-
-        // Act...
-        (new $controller)->successAction( $fruit );
-    }
-
-    /**
-     *
+     * Test that you can generate success responses using the facade.
      *
      * @test
      */
@@ -82,5 +61,43 @@ class MakeSuccessResponseTest extends TestCase
 
         // Act...
         ApiResponse::success( $fruit, 200 );
+    }
+
+    /**
+     * Test that you can generate success responses using the helper method.
+     *
+     * @test
+     */
+    public function youCanMakeSuccessResponsesUsingHelperMethod()
+    {
+        // Arrange...
+        $fruit = $this->createTestModel();
+
+        // Assert...
+        $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
+
+        // Act...
+        responder()->success( $fruit, 200 );
+    }
+
+    /**
+     * Test that you can generate success responses using the RespondsWithJson trait.
+     *
+     * @test
+     */
+    public function youCanMakeSuccessResponsesUsingTrait()
+    {
+        // Arrange...
+        $fruit = $this->createTestModel();
+        $controller = $this->createTestController();
+
+        $responder = Mockery::mock( Responder::class );
+        $this->app->instance( Responder::class, $responder );
+
+        // Assert...
+        $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
+
+        // Act...
+        ( new $controller )->successAction( $fruit );
     }
 }

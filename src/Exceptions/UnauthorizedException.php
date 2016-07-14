@@ -2,6 +2,13 @@
 
 namespace Flugg\Responder\Exceptions;
 
+/**
+ * An exception which replaces Laravel's own UnauthorizedException.
+ *
+ * @package Laravel Responder
+ * @author  Alexander Tømmerås <flugged@gmail.com>
+ * @license The MIT License
+ */
 class UnauthorizedException extends ApiException
 {
     /**

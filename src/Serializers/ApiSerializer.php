@@ -5,6 +5,13 @@ namespace Flugg\Responder\Serializers;
 use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Serializer\ArraySerializer;
 
+/**
+ * Laravel Responder's own default implementation of Fractal's serializers.
+ *
+ * @package Laravel Responder
+ * @author  Alexander Tømmerås <flugged@gmail.com>
+ * @license The MIT License
+ */
 class ApiSerializer extends ArraySerializer
 {
     /**
@@ -67,6 +74,13 @@ class ApiSerializer extends ArraySerializer
         return true;
     }
 
+    /**
+     * Merges any relations into the data. The 'data' field is also removed.
+     *
+     * @param  array $transformedData
+     * @param  array $includedData
+     * @return array
+     */
     public function mergeIncludes( $transformedData, $includedData )
     {
         $resourceKey = key( $includedData );

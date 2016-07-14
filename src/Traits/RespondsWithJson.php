@@ -2,11 +2,12 @@
 
 namespace Flugg\Responder\Traits;
 
-use Illuminate\Http\JsonResponse;
 use Flugg\Responder\Contracts\Responder;
+use Illuminate\Http\JsonResponse;
 
 /**
- * A trait you may apply to your controllers for quick access to the responder.
+ * Use this trait in your base controllere for quick access to the responder service
+ * methods in your controllers.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

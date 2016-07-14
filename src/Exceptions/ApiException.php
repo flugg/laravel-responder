@@ -4,6 +4,14 @@ namespace Flugg\Responder\Exceptions;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
+/**
+ * An abstract base exception used for any API related exception. You may extend this
+ * class in your exceptions to get automatic conversion to JSON error responses.
+ *
+ * @package Laravel Responder
+ * @author  Alexander Tømmerås <flugged@gmail.com>
+ * @license The MIT License
+ */
 abstract class ApiException extends HttpException
 {
     /**

@@ -2,14 +2,14 @@
 
 namespace Flugg\Responder;
 
-use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use League\Fractal\Manager;
 use Flugg\Responder\Console\MakeTransformer;
 use Flugg\Responder\Contracts\Manager as ManagerContract;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
+use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use League\Fractal\Manager;
 
 /**
- * The Laravel Responder service provider, which is where the package is bootstrapped.
+ * The Laravel Responder service provider. This is where the package is bootstrapped.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -66,7 +66,7 @@ class ResponderServiceProvider extends BaseServiceProvider
         } );
 
         $this->app->singleton( ManagerContract::class, function () {
-            return (new Manager())->setSerializer( new $this->config[ 'serializer' ] );
+            return ( new Manager() )->setSerializer( new $this->config[ 'serializer' ] );
         } );
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Flugg\Responder\Traits;
 
-use Illuminate\Contracts\Validation\Validator;
 use Flugg\Responder\Exceptions\UnauthorizedException;
 use Flugg\Responder\Exceptions\ValidationFailedException;
+use Illuminate\Contracts\Validation\Validator;
 
 
 /**

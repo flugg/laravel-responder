@@ -2,13 +2,13 @@
 
 namespace Flugg\Responder;
 
+use Flugg\Responder\Contracts\Transformable;
 use League\Fractal\Scope;
 use League\Fractal\TransformerAbstract;
-use Flugg\Responder\Contracts\Transformable;
 
 /**
- * An abstract base transformer. All transformers should extend this, and this class
- * itself extends the Fractal transformer.
+ * An abstract base transformer. Yourr transformers should extend this, and this class
+ * itself extends Fractal's transformer.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

@@ -4,6 +4,13 @@ namespace Flugg\Responder\Exceptions;
 
 use Illuminate\Contracts\Validation\Validator;
 
+/**
+ * An exception which replaces Laravel's validation exception.
+ *
+ * @package Laravel Responder
+ * @author  Alexander Tømmerås <flugged@gmail.com>
+ * @license The MIT License
+ */
 class ValidationFailedException extends ApiException
 {
     /**
@@ -40,6 +47,16 @@ class ValidationFailedException extends ApiException
     }
 
     /**
+     * Get the array of validation error messages.
+     *
+     * @return array
+     */
+    public function getValidationMessages()
+    {
+        return $this->validationMessages;
+    }
+
+    /**
      * Set the array of validation error messages.
      *
      * @param  Validator $validator
@@ -55,15 +72,5 @@ class ValidationFailedException extends ApiException
         }
 
         $this->validationMessages = $messages;
-    }
-
-    /**
-     * Get the array of validation error messages.
-     *
-     * @return array
-     */
-    public function getValidationMessages()
-    {
-        return $this->validationMessages;
     }
 }

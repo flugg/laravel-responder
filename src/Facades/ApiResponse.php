@@ -2,11 +2,11 @@
 
 namespace Flugg\Responder\Facades;
 
-use Illuminate\Support\Facades\Facade;
 use Flugg\Responder\Contracts\Responder;
+use Illuminate\Support\Facades\Facade;
 
 /**
- * A optional facade you can register to create API responses.
+ * An optional facade you can register to quickly access the responder service.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

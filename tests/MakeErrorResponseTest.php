@@ -2,14 +2,14 @@
 
 namespace Flugg\Responder\Tests;
 
-use Illuminate\Http\JsonResponse;
-use Illuminate\Translation\Translator;
 use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Facades\ApiResponse;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Translation\Translator;
 use Mockery;
 
 /**
- *
+ * This file is a collection of tests, testing that you can generate error responses.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -18,7 +18,7 @@ use Mockery;
 class MakeErrorResponseTest extends TestCase
 {
     /**
-     *
+     * Test that you can generate error responses using the responder service.
      *
      * @test
      */
@@ -41,27 +41,7 @@ class MakeErrorResponseTest extends TestCase
     }
 
     /**
-     *
-     *
-     * @test
-     */
-    public function youCanMakeErrorResponsesUsingTrait()
-    {
-        // Arrange...
-        $controller = $this->createTestController();
-
-        $responder = Mockery::mock( Responder::class );
-        $this->app->instance( Responder::class, $responder );
-
-        // Expect...
-        $responder->shouldReceive( 'error' )->with( 'test_error', 400, 'Test error.' )->once();
-
-        // Act...
-        ( new $controller )->errorAction();
-    }
-
-    /**
-     *
+     * Test that you can generate error responses using the facade.
      *
      * @test
      */
@@ -79,7 +59,7 @@ class MakeErrorResponseTest extends TestCase
     }
 
     /**
-     *
+     * Test that it uses error messages from the package language file based on error code.
      *
      * @test
      */
@@ -98,5 +78,25 @@ class MakeErrorResponseTest extends TestCase
 
         // Assert...
         $this->assertEquals( $response->getData( true )[ 'error' ][ 'message' ], 'Test error.' );
+    }
+
+    /**
+     * Test that you can generate error responses using the RespondsWithJson trait.
+     *
+     * @test
+     */
+    public function youCanMakeErrorResponsesUsingTrait()
+    {
+        // Arrange...
+        $controller = $this->createTestController();
+
+        $responder = Mockery::mock( Responder::class );
+        $this->app->instance( Responder::class, $responder );
+
+        // Expect...
+        $responder->shouldReceive( 'error' )->with( 'test_error', 400, 'Test error.' )->once();
+
+        // Act...
+        ( new $controller )->errorAction();
     }
 }

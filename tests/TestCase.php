@@ -2,15 +2,15 @@
 
 namespace Flugg\Responder\Tests;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Builder;
-use Illuminate\Routing\Controller;
 use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Contracts\Transformable;
 use Flugg\Responder\ResponderServiceProvider;
 use Flugg\Responder\Traits\RespondsWithJson;
 use Flugg\Responder\Transformer;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Routing\Controller;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 /**
@@ -155,7 +155,7 @@ abstract class TestCase extends BaseTestCase
             }
         };
 
-        $this->app->bind( 'test.transformer', function () use ($transformer) {
+        $this->app->bind( 'test.transformer', function () use ( $transformer ) {
             return new $transformer();
         } );
     }

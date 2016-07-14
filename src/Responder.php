@@ -2,6 +2,9 @@
 
 namespace Flugg\Responder;
 
+use Flugg\Responder\Contracts\Manager;
+use Flugg\Responder\Contracts\Responder as ResponderContract;
+use Flugg\Responder\Contracts\Transformable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
@@ -11,12 +14,10 @@ use League\Fractal\Resource\Collection as FractalCollection;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Resource\NullResource as FractalNull;
 use League\Fractal\Resource\ResourceInterface;
-use Flugg\Responder\Contracts\Manager;
-use Flugg\Responder\Contracts\Responder as ResponderContract;
-use Flugg\Responder\Contracts\Transformable;
 
 /**
  * The responder service. This class is responsible for generating JSON API responses.
+ * It can also transform and serialize data using Fractal behind the scenes.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -39,18 +40,13 @@ class Responder implements ResponderContract
 
         $resource = $this->transform( $data );
         $data = $this->serialize( $resource );
-
-        if ( config( 'responder.status_code' ) ) {
-            $data = array_merge( [
-                'status' => $statusCode
-            ], $data );
-        }
+        $data = $this->includeStatusCode( $statusCode, $data );
 
         return response()->json( $data, $statusCode );
     }
 
     /**
-     * Generate an error JSON response.
+     * Generate an unsuccessful JSON response.
      *
      * @param  string $errorCode
      * @param  int    $statusCode
@@ -59,7 +55,7 @@ class Responder implements ResponderContract
      */
     public function error( string $errorCode, int $statusCode = 500, $message = null ):JsonResponse
     {
-        $response = $this->getErrorResponse( $errorCode, $statusCode );
+        $response = $this->getErrorResponse( $errorCode );
         $messages = $this->getErrorMessages( $message, $errorCode );
 
         if ( count( $messages ) === 1 ) {
@@ -72,7 +68,7 @@ class Responder implements ResponderContract
     }
 
     /**
-     * Transforms the data using Fractal.
+     * Transforms the data.
      *
      * @param  mixed            $data
      * @param  Transformer|null $transformer
@@ -91,6 +87,28 @@ class Responder implements ResponderContract
         }
 
         throw new InvalidArgumentException( 'Data must be one or multiple models implementing the Transformable contract.' );
+    }
+
+    /**
+     * Serializes the data.
+     *
+     * @param  ResourceInterface $resource
+     * @return array
+     */
+    public function serialize( ResourceInterface $resource ):array
+    {
+        $manager = app( Manager::class );
+
+        $data = $resource->getData();
+        $model = $data instanceof Collection ? $this->resolveModel( $data ) : $data;
+
+        if ( ! is_null( $data ) ) {
+            $transformer = $model::transformer();
+            $includes = ( new $transformer( $model ) )->getAvailableIncludes();
+            $manager = $manager->parseIncludes( $includes );
+        }
+
+        return $manager->createData( $resource )->toArray();
     }
 
     /**
@@ -178,20 +196,23 @@ class Responder implements ResponderContract
         return $class;
     }
 
-    public function serialize( ResourceInterface $resource ):array
+    /**
+     * Here we prepend a status code to the response data, if status code is enabled in
+     * the configuration file.
+     *
+     * @param  int   $statusCode
+     * @param  array $data
+     * @return array
+     */
+    protected function includeStatusCode( int $statusCode, array $data ):array
     {
-        $manager = app( Manager::class );
-
-        $data = $resource->getData();
-        $model = $data instanceof Collection ? $this->resolveModel( $data ) : $data;
-
-        if ( ! is_null( $data ) ) {
-            $transformer = $model::transformer();
-            $includes = ( new $transformer( $model ) )->getAvailableIncludes();
-            $manager = $manager->parseIncludes( $includes );
+        if ( ! config( 'responder.status_code' ) ) {
+            return $data;
         }
 
-        return $manager->createData( $resource )->toArray();
+        return array_merge( [
+            'status' => $statusCode
+        ], $data );
     }
 
     /**
@@ -203,13 +224,14 @@ class Responder implements ResponderContract
      */
     protected function getErrorResponse( string $errorCode, int $statusCode ):array
     {
-        return [
+        $response = [
             'success' => false,
-            'status' => $statusCode,
             'error' => [
                 'code' => $errorCode
             ]
         ];
+
+        return $this->includeStatusCode( $statusCode, $response );
     }
 
     /**

@@ -48,6 +48,13 @@ trait ConvertsToSnakeCase
     }
 
     /**
+     * Get the input source for the request.
+     *
+     * @return \Symfony\Component\HttpFoundation\ParameterBag
+     */
+    abstract protected function getInputSource();
+
+    /**
      * Cast and convert parameters.
      *
      * @return array
@@ -60,6 +67,13 @@ trait ConvertsToSnakeCase
 
         return $parameters;
     }
+
+    /**
+     * Get all of the input and files for the request.
+     *
+     * @return array
+     */
+    abstract public function all();
 
     /**
      * Cast all string booleans to real boolean values.
@@ -130,18 +144,4 @@ trait ConvertsToSnakeCase
 
         return $converted;
     }
-
-    /**
-     * Get all of the input and files for the request.
-     *
-     * @return array
-     */
-    abstract public function all();
-
-    /**
-     * Get the input source for the request.
-     *
-     * @return \Symfony\Component\HttpFoundation\ParameterBag
-     */
-    abstract protected function getInputSource();
 }

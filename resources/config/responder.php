@@ -21,8 +21,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Wether or not you want to include status codes in your JSON responses.
-    | You may choose to include it for error responses, success responses
-    | or both, just by changing the configuration values listed below.
+    | The status code is then be prepended to both your success and error
+    | responses. This happens after serializing for success responses.
     |
     */
 

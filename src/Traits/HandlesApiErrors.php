@@ -3,19 +3,19 @@
 namespace Flugg\Responder\Traits;
 
 use Exception;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\JsonResponse;
 use Flugg\Responder\Exceptions\ApiException;
 use Flugg\Responder\Exceptions\ResourceNotFoundException;
 use Flugg\Responder\Exceptions\UnauthorizedException;
 use Flugg\Responder\Exceptions\ValidationFailedException;
 use Flugg\Responder\Responder;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
- * You may apply this trait to your exceptions handler to give you access to methods
- * you may use to let the package catch and handle any API exceptions.
+ * Use this trait in your exceptions handler to give you access to methods you may
+ * use to let the package catch and handle any API exceptions.
  *
  * @package Laravel Responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
