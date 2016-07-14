@@ -382,7 +382,7 @@ That wont work because the user model expects snake case fields. However, the pa
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Flugg\Responder\Traits\ConvertToSnakeCase;
+use Flugg\Responder\Traits\ConvertsParameters;
 
 abstract class Request extends FormRequest
 {
@@ -398,7 +398,7 @@ This trait will not only convert all incoming parameters to snake case, it will 
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Flugg\Responder\Traits\ConvertToSnakeCase;
+use Flugg\Responder\Traits\ConvertsParameters;
 
 abstract class Request extends FormRequest
 {
