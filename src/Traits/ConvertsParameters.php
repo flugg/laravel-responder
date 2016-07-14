@@ -11,7 +11,7 @@ namespace Flugg\Responder\Traits;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-trait ConvertsToSnakeCase
+trait ConvertsParameters
 {
     /**
      * Check if an input element is set on the request.
