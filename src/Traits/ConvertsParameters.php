@@ -65,6 +65,10 @@ trait ConvertsToSnakeCase
         $parameters = $this->castBooleans( $parameters );
         $parameters = $this->convertToSnakeCase( $parameters );
 
+        if ( method_exists( $this, 'convertParameters' ) ) {
+            $parameters = $this->convertParameters( $parameters );
+        }
+
         return $parameters;
     }
 
@@ -83,7 +87,7 @@ trait ConvertsToSnakeCase
      */
     protected function castBooleans( $input ):array
     {
-        if ( isset( $this->convertToSnakeCase ) && ! $this->convertToSnakeCase ) {
+        if ( isset( $this->castBooleans ) && ! $this->castBooleans ) {
             return;
         }
 
@@ -104,6 +108,10 @@ trait ConvertsToSnakeCase
      */
     protected function castValueToBoolean( $value )
     {
+        if ( isset( $this->convertToSnakeCase ) && ! $this->convertToSnakeCase ) {
+            return;
+        }
+
         if ( $value === 'true' || $value === 'false' ) {
             return filter_var( $value, FILTER_VALIDATE_BOOLEAN );
         }
