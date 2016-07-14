@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Routing\Controller;
+use Illuminate\Translation\Translator;
+use Mockery;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 /**
@@ -196,5 +198,34 @@ abstract class TestCase extends BaseTestCase
             'price' => 10,
             'is_rotten' => false
         ], $attributes ) );
+    }
+
+    /**
+     * Create a mock of the responder and binds it to the service container.
+     *
+     * @return \Mockery\MockInterface
+     */
+    protected function mockResponder()
+    {
+        $responder = Mockery::mock( Responder::class );
+
+        $this->app->instance( Responder::class, $responder );
+
+        return $responder;
+    }
+
+    /**
+     * Create a mock of Laravel's translator and binds it to the service container.
+     *
+     * @return \Mockery\MockInterface
+     */
+    protected function mockTranslator()
+    {
+        $translator = Mockery::mock( Translator::class );
+
+        $this->app->loadDeferredProvider( 'translator' );
+        $this->app->instance( 'translator', $translator );
+
+        return $translator;
     }
 }

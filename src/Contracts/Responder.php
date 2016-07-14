@@ -2,7 +2,9 @@
 
 namespace Flugg\Responder\Contracts;
 
+use Flugg\Responder\Transformer;
 use Illuminate\Http\JsonResponse;
+use League\Fractal\Resource\ResourceInterface;
 
 /**
  * A responder contract for the responder service which handles the generation of

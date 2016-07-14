@@ -55,8 +55,8 @@ class Responder implements ResponderContract
      */
     public function error( string $errorCode, int $statusCode = 500, $message = null ):JsonResponse
     {
-        $response = $this->getErrorResponse( $errorCode );
-        $messages = $this->getErrorMessages( $message, $errorCode );
+        $response = $this->getErrorResponse( $errorCode, $statusCode );
+        $messages = $this->getErrorMessages( $errorCode, $message );
 
         if ( count( $messages ) === 1 ) {
             $response[ 'error' ][ 'message' ] = $messages[ 0 ];
@@ -238,11 +238,11 @@ class Responder implements ResponderContract
      * Get any error messages for the response. If no message can be found it will
      * try to resolve a set message from the translator.
      *
-     * @param  mixed  $message
      * @param  string $errorCode
+     * @param  mixed  $message
      * @return array
      */
-    protected function getErrorMessages( $message, string $errorCode ):array
+    protected function getErrorMessages( string $errorCode, $message ):array
     {
         if ( is_array( $message ) ) {
             return $message;

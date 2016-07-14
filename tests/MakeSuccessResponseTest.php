@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder\Tests;
 
-use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Facades\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Mockery;
@@ -52,9 +51,7 @@ class MakeSuccessResponseTest extends TestCase
     {
         // Arrange...
         $fruit = $this->createTestModel();
-
-        $responder = Mockery::mock( Responder::class );
-        $this->app->instance( Responder::class, $responder );
+        $responder = $this->mockResponder();
 
         // Assert...
         $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
@@ -72,6 +69,7 @@ class MakeSuccessResponseTest extends TestCase
     {
         // Arrange...
         $fruit = $this->createTestModel();
+        $responder = $this->mockResponder();
 
         // Assert...
         $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
@@ -90,9 +88,7 @@ class MakeSuccessResponseTest extends TestCase
         // Arrange...
         $fruit = $this->createTestModel();
         $controller = $this->createTestController();
-
-        $responder = Mockery::mock( Responder::class );
-        $this->app->instance( Responder::class, $responder );
+        $responder = $this->mockResponder();
 
         // Assert...
         $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
