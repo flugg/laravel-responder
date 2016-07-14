@@ -432,13 +432,13 @@ You may also convert any parameters manually using the `convertParameters()` met
  */
 protected function convertParameters( array $parameters )
 {
-    $parameters[ 'included' ] = (array) $parameters[ 'included' ];
+    $parameters[ 'included' ] = $parameters[ 'included' ] ?? [];
     
     return $parameters;
 }
 ```
 
-The method takes in an array of all incoming parameters, which you may modify to your liking before returning it again. In the example above, we convert the `included` parameter to an array. This way we can use it as an argument in Eloquent's `with()` and `load()` methods, as these methods require the first parameter to be an array.
+The method takes in an array of all incoming parameters, which you may modify to your liking before returning it again. In the example above, we set the `included` parameter to an empty array if it's not set using the new [null coalesce operator in PHP7](https://wiki.php.net/rfc/isset_ternary). This way we can use it as an argument in Eloquent's `with()` and `load()` methods, as these methods require the first parameter to be an array.
 
 ### Serializers
 
