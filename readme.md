@@ -81,10 +81,10 @@ Flugg\Responder\ResponderServiceProvider::class
 
 #### Registering Facade
 
-If you like facades you may also append the `ApiResponse` facade to the `aliases` key:
+If you like facades you may also append the `Responder` facade to the `aliases` key:
 
 ```php
-'ApiResponse' => Flugg\Responder\Facades\ApiResponse::class
+'ApiResponse' => Flugg\Responder\Facades\Responder::class
 ```
 
 #### Publishing Package Assets
