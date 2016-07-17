@@ -84,7 +84,7 @@ Flugg\Responder\ResponderServiceProvider::class
 If you like facades you may also append the `Responder` facade to the `aliases` key:
 
 ```php
-'ApiResponse' => Flugg\Responder\Facades\Responder::class
+'Responder' => Flugg\Responder\Facades\Responder::class
 ```
 
 #### Publishing Package Assets
