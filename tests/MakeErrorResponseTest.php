@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Tests;
 
-use Flugg\Responder\Facades\ApiResponse;
+use Flugg\Responder\Facades\Responder;
 use Illuminate\Http\JsonResponse;
 use Mockery;
 
@@ -69,7 +69,7 @@ class MakeErrorResponseTest extends TestCase
         $responder->shouldReceive( 'error' )->with( 'test_error', 400, 'Test error.' )->once();
 
         // Act...
-        ApiResponse::error( 'test_error', 400, 'Test error.' );
+        Responder::error( 'test_error', 400, 'Test error.' );
     }
 
     /**

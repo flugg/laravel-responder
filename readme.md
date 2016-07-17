@@ -128,7 +128,7 @@ return $responder->error( 'invalid_user' );
 
 #### Option 2: Facade
 
-Optionally, you may use the `ApiResponse` facade to create responses:
+Optionally, you may use the `Responder` facade to create responses:
 
 ```php
 return Responder::success( $users );

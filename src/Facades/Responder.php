@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Facades;
 
-use Flugg\Responder\Contracts\Responder;
+use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ApiResponse extends Facade
+class Responder extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -21,6 +21,6 @@ class ApiResponse extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return Responder::class;
+        return ResponderContract::class;
     }
 }

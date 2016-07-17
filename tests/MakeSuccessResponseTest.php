@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Tests;
 
-use Flugg\Responder\Facades\ApiResponse;
+use Flugg\Responder\Facades\Responder;
 use Illuminate\Http\JsonResponse;
 use Mockery;
 
@@ -57,7 +57,7 @@ class MakeSuccessResponseTest extends TestCase
         $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
 
         // Act...
-        ApiResponse::success( $fruit, 200 );
+        Responder::success( $fruit, 200 );
     }
 
     /**
