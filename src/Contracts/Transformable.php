@@ -16,7 +16,7 @@ interface Transformable
      *
      * @return string
      */
-    public static function transformer():string;
+    public static function transformer();
 
     /**
      * Get the table associated with the model.
