@@ -116,11 +116,15 @@ class Responder implements ResponderContract
      *
      * @param  Transformable    $model
      * @param  Transformer|null $transformer
-     * @return FractalItem
+     * @return ResourceInterface
      */
-    protected function transformModel( Transformable $model, Transformer $transformer = null ):FractalItem
+    protected function transformModel( Transformable $model, Transformer $transformer = null ):ResourceInterface
     {
         $transformer = $transformer ?: $model::transformer();
+
+        if ( is_null( $transformer ) ) {
+            return new FractalNull();
+        }
 
         return $this->transformData( $model, new $transformer( $model ), $model->getTable() );
     }
@@ -130,12 +134,16 @@ class Responder implements ResponderContract
      *
      * @param  Collection       $collection
      * @param  Transformer|null $transformer
-     * @return FractalCollection
+     * @return ResourceInterface
      */
-    protected function transformCollection( Collection $collection, Transformer $transformer = null ):FractalCollection
+    protected function transformCollection( Collection $collection, Transformer $transformer = null ):ResourceInterface
     {
         $model = $this->resolveModel( $collection );
         $transformer = $transformer ?: $model::transformer();
+
+        if ( is_null( $transformer ) ) {
+            return new FractalNull();
+        }
 
         return $this->transformData( $collection, new $transformer( $model ), $model->getTable() );
     }
@@ -145,9 +153,9 @@ class Responder implements ResponderContract
      *
      * @param LengthAwarePaginator $paginator
      * @param Transformer|null     $transformer
-     * @return FractalCollection
+     * @return ResourceInterface
      */
-    protected function transformPaginator( LengthAwarePaginator $paginator, Transformer $transformer = null ):FractalCollection
+    protected function transformPaginator( LengthAwarePaginator $paginator, Transformer $transformer = null ):ResourceInterface
     {
         $resource = $this->transformCollection( $paginator->getCollection(), $transformer );
         $resource->setPaginator( new IlluminatePaginatorAdapter( $paginator ) );
