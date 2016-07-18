@@ -33,7 +33,7 @@ This package requires:
 
 ## Philosophy
 
-When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/thephpleague/fractal) has som great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
+When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/thephpleague/fractal) has some great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
 
 While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Here is an example response using Fractal in a Laravel controller:
 
@@ -547,7 +547,7 @@ Fractal also has a representation of the [JSON-API](http://jsonapi.org/) standar
 }
 ```
 
-As you can see, quite more verbose, but it definitiely has its uses.
+As you can see, quite more verbose, but it definitely has its uses.
 
 #### Custom Serializers
 
