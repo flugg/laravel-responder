@@ -33,7 +33,7 @@ This package requires:
 
 ## Philosophy
 
-When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/thephpleague/fractal) has som great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
+When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/thephpleague/fractal) has some great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
 
 While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Here is an example response using Fractal in a Laravel controller:
 
@@ -199,7 +199,7 @@ return Responder::success( $user, 201 );
 Sometimes you may not want to return anything, but still notify the user that the request was successful. In that case you may pass in the status code as the first argument and omit the data parameter:
 
 ```php
-return Responder::success( 204 );
+return Responder::success( 201 );
 ```
 
 #### Adding Meta Data
@@ -219,7 +219,7 @@ return Responder::success( $user, [ 'foo' => 'bar' ] );
 You may even omit the data parameter if you pass in a status code as the first argument:
 
 ```php
-return Responder::success( 204, [ 'foo' => 'bar' ] );
+return Responder::success( 200, [ 'foo' => 'bar' ] );
 ```
 
 #### Relationships
@@ -547,7 +547,7 @@ Fractal also has a representation of the [JSON-API](http://jsonapi.org/) standar
 }
 ```
 
-As you can see, quite more verbose, but it definitiely has its uses.
+As you can see, quite more verbose, but it definitely has its uses.
 
 #### Custom Serializers
 
