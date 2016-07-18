@@ -89,7 +89,7 @@ abstract class Transformer extends TransformerAbstract
      * @param  Scope  $scope
      * @param  string $includeName
      * @param  mixed  $data
-     * @return \League\Fractal\Resource\ResourceInterface
+     * @return \League\Fractal\Resource\ResourceInterface|bool
      * @throws \Exception
      */
     protected function callIncludeMethod( Scope $scope, $includeName, $data )

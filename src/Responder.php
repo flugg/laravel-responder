@@ -6,6 +6,7 @@ use Flugg\Responder\Contracts\Manager;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Contracts\Transformable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
