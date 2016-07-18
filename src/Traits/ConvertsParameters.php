@@ -87,7 +87,7 @@ trait ConvertsParameters
      */
     protected function castBooleans( $input ):array
     {
-        if ( isset( $this->castBooleans ) && ! $this->castBooleans ) {
+        if ( $this->castToBooleanIsDisabled() ) {
             return;
         }
 
@@ -101,25 +101,6 @@ trait ConvertsParameters
     }
 
     /**
-     * Cast a given value to a boolean if it is in fact a boolean.
-     *
-     * @param  mixed $value
-     * @return mixed
-     */
-    protected function castValueToBoolean( $value )
-    {
-        if ( isset( $this->convertToSnakeCase ) && ! $this->convertToSnakeCase ) {
-            return;
-        }
-
-        if ( $value === 'true' || $value === 'false' ) {
-            return filter_var( $value, FILTER_VALIDATE_BOOLEAN );
-        }
-
-        return $value;
-    }
-
-    /**
      * Convert a string or array to snake case.
      *
      * @param  mixed $input
@@ -127,6 +108,10 @@ trait ConvertsParameters
      */
     protected function convertToSnakeCase( $input )
     {
+        if ( $this->convertToSnakeCaseIsDisabled() ) {
+            return;
+        }
+
         if ( is_null( $input ) ) {
             return null;
         } elseif ( is_array( $input ) ) {
@@ -134,6 +119,41 @@ trait ConvertsParameters
         }
 
         return snake_case( $input );
+    }
+
+    /**
+     * Checks if the user wants to cast to booleans.
+     *
+     * @return bool
+     */
+    protected function castToBooleanIsDisabled():bool
+    {
+        return isset( $this->castBooleans ) && ! $this->castBooleans;
+    }
+
+    /**
+     * Checks if the user wants to convert to snake case.
+     *
+     * @return bool
+     */
+    protected function convertToSnakeCaseIsDisabled():bool
+    {
+        return isset( $this->convertToSnakeCase ) && ! $this->convertToSnakeCase;
+    }
+
+    /**
+     * Cast a given value to a boolean if it is in fact a boolean.
+     *
+     * @param  mixed $value
+     * @return mixed
+     */
+    protected function castValueToBoolean( $value )
+    {
+        if ( in_array( $value, [ 'true', 'false' ] ) ) {
+            return filter_var( $value, FILTER_VALIDATE_BOOLEAN );
+        }
+
+        return $value;
     }
 
     /**
