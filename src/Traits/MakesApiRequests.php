@@ -46,6 +46,23 @@ trait MakesApiRequests
     }
 
     /**
+     * Assert that the response data contains the given structure.
+     *
+     * @param  mixed $data
+     * @return $this
+     */
+    protected function seeSuccessStructure( $data = null, $status = 200 )
+    {
+        $this->seeStatusCode( $status );
+
+        $this->seeJsonStructure( [
+            'data' => $data
+        ] );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response is a valid success response.
      *
      * @param  mixed $data
