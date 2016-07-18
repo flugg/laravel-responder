@@ -5,7 +5,6 @@ namespace Flugg\Responder\Tests;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Facades\Responder as ResponderFacade;
 use Flugg\Responder\Responder;
-use Mockery;
 
 /**
  * This file is a collection of tests, testing that you can access the responder service

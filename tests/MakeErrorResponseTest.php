@@ -4,7 +4,6 @@ namespace Flugg\Responder\Tests;
 
 use Flugg\Responder\Facades\Responder;
 use Illuminate\Http\JsonResponse;
-use Mockery;
 
 /**
  * This file is a collection of tests, testing that you can generate error responses.
