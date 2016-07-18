@@ -115,7 +115,7 @@ class Responder implements ResponderContract
 
         if ( ! is_null( $data ) ) {
             $transformer = $model::transformer();
-            $includes = ( new $transformer( $model ) )->getAvailableIncludes();
+            $includes = is_string( $transformer ) ? ( new $transformer( $model ) )->getAvailableIncludes() : [ ];
             $manager = $manager->parseIncludes( $includes );
         }
 
@@ -134,7 +134,9 @@ class Responder implements ResponderContract
         $transformer = $transformer ?: $model::transformer();
 
         if ( is_null( $transformer ) ) {
-            return new FractalNull();
+            return new FractalItem( $model, function () use ( $model ) {
+                return $model->toArray();
+            } );
         }
 
         return $this->transformData( $model, new $transformer( $model ), $model->getTable() );
@@ -153,7 +155,9 @@ class Responder implements ResponderContract
         $transformer = $transformer ?: $model::transformer();
 
         if ( is_null( $transformer ) ) {
-            return new FractalNull();
+            return new FractalCollection( $collection, function () use ( $collection ) {
+                return $collection->toArray();
+            } );
         }
 
         return $this->transformData( $collection, new $transformer( $model ), $model->getTable() );

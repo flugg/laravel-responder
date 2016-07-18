@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Serializers;
 
+use League\Fractal\Pagination\PaginatorInterface;
 use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Serializer\ArraySerializer;
 
@@ -62,6 +63,28 @@ class ApiSerializer extends ArraySerializer
     public function meta( array $meta )
     {
         return $meta;
+    }
+
+    /**
+     * Serialize the paginator.
+     *
+     * @param PaginatorInterface $paginator
+     *
+     * @return array
+     */
+    public function paginator( PaginatorInterface $paginator )
+    {
+        $pagination = parent::paginator( $paginator )[ 'pagination' ];
+
+        $data = [
+            'total' => $pagination[ 'total' ],
+            'count' => $pagination[ 'count' ],
+            'perPage' => $pagination[ 'per_page' ],
+            'currentPage' => $pagination[ 'current_page' ],
+            'totalPages' => $pagination[ 'total_pages' ],
+        ];
+
+        return [ 'pagination' => $data ];
     }
 
     /**

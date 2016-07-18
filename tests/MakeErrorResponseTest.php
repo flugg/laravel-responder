@@ -95,7 +95,7 @@ class MakeErrorResponseTest extends TestCase
      *
      * @test
      */
-    public function itShouldUseLangFilesForErrorMessages()
+    public function youCanUseLangFilesForErrorMessages()
     {
         // Arrange...
         $translator = $this->mockTranslator();

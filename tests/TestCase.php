@@ -185,6 +185,45 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Creates a new adjustable model without an attached transformer for testing purposes.
+     *
+     * @param  array $attributes
+     * @return Model
+     */
+    protected function createTestModelWithNoTransformer( array $attributes = [ ] ):Model
+    {
+        $model = new class extends Model
+        {
+            protected $fillable = [ 'name', 'price', 'is_rotten' ];
+            protected $table = 'fruits';
+        };
+
+        return $this->storeModel( $model, $attributes );
+    }
+
+    /**
+     * Creates a new adjustable model with a null transformer for testing purposes.
+     *
+     * @param  array $attributes
+     * @return Model
+     */
+    protected function createTestModelWithNullTransformer( array $attributes = [ ] ):Model
+    {
+        $model = new class extends Model implements Transformable
+        {
+            protected $fillable = [ 'name', 'price', 'is_rotten' ];
+            protected $table = 'fruits';
+
+            public static function transformer()
+            {
+                return null;
+            }
+        };
+
+        return $this->storeModel( $model, $attributes );
+    }
+
+    /**
      * Stores an actual instance of an adjustable model to the database.
      *
      * @param  Model $model
