@@ -175,24 +175,4 @@ class MakeSuccessResponseTest extends TestCase
         $this->assertEquals( $response->getStatusCode(), 200 );
         $this->assertContains( $meta, $response->getData( true ) );
     }
-
-    /**
-     *
-     *
-     * @test
-     */
-    public function youCanOmitDataAndStatusCode()
-    {
-        // Arrange...
-        $meta = [
-            'foo' => 'bar'
-        ];
-
-        // Act...
-        $response = $this->responder->success( $meta );
-
-        // Assert...
-        $this->assertEquals( $response->getStatusCode(), 200 );
-        $this->assertContains( $meta, $response->getData( true ) );
-    }
 }

@@ -36,11 +36,9 @@ class Responder implements ResponderContract
     public function success( $data = null, $statusCode = 200, $meta = null ):JsonResponse
     {
         if ( is_integer( $data ) ) {
-            list( $statusCode, $data ) = [ $data, null ];
+            list( $data, $statusCode, $meta ) = [ null, $data, $statusCode ];
         } elseif ( is_array( $statusCode ) ) {
             list( $statusCode, $meta ) = [ 200, $statusCode ];
-        } elseif ( is_array( $data ) ) {
-            list( $data, $statusCode, $meta ) = [ null, 200, $data ];
         }
 
         $resource = $this->transform( $data );
@@ -92,6 +90,8 @@ class Responder implements ResponderContract
             return $this->transformModel( $data, $transformer );
         } elseif ( $data instanceof Collection ) {
             return $this->transformCollection( $data, $transformer );
+        } elseif ( $data instanceof Builder ) {
+            return $this->transformCollection( $data->get(), $transformer );
         } elseif ( $data instanceof LengthAwarePaginator ) {
             return $this->transformPaginator( $data, $transformer );
         }
