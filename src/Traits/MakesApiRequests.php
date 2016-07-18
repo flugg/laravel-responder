@@ -103,11 +103,26 @@ trait MakesApiRequests
     /**
      * Decodes JSON response and returns the data.
      *
+     * @param  string|array $field
      * @return array
      */
-    protected function getSuccessData()
+    protected function getSuccessData( $attributes = null )
     {
-        return $this->decodeResponseJson()[ 'data' ];
+        $rawData = $this->decodeResponseJson()[ 'data' ];
+
+        if ( is_null( $attributes ) ) {
+            return $rawData;
+        } elseif ( is_string( $attributes ) ) {
+            return array_get( $rawData, $attributes );
+        }
+
+        $data = [ ];
+
+        foreach ( $attributes as $attribute ) {
+            $data[] = array_get( $rawData, $attribute );
+        }
+
+        return $data;
     }
 
     /**
