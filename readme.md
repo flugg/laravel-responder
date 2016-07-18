@@ -199,7 +199,7 @@ return Responder::success( $user, 201 );
 Sometimes you may not want to return anything, but still notify the user that the request was successful. In that case you may pass in the status code as the first argument and omit the data parameter:
 
 ```php
-return Responder::success( 204 );
+return Responder::success( 201 );
 ```
 
 #### Adding Meta Data
@@ -219,7 +219,7 @@ return Responder::success( $user, [ 'foo' => 'bar' ] );
 You may even omit the data parameter if you pass in a status code as the first argument:
 
 ```php
-return Responder::success( 204, [ 'foo' => 'bar' ] );
+return Responder::success( 200, [ 'foo' => 'bar' ] );
 ```
 
 #### Relationships
