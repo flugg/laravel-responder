@@ -20,11 +20,12 @@ interface Responder
     /**
      * Generate a successful JSON response.
      *
-     * @param  mixed $data
-     * @param  int   $statusCode
+     * @param  mixed      $data
+     * @param  int        $statusCode
+     * @param  array|null $meta
      * @return JsonResponse
      */
-    public function success( $data = null, int $statusCode = 200 ):JsonResponse;
+    public function success( $data = null, $statusCode = 200, $meta = null ):JsonResponse;
 
     /**
      * Generate an unsuccessful JSON response.

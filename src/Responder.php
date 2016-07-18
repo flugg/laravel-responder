@@ -28,17 +28,27 @@ class Responder implements ResponderContract
     /**
      * Generate a successful JSON response.
      *
-     * @param  mixed $data
-     * @param  int   $statusCode
+     * @param  mixed      $data
+     * @param  int        $statusCode
+     * @param  array|null $meta
      * @return JsonResponse
      */
-    public function success( $data = null, int $statusCode = 200 ):JsonResponse
+    public function success( $data = null, $statusCode = 200, $meta = null ):JsonResponse
     {
         if ( is_integer( $data ) ) {
             list( $statusCode, $data ) = [ $data, null ];
+        } elseif ( is_array( $statusCode ) ) {
+            list( $statusCode, $meta ) = [ 200, $statusCode ];
+        } elseif ( is_array( $data ) ) {
+            list( $data, $statusCode, $meta ) = [ null, 200, $data ];
         }
 
         $resource = $this->transform( $data );
+
+        if ( is_array( $meta ) ) {
+            $resource->setMeta( $meta );
+        }
+
         $data = $this->serialize( $resource );
         $data = $this->includeStatusCode( $statusCode, $data );
 

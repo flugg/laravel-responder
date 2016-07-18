@@ -96,4 +96,103 @@ class MakeSuccessResponseTest extends TestCase
         // Act...
         ( new $controller )->successAction( $fruit );
     }
+
+    /**
+     *
+     *
+     * @test
+     */
+    public function youCanPassInStatusCode()
+    {
+        // Arrange...
+        $fruit = $this->createTestModel();
+
+        // Act...
+        $response = $this->responder->success( $fruit, 201 );
+
+        // Assert...
+        $this->assertEquals( $response->getStatusCode(), 201 );
+    }
+
+    /**
+     *
+     *
+     * @test
+     */
+    public function youCanPassInMetaData()
+    {
+        // Arrange...
+        $fruit = $this->createTestModel();
+        $meta = [
+            'foo' => 'bar'
+        ];
+
+        // Act...
+        $response = $this->responder->success( $fruit, 200, $meta );
+
+        // Assert...
+        $this->assertEquals( $response->getStatusCode(), 200 );
+        $this->assertContains( $meta, $response->getData( true ) );
+    }
+
+    /**
+     *
+     *
+     * @test
+     */
+    public function youCanOmitData()
+    {
+        // Arrange...
+        $meta = [
+            'foo' => 'bar'
+        ];
+
+        // Act...
+        $response = $this->responder->success( 200, $meta );
+
+        // Assert...
+        $this->assertEquals( $response->getStatusCode(), 200 );
+        $this->assertContains( $meta, $response->getData( true ) );
+    }
+
+    /**
+     *
+     *
+     * @test
+     */
+    public function youCanOmitStatusCode()
+    {
+        // Arrange...
+        $fruit = $this->createTestModel();
+        $meta = [
+            'foo' => 'bar'
+        ];
+
+        // Act...
+        $response = $this->responder->success( $fruit, $meta );
+
+        // Assert...
+        $this->assertEquals( $response->getStatusCode(), 200 );
+        $this->assertContains( $meta, $response->getData( true ) );
+    }
+
+    /**
+     *
+     *
+     * @test
+     */
+    public function youCanOmitDataAndStatusCode()
+    {
+        // Arrange...
+        $meta = [
+            'foo' => 'bar'
+        ];
+
+        // Act...
+        $response = $this->responder->success( $meta );
+
+        // Assert...
+        $this->assertEquals( $response->getStatusCode(), 200 );
+        $this->assertContains( $meta, $response->getData( true ) );
+    }
 }
