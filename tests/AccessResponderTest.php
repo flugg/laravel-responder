@@ -67,7 +67,7 @@ class AccessResponderTest extends TestCase
      *
      * @test
      */
-    public function youCanAccessThroughTrait()
+    public function youCanAccessThroughControllerTrait()
     {
         // Arrange...
         $fruit = $this->createTestModel();
@@ -75,7 +75,7 @@ class AccessResponderTest extends TestCase
         $responder = $this->mockResponder();
 
         // Assert...
-        $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
+        $responder->shouldReceive( 'success' )->with( $fruit, 200, [ ] )->once();
 
         // Act...
         ( new $controller )->successAction( $fruit );

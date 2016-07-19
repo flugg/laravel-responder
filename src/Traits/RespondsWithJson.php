@@ -20,11 +20,12 @@ trait RespondsWithJson
      *
      * @param  mixed $data
      * @param  int   $statusCode
+     * @param  array $meta
      * @return JsonResponse
      */
-    public function successResponse( $data = null, int $statusCode = 200 ):JsonResponse
+    public function successResponse( $data = null, int $statusCode = 200, array $meta = [ ] ):JsonResponse
     {
-        return app( Responder::class )->success( $data, $statusCode );
+        return app( Responder::class )->success( $data, $statusCode, $meta );
     }
 
     /**

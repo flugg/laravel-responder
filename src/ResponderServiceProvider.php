@@ -5,7 +5,11 @@ namespace Flugg\Responder;
 use Flugg\Responder\Console\MakeTransformer;
 use Flugg\Responder\Contracts\Manager as ManagerContract;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
+use Flugg\Responder\Factories\ErrorResponseFactory;
+use Flugg\Responder\Factories\SuccessResponseFactory;
+use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use Laravel\Lumen\Application as Lumen;
 use League\Fractal\Manager;
 
 /**
@@ -17,13 +21,6 @@ use League\Fractal\Manager;
  */
 class ResponderServiceProvider extends BaseServiceProvider
 {
-    /**
-     * Keeps a short reference to the package configurations.
-     *
-     * @var array
-     */
-    protected $config;
-
     /**
      * Indicates if loading of the provider is deferred.
      *
@@ -38,6 +35,30 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
+        if ( $this->app instanceof Laravel && $this->app->runningInConsole() ) {
+            $this->bootLaravelApplication();
+
+        } elseif ( $this->app instanceof Lumen ) {
+            $this->bootLumenApplication();
+        }
+
+        $this->mergeConfigFrom( __DIR__ . '/../resources/config/responder.php', 'responder' );
+
+        $this->commands( [
+            MakeTransformer::class
+        ] );
+
+        include __DIR__ . '/helpers.php';
+    }
+
+
+    /**
+     * Bootstrap the Laravel application.
+     *
+     * @return void
+     */
+    protected function bootLaravelApplication()
+    {
         $this->publishes( [
             __DIR__ . '/../resources/config/responder.php' => config_path( 'responder.php' )
         ], 'config' );
@@ -45,11 +66,18 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->publishes( [
             __DIR__ . '/../resources/lang/en/errors.php' => resource_path( 'lang/en/errors.php' )
         ], 'lang' );
-
-        $this->commands( [
-            MakeTransformer::class
-        ] );
     }
+
+    /**
+     * Bootstrap the Lumen application.
+     *
+     * @return void
+     */
+    protected function bootLumenApplication()
+    {
+        $this->app->configure( 'responder' );
+    }
+
 
     /**
      * Register the service provider.
@@ -58,17 +86,32 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom( __DIR__ . '/../resources/config/responder.php', 'responder' );
-        $this->config = $this->app[ 'config' ]->get( 'responder' );
+        $this->app->singleton( ResponderContract::class, function ( $app ) {
+            $statusCodes = $app->config->get( 'responder.status_code' );
+            $successFactory = new SuccessResponseFactory( $statusCodes );
+            $errorFactory = new ErrorResponseFactory( $statusCodes );
 
-        $this->app->singleton( ResponderContract::class, function () {
-            return new Responder();
+            return ( new Responder( $successFactory, $errorFactory ) );
         } );
 
-        $this->app->singleton( ManagerContract::class, function () {
-            return ( new Manager() )->setSerializer( new $this->config[ 'serializer' ] );
+        $this->app->singleton( ManagerContract::class, function ( $app ) {
+            $serializerClass = $app->config->get( 'responder.serializer' );;
+            $serializer = new $serializerClass;
+
+            return ( new Manager() )->setSerializer( new $serializer );
         } );
 
-        include __DIR__ . '/helpers.php';
+        $this->app->alias( ResponderContract::class, 'responder' );
+        $this->app->alias( ManagerContract::class, 'responder.manager' );
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [ 'responder', 'responder.manager' ];
     }
 }

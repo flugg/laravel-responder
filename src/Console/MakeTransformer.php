@@ -66,8 +66,9 @@ class MakeTransformer extends Command
      */
     protected function generateTransformer()
     {
+        var_dump( $this->laravel->basePath() );
         $name = (string) $this->argument( 'name' );
-        $path = app_path() . '/Transformers/' . $name . '.php';
+        $path = $this->laravel->basePath() . '/app/Transformers/' . $name . '.php';
 
         if ( $this->files->exists( $path ) ) {
             return $this->error( $name . ' already exists!' );
@@ -117,7 +118,11 @@ class MakeTransformer extends Command
      */
     protected function replaceNamespace( string $stub ):string
     {
-        $namespace = $this->laravel->getNamespace() . 'Transformers';
+        if ( method_exists( $this->laravel, 'getNameSpace' ) ) {
+            $namespace = $this->laravel->getNamespace() . 'Transformers';
+        } else {
+            $namespace = 'App\Transformers';
+        }
 
         $stub = str_replace( 'DummyNamespace', $namespace, $stub );
 

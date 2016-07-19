@@ -138,7 +138,7 @@ trait MakesApiRequests
             $this->seeStatusCode( $status );
         }
 
-        if ( config( 'responder.status_code' ) ) {
+        if ( $this->app->config->get( 'responder.status_code' ) ) {
             $this->seeJson( [
                 'status' => $status
             ] );

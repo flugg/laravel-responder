@@ -5,6 +5,7 @@
         "laravel",
         "responder",
         "api",
+        "json",
         "response",
         "fractal",
         "transformers"
@@ -19,6 +20,7 @@
     ],
     "require": {
         "php": "^7.0",
+        "illuminate/contracts": "5.1.* || 5.2.* || 5.3.*",
         "illuminate/support": "5.1.* || 5.2.* || 5.3.*",
         "league/fractal": "^0.13.0"
     },

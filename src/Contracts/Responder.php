@@ -2,9 +2,7 @@
 
 namespace Flugg\Responder\Contracts;
 
-use Flugg\Responder\Transformer;
 use Illuminate\Http\JsonResponse;
-use League\Fractal\Resource\ResourceInterface;
 
 /**
  * A responder contract for the responder service which handles the generation of
@@ -20,12 +18,12 @@ interface Responder
     /**
      * Generate a successful JSON response.
      *
-     * @param  mixed      $data
-     * @param  int        $statusCode
-     * @param  array|null $meta
+     * @param  mixed $data
+     * @param  int   $statusCode
+     * @param  array $meta
      * @return JsonResponse
      */
-    public function success( $data = null, $statusCode = 200, $meta = null ):JsonResponse;
+    public function success( $data = null, $statusCode = 200, array $meta = [ ] ):JsonResponse;
 
     /**
      * Generate an unsuccessful JSON response.
@@ -36,21 +34,4 @@ interface Responder
      * @return JsonResponse
      */
     public function error( string $error, int $statusCode = 404, $message = null ):JsonResponse;
-
-    /**
-     * Transforms the data.
-     *
-     * @param  mixed            $data
-     * @param  Transformer|null $transformer
-     * @return ResourceInterface
-     */
-    public function transform( $data = null, Transformer $transformer = null ):ResourceInterface;
-
-    /**
-     * Serializes the data.
-     *
-     * @param  ResourceInterface $resource
-     * @return array
-     */
-    public function serialize( ResourceInterface $resource ):array;
 }

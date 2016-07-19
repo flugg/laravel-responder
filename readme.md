@@ -29,7 +29,7 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
 
 This package requires:
 - PHP __7.0__+
-- Laravel __5.0__+
+- Laravel __5.1__+
 
 ## Philosophy
 
