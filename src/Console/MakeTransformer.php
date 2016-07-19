@@ -66,7 +66,6 @@ class MakeTransformer extends Command
      */
     protected function generateTransformer()
     {
-        var_dump( $this->laravel->basePath() );
         $name = (string) $this->argument( 'name' );
         $path = $this->laravel->basePath() . '/app/Transformers/' . $name . '.php';
 

@@ -117,7 +117,7 @@ class SuccessResponseFactory extends ResponseFactory
     /**
      * Transform an Eloquent builder.
      *
-     * @param  Builder          $collection
+     * @param  Builder          $query
      * @param  Transformer|null $transformer
      * @return FractalCollection
      */

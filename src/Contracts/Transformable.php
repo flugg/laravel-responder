@@ -39,4 +39,11 @@ interface Transformable
      * @return bool
      */
     public function relationLoaded( $key );
+
+    /**
+     * Convert the model instance to an array.
+     *
+     * @return array
+     */
+    public function toArray();
 }
