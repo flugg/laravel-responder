@@ -86,23 +86,28 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $this->app->singleton( ResponderContract::class, function ( $app ) {
-            $statusCodes = $app->config->get( 'responder.status_code' );
-            $successFactory = new SuccessResponseFactory( $statusCodes );
-            $errorFactory = new ErrorResponseFactory( $statusCodes );
+        $config = $this->app[ 'config' ];
 
-            return ( new Responder( $successFactory, $errorFactory ) );
+        $this->app->singleton( 'responder.success', function () use ( $config ) {
+            return new SuccessResponseFactory( $config->get( 'responder.status_code' ) );
         } );
 
-        $this->app->singleton( ManagerContract::class, function ( $app ) {
-            $serializerClass = $app->config->get( 'responder.serializer' );;
-            $serializer = new $serializerClass;
+        $this->app->singleton( 'responder.error', function () use ( $config ) {
+            return new ErrorResponseFactory( $config->get( 'responder.status_code' ) );
+        } );
+
+        $this->app->singleton( 'responder', function ( $app ) {
+            return ( new Responder( $app[ 'responder.success' ], $app[ 'responder.error' ] ) );
+        } );
+
+        $this->app->singleton( 'responder.manager', function () use ( $config ) {
+            $serializer = $config->get( 'responder.serializer' );
 
             return ( new Manager() )->setSerializer( new $serializer );
         } );
 
-        $this->app->alias( ResponderContract::class, 'responder' );
-        $this->app->alias( ManagerContract::class, 'responder.manager' );
+        $this->app->alias( 'responder', ResponderContract::class );
+        $this->app->alias( 'responder.manager', ManagerContract::class );
     }
 
     /**

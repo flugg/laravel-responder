@@ -4,9 +4,10 @@ namespace Flugg\Responder\Factories;
 
 use Flugg\Responder\Contracts\Manager;
 use Flugg\Responder\Contracts\Transformable;
-use Flugg\Responder\Transformer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -47,11 +48,11 @@ class SuccessResponseFactory extends ResponseFactory
     /**
      * Transforms the data.
      *
-     * @param  mixed            $data
-     * @param  Transformer|null $transformer
+     * @param  mixed $data
+     * @param  mixed $transformer
      * @return ResourceInterface
      */
-    protected function transform( $data = null, Transformer $transformer = null ):ResourceInterface
+    public function transform( $data = null, $transformer = null ):ResourceInterface
     {
         if ( is_null( $data ) ) {
             return new FractalNull();
@@ -61,7 +62,8 @@ class SuccessResponseFactory extends ResponseFactory
             Transformable::class => 'transformModel',
             Collection::class => 'transformCollection',
             Builder::class => 'transformBuilder',
-            Paginator::class => 'transformPaginator'
+            Paginator::class => 'transformPaginator',
+            Pivot::class => 'transformPivot'
         ];
 
         foreach ( $transforms as $class => $transform ) {
@@ -76,11 +78,11 @@ class SuccessResponseFactory extends ResponseFactory
     /**
      * Transform a transformable Eloquent model.
      *
-     * @param  Transformable    $model
-     * @param  Transformer|null $transformer
+     * @param  Model $model
+     * @param  mixed $transformer
      * @return FractalItem
      */
-    protected function transformModel( Transformable $model, Transformer $transformer = null ):FractalItem
+    protected function transformModel( Model $model, $transformer = null ):FractalItem
     {
         $transformer = $transformer ?: $model::transformer();
 
@@ -96,11 +98,11 @@ class SuccessResponseFactory extends ResponseFactory
     /**
      * Transform a collection of Eloquent models.
      *
-     * @param  Collection       $collection
-     * @param  Transformer|null $transformer
+     * @param  Collection $collection
+     * @param  mixed      $transformer
      * @return FractalCollection
      */
-    protected function transformCollection( Collection $collection, Transformer $transformer = null ):FractalCollection
+    protected function transformCollection( Collection $collection, $transformer = null ):FractalCollection
     {
         $model = $this->resolveModel( $collection );
         $transformer = $transformer ?: $model::transformer();
@@ -117,11 +119,11 @@ class SuccessResponseFactory extends ResponseFactory
     /**
      * Transform an Eloquent builder.
      *
-     * @param  Builder          $query
-     * @param  Transformer|null $transformer
+     * @param  Builder $query
+     * @param  mixed   $transformer
      * @return FractalCollection
      */
-    protected function transformBuilder( Builder $query, Transformer $transformer = null ):FractalCollection
+    protected function transformBuilder( Builder $query, $transformer = null ):FractalCollection
     {
         return $this->transformCollection( $query->get(), $transformer );
     }
@@ -129,11 +131,11 @@ class SuccessResponseFactory extends ResponseFactory
     /**
      * Transform paginated data using Laravel's paginator.
      *
-     * @param Paginator        $paginator
-     * @param Transformer|null $transformer
+     * @param  Paginator $paginator
+     * @param  mixed     $transformer
      * @return FractalCollection
      */
-    protected function transformPaginator( Paginator $paginator, Transformer $transformer = null ):FractalCollection
+    protected function transformPaginator( Paginator $paginator, $transformer = null ):FractalCollection
     {
         $resource = $this->transformCollection( $paginator->getCollection(), $transformer );
         $resource->setPaginator( new IlluminatePaginatorAdapter( $paginator ) );
@@ -142,18 +144,33 @@ class SuccessResponseFactory extends ResponseFactory
     }
 
     /**
+     * Transform paginated data using Laravel's paginator.
+     *
+     * @param  Pivot $pivot
+     * @param  mixed $transformer
+     * @return ResourceInterface
+     */
+    protected function transformPivot( Pivot $pivot, $transformer = null ):ResourceInterface
+    {
+        return $this->transformData( $pivot, $transformer );
+    }
+
+    /**
      * Transform the data using the given transformer.
      *
      * @param  Transformable|Collection $data
-     * @param  Transformer|null         $transformer
-     * @param  string                   $resourceKey
+     * @param  mixed                    $transformer
+     * @param  string|null              $resourceKey
      * @return ResourceInterface
      */
-    protected function transformData( $data, Transformer $transformer, string $resourceKey ):ResourceInterface
+    protected function transformData( $data, $transformer, string $resourceKey = null ):ResourceInterface
     {
-        $class = $data instanceof Transformable ? FractalItem::class : FractalCollection::class;
+        $class = $data instanceof Model ? FractalItem::class : FractalCollection::class;
         $resource = new $class( $data, $transformer );
-        $resource->setResourceKey( $resourceKey );
+
+        if ( is_string( $resourceKey ) ) {
+            $resource->setResourceKey( $resourceKey );
+        }
 
         return $resource;
     }

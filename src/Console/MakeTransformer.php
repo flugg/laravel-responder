@@ -21,6 +21,7 @@ class MakeTransformer extends Command
      */
     protected $signature = 'make:transformer 
                             {name : The name of the transformer class}
+                            {--pivot : Include a transformer method for pivot table data}
                             {--model= : The namespace to the model being transformed}';
 
     /**
@@ -74,7 +75,11 @@ class MakeTransformer extends Command
         }
 
         $this->makeDirectory( $path );
-        $this->files->put( $path, $this->makeClass( $name ) );
+
+        $stubPath = $this->option( 'pivot' ) ? 'resources/stubs/transformer.pivot.stub' : 'resources/stubs/transformer.stub';
+        $stub = $this->files->get( __DIR__ . '/../../' . $stubPath );
+
+        $this->files->put( $path, $this->makeTransformer( $name, $stub ) );
 
         $this->info( 'Transformer created successfully.' );
     }
@@ -93,15 +98,14 @@ class MakeTransformer extends Command
     }
 
     /**
-     * Build the class with the given name.
+     * Build the transformer class using the given name and stub.
      *
      * @param  string $name
+     * @param  string $stub
      * @return string
      */
-    protected function makeClass( string $name ):string
+    protected function makeTransformer( string $name, string $stub ):string
     {
-        $stub = $this->files->get( __DIR__ . '/../../resources/stubs/transformer.stub' );
-
         $stub = $this->replaceNamespace( $stub );
         $stub = $this->replaceClass( $stub, $name );
         $stub = $this->replaceModel( $stub, $name );

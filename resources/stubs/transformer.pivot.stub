@@ -1,0 +1,36 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyModelNamespace;
+use Flugg\Responder\Transformer;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+
+class DummyClass extends Transformer
+{
+    /**
+     * Transform the model data into a generic array.
+     *
+     * @param  DummyModelClass $DummyModelVariable
+     * @return array
+     */
+    public function transform(DummyModelClass $DummyModelVariable):array
+    {
+        return [
+            'id' => (int) $DummyModelVariable->id
+        ];
+    }
+
+    /**
+     * Transform the model's pivot table data into a generic array.
+     *
+     * @param  Pivot $pivot
+     * @return array
+     */
+    public function transformPivot(Pivot $pivot):array
+    {
+        return [
+            //
+        ];
+    }
+}

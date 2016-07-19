@@ -3,6 +3,7 @@
 namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\Transformable;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use League\Fractal\Scope;
 use League\Fractal\TransformerAbstract;
 
@@ -98,8 +99,31 @@ abstract class Transformer extends TransformerAbstract
             return false;
         }
 
-        $data = $data->$includeName;
+        $relation = $data->$includeName;
 
-        return app( Responder::class )->transform( $data );
+        if ( $relation instanceof Pivot ) {
+            return $this->includePivot( $relation );
+        }
+
+        return app( 'responder.success' )->transform( $relation );
+    }
+
+    /**
+     * Include pivot table data to the response.
+     *
+     * @param  Pivot $pivot
+     * @return \League\Fractal\Resource\ResourceInterface|bool
+     */
+    protected function includePivot( Pivot $pivot )
+    {
+        if ( method_exists( $this, 'transformPivot' ) ) {
+            $data = $this->transformPivot( $pivot );
+
+            return app( 'responder.success' )->transform( $pivot, function () use ( $data ) {
+                return $data;
+            } );
+        }
+
+        return false;
     }
 }
