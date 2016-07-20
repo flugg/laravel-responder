@@ -53,6 +53,7 @@ class Responder implements ResponderContract
     public function success( $data = null, $statusCode = 200, array $meta = [ ] ):JsonResponse
     {
         if ( is_integer( $data ) ) {
+            $statusCode = is_array( $statusCode ) ? $statusCode : [ ];
             list( $data, $statusCode, $meta ) = [ null, $data, $statusCode ];
         } elseif ( is_array( $statusCode ) ) {
             list( $statusCode, $meta ) = [ 200, $statusCode ];

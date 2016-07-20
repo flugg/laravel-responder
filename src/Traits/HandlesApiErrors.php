@@ -99,7 +99,7 @@ trait HandlesApiErrors
     {
         $message = $e instanceof ValidationFailedException ? $e->getValidationMessages() : $e->getMessage();
 
-        return app( Responder::class )->error( $e->getErrorCode(), $e->getStatusCode(), $message );
+        return app( 'responder' )->error( $e->getErrorCode(), $e->getStatusCode(), $message );
     }
 
     /**
