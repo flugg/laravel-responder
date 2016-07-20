@@ -7,11 +7,9 @@ use Flugg\Responder\Exceptions\ApiException;
 use Flugg\Responder\Exceptions\ResourceNotFoundException;
 use Flugg\Responder\Exceptions\UnauthorizedException;
 use Flugg\Responder\Exceptions\ValidationFailedException;
-use Flugg\Responder\Responder;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
  * Use this trait in your exceptions handler to give you access to methods you may
@@ -23,17 +21,6 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  */
 trait HandlesApiErrors
 {
-    /**
-     * Checks if the exception extends from the package API exception.
-     *
-     * @param  Exception $e
-     * @return bool
-     */
-    protected function isApiError( Exception $e ):bool
-    {
-        return $e instanceof ApiException;
-    }
-
     /**
      * Transforms and renders api responses.
      *
@@ -47,27 +34,6 @@ trait HandlesApiErrors
         if ( $e instanceof ApiException ) {
             return $this->renderApiResponse( $e );
         }
-    }
-
-    /**
-     * Checks if the application is currently in testing mode.
-     *
-     * @return bool
-     */
-    protected function isRunningTests():bool
-    {
-        return app()->runningUnitTests();
-    }
-
-    /**
-     * Renders readable responses for console, useful for testing.
-     *
-     * @param  Exception $e
-     * @return void
-     */
-    protected function renderTestErrors( Exception $e )
-    {
-        $this->renderConsoleResponse( $e );
     }
 
     /**
@@ -101,22 +67,4 @@ trait HandlesApiErrors
 
         return app( 'responder' )->error( $e->getErrorCode(), $e->getStatusCode(), $message );
     }
-
-    /**
-     * Render an exception into an HTTP response for the console, used for debugging in test mode.
-     *
-     * @param  Exception $e
-     * @return void
-     */
-    protected function renderConsoleResponse( Exception $e )
-    {
-        $this->renderForConsole( new ConsoleOutput( ConsoleOutput::VERBOSITY_VERBOSE ), $e );
-    }
-
-    /**
-     * Render an exception to the console.
-     *
-     *
-     */
-    abstract public function renderForConsole( $output, Exception $e );
 }
