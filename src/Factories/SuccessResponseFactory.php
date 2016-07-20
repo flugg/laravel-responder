@@ -27,6 +27,19 @@ use League\Fractal\Resource\ResourceInterface;
 class SuccessResponseFactory extends ResponseFactory
 {
     /**
+     * Mapping between the type of data and which transform method should be used.
+     *
+     * @var array
+     */
+    protected $transforms = [
+        Transformable::class => 'transformModel',
+        Collection::class => 'transformCollection',
+        Builder::class => 'transformBuilder',
+        Paginator::class => 'transformPaginator',
+        Pivot::class => 'transformPivot'
+    ];
+
+    /**
      * Generate a successful JSON response.
      *
      * @param  mixed $data
@@ -56,17 +69,9 @@ class SuccessResponseFactory extends ResponseFactory
     {
         if ( is_null( $data ) ) {
             return new FractalNull();
-        }
+        };
 
-        $transforms = [
-            Transformable::class => 'transformModel',
-            Collection::class => 'transformCollection',
-            Builder::class => 'transformBuilder',
-            Paginator::class => 'transformPaginator',
-            Pivot::class => 'transformPivot'
-        ];
-
-        foreach ( $transforms as $class => $transform ) {
+        foreach ( $this->transforms as $class => $transform ) {
             if ( $data instanceof $class ) {
                 return $this->$transform( $data, $transformer );
             }

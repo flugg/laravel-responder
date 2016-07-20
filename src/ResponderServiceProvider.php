@@ -22,6 +22,13 @@ use League\Fractal\Manager;
 class ResponderServiceProvider extends BaseServiceProvider
 {
     /**
+     * Keeps a quick reference to the Responder config.
+     *
+     * @var \Illuminate\Config\Repository
+     */
+    protected $config;
+
+    /**
      * Indicates if loading of the provider is deferred.
      *
      * @var bool
@@ -51,6 +58,32 @@ class ResponderServiceProvider extends BaseServiceProvider
         include __DIR__ . '/helpers.php';
     }
 
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->config = $this->app[ 'config' ];
+
+        $this->registerResponseFactories();
+        $this->registerFractalManager();
+        $this->registerResponder();
+
+        $this->app->alias( 'responder', ResponderContract::class );
+        $this->app->alias( 'responder.manager', ManagerContract::class );
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [ 'responder', 'responder.success', 'responder.error', 'responder.manager' ];
+    }
 
     /**
      * Bootstrap the Laravel application.
@@ -78,45 +111,45 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->app->configure( 'responder' );
     }
 
-
     /**
-     * Register the service provider.
+     * Register the success and error response factory providers.
      *
      * @return void
      */
-    public function register()
+    protected function registerResponseFactories()
     {
-        $config = $this->app[ 'config' ];
-
-        $this->app->singleton( 'responder.success', function () use ( $config ) {
-            return new SuccessResponseFactory( $config->get( 'responder.status_code' ) );
+        $this->app->singleton( 'responder.success', function () {
+            return new SuccessResponseFactory( $this->config->get( 'responder.status_code' ) );
         } );
 
-        $this->app->singleton( 'responder.error', function () use ( $config ) {
-            return new ErrorResponseFactory( $config->get( 'responder.status_code' ) );
+        $this->app->singleton( 'responder.error', function () {
+            return new ErrorResponseFactory( $this->config->get( 'responder.status_code' ) );
         } );
-
-        $this->app->singleton( 'responder', function ( $app ) {
-            return ( new Responder( $app[ 'responder.success' ], $app[ 'responder.error' ] ) );
-        } );
-
-        $this->app->singleton( 'responder.manager', function () use ( $config ) {
-            $serializer = $config->get( 'responder.serializer' );
-
-            return ( new Manager() )->setSerializer( new $serializer );
-        } );
-
-        $this->app->alias( 'responder', ResponderContract::class );
-        $this->app->alias( 'responder.manager', ManagerContract::class );
     }
 
     /**
-     * Get the services provided by the provider.
+     * Register the fractal manager provider.
      *
-     * @return array
+     * @return void
      */
-    public function provides()
+    protected function registerFractalManager()
     {
-        return [ 'responder', 'responder.manager' ];
+        $this->app->singleton( 'responder.manager', function () {
+            $serializer = $this->config->get( 'responder.serializer' );
+
+            return ( new Manager() )->setSerializer( new $serializer );
+        } );
+    }
+
+    /**
+     * Register the responder service provider.
+     *
+     * @return void
+     */
+    protected function registerResponder()
+    {
+        $this->app->singleton( 'responder', function ( $app ) {
+            return ( new Responder( $app[ 'responder.success' ], $app[ 'responder.error' ] ) );
+        } );
     }
 }
