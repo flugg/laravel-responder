@@ -361,7 +361,7 @@ $user = User::with( 'roles' )->find( 1 );
 return Responder::success( $user );
 ```
 
-The reasoning behind is this, is because the `pivot` field is appended to the related resource.
+The reasoning behind this is because the `pivot` field is appended to the related resource.
 
 #### Creating Transformers
 
