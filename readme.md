@@ -237,6 +237,10 @@ public function index()
 }
 ```
 
+***
+_If you're including a many to many relationship, you will have a pivot field with additional data. To learn how to transform the pivot data to expose it to your API, you can read the [Transforming Pivots](#transforming-pivots) section._
+***
+
 #### Pagination
 
 Adding pagination to your responses is equally easy. You can simply use Laravel's `paginate()` method on the query builder:
@@ -295,6 +299,67 @@ Transformers basically give you a way to abstract your database logic from your 
 _Note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case](#converting-to-camel-case) section._
 ***
 
+#### Transforming Pivots
+
+When you include a many to many relationship to your response, you may want to transform the pivot table data, to expose the data to the API. You may do so by adding an additional transform method, `transformPivot()` to your transformer:
+
+```php
+<?php
+
+namespace App\Transformer;
+
+use App\User;
+use Flugg\Responder\Transformer;
+
+class UserTransformer extends Transformer
+{
+    /**
+     * Transform the model data into a generic array.
+     *
+     * @param  User $user
+     * @return array
+     */
+    public function transform( User $user )
+    {
+        return [
+            'id' => (int) $user->id
+        ];
+    }
+
+    /**
+     * Transform the model's pivot table data into a generic array.
+     *
+     * @param  Pivot $pivot
+     * @return array
+     */
+    public function transformPivot( Pivot $pivot ):array
+    {
+        return [
+            'user_id' => $pivot->user_id,
+            'role_id' => $pivot->role_id
+        ];
+    }
+}
+```
+
+In the example above, we assume we have a many to many relationship between a `User` and `Role`. Continuing on the example and using the response below, it will look for a `transformPivot()` method in your `UserTransformer`:
+
+````php
+$role = Role::with( 'users' )->find( 1 );
+
+return Responder::success( $role );
+```
+
+However, if you do the inverse, you will have to place the `transformPivot()` method in your `RoleTransformer`:
+
+````php
+$user = User::with( 'roles' )->find( 1 );
+
+return Responder::success( $user );
+```
+
+This is because the `pivot` field is appended to the related resource.
+
 #### Creating Transformers
 
 The package gives you an Artisan command you can use to quickly generate new transformers:
@@ -311,6 +376,12 @@ If you store your models somewhere else you may also use the `--model` option to
 
 ```shell
 php artisan make:transformer UserTransformer --model="App\Models\User"
+```
+
+You can also use the `--pivot` option to also include an additional method to transform the model's pivot table:
+
+```shell
+php artisan make:transformer UserTransformer --pivot
 ```
 
 #### Mapping Transformers to Models
