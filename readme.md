@@ -343,7 +343,7 @@ class UserTransformer extends Transformer
 }
 ```
 
-In the example above, we assume we have a many to many relationship between a `User` and `Role`. Note how the new method takes in an instance of `Illuminate\Database\Eloquent\Relations\Pivot`. This is what a many to many relation returns, and it extends `Illuminate\Database\Eloquent\Model`.
+In the example above, we assume we have a many to many relationship between a `User` and `Role`. Note how the new method takes in an instance of `Illuminate\Database\Eloquent\Relations\Pivot`, which is what a many to many relation returns. If it's a polymorphic many to many relationship, you may instead inject an instance of `Illuminate\Database\Eloquent\Relations\MorphPivot`.
 
 Continuing on the example and using the response below, it will automatically look for a `transformPivot()` method in your `UserTransformer`:
 
