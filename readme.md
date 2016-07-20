@@ -310,6 +310,7 @@ namespace App\Transformer;
 
 use App\User;
 use Flugg\Responder\Transformer;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class UserTransformer extends Transformer
 {
@@ -342,7 +343,9 @@ class UserTransformer extends Transformer
 }
 ```
 
-In the example above, we assume we have a many to many relationship between a `User` and `Role`. Continuing on the example and using the response below, it will look for a `transformPivot()` method in your `UserTransformer`:
+In the example above, we assume we have a many to many relationship between a `User` and `Role`. Note how the new method takes in an instance of `Illuminate\Database\Eloquent\Relations\Pivot`. This is what a many to many relation returns, and it extends `Illuminate\Database\Eloquent\Model`.
+
+Continuing on the example and using the response below, it will automatically look for a `transformPivot()` method in your `UserTransformer`:
 
 ````php
 $role = Role::with( 'users' )->find( 1 );
@@ -358,7 +361,7 @@ $user = User::with( 'roles' )->find( 1 );
 return Responder::success( $user );
 ```
 
-This is because the `pivot` field is appended to the related resource.
+The reasoning behind is this, is because the `pivot` field is appended to the related resource.
 
 #### Creating Transformers
 
