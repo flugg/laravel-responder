@@ -51,10 +51,8 @@ trait MakesApiRequests
      * @param  mixed $data
      * @return $this
      */
-    protected function seeSuccessStructure( $data = null, $status = 200 )
+    protected function seeSuccessStructure( $data = null )
     {
-        $this->seeStatusCode( $status );
-
         $this->seeJsonStructure( [
             'data' => $data
         ] );
