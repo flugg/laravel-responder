@@ -105,10 +105,14 @@ class SuccessResponseFactory extends ResponseFactory
      *
      * @param  Collection $collection
      * @param  mixed      $transformer
-     * @return FractalCollection
+     * @return ResourceInterface
      */
-    protected function transformCollection( Collection $collection, $transformer = null ):FractalCollection
+    protected function transformCollection( Collection $collection, $transformer = null ):ResourceInterface
     {
+        if ( $collection->isEmpty() ) {
+            return new FractalNull();
+        }
+
         $model = $this->resolveModel( $collection );
         $transformer = $transformer ?: $model::transformer();
 
