@@ -29,7 +29,7 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
 
 This package requires:
 - PHP __7.0__+
-- Laravel __5.1__+
+- Laravel __5.1__+ or Lumen __5.1__+
 
 ## Philosophy
 
@@ -71,7 +71,9 @@ Install the package through Composer:
 composer require flugger/laravel-responder
 ```
 
-#### Registering Service Provider
+### Laravel
+
+#### Registering the Service Provider
 
 After updating Composer, append the following service provider to the `providers` key in `config/app.php`:
 
@@ -79,7 +81,7 @@ After updating Composer, append the following service provider to the `providers
 Flugg\Responder\ResponderServiceProvider::class
 ```
 
-#### Registering Facade
+#### Registering the Facade
 
 If you like facades you may also append the `Responder` facade to the `aliases` key:
 
@@ -98,6 +100,32 @@ php artisan vendor:publish
 This will publish a `responder.php` configuration file in your `config` folder. 
 
 It will also publish an `errors.php` file inside your `lang/en` folder which is used to store your error messages.
+
+### Lumen
+
+#### Registering the Service Provider
+
+Register the package service provider by adding the following line to `app/bootstrap.php`:
+
+```php
+$app->register(Flugg\Responder\ResponderServiceProvider::class);
+```
+
+#### Registering the Facade
+
+You may also register the facade by adding the following line to `app/bootstrap.php`:
+
+```php
+class_alias( Flugg\Responder\Facades\Responder::class, 'Responder' );
+````
+
+***
+_Remember to uncomment the `$app->withFacades();` line as well for facades to work in Lumen._
+***
+
+#### Publishing Package Assets
+
+There is no `php artisan vendor:publish` in Lumen, you will therefore have to create your own `config/responder.php` file, if you want to configure the package. Do also note that unlike Laravel there is no `resources/lang` folder, however, you're free to create a `resources/lang/en/errors.php` manually and it will be picked up by the package.
 
 ## Usage
 
@@ -731,6 +759,10 @@ return [
 ];
 ```
 
+***
+_If you use Lumen, you need to create the `resources/lang/en/errors.php` file manually. Feel free to copy over the code above into your file._
+***
+
 These messages are for the default Laravel exceptions, thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exceptions](#exceptions).
 
 The error messages keys map up to an error code. So if you add the following line to the language file...
@@ -784,16 +816,22 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Flugg\Responder\Exceptions\Handler as ExceptionHandler;
 ```
 
+***
+_Lumen uses a different base exception handler, and is incompatible with the package exception handler. Option 2, however, works with both Lumen and Laravel._
+***
+
 ##### Option 2: Use Trait
 
 There exists other packages where you also need to extend their exception handlers. Since you can not extend more than one class at once, this quickly turns problematic. Which is why we provide an alternative way of adding the handler.
 
-Just add the `Flugg\Responder\Traits\HandlesApiErrors` trait to your exceptions handler, and add the following code to your render method:
+Just add the `Flugg\Responder\Traits\HandlesApiErrors` trait to your exceptions handler, and add the following code before the `return parent::render( $request, $e );` in your render method:
 
 ```php
 public function render( $request, Exception $e )
 {
-    if ( $e instanceof Flugg\Responder\Exceptions\ApiException ) {
+    $this->transformExceptions( $e );
+    
+    if ( $e instanceof \Flugg\Responder\Exceptions\ApiException ) {
         return $this->renderApiErrors( $e );
     }
 
