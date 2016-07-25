@@ -106,10 +106,10 @@ class ApiSerializer extends ArraySerializer
      */
     public function mergeIncludes( $transformedData, $includedData )
     {
-        $resourceKey = key( $includedData );
+        $keys = array_keys( $includedData );
 
-        if ( $resourceKey ) {
-            $includedData[ $resourceKey ] = $includedData[ $resourceKey ][ 'data' ];
+        foreach ( $keys as $key ) {
+            $includedData[ $key ] = $includedData[ $key ][ 'data' ];
         }
 
         return array_merge( $transformedData, $includedData );

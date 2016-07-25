@@ -832,7 +832,7 @@ public function render( $request, Exception $e )
     $this->transformExceptions( $e );
     
     if ( $e instanceof \Flugg\Responder\Exceptions\ApiException ) {
-        return $this->renderApiErrors( $e );
+        return $this->renderApiError( $e );
     }
 
     return parent::render( $request, $e );
