@@ -43,7 +43,7 @@ class ValidationFailedException extends ApiException
     {
         $this->setValidationMessages( $validator );
 
-        parent::__construct( 'Form request validation has failed.' );
+        parent::__construct( 'Validation has failed.' );
     }
 
     /**

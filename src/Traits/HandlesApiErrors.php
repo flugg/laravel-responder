@@ -5,11 +5,14 @@ namespace Flugg\Responder\Traits;
 use Exception;
 use Flugg\Responder\Exceptions\ApiException;
 use Flugg\Responder\Exceptions\ResourceNotFoundException;
+use Flugg\Responder\Exceptions\UnauthenticatedException;
 use Flugg\Responder\Exceptions\UnauthorizedException;
 use Flugg\Responder\Exceptions\ValidationFailedException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Use this trait in your exceptions handler to give you access to methods you may
@@ -41,17 +44,26 @@ trait HandlesApiErrors
      *
      * @param  Exception $e
      * @return void
-     * @throws ResourceNotFoundException
+     * @throws UnauthenticatedException
      * @throws UnauthorizedException
+     * @throws ResourceNotFoundException
      */
     protected function transformExceptions( Exception $e )
     {
+        if ( $e instanceof AuthenticationException ) {
+            throw new UnauthenticatedException();
+        }
+
         if ( $e instanceof AuthorizationException ) {
             throw new UnauthorizedException();
         }
 
         if ( $e instanceof ModelNotFoundException ) {
             throw new ResourceNotFoundException();
+        }
+
+        if ( $e instanceof ValidationException ) {
+            throw new ValidationFailedException( $e->validator );
         }
     }
 
