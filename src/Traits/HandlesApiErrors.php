@@ -25,21 +25,6 @@ use Illuminate\Validation\ValidationException;
 trait HandlesApiErrors
 {
     /**
-     * Transforms and renders api responses.
-     *
-     * @param  Exception $e
-     * @return JsonResponse
-     */
-    protected function renderApiErrors( Exception $e ):JsonResponse
-    {
-        $this->transformExceptions( $e );
-
-        if ( $e instanceof ApiException ) {
-            return $this->renderApiResponse( $e );
-        }
-    }
-
-    /**
      * Transform Laravel exceptions into API exceptions.
      *
      * @param  Exception $e
@@ -47,6 +32,7 @@ trait HandlesApiErrors
      * @throws UnauthenticatedException
      * @throws UnauthorizedException
      * @throws ResourceNotFoundException
+     * @throws ValidationFailedException
      */
     protected function transformExceptions( Exception $e )
     {
@@ -68,12 +54,12 @@ trait HandlesApiErrors
     }
 
     /**
-     * Render an exception into an API response.
+     * Renders any API exception into a JSON error response.
      *
      * @param  ApiException $e
      * @return JsonResponse
      */
-    protected function renderApiResponse( ApiException $e ):JsonResponse
+    protected function renderApiError( ApiException $e ):JsonResponse
     {
         $message = $e instanceof ValidationFailedException ? $e->getValidationMessages() : $e->getMessage();
 

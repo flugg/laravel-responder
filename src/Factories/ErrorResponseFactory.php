@@ -75,6 +75,9 @@ class ErrorResponseFactory extends ResponseFactory
             return [ $message ];
         }
 
-        return [ app( 'translator' )->trans( 'errors.' . $errorCode ) ];
+        $translator = app( 'translator' );
+        $code = "errors.$errorCode";
+
+        return $translator->has( $code ) ? [ $translator->trans( $code ) ] : [ ];
     }
 }

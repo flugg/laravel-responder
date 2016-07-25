@@ -19,6 +19,8 @@ class Handler extends ExceptionHandler
      */
     public function render( $request, Exception $e )
     {
+        $this->transformExceptions( $e );
+
         if ( $e instanceof ApiException ) {
             return $this->renderApiErrors( $e );
         }

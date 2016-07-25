@@ -100,6 +100,7 @@ class MakeErrorResponseTest extends TestCase
         $translator = $this->mockTranslator();
 
         // Expect...
+        $translator->shouldReceive( 'has' )->with( 'errors.test_error' )->once()->andReturn( true );
         $translator->shouldReceive( 'trans' )->with( 'errors.test_error' )->once()->andReturn( 'Test error.' );
 
         // Act...
