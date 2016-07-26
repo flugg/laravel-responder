@@ -130,9 +130,9 @@ class SuccessResponseFactory extends ResponseFactory
      *
      * @param  Builder $query
      * @param  mixed   $transformer
-     * @return FractalCollection
+     * @return ResourceInterface
      */
-    protected function transformBuilder( Builder $query, $transformer = null ):FractalCollection
+    protected function transformBuilder( Builder $query, $transformer = null ):ResourceInterface
     {
         return $this->transformCollection( $query->get(), $transformer );
     }
@@ -142,9 +142,9 @@ class SuccessResponseFactory extends ResponseFactory
      *
      * @param  Paginator $paginator
      * @param  mixed     $transformer
-     * @return FractalCollection
+     * @return ResourceInterface
      */
-    protected function transformPaginator( Paginator $paginator, $transformer = null ):FractalCollection
+    protected function transformPaginator( Paginator $paginator, $transformer = null ):ResourceInterface
     {
         $resource = $this->transformCollection( $paginator->getCollection(), $transformer );
         $resource->setPaginator( new IlluminatePaginatorAdapter( $paginator ) );
