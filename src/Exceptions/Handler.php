@@ -22,7 +22,7 @@ class Handler extends ExceptionHandler
         $this->transformExceptions( $e );
 
         if ( $e instanceof ApiException ) {
-            return $this->renderApiErrors( $e );
+            return $this->renderApiError( $e );
         }
 
         return parent::render( $request, $e );
