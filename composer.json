@@ -3,12 +3,13 @@
     "description": "A Laravel package for APIs, wrapping the Fractal library behind an elegant Laravel API.",
     "keywords": [
         "laravel",
+        "lumen",
         "responder",
         "api",
         "json",
         "response",
         "fractal",
-        "transformers"
+        "transformer"
     ],
     "homepage": "https://github.com/flugger/laravel-responder",
     "license": "MIT",
