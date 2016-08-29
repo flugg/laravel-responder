@@ -12,8 +12,8 @@ Laravel Responder is a package for your JSON APIs, integrating [Fractal](http://
 
 ## Table of Contents
 
-- [Requirements](#requirements)
 - [Philosophy](#philosophy)
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
     - [Accessing the Responder](#accessing-the-responder)
@@ -27,43 +27,43 @@ Laravel Responder is a package for your JSON APIs, integrating [Fractal](http://
 - [Contributing](#contributing)
 - [License](#license)
 
-## Requirements
-
-This package requires:
-- PHP __7.0__+
-- Laravel __5.1__+ or Lumen __5.1__+
-
 ## Philosophy
 
-When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/thephpleague/fractal) has some great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
+When building powerful APIs, you want to make sure your endpoints are consistent and easy to consume by your application. Laravel is a great fit your API, however, it lacks support for common tools like transformers and serializers. Fractal, on the other hand, has some great tools for building APIs and fills in the gaps of Laravel. 
 
-While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Here is an example response using Fractal in a Laravel controller:
+While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Take this example from a controller:
 
 ```php
  public function index()
  {
     $users = User::all();
-    $fractal = new Manager();
-    $resource = new Collection($users, new UserTransformer());
+    $manager = new Manager();
+    $resource = new Collection($users, new UserTransformer(), 'users');
 
-    return response()->json($fractal->createData($resource)->toArray());
+    return response()->json($manager->createData($resource)->toArray());
  }
 ```
 
-I admit, the Fractal manager could be moved outside the controller. You could also return the array directly, however, as soon as you want to return a different status code than `200`, you probably want to use `response()->json()` anyway.
+I admit, the Fractal manager could be moved outside the controller and you could return the array directly. However, as soon as you want a different status code than the default `200`, you probably need to use `response()->json()` anyway.
 
-The point is, we all get a little spoiled by Laravel's magic. Wouldn't it be sweet if the above could be rewritten as:
+The point is, we all get a little spoiled by Laravel's magic. Wouldn't it be sweet if the above could be written as following:
 
 ```php
 public function index()
 {
     $users = User::all();
 
-    return $this->successResponse($users);
+    return responder()->success($users);
 }
 ```
 
-By calling on Fractal behind the scenes, the package will automatically transform your models and related models. It will also serialize the data with a serializer of your choice and wrap the data in an `Illuminate\Http\JsonResponse` instance. No longer will you have to call on different Fractal methods depending on if you're dealing with a model or a collection, the package deals with all of it automatically under the hood.
+The package will call on Fractal behind the scenes to automatically transform and serialize the data. No longer will you have to instantiate different Fractal resources depending on if it's a model or a collection, the package deals with all of it automatically under the hood.
+
+## Requirements
+
+This package requires:
+- PHP __7.0__+
+- Laravel __5.1__+ or Lumen __5.1__+
 
 ## Installation
 
