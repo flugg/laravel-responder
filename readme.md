@@ -29,7 +29,7 @@ Laravel Responder is a package for your JSON APIs, integrating [Fractal](http://
 
 ## Philosophy
 
-When building powerful APIs, you want to make sure your endpoints are consistent and easy to consume by your application. Laravel is a great fit your API, however, it lacks support for common tools like transformers and serializers. Fractal, on the other hand, has some great tools for building APIs and fills in the gaps of Laravel. 
+When building powerful APIs, you want to make sure your endpoints are consistent and easy to consume by your application. Laravel is a great fit for your API, however, it lacks support for common tools like transformers and serializers. Fractal, on the other hand, has some great tools for building APIs and fills in the gaps of Laravel. 
 
 While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Take this example from a controller:
 
