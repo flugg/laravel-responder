@@ -201,32 +201,96 @@ _As described above, you may build your responses in multiple ways. Which way yo
 
 ### Success Responses
 
-When a user makes a valid request to your API you probably want to provide an informative response in return to let the user know the request succeeded. You may use the `success()` method for this:
+The responder service has a `success()` method you can use to quickly generate a successful JSON response:
 
 ```php
 public function index()
 {
-    $users = User::all();
-    
-    return Responder::success($users);
+    return Responder::success(User::all());
 }
 ```
 
-The first argument is the data you want to transform, and should be an Eloquent model or a collection of Eloquent models. It can also be a paginator, we will get to that soon.
+This method returns an instance of `\Illuminate\Http\JsonResponse` and will both transform and serialize the data. The first argument is the transformation data.
+
+#### Setting Transformation Data
+
+The transformation data will be transformed if a transformer is set, and must be one of the following types:
+
+##### Eloquent Model
+
+You may pass in a model as the transformation data:
+
+```php
+return Responder::success(User::first());
+```
+
+##### Collection
+
+You may also pass in a collection of models:
+
+```php
+return Responder::success(User::all());
+```
+
+##### Array
+
+You may also pass in an array of models:
+
+```php
+return Responder::success([User::find(1), User::find(2)]);
+```
 
 ***
-_If you try to run the above code you will get an exception saying the given model is not transformable. This is because all models you pass into the `success()` method must implement the `Flugg\Responder\Contracts\Transformable` contract and have a corresponding transformer. More on this in the [Transformers](#transformers) section._
+_The array must contain actual model instances, meaning you cannot use `User::all()->toArray()` as transformation data._
 ***
+
+##### Query Builder
+
+Instead of turning it into a collection, you may pass in a query builder directly:
+
+```php
+return Responder::success(User::where('id', 1));
+```
+
+The package will then automatically add info pagination data to the response, depending on which [serializer](#serializes) you use.
+
+##### Paginator
+
+Additionally, you may limit the amount of items by passing in a paginator:
+
+```php
+return Responder::success(User::paginate(5));
+```
+
+The package will then automatically add info pagination data to the response, depending on which [serializer](#serializes) you use.
+
+##### Relation
+
+You can also pass in an Eloquent relationship instance:
+
+```php
+return Responder::success(User::first()->roles());
+```
+
+#### Including Relations
+
+When using Fractal, you include relations using the `parseIncludes()` method on the manager, and add the available relations to the `$availableIncludes` array in your transformer.
+
+With Laravel Responder you don't have to do any of these things. It integrates neatly with Eloquent and automatically parses loaded relations from the model:
+
+```php
+return Responder::success(User::with('roles.permissions')->all());
+```
 
 #### Setting Status Codes
 
-The status code is `200` by default, but can easily be changed by adding an optional second argument to the `success()` method:
+The status code is set to `200` by default, but can easily be changed by adding a second argument to the `success()` method:
 
 ```php
-return Responder::success($user, 201);
+return Responder::success(User::all(), 201);
 ```
 
-Sometimes you may not want to return anything, but still notify the user that the request was successful. In that case you may pass in the status code as the first argument and omit the data parameter:
+Sometimes you may not want to return anything. In that case you may either pass in null as the first argument or skip it entirely:
 
 ```php
 return Responder::success(201);
@@ -234,10 +298,10 @@ return Responder::success(201);
 
 #### Adding Meta Data
 
-You may want to pass in additional data to the response, you may do so by adding an additional third argument:
+You may want to pass in additional meta data to the response, you can do so by adding an additional third argument:
 
 ```php
-return Responder::success($user, 200, ['foo' => 'bar']);
+return Responder::success(User::all(), 200, ['foo' => 'bar']);
 ```
 
 You may also omit the status code if you want to send a default `200` response:
@@ -245,50 +309,6 @@ You may also omit the status code if you want to send a default `200` response:
 ```php
 return Responder::success($user, ['foo' => 'bar']);
 ```
-
-You may even omit the data parameter if you pass in a status code as the first argument:
-
-```php
-return Responder::success(200, ['foo' => 'bar']);
-```
-
-#### Relationships
-
-Using Fractal, you can include relationships to your responses using the `parseIncludes()` method on the manager instance, and add the available relationship as an `$availableIncludes` array in your transformers.
-
-With Laravel Responder you don't have to do any of these things. It integrates neatly with Eloquent and automatically parses relationships:
-
-```php
-public function index()
-{
-    $users = User::with('profile', 'roles.permissions')->all();
-    
-    return Responder::success($users);
-}
-```
-
-***
-_If you're including a many to many relationship, you will have a pivot field with additional data. To learn how to transform the pivot data to expose it to your API, you can read the [Transforming Pivots](#transforming-pivots) section._
-***
-
-#### Pagination
-
-Adding pagination to your responses is equally easy. You can simply use Laravel's `paginate()` method on the query builder:
-
-```php
-public function index()
-{
-    $users = User::paginate(10);
-    
-    return Responder::success($users);
-}
-```
-
-The package will then automatically add info about the paginated results in the response data, depending on which [serializer](#serializes) you use.
-
-#### Cursors
-
-__TODO__
 
 ### Transformers
 
