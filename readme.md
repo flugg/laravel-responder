@@ -85,7 +85,7 @@ Flugg\Responder\ResponderServiceProvider::class
 
 #### Registering the Facade
 
-If you like facades you may also append the `Responder` facade to the `aliases` key:
+If you like facades, you may also append the `Responder` facade to the `aliases` key:
 
 ```php
 'Responder' => Flugg\Responder\Facades\Responder::class
@@ -93,7 +93,7 @@ If you like facades you may also append the `Responder` facade to the `aliases` 
 
 #### Publishing Package Assets
 
-You also need to publish the package configuration and language file using the Artisan command:
+You may also publish the package configuration and language file using the Artisan command:
 
 ```shell
 php artisan vendor:publish
@@ -122,7 +122,7 @@ class_alias(Flugg\Responder\Facades\Responder::class, 'Responder');
 ````
 
 ***
-_Remember to uncomment the `$app->withFacades();` line as well for facades to work in Lumen._
+_Remember to uncomment `$app->withFacades();` to enable facades in Lumen._
 ***
 
 #### Publishing Package Assets
@@ -131,15 +131,15 @@ There is no `php artisan vendor:publish` in Lumen, you will therefore have to cr
 
 ## Usage
 
-The package has a `Flugg\Responder\Responder` service class which is responsible for generating success- and error JSON responses for your API. The service has a `success()` and `error()` method which returns an instance of `Illuminate\Http\JsonResponse`.
+The package has a `Flugg\Responder\Responder` service which is responsible for building success- and error responses for your JSON API. The class has a `success()` and `error()` method which both returns an instance of `Illuminate\Http\JsonResponse`.
 
 ### Accessing the Responder
 
-To begin creating API responses, you need to access the responder service. In good Laravel spirit you have multiple ways of doing the same thing.
+Before you can start making JSON responses, you need to access the responder service. In good Laravel spirit you have multiple ways of doing the same thing:
 
 #### Option 1: Dependency Injection
 
-You may inject the service directly into your controller to create success responses:
+You may inject the responder service directly into your controller to create success responses:
 
 ```php
 public function index(Responder $responder)
@@ -193,10 +193,10 @@ return $this->successResponse($users);
 return $this->errorResponse('invalid_user');
 ```
 
-These methods call on the service behind the scene.
+These methods call on the responder service behind the scene.
 
 ***
-_As described above, you may generate responses in multiple ways. Which way you choose is up to you, the important thing is to stay consistent. We will use the facade for the remaining of the documentation for simplicity's sake._
+_As described above, you may build your responses in multiple ways. Which way you choose is up to you, the important thing is to stay consistent. We will use the facade for the remaining of the documentation for simplicity's sake._
 ***
 
 ### Success Responses
