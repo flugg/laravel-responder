@@ -210,7 +210,7 @@ public function index()
 }
 ```
 
-This method returns an instance of `\Illuminate\Http\JsonResponse` and will both transform and serialize the data. The first argument is the transformation data.
+This method returns an instance of `\Illuminate\Http\JsonResponse` and will transform and serialize the data. The first argument is the transformation data.
 
 #### Setting Transformation Data
 
@@ -251,8 +251,6 @@ Instead of turning it into a collection, you may pass in a query builder directl
 ```php
 return Responder::success(User::where('id', 1));
 ```
-
-The package will then automatically add info pagination data to the response, depending on which [serializer](#serializes) you use.
 
 ##### Paginator
 
