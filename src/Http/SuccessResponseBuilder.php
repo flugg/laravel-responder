@@ -221,25 +221,16 @@ class SuccessResponseBuilder extends ResponseBuilder
      * @param  \Illuminate\Database\ELoquent\Model        $model
      * @param  \Flugg\Responder\Transformer|callable|null $transformer
      * @return \Flugg\Responder\Transformer|callable
-     * @throws \InvalidTransformerException
      */
     protected function resolveTransformer(Model $model, $transformer = null)
     {
-        if (is_null($transformer)) {
-            $transformer = $this->resolveTransformerFromModel($model);
-        }
+        $transformer = $transformer ?: $this->resolveTransformerFromModel($model);
 
         if (is_string($transformer)) {
             $transformer = new $transformer;
         }
 
-        if ($transformer instanceof Transformer) {
-            $this->setRelations($transformer, $model);
-        } elseif (! is_callable($transformer)) {
-            throw new InvalidTransformerException($model);
-        }
-
-        return $transformer;
+        return $this->parseTransformer($transformer);
     }
 
     /**
@@ -261,17 +252,24 @@ class SuccessResponseBuilder extends ResponseBuilder
     }
 
     /**
-     * Set relations on the transformer and parse them using the manager.
+     * Parse a transformer class and set relations.
      *
-     * @param  \Flugg\Responder\Transformer        $transformer
-     * @param  \Illuminate\Database\Eloquent\Model $model
-     * @return void
+     * @param  \Flugg\Responder\Transformer|callable $transformer
+     * @return \Flugg\Responder\Transformer|callable
+     * @throws \InvalidTransformerException
      */
-    protected function setRelations(Transformer $transformer, Model $model)
+    protected function parseTransformer($transformer)
     {
-        $transformer->setRelations($this->resolveRelations($model));
+        if ($transformer instanceof Transformer) {
+            $transformer = $transformer->setRelations($this->resolveRelations($model));
+            $this->manager->parseIncludes($transformer->getRelations());
 
-        $this->manager->parseIncludes($transformer->getRelations());
+            if (! is_callable($transformer)) {
+                throw new InvalidTransformerException($model);
+            }
+        }
+
+        return $transformer;
     }
 
     /**
