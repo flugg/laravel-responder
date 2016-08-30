@@ -8,7 +8,7 @@
 
 ![Laravel Responder](http://goo.gl/HvmX4j)
 
-Laravel Responder is a package for your JSON APIs, integrating [Fractal](http://fractal.thephpleague.com) into Laravel and Lumen. It can [transform](http://fractal.thephpleague.com/transformers) your Eloquent models and [serialize](http://fractal.thephpleague.com/serializers) your success responses, but it can also help you build error responses, handle exceptions and integration test your API.
+Laravel Responder is a package for your JSON APIs, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can [transform](http://fractal.thephpleague.com/transformers) your Eloquent models and [serialize](http://fractal.thephpleague.com/serializers) your success responses, but it can also help you build error responses, handle exceptions and integration test your API.
 
 ## Table of Contents
 
@@ -29,31 +29,28 @@ Laravel Responder is a package for your JSON APIs, integrating [Fractal](http://
 
 ## Philosophy
 
-When building powerful APIs, you want to make sure your endpoints are consistent and easy to consume by your application. Laravel is a great fit for your API, however, it lacks support for common tools like transformers and serializers. Fractal, on the other hand, has some great tools for building APIs and fills in the gaps of Laravel. 
+When building powerful APIs, you want to make sure your endpoints are consistent and easy to consume by your application. Laravel is a great fit your API, however, it lacks support for common tools like transformers and serializers. Fractal, on the other hand, has some great tools for building APIs and fills in the gaps of Laravel. 
 
 While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Take this example from a controller:
 
 ```php
  public function index()
  {
-    $users = User::all();
     $manager = new Manager();
-    $resource = new Collection($users, new UserTransformer(), 'users');
+    $resource = new Collection(User::get(), new UserTransformer(), 'users');
 
     return response()->json($manager->createData($resource)->toArray());
  }
 ```
 
-I admit, the Fractal manager could be moved outside the controller and you could return the array directly. However, as soon as you want a different status code than the default `200`, you probably need to use `response()->json()` anyway.
+I admit, the Fractal manager could be moved outside the controller and you could return the array directly. However, as soon as you want a different status code than the default `200`, you probably need to wrap it in a `response()->json()` anyway.
 
 The point is, we all get a little spoiled by Laravel's magic. Wouldn't it be sweet if the above could be written as following:
 
 ```php
 public function index()
 {
-    $users = User::all();
-
-    return responder()->success($users);
+    return responder()->success(User::all());
 }
 ```
 
@@ -115,11 +112,11 @@ $app->register(Flugg\Responder\ResponderServiceProvider::class);
 
 #### Registering the Facade
 
-You may also register the facade by adding the following line to `app/bootstrap.php`:
+You may also add the following line to `app/bootstrap.php` to register the optional facade:
 
 ```php
 class_alias(Flugg\Responder\Facades\Responder::class, 'Responder');
-````
+```
 
 ***
 _Remember to uncomment `$app->withFacades();` to enable facades in Lumen._
@@ -131,7 +128,7 @@ There is no `php artisan vendor:publish` in Lumen, you will therefore have to cr
 
 ## Usage
 
-The package has a `Flugg\Responder\Responder` service which is responsible for building success- and error responses for your JSON API. The class has a `success()` and `error()` method which both returns an instance of `Illuminate\Http\JsonResponse`.
+The package has a `Flugg\Responder\Responder` service which is responsible for building success and error responses for your API.
 
 ### Accessing the Responder
 
@@ -144,9 +141,7 @@ You may inject the responder service directly into your controller to create suc
 ```php
 public function index(Responder $responder)
 {
-    $users = User::all();
-    
-    return $responder->success($users);
+    return $responder->success(User::all());
 }
 ```
 
@@ -161,7 +156,7 @@ return $responder->error('invalid_user');
 Optionally, you may use the `Responder` facade to create responses:
 
 ```php
-return Responder::success($users);
+return Responder::success(User::all());
 ```
 ```php
 return Responder::error('invalid_user');
@@ -172,7 +167,7 @@ return Responder::error('invalid_user');
 Additionally, you can use the `responder()` helper method if you're fan of Laravel's `response()` helper method:
 
 ```php
-return responder()->success($users);
+return responder()->success(User::all());
 ```
 ```php
 return responder()->error('invalid_user');
@@ -187,7 +182,7 @@ Lastly, the package also has a `Flugg\Responder\Traits\RespondsWithJson` trait y
 The trait gives you access to `successResponse()` and `errorResponse()` methods in your controllers: 
 
 ```php
-return $this->successResponse($users);
+return $this->successResponse(User::all());
 ```
 ```php
 return $this->errorResponse('invalid_user');
@@ -210,11 +205,11 @@ public function index()
 }
 ```
 
-This method returns an instance of `\Illuminate\Http\JsonResponse` and will transform and serialize the data. The first argument is the transformation data.
+This method returns an instance of `\Illuminate\Http\JsonResponse` and will transform and serialize the data before wrapping it in a JSON response.
 
-#### Setting Transformation Data
+#### Setting Data
 
-The transformation data will be transformed if a transformer is set, and must be one of the following types:
+The first argument of the `success` method is the transformation data. The transformation data will be transformed if a transformer is set, and must be one of the following types:
 
 ##### Eloquent Model
 
@@ -251,6 +246,8 @@ Instead of turning it into a collection, you may pass in a query builder directl
 ```php
 return Responder::success(User::where('id', 1));
 ```
+
+The package will then automatically add info pagination data to the response defined by the serializer.
 
 ##### Paginator
 
@@ -305,121 +302,98 @@ return Responder::success(User::all(), 200, ['foo' => 'bar']);
 You may also omit the status code if you want to send a default `200` response:
 
 ```php
-return Responder::success($user, ['foo' => 'bar']);
+return Responder::success(User::all(), ['foo' => 'bar']);
 ```
 
 ### Transformers
 
-Transformers are classes which only have one responsibility; to transform one set of data to another. In our case we want to transform an Eloquent model into an array. The package provides its own abstract transformer, `Flugg\Responder\Transformer`. This transformer extends `League\Fractal\Transformer` and adds integration with Eloquent.
-
-Your transformers should extend the package transformer as follows:
-
-```php
-<?php
-
-namespace App\Transformer;
-
-use App\User;
-use Flugg\Responder\Transformer;
-
-class UserTransformer extends Transformer
-{
-    /**
-     * Transform the model data into a generic array.
-     *
-     * @param  User $user
-     * @return array
-     */
-    public function transform(User $user)
-    {
-        return [
-            'id'       => (int) $user->id,
-            'email'    => $user->email,
-            'fullName' => $user->first_name . ' ' . $user->last_name
-        ];
-    }
-}
-```
-
-Transformers basically give you a way to abstract your database logic from your API design, and transforms all values to the correct type. As seen in the example above, we cast the user id to an integer. Then we concatenate the first- and last name together, and only expose a `fullName` field to the API.
+A transformer is responsible for transforming your Eloquent models into an array for your API. A transformer may be associated with a model, which means your data will be automatically transformed without having to specify a transformer.
 
 ***
-_Note how we're converting snake case fields to camel case. You can read more about it in the [Converting to Camel Case](#converting-to-camel-case) section._
+_You may read more about how the mapping between a model and transformer work [a few chapters below](#mapping-transformers-to-models)._
 ***
 
-#### Transforming Pivots
+#### Transforming Data
 
-When you include a many to many relationship to your response, you may want to transform the pivot table data, to expose the data to the API. You may do so by adding an additional transform method, `transformPivot()` to your transformer:
+When using the `success()` method, the package will try to resolve a transformer from the model in the transformation data. If no transformer is found, the model's `toArray()` fields will be returned instead.
+
+If you want to be explicit about which transformer to use, you may call the `transform()` method on the responder service:
 
 ```php
-<?php
-
-namespace App\Transformer;
-
-use App\User;
-use Flugg\Responder\Transformer;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-
-class UserTransformer extends Transformer
-{
-    /**
-     * Transform the model data into a generic array.
-     *
-     * @param  User $user
-     * @return array
-     */
-    public function transform(User $user)
-    {
-        return [
-            'id' => (int) $user->id
-        ];
-    }
-
-    /**
-     * Transform the model's pivot table data into a generic array.
-     *
-     * @param  Pivot $pivot
-     * @return array
-     */
-    public function transformPivot(Pivot $pivot):array
-    {
-        return [
-            'user_id' => $pivot->user_id,
-            'role_id' => $pivot->role_id
-        ];
-    }
-}
+return Responder::transform(User::all(), new UserTransformer)->respond();
 ```
 
-In the example above, we assume we have a many to many relationship between a `User` and `Role`. Note how the new method takes in an instance of `Illuminate\Database\Eloquent\Relations\Pivot`, which is what a many to many relation returns. If it's a polymorphic many to many relationship, you may instead inject an instance of `Illuminate\Database\Eloquent\Relations\MorphPivot`.
+Instead of using a full-blown transformer class, you may also pass in a closure:
 
-Continuing on the example and using the response below, it will automatically look for a `transformPivot()` method in your `UserTransformer`:
-
-````php
-$role = Role::with('users')->find(1);
-
-return Responder::success($role);
+```php
+return Responder::transform(User::all(), function ($user) {
+    return [
+        'id' => (int) $user->id,
+        'email' => (string) $user->email
+    ];
+})->respond();
 ```
 
-However, if you do the inverse, you will have to place the `transformPivot()` method in your `RoleTransformer`:
+If you don't pass in a transformer, it will behave in the same way as the `success()` method:
 
-````php
-$user = User::with('roles')->find(1);
-
-return Responder::success($user);
+```php
+return Responder::transform(User::all())->respond();
 ```
 
-The reasoning behind this is because the `pivot` field is appended to the related resource.
+Unlike the `success()` method, the `transform()` method returns an instance of `Flugg\Responder\Http\SuccessResponseBuilder`, which is why we chain our call with `respond()` to convert it to an `Illuminate\Http\JsonResponse`.
+
+You can also set the status code or headers using the `respond()` method:
+
+```php
+return Responder::transform(User::all())->respond(201, ['x-foo' => 'bar']);
+```
+
+You may additionally add any meta data using the `addMeta()` method:
+
+```php
+return Responder::transform(User::all())->addMeta(['foo' => 'bar'])->respond();
+```
+
+***
+_As you might have guessed, the `Responder::success($data, $status, $meta)` method is just a shorthand for calling `Responder::transform($data)->addMeta($meta)->respond($status)`._
+***
+
+By using the `serializer()` method you can also explicitly set the serializer:
+
+```php
+return Responder::transform(User::all())->serializer(new JsonApiSerializer)->respond();
+```
+
+Instead of using `respond()`, you may also convert it to a few other types:
+
+```php
+return Responder::transform(User::all())->toArray();
+```
+```php
+return Responder::transform(User::all())->toCollection();
+```
+```php
+return Responder::transform(User::all())->toJson();
+```
+
+You can also retrieve the Fractal resource or manager instances:
+
+```php
+return Responder::transform(User::all())->getResource();
+```
+```php
+return Responder::transform(User::all())->getManager();
+```
 
 #### Creating Transformers
 
-The package gives you an Artisan command you can use to quickly generate new transformers:
+The package gives you an Artisan command you can use to quickly whip up new transformers:
 
 ```shell
 php artisan make:transformer UserTransformer
 ```
 
-This will create a new `UserTransformer.php` in an `app/Transformers` folder.
+This will create a new `UserTransformer.php` in the `app/Transformers` folder.
 
 It will automatically resolve what model to inject from the name. For instance, in the example above the package will extract `User` from `UserTransformer` and assume the models live directly in the app folder (as per Laravel's default).
 
@@ -429,7 +403,7 @@ If you store your models somewhere else you may also use the `--model` option to
 php artisan make:transformer UserTransformer --model="App\Models\User"
 ```
 
-You can also use the `--pivot` option to also include an additional method to transform the model's pivot table:
+You can also use the `--pivot` option to include an additional `transformPivot()` method to transform the model's pivot table:
 
 ```shell
 php artisan make:transformer UserTransformer --pivot
@@ -437,140 +411,46 @@ php artisan make:transformer UserTransformer --pivot
 
 #### Mapping Transformers to Models
 
-When you pass in a model or a collection of models into the `success` method, the package will automatically transform the models. However, because you're free to place your transformers anywhere you want, the package has no way of knowing which transformer to use for each model. 
+In a lot of cases you want to use the same transformer everytime you refer to a model. Instead of passing in a transformer for every response, you can map a transformer to a model, so the model is automatically transformed. 
 
-To map a transformer to a model, you need to implement `Flugg\Responder\Contract\Transformable` in your models. The interface requires you to create a static `transformer()` method, which should return the path to the corresponding transformer:
+To map a transformer to a model, your model needs to implement `Flugg\Responder\Contract\Transformable`. The interface requires a static `transformer()` method, which should return a transformer:
 
 ```php
-<?php
-
-namespace App;
-
-use App\Transformers\FruitTransformer;
-use Flugg\Responder\Contracts\Transformable;
-use Illuminate\Database\Eloquent\Model;
-
-class Fruit extends Model implements Transformable
+class Role extends Model implements Transformable
 {
     /**
-     * The path to the transformer class.
+     * The transformer used to transform the model data.
      *
-     * @return string|null
+     * @return Transformer|callable|string|null
      */
     public static function transformer()
     {
-        return FruitTransformer::class;
+        return RoleTransformer::class;
     }
 }
 ```
 
-All models you expose to the API should implement the `Flugg\Responder\Contract\Transformable` contract. If you don't want to transform a given model, you can simply return `null`:
+The `transformer()` method can also return a closure transformer:
 
 ```php
 public static function transformer()
 {
-    return null;
+    return function ($user) {
+        return [
+            'id' => (int) $user->id,
+            'email' => (string) $user->email
+        ];
+    };
 }
 ```
-
-#### Converting to Camel Case
-
-You may want to expose all fields in your API in camel case, however, Eloquent uses snake case attributes by default. A transformer is one of the last things that take place before the data is returned to the API, and is a perfect location to do the conversion to camel casing:
-
-```php
-public function transform(User $user)
-{
-    return [
-        'id'        => (int) $user->id,
-        'roleId'    => (int) $user->permission_id,
-        'isAdmin'   => (bool) $user->is_admin,
-        'createdAt' => (string) $user->created_at,
-        'updatedAt' => (string) $user->updated_at
-    ];
-}
-```
-
-This is great, but only works for API responses, and not for request parameters. Imagine you create a user from the request input with camel case fields:
-
-```php
-User::create(request()->all());
-```
-
-That wont work because the user model expects snake case fields. However, the package has a `Flugg\Responder\Traits\ConvertsParameters` trait, which you can use in your `app/Http/Requests/Request.php` file to automatically convert all incoming parameters to snake case before reaching the controller:
-
-```php
-<?php
-
-namespace App\Http\Requests;
-
-use Flugg\Responder\Traits\ConvertsParameters;
-use Illuminate\Foundation\Http\FormRequest;
-
-abstract class Request extends FormRequest
-{
-    use ConvertsParameters;
-}
-```
-
-This trait will not only convert all incoming parameters to snake case, it will also convert all `'true'` and `'false'` values to actual booleans. If you only want one of the conversions, you may set the following variables on the request:
-
-```php
-<?php
-
-namespace App\Http\Requests;
-
-use Flugg\Responder\Traits\ConvertsParameters;
-use Illuminate\Foundation\Http\FormRequest;
-
-abstract class Request extends FormRequest
-{
-    use ConvertsParameters;
-    
-    /**
-     * Automatically cast all string booleans to booleans.
-     *
-     * @var bool
-     */
-    protected $castBooleans = false;
-    
-    
-    /**
-     * Automatically convert all parameter keys to snake case.
-     *
-     * @var bool
-     */
-    protected $convertToSnakeCase = false;
-}
-```
-
-You may also convert any parameters manually using the `convertParameters()` method in your request:
-
-```php
-/**
- * Convert incoming parameters.
- *
- * @param  array $parameters
- * @return array
- */
-protected function convertParameters(array $parameters)
-{
-    $parameters['included'] = $parameters['included'] ?? [];
-    
-    return $parameters;
-}
-```
-
-The method takes in an array of all incoming parameters, which you may modify to your liking before returning it again. In the example above, we set the `included` parameter to an empty array if it's not set using the new [null coalesce operator in PHP7](https://wiki.php.net/rfc/isset_ternary). This way we can use it as an argument in Eloquent's `with()` and `load()` methods, as these methods require the first parameter to be an array.
 
 ### Serializers
 
-After your models have been transformed, the data will be serialized using the serializer set in the `responder.php` configuration file. The serializer structures your data output in a certain way. It can also add additional data like pagination information and meta data.
-
-When all responses are serialized with the same serializer, you end up with a consistent API, and if you want to change the structure in the future, you can simply swap out the serializer.
+After your models have been transformed, the data will be serialized using the set serializer. The serializer structures your data output in a certain way, but it can also add additional data like pagination and meta data.
 
 #### Default Serializer
 
-The package brings its own serializer `Flugg\Responder\Serializers\ApiSerailizer`, which is the default serializer. Below is an example response with a user model, with a related role model:
+The package brings it own default serializer, `Flugg\Responder\Serializers\ApiSerailizer`. Below is an example response, given a user with a related role:
 
 ```json
 {
@@ -579,7 +459,6 @@ The package brings its own serializer `Flugg\Responder\Serializers\ApiSerailizer
     "data": {
         "id": 1,
         "email": "example@email.com",
-        "fullName": "John Doe",
         "role": {
             "name": "admin"
         }
@@ -604,8 +483,7 @@ The above example would look like the following using `League\Fractal\Serializer
 ```json
 {
     "id": 1,
-    "email": "example@email.com",
-    "fullName": "John Doe",
+    "email": "example@email.com"
     "role": {
         "name": "admin"
     }
@@ -620,8 +498,7 @@ You can also add the `data` field using `League\Fractal\Serializers\DataArraySer
 {
     "data": {
         "id": 1,
-        "email": "example@email.com",
-        "fullName": "John Doe",
+        "email": "example@email.com"
         "role": {
             "data": {
                 "name": "admin"
@@ -645,8 +522,7 @@ Fractal also has a representation of the [JSON-API](http://jsonapi.org/) standar
         "type": "users",
         "id": 1,
         "attributes": {
-            "email": "example@email.com",
-            "fullName": "John Doe"
+            "email": "example@email.com"
         },
         "relationships": {
             "role": {
@@ -677,195 +553,163 @@ If none of the above serializers suit your taste, feel free to create your own a
 
 ### Error Responses
 
-Just like we've been generating success responses, you can equally easy generate error responses when something does not go as planned:
+Just like success responses, you can equally easy generate error responses when something does not go as planned, using the `error()` method:
 
 ```php
 public function index()
 {
-    if (request()->has('bomb')) {
-        return Responder::error('bomb_found');
-    }
+    return Responder::error();
 }
 ```
 
-The only required argument to the `error()` method is an error code. You can use any string you like for the error code, and later on we will map these to corresponding error messages.
+Just like with success responses, this method returns an instance of `\Illuminate\Http\JsonResponse`, the above would return the following JSON:
 
-The example above will return the following JSON response:
+```json
+{
+    "status": 500,
+    "success": false,
+    "error": null
+}
+```
+
+#### Setting Error Codes
+
+The first parameter of the `error()` method is the error code, which can be any string value:
+
+```php
+if (request()->has('bomb')) {
+    return Responder::error('bomb_found');
+}
+```
+
+The above example would include an error object with a set error code:
 
 ```json
 {
     "status": 500,
     "success": false,
     "error": {
-        "code": "bomb_found"
+        "code": "bomb_found",
+        "message": null
     }
 }
 ```
 
-The default status code for error responses is `500`. However, you can change the status code by passing in a second argument:
+#### Setting Status Codes
+
+The default status code for error responses is `500`. However, you are free to change the status code by passing in a second argument:
 
 ```php
 return Responder::error('bomb_found', 400);
 ```
 
-#### Setting Error Messages
-
-An error code is useful for many reasons, but it might not give enough clues to the user about what caused the error. So you might want to add a more descriptive error message to the response. You can do so by passing in a third argument to the `error()` method:
+You may also omit the error code:
 
 ```php
-return Responder::error('bomb_found', 400, 'No explosives allowed in this request.');
+return Responder::error(400);
+```
+
+#### Setting Error Messages
+
+You might also be interested in providing more descriptive error messages to your responses. You can do so by adding a third parameter to the `error()` method:
+
+```php
+return Responder::error('bomb_found', 500, 'No explosives allowed.');
 ```
 
 Which will output the following JSON:
 
 ```json
 {
+    "status": 500,
     "success": false,
-    "status": 400,
     "error": {
         "code": "bomb_found",
-        "message": "No explosives allowed in this request."
+        "message": "No explosives allowed."
     }
 }
 ```
 
+You may also choose to omit the second parameter when responding with the default status code of `500`:
+
+```php
+return Responder::error('bomb_found', 'No explosives allowed.');
+```
+
+#### Using Language File
+
+You might return the same error response multiple places. Instead of setting the message for each response, you can instead use the `errors.php` language file. This file should be in your `resources/lang/en` folder after you [published your vendor assets](#publishing-package-assets).
+
 ***
-_Notice how a `message` field was added inside the `error` field._
+_If you use Lumen, you need to create the `resources/lang/en/errors.php` file manually. You may simply copy the [default language file](resources/lang/en/errors.php)._
 ***
 
-There will in most cases only be one error message per error. However, validation errors are an exception to this rule. Since there can be multiple error messages after validation, all messages are put inside a `messages` field, instead of the singular `message` field.
+The language file contains the following error messages out of the box:
 
-Below is an example response from a user registration request, where multiple validation rules failed:
+```php
+'resource_not_found' => 'The requested resource does not exist.',
+'unauthenticated' => 'You are not authenticated for this request.',
+'unauthorized' => 'You are not authorized for this request.',
+'relation_not_found' => 'The requested relation does not exist.',
+'validation_failed' => 'The given data failed to pass validation..',
+```
+
+These messages are used for Laravel's default exceptions, which the package can catch and convert to an error JSON response. We'll take a closer look at how to catch these exceptions in the next section on [exceptions](#exceptions).
+
+Let's add the `bomb_found` error code and map it to a corresponding message:
+
+```php
+'bomb_found' => 'No explosives allowed.',
+```
+
+You can then refer to it from your error response:
+
+```php
+return Responder::error('bomb_found');
+```
+
+Which will output the same JSON as above, with the error message set:
 
 ```json
 {
+    "status": 500,
     "success": false,
-    "status": 422,
-    "error": {
-        "code": "validation_failed",
-        "messages": [
-            "Username is required.",
-            "Password must be at least 8 characters long.",
-        ]
-    }
-}
-```
-
-#### Language File
-
-Instead of adding the error messages on the fly when you create the error responses, you can instead use the `errors.php` language file. The file should be in your `resources/lang/en` folder if you [published package assets](#publishing-package-assets).
-
-The default language file looks like this:
-
-```php
-<?php
-
-return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Error Message Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used by the Laravel Responder package.
-    | When it generates error responses, it will search the messages array
-    | below for any key matching the given error code for the response.
-    |
-    */
-
-    'resource_not_found' => 'The requested resource does not exist.',
-    'unauthorized' => 'You are not authorized for this request.',
-
-];
-```
-
-***
-_If you use Lumen, you need to create the `resources/lang/en/errors.php` file manually. Feel free to copy over the code above into your file._
-***
-
-These messages are for the default Laravel exceptions, thrown when a model is not found or authorization failed. To learn more about how to catch these exceptions you can read the next section on [exceptions](#exceptions).
-
-The error messages keys map up to an error code. So if you add the following line to the language file...
-
-```php
-'bomb_found' => 'No explosives allowed in this request.',
-```
-
-...and return the following error response...
-
-```php
-return $this->errorResponse('bomb_found', 400);
-```
-
-...the JSON below will be generated:
-
-```json
-{
-    "success": false,
-    "status": 400,
     "error": {
         "code": "bomb_found",
-        "message": "No explosives allowed in this request."
+        "message": "No explosives allowed."
     }
 }
 ```
 
 ### Exceptions
 
-When something bad happens, you might prefer to throw an actual exception instead of using the `error()` method. And even if you don't, you might want the package to catch Laravel's own exceptions, to convert them to proper JSON error responses for your API. 
+When something unexpected happens, you might prefer to throw actual exceptions instead of using the `error()` method. And even if you don't, you might want the package to catch Laravel's default exceptions, to automatically convert them to JSON error responses. 
 
 #### Handle Exceptions
 
-If you let the package handle exceptions, the package will catch all exceptions that extend `Flugg\Responder\Exceptions\ApiException` and turn them into informative JSON error responses.
+If you let the package handle exceptions, the package will catch all exceptions extending `Flugg\Responder\Exceptions\ApiException` and convert them to JSON responses.
 
-To let the package handle exceptions you need to add some code to `app/Exceptions/Handler.php`. You have two options: extend the package exceptions handler or use a trait and add a code snippet.
-
-##### Option 1: Extend Package Handler
-
-You may let the package handle your exceptions by extending the package exception handler instead of the Laravel one. 
-
-To do so, replace the following import in your exceptions handler...
+To use the package exception handler you need to replace the following line in `app/Exceptions/Handler.php`:
 
 ```php
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 ```
 
-...with this one:
+With the package exception handler:
 
 ```php
 use Flugg\Responder\Exceptions\Handler as ExceptionHandler;
 ```
 
 ***
-_Lumen uses a different base exception handler, and is incompatible with the package exception handler. Option 2, however, works with both Lumen and Laravel._
+_Lumen uses a different base exception handler, and is incompatible with the package exception handler. You may instead, simply copy the contents of the [package exception handler](src/Exceptions/Handler.php) and paste it into your `render()` method and use the `Flugg\Responder\Traits\HandlesApiErrors` trait._
 ***
-
-##### Option 2: Use Trait
-
-There exists other packages where you also need to extend their exception handlers. Since you can not extend more than one class at once, this quickly turns problematic. Which is why we provide an alternative way of adding the handler.
-
-Just add the `Flugg\Responder\Traits\HandlesApiErrors` trait to your exceptions handler, and add the following code before the `return parent::render( $request, $e );` in your render method:
-
-```php
-public function render($request, Exception $e)
-{
-    $this->transformExceptions($e);
-    
-    if ($e instanceof \Flugg\Responder\Exceptions\ApiException) {
-        return $this->renderApiError($e);
-    }
-
-    return parent::render($request, $e);
-}`
-```
 
 #### Catching Laravel Exceptions
 
-Laravel throws a few exceptions when things go wrong. For instance, if no model could be found during route model binding, an `Illuminate\Database\Eloquent\ModelNotFoundException` exception will be thrown. This exception is handled by the package if you added the package exception handling, as explained in the previous section.
+Laravel throws a few exceptions when things go wrong. For instance, an `Illuminate\Database\Eloquent\ModelNotFoundException` exception will be thrown when no model is found using the `findOrFail()` method. This exception, and more, are handled by the package if you added the package exception handling, as explained in the paragraph above.
 
-However, when validation or authorization fails, a more generic `Illuminate\Http\Exception\HttpResponseException` is thrown. Since this exception is thrown from multiple sources, the package wont be able to distinct a validation error from an authorization error.
-
-Luckily, Laravel allows you to override the `failedValidation()` and `failedAuthorization()` methods in your request files to throw your own exception. The package has a trait, `Flugg\Responder\Traits\ThrowsApiErrors`, which does just that.
+The authorization and validation exceptions thrown from form requests cannot be caught by the package automatically since the exceptions are too generic. However, you may use the `Flugg\Responder\Traits\ThrowsApiErrors` in your base request class:
 
 ```php
 <?php
@@ -881,17 +725,15 @@ abstract class Request extends FormRequest
 }
 ```
 
-The exceptions thrown by this trait extends `Flugg\Responder\Exceptions\ApiException`, so they are picked up by the package exceptions handler.
+This trait will throw exceptions extending `Flugg\Responder\Exceptions\ApiException` instead, so they are picked up by the package exceptions handler.
 
 ***
-_As discussed in the [Transformers](#converting-to-camel-case) section, you can also use the `Flugg\Responder\Traits\ConvertsParameters` trait in your base request class to convert incoming parameters to snake case._
+_After Laravel 5.3 there is no longer a base request class out of the box. You may either create one manually or use the trait in all your form requests._
 ***
 
 #### Creating Custom Exceptions
 
-The package provides a few exceptions to handle default Laravel exceptions. However, you may want to create your own exceptions to handle custom errors. You are free to create as many exceptions as you like, but if you want them to be automatically caught and converted to a JSON response by the package, they will need to extend `Flugg\Responder\Exceptions\ApiException`.
-
-When creating exceptions that extend `Flugg\Responder\Exceptions\ApiException`, you will get access to two protected properties you can declare to set status code and error code. The package will use these properties when converting the exception to a JSON response. Below is an example exception:
+The package has a few exceptions out of the box to handle Laravel's default exceptions. However, you may want to create your own exceptions for your API. If you want the package to automatically convert your exceptions to JSON responses, they will need to extend `Flugg\Responder\Exceptions\ApiException`:
 
 ```php
 <?php
@@ -917,6 +759,8 @@ class CustomException extends ApiException
     protected $errorCode = 'custom_error';
 }
 ```
+
+You can customize the response generated from your exceptions by setting the `$statusCode` and `$errorCode` properties as seen above.
 
 ### Testing Helpers
 
