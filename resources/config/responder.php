@@ -21,11 +21,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | Wether or not you want to include status codes in your JSON responses.
-    | The status code is then be prepended to both your success and error
-    | responses. This happens after serializing for success responses.
+    | If true the status code is prepended to both your success and error
+    | responses. This takes place right after your data is serialized.
     |
     */
 
-    'status_code' => true
+    'include_status_code' => true
 
 ];

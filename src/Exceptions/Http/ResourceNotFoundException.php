@@ -1,11 +1,11 @@
 <?php
 
-namespace Flugg\Responder\Exceptions;
+namespace Flugg\Responder\Exceptions\Http;
 
 /**
- * An exception which replaces Laravel's ModelNotFoundException.
+ * An exception replacing Laravel's \Illuminate\Database\Eloquent\ModelNotFoundException.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */

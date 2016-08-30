@@ -2,90 +2,46 @@
 
 namespace Flugg\Responder;
 
-use Flugg\Responder\Contracts\Transformable;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use League\Fractal\Scope;
 use League\Fractal\TransformerAbstract;
 
 /**
- * An abstract base transformer. Yourr transformers should extend this, and this class
- * itself extends Fractal's transformer.
+ * An abstract base transformer. Your transformers should extend this class, and this
+ * class itself extends Fractal's transformer.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
 abstract class Transformer extends TransformerAbstract
 {
     /**
-     * The transformable model associated with the transformer.
-     *
-     * @var Transformable
-     */
-    protected $model;
-
-    /**
-     * Constructor.
-     *
-     * @param Transformable|null $model
-     */
-    public function __construct( Transformable $model = null )
-    {
-        $this->model = $model;
-    }
-
-    /**
-     * Get avilable includes.
+     * Get relations set on the transformer.
      *
      * @return array
      */
-    public function getAvailableIncludes()
+    public function getRelations():array
     {
-        return array_keys( $this->model->getRelations() );
+        return array_merge($this->getAvailableIncludes(), $this->getDefaultIncludes());
     }
 
     /**
-     * This method is fired to loop through available includes, see if any of
-     * them are requested and permitted for this scope.
+     * Set relations on the transformer.
      *
-     * @param  Scope $scope
-     * @param  mixed $data
-     * @return array
+     * @param  array|string $relations
+     * @return self
      */
-    public function processIncludedResources( Scope $scope, $data )
+    public function setRelations($relations)
     {
-        $includedData = [ ];
-        $includes = array_merge( $this->getDefaultIncludes(), $this->getAvailableIncludes() );
+        $this->setAvailableIncludes(array_merge($this->availableIncludes, (array) $relations));
 
-        foreach ( $includes as $include ) {
-            $includedData = $this->includeResourceIfAvailable( $scope, $data, $includedData, $include );
-        }
-
-        return $includedData === [ ] ? false : $includedData;
+        return $this;
     }
 
     /**
-     * Include a resource only if it is available on the method.
-     *
-     * @param  Scope  $scope
-     * @param  mixed  $data
-     * @param  array  $includedData
-     * @param  string $include
-     * @return array
-     */
-    protected function includeResourceIfAvailable( Scope $scope, $data, $includedData, $include )
-    {
-        if ( $resource = $this->callIncludeMethod( $scope, $include, $data ) ) {
-            $childScope = $scope->embedChildScope( $include, $resource );
-
-            $includedData[ $include ] = $childScope->toArray();
-        }
-
-        return $includedData;
-    }
-
-    /**
-     * Call Include Method.
+     * Call method for retrieving a relation. This method overrides Fractal's own
+     * [callIncludeMethod] method to load relations directly from your models.
      *
      * @param  Scope  $scope
      * @param  string $includeName
@@ -93,19 +49,13 @@ abstract class Transformer extends TransformerAbstract
      * @return \League\Fractal\Resource\ResourceInterface|bool
      * @throws \Exception
      */
-    protected function callIncludeMethod( Scope $scope, $includeName, $data )
+    protected function callIncludeMethod(Scope $scope, $includeName, $data)
     {
-        if ( ! $data instanceof Transformable || ! $data->relationLoaded( $includeName ) ) {
-            return false;
+        if ($includeName === 'pivot') {
+            return $this->includePivot($data->$includeName);
         }
 
-        $relation = $data->$includeName;
-
-        if ( $relation instanceof Pivot ) {
-            return $this->includePivot( $relation );
-        }
-
-        return app( 'responder.success' )->transform( $relation );
+        return app(Responder::class)->transform($data->$includeName)->getResource();
     }
 
     /**
@@ -114,16 +64,14 @@ abstract class Transformer extends TransformerAbstract
      * @param  Pivot $pivot
      * @return \League\Fractal\Resource\ResourceInterface|bool
      */
-    protected function includePivot( Pivot $pivot )
+    protected function includePivot(Pivot $pivot)
     {
-        if ( method_exists( $this, 'transformPivot' ) ) {
-            $data = $this->transformPivot( $pivot );
-
-            return app( 'responder.success' )->transform( $pivot, function () use ( $data ) {
-                return $data;
-            } );
+        if (! method_exists($this, 'transformPivot')) {
+            return false;
         }
 
-        return false;
+        return app(Responder::class)->transform($pivot, function () use ($pivot) {
+            return $this->transformPivot($pivot);
+        })->getResource();
     }
 }

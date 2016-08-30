@@ -2,13 +2,13 @@
 
 namespace Flugg\Responder\Facades;
 
-use Flugg\Responder\Contracts\Responder as ResponderContract;
+use Flugg\Responder\Responder as ResponderService;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * An optional facade you can register to quickly access the responder service.
+ * A facade you can register in config/app.php to quickly get access to the responder.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -21,6 +21,6 @@ class Responder extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return ResponderContract::class;
+        return ResponderService::class;
     }
 }

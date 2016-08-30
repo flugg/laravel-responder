@@ -5,7 +5,7 @@ namespace Flugg\Responder\Contracts;
 /**
  * A contract you can apply to your models to map a specific transformer to a model.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -38,7 +38,7 @@ interface Transformable
      * @param  string $key
      * @return bool
      */
-    public function relationLoaded( $key );
+    public function relationLoaded($key);
 
     /**
      * Convert the model instance to an array.

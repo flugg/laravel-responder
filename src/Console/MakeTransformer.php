@@ -8,7 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 /**
  * An Artisan command for generating a new transformer class.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -43,7 +43,7 @@ class MakeTransformer extends Command
      *
      * @param  Filesystem $files
      */
-    public function __construct( Filesystem $files )
+    public function __construct(Filesystem $files)
     {
         parent::__construct();
 
@@ -67,21 +67,21 @@ class MakeTransformer extends Command
      */
     protected function generateTransformer()
     {
-        $name = (string) $this->argument( 'name' );
+        $name = (string) $this->argument('name');
         $path = $this->laravel->basePath() . '/app/Transformers/' . $name . '.php';
 
-        if ( $this->files->exists( $path ) ) {
-            return $this->error( $name . ' already exists!' );
+        if ($this->files->exists($path)) {
+            return $this->error($name . ' already exists!');
         }
 
-        $this->makeDirectory( $path );
+        $this->makeDirectory($path);
 
-        $stubPath = $this->option( 'pivot' ) ? 'resources/stubs/transformer.pivot.stub' : 'resources/stubs/transformer.stub';
-        $stub = $this->files->get( __DIR__ . '/../../' . $stubPath );
+        $stubPath = $this->option('pivot') ? 'resources/stubs/transformer.pivot.stub' : 'resources/stubs/transformer.stub';
+        $stub = $this->files->get(__DIR__ . '/../../' . $stubPath);
 
-        $this->files->put( $path, $this->makeTransformer( $name, $stub ) );
+        $this->files->put($path, $this->makeTransformer($name, $stub));
 
-        $this->info( 'Transformer created successfully.' );
+        $this->info('Transformer created successfully.');
     }
 
     /**
@@ -90,10 +90,10 @@ class MakeTransformer extends Command
      * @param  string $path
      * @return void
      */
-    protected function makeDirectory( string $path )
+    protected function makeDirectory(string $path)
     {
-        if ( ! $this->files->isDirectory( dirname( $path ) ) ) {
-            $this->files->makeDirectory( dirname( $path ), 0777, true, true );
+        if (! $this->files->isDirectory(dirname($path))) {
+            $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
     }
 
@@ -104,11 +104,11 @@ class MakeTransformer extends Command
      * @param  string $stub
      * @return string
      */
-    protected function makeTransformer( string $name, string $stub ):string
+    protected function makeTransformer(string $name, string $stub):string
     {
-        $stub = $this->replaceNamespace( $stub );
-        $stub = $this->replaceClass( $stub, $name );
-        $stub = $this->replaceModel( $stub, $name );
+        $stub = $this->replaceNamespace($stub);
+        $stub = $this->replaceClass($stub, $name);
+        $stub = $this->replaceModel($stub, $name);
 
         return $stub;
     }
@@ -119,15 +119,15 @@ class MakeTransformer extends Command
      * @param  string $stub
      * @return string
      */
-    protected function replaceNamespace( string $stub ):string
+    protected function replaceNamespace(string $stub):string
     {
-        if ( method_exists( $this->laravel, 'getNameSpace' ) ) {
+        if (method_exists($this->laravel, 'getNameSpace')) {
             $namespace = $this->laravel->getNamespace() . 'Transformers';
         } else {
             $namespace = 'App\Transformers';
         }
 
-        $stub = str_replace( 'DummyNamespace', $namespace, $stub );
+        $stub = str_replace('DummyNamespace', $namespace, $stub);
 
         return $stub;
     }
@@ -139,9 +139,9 @@ class MakeTransformer extends Command
      * @param  string $name
      * @return string
      */
-    protected function replaceClass( string $stub, string $name ):string
+    protected function replaceClass(string $stub, string $name):string
     {
-        $stub = str_replace( 'DummyClass', $name, $stub );
+        $stub = str_replace('DummyClass', $name, $stub);
 
         return $stub;
     }
@@ -153,14 +153,14 @@ class MakeTransformer extends Command
      * @param  string $name
      * @return string
      */
-    protected function replaceModel( string $stub, string $name ):string
+    protected function replaceModel(string $stub, string $name):string
     {
-        $model = $this->getModelNamespace( $name );
-        $class = $this->getClassFromNamespace( $model );
+        $model = $this->getModelNamespace($name);
+        $class = $this->getClassFromNamespace($model);
 
-        $stub = str_replace( 'DummyModelNamespace', $model, $stub );
-        $stub = str_replace( 'DummyModelClass', $class, $stub );
-        $stub = str_replace( 'DummyModelVariable', camel_case( $class ), $stub );
+        $stub = str_replace('DummyModelNamespace', $model, $stub);
+        $stub = str_replace('DummyModelClass', $class, $stub);
+        $stub = str_replace('DummyModelVariable', camel_case($class), $stub);
 
         return $stub;
     }
@@ -171,13 +171,13 @@ class MakeTransformer extends Command
      * @param  string $name
      * @return string
      */
-    protected function getModelNamespace( string $name ):string
+    protected function getModelNamespace(string $name):string
     {
-        if ( $this->option( 'model' ) ) {
-            return $this->option( 'model' );
+        if ($this->option('model')) {
+            return $this->option('model');
         }
 
-        return 'App\\' . str_replace( 'Transformer', '', $name );
+        return 'App\\' . str_replace('Transformer', '', $name);
     }
 
     /**
@@ -186,8 +186,8 @@ class MakeTransformer extends Command
      * @param  string $namespace
      * @return string
      */
-    protected function getClassFromNamespace( string $namespace ):string
+    protected function getClassFromNamespace(string $namespace):string
     {
-        return last( explode( '\\', $namespace ) );
+        return last(explode('\\', $namespace));
     }
 }

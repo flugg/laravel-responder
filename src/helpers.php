@@ -1,8 +1,8 @@
 <?php
 
-use Flugg\Responder\Contracts\Responder;
+use Flugg\Responder\Responder;
 
-if ( ! function_exists( 'responder' ) ) {
+if (! function_exists('responder')) {
 
     /**
      * A helper method to quickly resolve the responder out of the service container.
@@ -11,6 +11,6 @@ if ( ! function_exists( 'responder' ) ) {
      */
     function responder()
     {
-        return app( Responder::class );
+        return app(Responder::class);
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 /**
  * This file is a collection of tests, testing that you can generate error responses.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -22,19 +22,18 @@ class MakeErrorResponseTest extends TestCase
     public function youCanMakeErrorResponses()
     {
         // Act...
-        $response = $this->responder->error( 'test_error', 400, 'Test error.' );
+        $response = $this->responder->error('test_error', 400, 'Test error.');
 
         // Assert...
-        $this->assertInstanceOf( JsonResponse::class, $response );
-        $this->assertEquals( $response->getStatusCode(), 400 );
-        $this->assertEquals( $response->getData( true ), [
-            'status' => 400,
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals($response->getStatusCode(), 400);
+        $this->assertEquals($response->getData(true), [
             'success' => false,
             'error' => [
                 'code' => 'test_error',
                 'message' => 'Test error.'
             ]
-        ] );
+        ]);
     }
 
     /**
@@ -48,10 +47,10 @@ class MakeErrorResponseTest extends TestCase
         $responder = $this->mockResponder();
 
         // Expect...
-        $responder->shouldReceive( 'error' )->with( 'test_error', 400, 'Test error.' )->once();
+        $responder->shouldReceive('error')->with('test_error', 400, 'Test error.')->once();
 
         // Act...
-        responder()->error( 'test_error', 400, 'Test error.' );
+        responder()->error('test_error', 400, 'Test error.');
     }
 
     /**
@@ -65,10 +64,10 @@ class MakeErrorResponseTest extends TestCase
         $responder = $this->mockResponder();
 
         // Expect...
-        $responder->shouldReceive( 'error' )->with( 'test_error', 400, 'Test error.' )->once();
+        $responder->shouldReceive('error')->with('test_error', 400, 'Test error.')->once();
 
         // Act...
-        Responder::error( 'test_error', 400, 'Test error.' );
+        Responder::error('test_error', 400, 'Test error.');
     }
 
     /**
@@ -83,10 +82,10 @@ class MakeErrorResponseTest extends TestCase
         $responder = $this->mockResponder();
 
         // Expect...
-        $responder->shouldReceive( 'error' )->with( 'test_error', 400, 'Test error.' )->once();
+        $responder->shouldReceive('error')->with('test_error', 400, 'Test error.')->once();
 
         // Act...
-        ( new $controller )->errorAction();
+        (new $controller)->errorAction();
     }
 
     /**
@@ -97,16 +96,13 @@ class MakeErrorResponseTest extends TestCase
     public function youCanUseLangFilesForErrorMessages()
     {
         // Arrange...
-        $translator = $this->mockTranslator();
-
-        // Expect...
-        $translator->shouldReceive( 'has' )->with( 'errors.test_error' )->once()->andReturn( true );
-        $translator->shouldReceive( 'trans' )->with( 'errors.test_error' )->once()->andReturn( 'Test error.' );
+        $this->mockTranslator('Test error');
+        $responder = $this->app->make('responder');
 
         // Act...
-        $response = $this->responder->error( 'test_error', 400 );
+        $response = $responder->error('test_error', 400);
 
         // Assert...
-        $this->assertEquals( $response->getData( true )[ 'error' ][ 'message' ], 'Test error.' );
+        $this->assertEquals('Test error', $response->getData(true)['error']['message']);
     }
 }

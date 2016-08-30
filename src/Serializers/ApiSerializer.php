@@ -7,9 +7,9 @@ use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Serializer\ArraySerializer;
 
 /**
- * Laravel Responder's own default implementation of Fractal's serializers.
+ * This class is the package's own implementation of Fractal's serializers.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -22,9 +22,9 @@ class ApiSerializer extends ArraySerializer
      * @param  array  $data
      * @return array
      */
-    public function collection( $resourceKey, array $data )
+    public function collection($resourceKey, array $data)
     {
-        return $this->item( $resourceKey, $data );
+        return $this->item($resourceKey, $data);
     }
 
     /**
@@ -34,11 +34,11 @@ class ApiSerializer extends ArraySerializer
      * @param  array  $data
      * @return array
      */
-    public function item( $resourceKey, array $data )
+    public function item($resourceKey, array $data)
     {
-        return array_merge( $this->null(), [
+        return array_merge($this->null(), [
             'data' => $data
-        ] );
+        ]);
     }
 
     /**
@@ -60,7 +60,7 @@ class ApiSerializer extends ArraySerializer
      * @param  array $meta
      * @return array
      */
-    public function meta( array $meta )
+    public function meta(array $meta)
     {
         return $meta;
     }
@@ -72,19 +72,19 @@ class ApiSerializer extends ArraySerializer
      *
      * @return array
      */
-    public function paginator( PaginatorInterface $paginator )
+    public function paginator(PaginatorInterface $paginator)
     {
-        $pagination = parent::paginator( $paginator )[ 'pagination' ];
+        $pagination = parent::paginator($paginator)['pagination'];
 
         $data = [
-            'total' => $pagination[ 'total' ],
-            'count' => $pagination[ 'count' ],
-            'perPage' => $pagination[ 'per_page' ],
-            'currentPage' => $pagination[ 'current_page' ],
-            'totalPages' => $pagination[ 'total_pages' ],
+            'total' => $pagination['total'],
+            'count' => $pagination['count'],
+            'perPage' => $pagination['per_page'],
+            'currentPage' => $pagination['current_page'],
+            'totalPages' => $pagination['total_pages'],
         ];
 
-        return [ 'pagination' => $data ];
+        return ['pagination' => $data];
     }
 
     /**
@@ -104,15 +104,15 @@ class ApiSerializer extends ArraySerializer
      * @param  array $includedData
      * @return array
      */
-    public function mergeIncludes( $transformedData, $includedData )
+    public function mergeIncludes($transformedData, $includedData)
     {
-        $keys = array_keys( $includedData );
+        $keys = array_keys($includedData);
 
-        foreach ( $keys as $key ) {
-            $includedData[ $key ] = $includedData[ $key ][ 'data' ];
+        foreach ($keys as $key) {
+            $includedData[$key] = $includedData[$key]['data'];
         }
 
-        return array_merge( $transformedData, $includedData );
+        return array_merge($transformedData, $includedData);
     }
 
     /**
@@ -123,8 +123,8 @@ class ApiSerializer extends ArraySerializer
      *
      * @return array
      */
-    public function includedData( ResourceInterface $resource, array $data )
+    public function includedData(ResourceInterface $resource, array $data)
     {
-        return [ ];
+        return [];
     }
 }

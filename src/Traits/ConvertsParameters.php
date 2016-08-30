@@ -7,7 +7,7 @@ namespace Flugg\Responder\Traits;
  * snake case and boolean strings to PHP booleans when accessing the input from
  * the controller.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -19,9 +19,9 @@ trait ConvertsParameters
      * @param  string $key
      * @return bool
      */
-    public function __isset( $key )
+    public function __isset($key)
     {
-        return parent::__isset( snake_case( $key ) );
+        return parent::__isset(snake_case($key));
     }
 
     /**
@@ -30,9 +30,9 @@ trait ConvertsParameters
      * @param  string $key
      * @return mixed
      */
-    public function __get( $key )
+    public function __get($key)
     {
-        return parent::__get( snake_case( $key ) );
+        return parent::__get(snake_case($key));
     }
 
     /**
@@ -42,7 +42,7 @@ trait ConvertsParameters
      */
     protected function getValidatorInstance()
     {
-        $this->getInputSource()->replace( $this->getConvertedParameters() );
+        $this->getInputSource()->replace($this->getConvertedParameters());
 
         return parent::getValidatorInstance();
     }
@@ -62,11 +62,11 @@ trait ConvertsParameters
     protected function getConvertedParameters():array
     {
         $parameters = $this->all();
-        $parameters = $this->castBooleans( $parameters );
-        $parameters = $this->convertToSnakeCase( $parameters );
+        $parameters = $this->castBooleans($parameters);
+        $parameters = $this->convertToSnakeCase($parameters);
 
-        if ( method_exists( $this, 'convertParameters' ) ) {
-            $parameters = $this->convertParameters( $parameters );
+        if (method_exists($this, 'convertParameters')) {
+            $parameters = $this->convertParameters($parameters);
         }
 
         return $parameters;
@@ -85,40 +85,19 @@ trait ConvertsParameters
      * @param  mixed $input
      * @return array
      */
-    protected function castBooleans( $input ):array
+    protected function castBooleans($input):array
     {
-        if ( $this->castToBooleanIsDisabled() ) {
+        if ($this->castToBooleanIsDisabled()) {
             return;
         }
 
-        $casted = [ ];
+        $casted = [];
 
-        foreach ( $input as $key => $value ) {
-            $casted[ $key ] = $this->castValueToBoolean( $value );
+        foreach ($input as $key => $value) {
+            $casted[$key] = $this->castValueToBoolean($value);
         }
 
         return $casted;
-    }
-
-    /**
-     * Convert a string or array to snake case.
-     *
-     * @param  mixed $input
-     * @return mixed
-     */
-    protected function convertToSnakeCase( $input )
-    {
-        if ( $this->convertToSnakeCaseIsDisabled() ) {
-            return;
-        }
-
-        if ( is_null( $input ) ) {
-            return null;
-        } elseif ( is_array( $input ) ) {
-            return $this->convertArrayToSnakeCase( $input );
-        }
-
-        return snake_case( $input );
     }
 
     /**
@@ -128,7 +107,43 @@ trait ConvertsParameters
      */
     protected function castToBooleanIsDisabled():bool
     {
-        return isset( $this->castBooleans ) && ! $this->castBooleans;
+        return isset($this->castBooleans) && ! $this->castBooleans;
+    }
+
+    /**
+     * Cast a given value to a boolean if it is in fact a boolean.
+     *
+     * @param  mixed $value
+     * @return mixed
+     */
+    protected function castValueToBoolean($value)
+    {
+        if (in_array($value, ['true', 'false'])) {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Convert a string or array to snake case.
+     *
+     * @param  mixed $input
+     * @return mixed
+     */
+    protected function convertToSnakeCase($input)
+    {
+        if ($this->convertToSnakeCaseIsDisabled()) {
+            return;
+        }
+
+        if (is_null($input)) {
+            return null;
+        } elseif (is_array($input)) {
+            return $this->convertArrayToSnakeCase($input);
+        }
+
+        return snake_case($input);
     }
 
     /**
@@ -138,22 +153,7 @@ trait ConvertsParameters
      */
     protected function convertToSnakeCaseIsDisabled():bool
     {
-        return isset( $this->convertToSnakeCase ) && ! $this->convertToSnakeCase;
-    }
-
-    /**
-     * Cast a given value to a boolean if it is in fact a boolean.
-     *
-     * @param  mixed $value
-     * @return mixed
-     */
-    protected function castValueToBoolean( $value )
-    {
-        if ( in_array( $value, [ 'true', 'false' ] ) ) {
-            return filter_var( $value, FILTER_VALIDATE_BOOLEAN );
-        }
-
-        return $value;
+        return isset($this->convertToSnakeCase) && ! $this->convertToSnakeCase;
     }
 
     /**
@@ -162,12 +162,12 @@ trait ConvertsParameters
      * @param  array $input
      * @return array
      */
-    protected function convertArrayToSnakeCase( array $input ):array
+    protected function convertArrayToSnakeCase(array $input):array
     {
-        $converted = [ ];
+        $converted = [];
 
-        foreach ( $input as $key => $value ) {
-            $converted[ snake_case( $key ) ] = $value;
+        foreach ($input as $key => $value) {
+            $converted[snake_case($key)] = $value;
         }
 
         return $converted;

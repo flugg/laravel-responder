@@ -4,18 +4,19 @@ namespace Flugg\Responder;
 
 use Flugg\Responder\Console\MakeTransformer;
 use Flugg\Responder\Contracts\Manager as ManagerContract;
-use Flugg\Responder\Contracts\Responder as ResponderContract;
-use Flugg\Responder\Factories\ErrorResponseFactory;
-use Flugg\Responder\Factories\SuccessResponseFactory;
+use Flugg\Responder\Http\ErrorResponseBuilder;
+use Flugg\Responder\Http\SuccessResponseBuilder;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Laravel\Lumen\Application as Lumen;
 use League\Fractal\Manager;
+use League\Fractal\Serializer\SerializerAbstract;
 
 /**
  * The Laravel Responder service provider. This is where the package is bootstrapped.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -42,18 +43,18 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
-        if ( $this->app instanceof Laravel && $this->app->runningInConsole() ) {
+        if ($this->app instanceof Laravel && $this->app->runningInConsole()) {
             $this->bootLaravelApplication();
 
-        } elseif ( $this->app instanceof Lumen ) {
+        } elseif ($this->app instanceof Lumen) {
             $this->bootLumenApplication();
         }
 
-        $this->mergeConfigFrom( __DIR__ . '/../resources/config/responder.php', 'responder' );
+        $this->mergeConfigFrom(__DIR__ . '/../resources/config/responder.php', 'responder');
 
-        $this->commands( [
+        $this->commands([
             MakeTransformer::class
-        ] );
+        ]);
 
         include __DIR__ . '/helpers.php';
     }
@@ -65,14 +66,37 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $this->config = $this->app[ 'config' ];
+        $this->app->bind(SerializerAbstract::class, function ($app) {
+            $serializer = $app->config->get('responder.serializer');
 
-        $this->registerResponseFactories();
-        $this->registerFractalManager();
-        $this->registerResponder();
+            return new $serializer;
+        });
 
-        $this->app->alias( 'responder', ResponderContract::class );
-        $this->app->alias( 'responder.manager', ManagerContract::class );
+        $this->app->bind(Manager::class, function ($app) {
+            return (new Manager())->setSerializer($app[SerializerAbstract::class]);
+        });
+
+        $this->app->bind(ResourceFactory::class, function () {
+            return new ResourceFactory();
+        });
+
+        $this->app->bind(SuccessResponseBuilder::class, function ($app) {
+            $builder = new SuccessResponseBuilder($app[ResponseFactory::class], $app[ResourceFactory::class], $app[Manager::class]);
+
+            return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
+        });
+
+        $this->app->bind(ErrorResponseBuilder::class, function ($app) {
+            $builder = new ErrorResponseBuilder($app[ResponseFactory::class], $app['translator']);
+
+            return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
+        });
+
+        $this->app->bind(Responder::class, function ($app) {
+            return new Responder($app[SuccessResponseBuilder::class], $app[ErrorResponseBuilder::class]);
+        });
+
+        $this->registerAliases();
     }
 
     /**
@@ -82,7 +106,21 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     public function provides()
     {
-        return [ 'responder', 'responder.success', 'responder.error', 'responder.manager' ];
+        return ['responder', 'responder.success', 'responder.error', 'responder.manager', 'responder.serializer'];
+    }
+
+    /**
+     * Set aliases for the provided services.
+     *
+     * @return array
+     */
+    protected function registerAliases()
+    {
+        $this->app->alias(Responder::class, 'responder');
+        $this->app->alias(SuccessResponseBuilder::class, 'responder.success');
+        $this->app->alias(ErrorResponseBuilder::class, 'responder.error');
+        $this->app->alias(Manager::class, 'responder.manager');
+        $this->app->alias(Manager::class, 'responder.serializer');
     }
 
     /**
@@ -92,13 +130,13 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function bootLaravelApplication()
     {
-        $this->publishes( [
-            __DIR__ . '/../resources/config/responder.php' => config_path( 'responder.php' )
-        ], 'config' );
+        $this->publishes([
+            __DIR__ . '/../resources/config/responder.php' => config_path('responder.php')
+        ], 'config');
 
-        $this->publishes( [
-            __DIR__ . '/../resources/lang/en/errors.php' => resource_path( 'lang/en/errors.php' )
-        ], 'lang' );
+        $this->publishes([
+            __DIR__ . '/../resources/lang/en/errors.php' => resource_path('lang/en/errors.php')
+        ], 'lang');
     }
 
     /**
@@ -108,48 +146,6 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function bootLumenApplication()
     {
-        $this->app->configure( 'responder' );
-    }
-
-    /**
-     * Register the success and error response factory providers.
-     *
-     * @return void
-     */
-    protected function registerResponseFactories()
-    {
-        $this->app->singleton( 'responder.success', function () {
-            return new SuccessResponseFactory( $this->config->get( 'responder.status_code' ) );
-        } );
-
-        $this->app->singleton( 'responder.error', function () {
-            return new ErrorResponseFactory( $this->config->get( 'responder.status_code' ) );
-        } );
-    }
-
-    /**
-     * Register the fractal manager provider.
-     *
-     * @return void
-     */
-    protected function registerFractalManager()
-    {
-        $this->app->singleton( 'responder.manager', function () {
-            $serializer = $this->config->get( 'responder.serializer' );
-
-            return ( new Manager() )->setSerializer( new $serializer );
-        } );
-    }
-
-    /**
-     * Register the responder service provider.
-     *
-     * @return void
-     */
-    protected function registerResponder()
-    {
-        $this->app->singleton( 'responder', function ( $app ) {
-            return ( new Responder( $app[ 'responder.success' ], $app[ 'responder.error' ] ) );
-        } );
+        $this->app->configure('responder');
     }
 }

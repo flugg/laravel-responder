@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder\Tests;
 
-use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Facades\Responder as ResponderFacade;
 use Flugg\Responder\Responder;
 
@@ -10,7 +9,7 @@ use Flugg\Responder\Responder;
  * This file is a collection of tests, testing that you can access the responder service
  * in multiple ways.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -24,10 +23,10 @@ class AccessResponderTest extends TestCase
     public function youCanResolveFromServiceContainer()
     {
         // Arrange...
-        $responder = app( ResponderContract::class );
+        $responder = app(Responder::class);
 
         // Assert...
-        $this->assertInstanceOf( Responder::class, $responder );
+        $this->assertInstanceOf(Responder::class, $responder);
     }
 
     /**
@@ -38,14 +37,14 @@ class AccessResponderTest extends TestCase
     public function youCanAccessThroughFacade()
     {
         // Arrange...
-        $fruit = $this->createTestModel();
+        $fruit = $this->createModel();
         $responder = $this->mockResponder();
 
-        // Assert...
-        $responder->shouldReceive( 'success' )->with( $fruit, 200 )->once();
-
         // Act...
-        ResponderFacade::success( $fruit, 200 );
+        ResponderFacade::success($fruit, 200);
+
+        // Assert...
+        $responder->shouldHaveReceived('success')->with($fruit, 200);
     }
 
     /**
@@ -59,7 +58,7 @@ class AccessResponderTest extends TestCase
         $responder = responder();
 
         // Assert...
-        $this->assertInstanceOf( Responder::class, $responder );
+        $this->assertInstanceOf(Responder::class, $responder);
     }
 
     /**
@@ -70,14 +69,14 @@ class AccessResponderTest extends TestCase
     public function youCanAccessThroughControllerTrait()
     {
         // Arrange...
-        $fruit = $this->createTestModel();
+        $fruit = $this->createModel();
         $controller = $this->createTestController();
         $responder = $this->mockResponder();
 
-        // Assert...
-        $responder->shouldReceive( 'success' )->with( $fruit, 200, [ ] )->once();
-
         // Act...
-        ( new $controller )->successAction( $fruit );
+        (new $controller)->successAction($fruit);
+
+        // Assert...
+        $responder->shouldHaveReceived('success')->with($fruit, null, []);
     }
 }

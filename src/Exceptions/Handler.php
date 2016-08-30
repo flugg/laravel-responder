@@ -17,14 +17,14 @@ class Handler extends ExceptionHandler
      * @param  Exception                $e
      * @return \Illuminate\Http\Response
      */
-    public function render( $request, Exception $e )
+    public function render($request, Exception $e)
     {
-        $this->transformExceptions( $e );
+        $this->transformException($e);
 
-        if ( $e instanceof ApiException ) {
-            return $this->renderApiErrors( $e );
+        if ($e instanceof ApiException) {
+            return $this->renderApiError($e);
         }
 
-        return parent::render( $request, $e );
+        return parent::render($request, $e);
     }
 }

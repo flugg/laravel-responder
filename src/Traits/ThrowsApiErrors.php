@@ -12,7 +12,7 @@ use Illuminate\Contracts\Validation\Validator;
  * validation or authorization fails. This allows the package to render proper
  * API responses through the HandlesApiErrors trait.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -25,9 +25,9 @@ trait ThrowsApiErrors
      * @return void
      * @throws ValidationFailedException
      */
-    protected function failedValidation( Validator $validator )
+    protected function failedValidation(Validator $validator)
     {
-        throw new ValidationFailedException( $validator );
+        throw new ValidationFailedException($validator);
     }
 
     /**

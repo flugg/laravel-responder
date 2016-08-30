@@ -1,14 +1,15 @@
 <?php
 
-namespace Flugg\Responder\Exceptions;
+namespace Flugg\Responder\Exceptions\Http;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * An abstract base exception used for any API related exception. You may extend this
- * class in your exceptions to get automatic conversion to JSON error responses.
+ * An abstract base exception used for any API related exceptions. All exceptions thrown
+ * that extends this class will automatically be converted to JSON responses if using
+ * the \Flugg\Responder\Traits\HandlesApiErrors trait in your exception handler.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -22,7 +23,7 @@ abstract class ApiException extends HttpException
     protected $statusCode = 500;
 
     /**
-     * The error code used for API responses.
+     * The error code.
      *
      * @var string
      */
@@ -33,9 +34,9 @@ abstract class ApiException extends HttpException
      *
      * @param mixed $message
      */
-    public function __construct( $message = null )
+    public function __construct($message = null)
     {
-        parent::__construct( $this->statusCode, $message );
+        parent::__construct($this->statusCode, $message);
     }
 
     /**
@@ -56,5 +57,15 @@ abstract class ApiException extends HttpException
     public function getErrorCode()
     {
         return $this->errorCode;
+    }
+
+    /**
+     * Get the error data.
+     *
+     * @return array|null
+     */
+    public function getData()
+    {
+        return null;
     }
 }

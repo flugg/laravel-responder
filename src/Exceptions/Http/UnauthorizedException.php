@@ -1,11 +1,11 @@
 <?php
 
-namespace Flugg\Responder\Exceptions;
+namespace Flugg\Responder\Exceptions\Http;
 
 /**
- * An exception which replaces Laravel's own UnauthorizedException.
+ * An exception replacing Laravel's \Illuminate\Auth\Access\AuthorizationException.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */

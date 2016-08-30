@@ -3,12 +3,11 @@
 namespace Flugg\Responder\Tests;
 
 use Illuminate\Http\JsonResponse;
-use InvalidArgumentException;
 
 /**
  * This file is a collection of tests, testing that you can generate success responses.
  *
- * @package Laravel Responder
+ * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -22,23 +21,22 @@ class MakeSuccessResponseTest extends TestCase
     public function youCanMakeSuccessResponses()
     {
         // Arrange...
-        $fruit = $this->createTestModel();
+        $fruit = $this->createModel();
 
         // Act...
-        $response = $this->responder->success( $fruit );
+        $response = $this->responder->success($fruit);
 
         // Assert...
-        $this->assertInstanceOf( JsonResponse::class, $response );
-        $this->assertEquals( $response->getStatusCode(), 200 );
-        $this->assertEquals( $response->getData( true ), [
-            'status' => 200,
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals($response->getStatusCode(), 200);
+        $this->assertEquals($response->getData(true), [
             'success' => true,
             'data' => [
                 'name' => 'Mango',
                 'price' => 10,
                 'isRotten' => false
             ]
-        ] );
+        ]);
     }
 
     /**
@@ -49,13 +47,13 @@ class MakeSuccessResponseTest extends TestCase
     public function youCanPassInStatusCode()
     {
         // Arrange...
-        $fruit = $this->createTestModel();
+        $fruit = $this->createModel();
 
         // Act...
-        $response = $this->responder->success( $fruit, 201 );
+        $response = $this->responder->success($fruit, 201);
 
         // Assert...
-        $this->assertEquals( $response->getStatusCode(), 201 );
+        $this->assertEquals($response->getStatusCode(), 201);
     }
 
     /**
@@ -66,17 +64,17 @@ class MakeSuccessResponseTest extends TestCase
     public function youCanPassInMetaData()
     {
         // Arrange...
-        $fruit = $this->createTestModel();
+        $fruit = $this->createModel();
         $meta = [
             'foo' => 'bar'
         ];
 
         // Act...
-        $response = $this->responder->success( $fruit, 200, $meta );
+        $response = $this->responder->success($fruit, 200, $meta);
 
         // Assert...
-        $this->assertEquals( $response->getStatusCode(), 200 );
-        $this->assertContains( $meta, $response->getData( true ) );
+        $this->assertEquals($response->getStatusCode(), 200);
+        $this->assertContains($meta, $response->getData(true));
     }
 
     /**
@@ -92,11 +90,11 @@ class MakeSuccessResponseTest extends TestCase
         ];
 
         // Act...
-        $response = $this->responder->success( 200, $meta );
+        $response = $this->responder->success(200, $meta);
 
         // Assert...
-        $this->assertEquals( $response->getStatusCode(), 200 );
-        $this->assertContains( $meta, $response->getData( true ) );
+        $this->assertEquals($response->getStatusCode(), 200);
+        $this->assertContains($meta, $response->getData(true));
     }
 
     /**
@@ -107,17 +105,17 @@ class MakeSuccessResponseTest extends TestCase
     public function youCanOmitStatusCode()
     {
         // Arrange...
-        $fruit = $this->createTestModel();
+        $fruit = $this->createModel();
         $meta = [
             'foo' => 'bar'
         ];
 
         // Act...
-        $response = $this->responder->success( $fruit, $meta );
+        $response = $this->responder->success($fruit, $meta);
 
         // Assert...
-        $this->assertEquals( $response->getStatusCode(), 200 );
-        $this->assertContains( $meta, $response->getData( true ) );
+        $this->assertEquals($response->getStatusCode(), 200);
+        $this->assertContains($meta, $response->getData(true));
     }
 
     /**
@@ -128,20 +126,19 @@ class MakeSuccessResponseTest extends TestCase
     public function youCanUseACollectionAsData()
     {
         // Arrange...
-        $mango = $this->createTestModel();
-        $apple = $this->createTestModel( [
+        $mango = $this->createModel();
+        $apple = $this->createModel([
             'name' => 'Apple',
             'price' => 5
-        ] );
+        ]);
 
-        $fruits = collect( [ $mango, $apple ] );
+        $fruits = collect([$mango, $apple]);
 
         // Act...
-        $response = $this->responder->success( $fruits );
+        $response = $this->responder->success($fruits);
 
         // Assert...
-        $this->assertEquals( $response->getData( true ), [
-            'status' => 200,
+        $this->assertEquals($response->getData(true), [
             'success' => true,
             'data' => [
                 [
@@ -155,7 +152,7 @@ class MakeSuccessResponseTest extends TestCase
                     'isRotten' => false
                 ]
             ]
-        ] );
+        ]);
     }
 
     /**
@@ -166,14 +163,13 @@ class MakeSuccessResponseTest extends TestCase
     public function youCanUseABuilderAsData()
     {
         // Arrange...
-        $fruit = $this->createTestModel()->newQuery();
+        $fruit = $this->createModel()->newQuery();
 
         // Act...
-        $response = $this->responder->success( $fruit );
+        $response = $this->responder->success($fruit);
 
         // Assert...
-        $this->assertEquals( $response->getData( true ), [
-            'status' => 200,
+        $this->assertEquals($response->getData(true), [
             'success' => true,
             'data' => [
                 [
@@ -182,7 +178,7 @@ class MakeSuccessResponseTest extends TestCase
                     'isRotten' => false
                 ]
             ]
-        ] );
+        ]);
     }
 
     /**
@@ -193,14 +189,13 @@ class MakeSuccessResponseTest extends TestCase
     public function youCanUseAPaginatorAsData()
     {
         // Arrange...
-        $fruit = $this->createTestModel()->newQuery()->paginate( 1 );
+        $fruit = $this->createModel()->newQuery()->paginate(1);
 
         // Act...
-        $response = $this->responder->success( $fruit );
+        $response = $this->responder->success($fruit);
 
         // Assert...
-        $this->assertEquals( $response->getData( true ), [
-            'status' => 200,
+        $this->assertEquals($response->getData(true), [
             'success' => true,
             'data' => [
                 [
@@ -216,7 +211,7 @@ class MakeSuccessResponseTest extends TestCase
                 'currentPage' => 1,
                 'totalPages' => 1
             ]
-        ] );
+        ]);
     }
 
     /**
@@ -227,51 +222,12 @@ class MakeSuccessResponseTest extends TestCase
     public function youCanUseNullAsData()
     {
         // Act...
-        $response = $this->responder->success( null );
+        $response = $this->responder->success(null);
 
         // Assert...
-        $this->assertEquals( $response->getData( true ), [
-            'status' => 200,
+        $this->assertEquals($response->getData(true), [
             'success' => true,
             'data' => null
-        ] );
-    }
-
-    /**
-     * Test that you may only pass in models that implement the transformable contract.
-     *
-     * @test
-     */
-    public function youCanOnlyUseTransformableModels()
-    {
-        // Arrange...
-        $fruit = $this->createTestModelWithNoTransformer();
-
-        // Expect...
-        $this->expectException( InvalidArgumentException::class );
-
-        // Act...
-        $this->responder->success( $fruit );
-    }
-
-    /**
-     * Test that you may use no transformer by returning null in the transformer method.
-     *
-     * @test
-     */
-    public function youCanUseModelsWithANullTransformer()
-    {
-        // Arrange...
-        $fruit = $this->createTestModelWithNullTransformer();
-
-        // Act...
-        $response = $this->responder->success( $fruit );
-
-        // Assert...
-        $this->assertEquals( $response->getData( true ), [
-            'status' => 200,
-            'success' => true,
-            'data' => $fruit->toArray()
-        ] );
+        ]);
     }
 }
