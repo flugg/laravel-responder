@@ -30,7 +30,7 @@ class SuccessResponseBuilder extends ResponseBuilder
     /**
      * The manager responsible for transforming and serializing data.
      *
-     * @var \Flugg\Responder\Contracts\Manager
+     * @var \League\Fractal\Manager
      */
     protected $manager;
 

@@ -101,7 +101,7 @@ trait MakesApiRequests
     /**
      * Decodes JSON response and returns the data.
      *
-     * @param  string|array $attributes
+     * @param  string|array|null $attributes
      * @return array
      */
     protected function getSuccessData($attributes = null)

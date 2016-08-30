@@ -19,14 +19,14 @@ trait RespondsWithJson
     /**
      * Generate an error JSON response.
      *
-     * @param  string $error
-     * @param  int    $statusCode
-     * @param  mixed  $message
+     * @param  string|null $errorCode
+     * @param  int|null    $statusCode
+     * @param  mixed       $message
      * @return JsonResponse
      */
-    public function errorResponse(string $error = null, int $statusCode = null, $message = null):JsonResponse
+    public function errorResponse(string $errorCode = null, int $statusCode = null, $message = null):JsonResponse
     {
-        return app(Responder::class)->error($error, $statusCode, $message);
+        return app(Responder::class)->error($errorCode, $statusCode, $message);
     }
 
     /**
