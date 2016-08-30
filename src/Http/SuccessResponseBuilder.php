@@ -257,7 +257,7 @@ class SuccessResponseBuilder extends ResponseBuilder
             };
         }
 
-        return $model::ransformer();
+        return $model::transformer();
     }
 
     /**
