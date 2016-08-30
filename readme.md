@@ -483,7 +483,7 @@ The above example would look like the following using `League\Fractal\Serializer
 ```json
 {
     "id": 1,
-    "email": "example@email.com"
+    "email": "example@email.com",
     "role": {
         "name": "admin"
     }
@@ -498,7 +498,7 @@ You can also add the `data` field using `League\Fractal\Serializers\DataArraySer
 {
     "data": {
         "id": 1,
-        "email": "example@email.com"
+        "email": "example@email.com",
         "role": {
             "data": {
                 "name": "admin"
