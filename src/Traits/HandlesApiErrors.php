@@ -28,7 +28,7 @@ trait HandlesApiErrors
     /**
      * Transform Laravel exceptions into API exceptions.
      *
-     * @param  Exception $e
+     * @param  Exception $exception
      * @return void
      * @throws UnauthenticatedException
      * @throws UnauthorizedException
@@ -36,40 +36,40 @@ trait HandlesApiErrors
      * @throws RelationNotFoundException
      * @throws ValidationFailedException
      */
-    protected function transformException(Exception $e)
+    protected function transformException(Exception $exception)
     {
-        if ($e instanceof AuthenticationException) {
+        if ($exception instanceof AuthenticationException) {
             throw new UnauthenticatedException();
         }
 
-        if ($e instanceof AuthorizationException) {
+        if ($exception instanceof AuthorizationException) {
             throw new UnauthorizedException();
         }
 
-        if ($e instanceof ModelNotFoundException) {
+        if ($exception instanceof ModelNotFoundException) {
             throw new ResourceNotFoundException();
         }
 
-        if ($e instanceof RelationNotFoundException) {
+        if ($exception instanceof RelationNotFoundException) {
             throw new RelationNotFoundException();
         }
 
-        if ($e instanceof ValidationException) {
-            throw new ValidationFailedException($e->validator);
+        if ($exception instanceof ValidationException) {
+            throw new ValidationFailedException($exception->validator);
         }
     }
 
     /**
      * Renders any API exception into a JSON error response.
      *
-     * @param  ApiException $e
+     * @param  ApiException $exception
      * @return JsonResponse
      */
-    protected function renderApiError(ApiException $e):JsonResponse
+    protected function renderApiError(ApiException $exception):JsonResponse
     {
         return app('responder.error')
-            ->setError($e->getErrorCode(), $e->getMessage())
-            ->addData($e->getData())
-            ->respond($e->getStatusCode());
+            ->setError($exception->getErrorCode(), $exception->getMessage())
+            ->addData($exception->getData())
+            ->respond($exception->getStatusCode());
     }
 }

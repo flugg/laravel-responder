@@ -6,12 +6,14 @@
 [![Build Status](https://img.shields.io/travis/flugger/laravel-responder/master.svg?style=flat-square)](https://travis-ci.org/flugger/laravel-responder)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/flugger/laravel-responder.svg?style=flat-square)](https://scrutinizer-ci.com/g/flugger/laravel-responder/?branch=master)
 
-Laravel Responder is a package that integrates [Fractal](https://github.com/thephpleague/fractal) into Laravel. It will automatically transform your Eloquent models and serialize your API responses using a simple and elegant syntax. You can use it to send both success- and error responses, and it gives you tools to handle exceptions and integration test your responses.
+![Laravel Responder](http://goo.gl/HvmX4j)
+
+Laravel Responder is a package for your JSON APIs, integrating [Fractal](http://fractal.thephpleague.com) into Laravel and Lumen. It can [transform](http://fractal.thephpleague.com/transformers) your Eloquent models and [serialize](http://fractal.thephpleague.com/serializers) your success responses, but it can also help you build error responses, handle exceptions and integration test your API.
 
 ## Table of Contents
 
-- [Requirements](#requirements)
 - [Philosophy](#philosophy)
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
     - [Accessing the Responder](#accessing-the-responder)
@@ -25,43 +27,43 @@ Laravel Responder is a package that integrates [Fractal](https://github.com/thep
 - [Contributing](#contributing)
 - [License](#license)
 
-## Requirements
-
-This package requires:
-- PHP __7.0__+
-- Laravel __5.1__+ or Lumen __5.1__+
-
 ## Philosophy
 
-When you want to create a powerful API, you want to make sure all your end-points are consistent and easy to consume. [Laravel](https://laravel.com) is an excellent framework to build your API, however, it's slightly limited when it comes to API building tools. [Fractal](https://github.com/thephpleague/fractal) has some great tools for building powerful APIs. Among other things, a transformation layer to make sure you expose the right data, and serializers which structures your responses in a consistent manner.
+When building powerful APIs, you want to make sure your endpoints are consistent and easy to consume by your application. Laravel is a great fit for your API, however, it lacks support for common tools like transformers and serializers. Fractal, on the other hand, has some great tools for building APIs and fills in the gaps of Laravel. 
 
-While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Here is an example response using Fractal in a Laravel controller:
+While Fractal solves many of the shortcomings of Laravel, it's often a bit cumbersome to integrate into the framework. Take this example from a controller:
 
 ```php
  public function index()
  {
     $users = User::all();
-    $fractal = new Manager();
-    $resource = new Collection( $users, new UserTransformer() );
+    $manager = new Manager();
+    $resource = new Collection($users, new UserTransformer(), 'users');
 
-    return response()->json( $fractal->createData( $resource )->toArray() );
+    return response()->json($manager->createData($resource)->toArray());
  }
 ```
 
-I admit, the Fractal manager could be moved outside the controller. You could also return the array directly, however, as soon as you want to return a different status code than `200`, you probably want to use `response()->json()` anyway.
+I admit, the Fractal manager could be moved outside the controller and you could return the array directly. However, as soon as you want a different status code than the default `200`, you probably need to use `response()->json()` anyway.
 
-The point is, we all get a little spoiled by Laravel's magic. Wouldn't it be sweet if the above could be rewritten as:
+The point is, we all get a little spoiled by Laravel's magic. Wouldn't it be sweet if the above could be written as following:
 
 ```php
 public function index()
 {
     $users = User::all();
 
-    return $this->successResponse( $users );
+    return responder()->success($users);
 }
 ```
 
-By calling on Fractal behind the scenes, the package will automatically transform your models and related models. It will also serialize the data with a serializer of your choice and wrap the data in an `Illuminate\Http\JsonResponse` instance. No longer will you have to call on different Fractal methods depending on if you're dealing with a model or a collection, the package deals with all of it automatically under the hood.
+The package will call on Fractal behind the scenes to automatically transform and serialize the data. No longer will you have to instantiate different Fractal resources depending on if it's a model or a collection, the package deals with all of it automatically under the hood.
+
+## Requirements
+
+This package requires:
+- PHP __7.0__+
+- Laravel __5.1__+ or Lumen __5.1__+
 
 ## Installation
 
@@ -83,7 +85,7 @@ Flugg\Responder\ResponderServiceProvider::class
 
 #### Registering the Facade
 
-If you like facades you may also append the `Responder` facade to the `aliases` key:
+If you like facades, you may also append the `Responder` facade to the `aliases` key:
 
 ```php
 'Responder' => Flugg\Responder\Facades\Responder::class
@@ -91,7 +93,7 @@ If you like facades you may also append the `Responder` facade to the `aliases` 
 
 #### Publishing Package Assets
 
-You also need to publish the package configuration and language file using the Artisan command:
+You may also publish the package configuration and language file using the Artisan command:
 
 ```shell
 php artisan vendor:publish
@@ -116,11 +118,11 @@ $app->register(Flugg\Responder\ResponderServiceProvider::class);
 You may also register the facade by adding the following line to `app/bootstrap.php`:
 
 ```php
-class_alias( Flugg\Responder\Facades\Responder::class, 'Responder' );
+class_alias(Flugg\Responder\Facades\Responder::class, 'Responder');
 ````
 
 ***
-_Remember to uncomment the `$app->withFacades();` line as well for facades to work in Lumen._
+_Remember to uncomment `$app->withFacades();` to enable facades in Lumen._
 ***
 
 #### Publishing Package Assets
@@ -129,29 +131,29 @@ There is no `php artisan vendor:publish` in Lumen, you will therefore have to cr
 
 ## Usage
 
-The package has a `Flugg\Responder\Responder` service class which is responsible for generating success- and error JSON responses for your API. The service has a `success()` and `error()` method which returns an instance of `Illuminate\Http\JsonResponse`.
+The package has a `Flugg\Responder\Responder` service which is responsible for building success- and error responses for your JSON API. The class has a `success()` and `error()` method which both returns an instance of `Illuminate\Http\JsonResponse`.
 
 ### Accessing the Responder
 
-To begin creating API responses, you need to access the responder service. In good Laravel spirit you have multiple ways of doing the same thing.
+Before you can start making JSON responses, you need to access the responder service. In good Laravel spirit you have multiple ways of doing the same thing:
 
 #### Option 1: Dependency Injection
 
-You may inject the service directly into your controller to create success responses:
+You may inject the responder service directly into your controller to create success responses:
 
 ```php
-public function index( Responder $responder )
+public function index(Responder $responder)
 {
     $users = User::all();
     
-    return $responder->success( $users );
+    return $responder->success($users);
 }
 ```
 
 You may also create error responses:
 
 ```php
-return $responder->error( 'invalid_user' );
+return $responder->error('invalid_user');
 ```
 
 #### Option 2: Facade
@@ -159,10 +161,10 @@ return $responder->error( 'invalid_user' );
 Optionally, you may use the `Responder` facade to create responses:
 
 ```php
-return Responder::success( $users );
+return Responder::success($users);
 ```
 ```php
-return Responder::error( 'invalid_user' );
+return Responder::error('invalid_user');
 ```
 
 #### Option 3: Helper Method
@@ -170,10 +172,10 @@ return Responder::error( 'invalid_user' );
 Additionally, you can use the `responder()` helper method if you're fan of Laravel's `response()` helper method:
 
 ```php
-return responder()->success( $users );
+return responder()->success($users);
 ```
 ```php
-return responder()->error( 'invalid_user' );
+return responder()->error('invalid_user');
 ```
 
 Both the helper method and the facade are just different ways of accessing the responder service, so you have access to the same methods.
@@ -185,108 +187,126 @@ Lastly, the package also has a `Flugg\Responder\Traits\RespondsWithJson` trait y
 The trait gives you access to `successResponse()` and `errorResponse()` methods in your controllers: 
 
 ```php
-return $this->successResponse( $users );
+return $this->successResponse($users);
 ```
 ```php
-return $this->errorResponse( 'invalid_user' );
+return $this->errorResponse('invalid_user');
 ```
 
-These methods call on the service behind the scene.
+These methods call on the responder service behind the scene.
 
 ***
-_As described above, you may generate responses in multiple ways. Which way you choose is up to you, the important thing is to stay consistent. We will use the facade for the remaining of the documentation for simplicity's sake._
+_As described above, you may build your responses in multiple ways. Which way you choose is up to you, the important thing is to stay consistent. We will use the facade for the remaining of the documentation for simplicity's sake._
 ***
 
 ### Success Responses
 
-When a user makes a valid request to your API you probably want to provide an informative response in return to let the user know the request succeeded. You may use the `success()` method for this:
+The responder service has a `success()` method you can use to quickly generate a successful JSON response:
 
 ```php
 public function index()
 {
-    $users = User::all();
-    
-    return Responder::success( $users );
+    return Responder::success(User::all());
 }
 ```
 
-The first argument is the data you want to transform, and should be an Eloquent model or a collection of Eloquent models. It can also be a paginator, we will get to that soon.
+This method returns an instance of `\Illuminate\Http\JsonResponse` and will transform and serialize the data. The first argument is the transformation data.
+
+#### Setting Transformation Data
+
+The transformation data will be transformed if a transformer is set, and must be one of the following types:
+
+##### Eloquent Model
+
+You may pass in a model as the transformation data:
+
+```php
+return Responder::success(User::first());
+```
+
+##### Collection
+
+You may also pass in a collection of models:
+
+```php
+return Responder::success(User::all());
+```
+
+##### Array
+
+You may also pass in an array of models:
+
+```php
+return Responder::success([User::find(1), User::find(2)]);
+```
 
 ***
-_If you try to run the above code you will get an exception saying the given model is not transformable. This is because all models you pass into the `success()` method must implement the `Flugg\Responder\Contracts\Transformable` contract and have a corresponding transformer. More on this in the [Transformers](#transformers) section._
+_The array must contain actual model instances, meaning you cannot use `User::all()->toArray()` as transformation data._
 ***
+
+##### Query Builder
+
+Instead of turning it into a collection, you may pass in a query builder directly:
+
+```php
+return Responder::success(User::where('id', 1));
+```
+
+##### Paginator
+
+Additionally, you may limit the amount of items by passing in a paginator:
+
+```php
+return Responder::success(User::paginate(5));
+```
+
+The package will then automatically add info pagination data to the response, depending on which [serializer](#serializes) you use.
+
+##### Relation
+
+You can also pass in an Eloquent relationship instance:
+
+```php
+return Responder::success(User::first()->roles());
+```
+
+#### Including Relations
+
+When using Fractal, you include relations using the `parseIncludes()` method on the manager, and add the available relations to the `$availableIncludes` array in your transformer.
+
+With Laravel Responder you don't have to do any of these things. It integrates neatly with Eloquent and automatically parses loaded relations from the model:
+
+```php
+return Responder::success(User::with('roles.permissions')->all());
+```
 
 #### Setting Status Codes
 
-The status code is `200` by default, but can easily be changed by adding an optional second argument to the `success()` method:
+The status code is set to `200` by default, but can easily be changed by adding a second argument to the `success()` method:
 
 ```php
-return Responder::success( $user, 201 );
+return Responder::success(User::all(), 201);
 ```
 
-Sometimes you may not want to return anything, but still notify the user that the request was successful. In that case you may pass in the status code as the first argument and omit the data parameter:
+Sometimes you may not want to return anything. In that case you may either pass in null as the first argument or skip it entirely:
 
 ```php
-return Responder::success( 201 );
+return Responder::success(201);
 ```
 
 #### Adding Meta Data
 
-You may want to pass in additional data to the response, you may do so by adding an additional third argument:
+You may want to pass in additional meta data to the response, you can do so by adding an additional third argument:
 
 ```php
-return Responder::success( $user, 200, [ 'foo' => 'bar' ] );
+return Responder::success(User::all(), 200, ['foo' => 'bar']);
 ```
 
 You may also omit the status code if you want to send a default `200` response:
 
 ```php
-return Responder::success( $user, [ 'foo' => 'bar' ] );
+return Responder::success($user, ['foo' => 'bar']);
 ```
-
-You may even omit the data parameter if you pass in a status code as the first argument:
-
-```php
-return Responder::success( 200, [ 'foo' => 'bar' ] );
-```
-
-#### Relationships
-
-Using Fractal, you can include relationships to your responses using the `parseIncludes()` method on the manager instance, and add the available relationship as an `$availableIncludes` array in your transformers.
-
-With Laravel Responder you don't have to do any of these things. It integrates neatly with Eloquent and automatically parses relationships:
-
-```php
-public function index()
-{
-    $users = User::with( 'profile', 'roles.permissions' )->all();
-    
-    return Responder::success( $users );
-}
-```
-
-***
-_If you're including a many to many relationship, you will have a pivot field with additional data. To learn how to transform the pivot data to expose it to your API, you can read the [Transforming Pivots](#transforming-pivots) section._
-***
-
-#### Pagination
-
-Adding pagination to your responses is equally easy. You can simply use Laravel's `paginate()` method on the query builder:
-
-```php
-public function index()
-{
-    $users = User::paginate( 15 );
-    
-    return Responder::success( $users );
-}
-```
-
-The package will then automatically add info about the paginated results in the response data, depending on which [serializer](#serializes) you use.
-
-#### Cursors
-
-__TODO__
 
 ### Transformers
 
@@ -310,7 +330,7 @@ class UserTransformer extends Transformer
      * @param  User $user
      * @return array
      */
-    public function transform( User $user )
+    public function transform(User $user)
     {
         return [
             'id'       => (int) $user->id,
@@ -348,7 +368,7 @@ class UserTransformer extends Transformer
      * @param  User $user
      * @return array
      */
-    public function transform( User $user )
+    public function transform(User $user)
     {
         return [
             'id' => (int) $user->id
@@ -361,7 +381,7 @@ class UserTransformer extends Transformer
      * @param  Pivot $pivot
      * @return array
      */
-    public function transformPivot( Pivot $pivot ):array
+    public function transformPivot(Pivot $pivot):array
     {
         return [
             'user_id' => $pivot->user_id,
@@ -376,17 +396,17 @@ In the example above, we assume we have a many to many relationship between a `U
 Continuing on the example and using the response below, it will automatically look for a `transformPivot()` method in your `UserTransformer`:
 
 ````php
-$role = Role::with( 'users' )->find( 1 );
+$role = Role::with('users')->find(1);
 
-return Responder::success( $role );
+return Responder::success($role);
 ```
 
 However, if you do the inverse, you will have to place the `transformPivot()` method in your `RoleTransformer`:
 
 ````php
-$user = User::with( 'roles' )->find( 1 );
+$user = User::with('roles')->find(1);
 
-return Responder::success( $user );
+return Responder::success($user);
 ```
 
 The reasoning behind this is because the `pivot` field is appended to the related resource.
@@ -427,8 +447,8 @@ To map a transformer to a model, you need to implement `Flugg\Responder\Contract
 namespace App;
 
 use App\Transformers\FruitTransformer;
-use Illuminate\Database\Eloquent\Model;
 use Flugg\Responder\Contracts\Transformable;
+use Illuminate\Database\Eloquent\Model;
 
 class Fruit extends Model implements Transformable
 {
@@ -458,7 +478,7 @@ public static function transformer()
 You may want to expose all fields in your API in camel case, however, Eloquent uses snake case attributes by default. A transformer is one of the last things that take place before the data is returned to the API, and is a perfect location to do the conversion to camel casing:
 
 ```php
-public function transform( User $user )
+public function transform(User $user)
 {
     return [
         'id'        => (int) $user->id,
@@ -473,7 +493,7 @@ public function transform( User $user )
 This is great, but only works for API responses, and not for request parameters. Imagine you create a user from the request input with camel case fields:
 
 ```php
-User::create( request()->all() );
+User::create(request()->all());
 ```
 
 That wont work because the user model expects snake case fields. However, the package has a `Flugg\Responder\Traits\ConvertsParameters` trait, which you can use in your `app/Http/Requests/Request.php` file to automatically convert all incoming parameters to snake case before reaching the controller:
@@ -483,8 +503,8 @@ That wont work because the user model expects snake case fields. However, the pa
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Flugg\Responder\Traits\ConvertsParameters;
+use Illuminate\Foundation\Http\FormRequest;
 
 abstract class Request extends FormRequest
 {
@@ -499,8 +519,8 @@ This trait will not only convert all incoming parameters to snake case, it will 
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Flugg\Responder\Traits\ConvertsParameters;
+use Illuminate\Foundation\Http\FormRequest;
 
 abstract class Request extends FormRequest
 {
@@ -532,9 +552,9 @@ You may also convert any parameters manually using the `convertParameters()` met
  * @param  array $parameters
  * @return array
  */
-protected function convertParameters( array $parameters )
+protected function convertParameters(array $parameters)
 {
-    $parameters[ 'included' ] = $parameters[ 'included' ] ?? [];
+    $parameters['included'] = $parameters['included'] ?? [];
     
     return $parameters;
 }
@@ -662,8 +682,8 @@ Just like we've been generating success responses, you can equally easy generate
 ```php
 public function index()
 {
-    if ( request()->has( 'bomb ) ) {
-        return Responder::error( 'bomb_found' );
+    if (request()->has('bomb')) {
+        return Responder::error('bomb_found');
     }
 }
 ```
@@ -685,7 +705,7 @@ The example above will return the following JSON response:
 The default status code for error responses is `500`. However, you can change the status code by passing in a second argument:
 
 ```php
-return Responder::error( 'bomb_found', 400 );
+return Responder::error('bomb_found', 400);
 ```
 
 #### Setting Error Messages
@@ -693,7 +713,7 @@ return Responder::error( 'bomb_found', 400 );
 An error code is useful for many reasons, but it might not give enough clues to the user about what caused the error. So you might want to add a more descriptive error message to the response. You can do so by passing in a third argument to the `error()` method:
 
 ```php
-return Responder::error( 'bomb_found', 400, 'No explosives allowed in this request.' );
+return Responder::error('bomb_found', 400, 'No explosives allowed in this request.');
 ```
 
 Which will output the following JSON:
@@ -774,7 +794,7 @@ The error messages keys map up to an error code. So if you add the following lin
 ...and return the following error response...
 
 ```php
-return $this->errorResponse( 'bomb_found', 400 );
+return $this->errorResponse('bomb_found', 400);
 ```
 
 ...the JSON below will be generated:
@@ -827,15 +847,15 @@ There exists other packages where you also need to extend their exception handle
 Just add the `Flugg\Responder\Traits\HandlesApiErrors` trait to your exceptions handler, and add the following code before the `return parent::render( $request, $e );` in your render method:
 
 ```php
-public function render( $request, Exception $e )
+public function render($request, Exception $e)
 {
-    $this->transformExceptions( $e );
+    $this->transformExceptions($e);
     
-    if ( $e instanceof \Flugg\Responder\Exceptions\ApiException ) {
-        return $this->renderApiError( $e );
+    if ($e instanceof \Flugg\Responder\Exceptions\ApiException) {
+        return $this->renderApiError($e);
     }
 
-    return parent::render( $request, $e );
+    return parent::render($request, $e);
 }`
 ```
 
@@ -913,7 +933,7 @@ _Currently, the success response methods only work if you use the default serial
 The testing trait provides a `seeSuccess()` method you can use to assert that the success response was successful:
 
 ```php
-$this->seeSuccess( $user, 201 );
+$this->seeSuccess($user, 201);
 ```
 
 This will transform and serialize your data, just like the `success()` method on the responder. It will run a `seeStatusCode()` on the status code and assert that the response has the right base structure and contains the given data. You may also pass in any meta data as the third parameter.
@@ -921,7 +941,7 @@ This will transform and serialize your data, just like the `success()` method on
 While the above method only checks if any part of the success data has the values you specified, you can also assert for an exact match:
 
 ```php
-$this->seeSuccessEquals( $user, 201 );
+$this->seeSuccessEquals($user, 201);
 ```
 
 This works much in the same way as Laravel's `seeJsonEquals`.
@@ -931,7 +951,7 @@ This works much in the same way as Laravel's `seeJsonEquals`.
 In the same way as you can assert for success responses, you may also verify that your application sends the right error responses using the `seeError()` method:
 
 ```php
-$this->seeError( 'invalid_user', 400 );
+$this->seeError('invalid_user', 400);
 ```
 
 This checks the status code and error response structure. You may also pass in a message as third parameter.
@@ -941,7 +961,7 @@ This checks the status code and error response structure. You may also pass in a
 You can also easily fetch the data from the response:
 
 ```php
-$this->json( 'post', 'sessions', $credentials );
+$this->json('post', 'sessions', $credentials);
 $data = $this->getSuccessData();
 ```
 
