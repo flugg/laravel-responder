@@ -26,17 +26,27 @@ use Illuminate\Validation\ValidationException;
 trait HandlesApiErrors
 {
     /**
-     * Transform Laravel exceptions into API exceptions.
+     * Transform a Laravel exception into an API exception.
+     *
+     * @param  Exception $exception
+     * @return void
+     */
+    protected function transformException(Exception $exception)
+    {
+        $this->transformAuthException($exception);
+        $this->transformEloquentException($exception);
+        $this->transformValidationException($exception);
+    }
+
+    /**
+     * Transform a Laravel auth exception into an API exception.
      *
      * @param  Exception $exception
      * @return void
      * @throws UnauthenticatedException
      * @throws UnauthorizedException
-     * @throws ResourceNotFoundException
-     * @throws RelationNotFoundException
-     * @throws ValidationFailedException
      */
-    protected function transformException(Exception $exception)
+    protected function transformAuthException(Exception $exception)
     {
         if ($exception instanceof AuthenticationException) {
             throw new UnauthenticatedException();
@@ -45,7 +55,18 @@ trait HandlesApiErrors
         if ($exception instanceof AuthorizationException) {
             throw new UnauthorizedException();
         }
+    }
 
+    /**
+     * Transform an Eloquent exception into an API exception.
+     *
+     * @param  Exception $exception
+     * @return void
+     * @throws ResourceNotFoundException
+     * @throws RelationNotFoundException
+     */
+    protected function transformEloquentException(Exception $exception)
+    {
         if ($exception instanceof ModelNotFoundException) {
             throw new ResourceNotFoundException();
         }
@@ -53,7 +74,17 @@ trait HandlesApiErrors
         if ($exception instanceof RelationNotFoundException) {
             throw new RelationNotFoundException();
         }
+    }
 
+    /**
+     * Transform a Laravel validation exception into an API exception.
+     *
+     * @param  Exception $exception
+     * @return void
+     * @throws ValidationFailedException
+     */
+    protected function transformValidationException(Exception $exception)
+    {
         if ($exception instanceof ValidationException) {
             throw new ValidationFailedException($exception->validator);
         }

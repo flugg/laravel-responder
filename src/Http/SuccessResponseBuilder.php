@@ -216,7 +216,7 @@ class SuccessResponseBuilder extends ResponseBuilder
     }
 
     /**
-     * Resolve a transformer from the model.
+     * Resolve a transformer.
      *
      * @param  \Illuminate\Database\ELoquent\Model        $model
      * @param  \Flugg\Responder\Transformer|callable|null $transformer
@@ -226,13 +226,8 @@ class SuccessResponseBuilder extends ResponseBuilder
     protected function resolveTransformer(Model $model, $transformer = null)
     {
         if (is_null($transformer)) {
-            if (! $model instanceof Transformable) {
-                return $this->makeClosureTransformer($model);
-            }
-
-            $transformer = $model::transformer();
+            $transformer = $this->resolveTransformerFromModel($model);
         }
-
 
         if (is_string($transformer)) {
             $transformer = new $transformer;
@@ -248,16 +243,21 @@ class SuccessResponseBuilder extends ResponseBuilder
     }
 
     /**
-     * Make a closure based transformer from the model's fillable attributes.
+     * Resolve a transformer from the model. If the model is not transformable, a closure
+     * based transformer will be created instead, from the model's fillable attributes.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\ELoquent\Model $model
      * @return \Flugg\Responder\Transformer|callable
      */
-    protected function makeClosureTransformer(Model $model)
+    protected function resolveTransformerFromModel(Model $model)
     {
-        return function () use ($model) {
-            return $model->toArray();
-        };
+        if (! $model instanceof Transformable) {
+            return return function () use ($model) {
+                return $model->toArray();
+            };
+        }
+
+        return $model::transformer();
     }
 
     /**

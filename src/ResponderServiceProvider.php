@@ -66,31 +66,8 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $this->app->bind(SerializerAbstract::class, function ($app) {
-            $serializer = $app->config->get('responder.serializer');
-
-            return new $serializer;
-        });
-
-        $this->app->bind(Manager::class, function ($app) {
-            return (new Manager())->setSerializer($app[SerializerAbstract::class]);
-        });
-
-        $this->app->bind(ResourceFactory::class, function () {
-            return new ResourceFactory();
-        });
-
-        $this->app->bind(SuccessResponseBuilder::class, function ($app) {
-            $builder = new SuccessResponseBuilder($app[ResponseFactory::class], $app[ResourceFactory::class], $app[Manager::class]);
-
-            return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
-        });
-
-        $this->app->bind(ErrorResponseBuilder::class, function ($app) {
-            $builder = new ErrorResponseBuilder($app[ResponseFactory::class], $app['translator']);
-
-            return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
-        });
+        $this->registerFractal();
+        $this->registerResponseBuilders();
 
         $this->app->bind(Responder::class, function ($app) {
             return new Responder($app[SuccessResponseBuilder::class], $app[ErrorResponseBuilder::class]);
@@ -107,6 +84,49 @@ class ResponderServiceProvider extends BaseServiceProvider
     public function provides()
     {
         return ['responder', 'responder.success', 'responder.error', 'responder.manager', 'responder.serializer'];
+    }
+
+    /**
+     * Register Fractal serializer, manager and a factory to generate Fractal
+     * resource instances.
+     *
+     * @return vpod
+     */
+    protected function registerFractal()
+    {
+        $this->app->bind(SerializerAbstract::class, function ($app) {
+            $serializer = $app->config->get('responder.serializer');
+
+            return new $serializer;
+        });
+
+        $this->app->bind(Manager::class, function ($app) {
+            return (new Manager())->setSerializer($app[SerializerAbstract::class]);
+        });
+
+        $this->app->bind(ResourceFactory::class, function () {
+            return new ResourceFactory();
+        });
+    }
+
+    /**
+     * Register success and error response builders.
+     *
+     * @return vpod
+     */
+    protected function registerResponseBuilders()
+    {
+        $this->app->bind(SuccessResponseBuilder::class, function ($app) {
+            $builder = new SuccessResponseBuilder($app[ResponseFactory::class], $app[ResourceFactory::class], $app[Manager::class]);
+
+            return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
+        });
+
+        $this->app->bind(ErrorResponseBuilder::class, function ($app) {
+            $builder = new ErrorResponseBuilder($app[ResponseFactory::class], $app['translator']);
+
+            return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
+        });
     }
 
     /**
