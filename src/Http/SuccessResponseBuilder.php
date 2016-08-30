@@ -230,7 +230,7 @@ class SuccessResponseBuilder extends ResponseBuilder
             $transformer = new $transformer;
         }
 
-        return $this->parseTransformer($transformer);
+        return $this->parseTransformer($transformer, $model);
     }
 
     /**
@@ -255,18 +255,18 @@ class SuccessResponseBuilder extends ResponseBuilder
      * Parse a transformer class and set relations.
      *
      * @param  \Flugg\Responder\Transformer|callable $transformer
+     * @param  \Illuminate\Database\ELoquent\Model   $model
      * @return \Flugg\Responder\Transformer|callable
      * @throws \InvalidTransformerException
      */
-    protected function parseTransformer($transformer)
+    protected function parseTransformer($transformer, Model $model)
     {
         if ($transformer instanceof Transformer) {
             $transformer = $transformer->setRelations($this->resolveRelations($model));
             $this->manager->parseIncludes($transformer->getRelations());
 
-            if (! is_callable($transformer)) {
-                throw new InvalidTransformerException($model);
-            }
+        } elseif (! is_callable($transformer)) {
+            throw new InvalidTransformerException($model);
         }
 
         return $transformer;
