@@ -687,7 +687,7 @@ When something unexpected happens, you might prefer to throw actual exceptions i
 
 #### Handle Exceptions
 
-If you let the package handle exceptions, the package will catch all exceptions extending `Flugg\Responder\Exceptions\ApiException` and convert them to JSON responses.
+If you let the package handle exceptions, the package will catch all exceptions extending `Flugg\Responder\Exceptions\Http\ApiException` and convert them to JSON responses.
 
 To use the package exception handler you need to replace the following line in `app/Exceptions/Handler.php`:
 
@@ -725,7 +725,7 @@ abstract class Request extends FormRequest
 }
 ```
 
-This trait will throw exceptions extending `Flugg\Responder\Exceptions\ApiException` instead, so they are picked up by the package exceptions handler.
+This trait will throw exceptions extending `Flugg\Responder\Exceptions\Http\ApiException` instead, so they are picked up by the package exceptions handler.
 
 ***
 _After Laravel 5.3 there is no longer a base request class out of the box. You may either create one manually or use the trait in all your form requests._
@@ -733,14 +733,14 @@ _After Laravel 5.3 there is no longer a base request class out of the box. You m
 
 #### Creating Custom Exceptions
 
-The package has a few exceptions out of the box to handle Laravel's default exceptions. However, you may want to create your own exceptions for your API. If you want the package to automatically convert your exceptions to JSON responses, they will need to extend `Flugg\Responder\Exceptions\ApiException`:
+The package has a few exceptions out of the box to handle Laravel's default exceptions. However, you may want to create your own exceptions for your API. If you want the package to automatically convert your exceptions to JSON responses, they will need to extend `Flugg\Responder\Exceptions\Http\ApiException`:
 
 ```php
 <?php
 
 namespace App\Exceptions;
 
-use Flugg\Responder\Exceptions\ApiException;
+use Flugg\Responder\Exceptions\Http\ApiException;
 
 class CustomException extends ApiException
 {
