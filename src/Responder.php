@@ -47,7 +47,7 @@ class Responder
      * Generate an error JSON response.
      *
      * @param  string|null $errorCode
-     * @param  int         $statusCode
+     * @param  int|null    $statusCode
      * @param  mixed       $message
      * @return \Illuminate\Http\JsonResponse
      */

@@ -15,12 +15,12 @@ use RuntimeException;
 class InvalidTransformerException extends RuntimeException
 {
     /**
-     * InvalidSerializerException constructor.
+     * Create a new exception instance.
      *
      * @param Model $model
      */
     public function __construct(Model $model)
     {
-        return parent::__construct('The given transformer does not exist for model [' . get_class($model) . '].');
+        parent::__construct('The given transformer does not exist for model [' . get_class($model) . '].');
     }
 }

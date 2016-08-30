@@ -90,7 +90,7 @@ class ResponderServiceProvider extends BaseServiceProvider
      * Register Fractal serializer, manager and a factory to generate Fractal
      * resource instances.
      *
-     * @return vpod
+     * @return void
      */
     protected function registerFractal()
     {
@@ -112,7 +112,7 @@ class ResponderServiceProvider extends BaseServiceProvider
     /**
      * Register success and error response builders.
      *
-     * @return vpod
+     * @return void
      */
     protected function registerResponseBuilders()
     {
@@ -132,7 +132,7 @@ class ResponderServiceProvider extends BaseServiceProvider
     /**
      * Set aliases for the provided services.
      *
-     * @return array
+     * @return void
      */
     protected function registerAliases()
     {

@@ -87,7 +87,7 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Set the error code and optionally an error message.
      *
-     * @param  string            $errorCode
+     * @param  string|null       $errorCode
      * @param  string|array|null $message
      * @return self
      */

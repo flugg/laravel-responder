@@ -144,6 +144,6 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
             return $data;
         }
 
-        return array_merge(['status' => $this->statusCode], $data);;
+        return array_merge(['status' => $this->statusCode], $data);
     }
 }

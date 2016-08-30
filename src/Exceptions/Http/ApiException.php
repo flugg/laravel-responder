@@ -30,7 +30,7 @@ abstract class ApiException extends HttpException
     protected $errorCode = 'error_occurred';
 
     /**
-     * Constructor.
+     * Create a new exception instance.
      *
      * @param mixed $message
      */

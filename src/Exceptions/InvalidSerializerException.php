@@ -15,10 +15,10 @@ use RuntimeException;
 class InvalidSerializerException extends RuntimeException
 {
     /**
-     * InvalidSerializerException constructor.
+     * Create a new exception instance.
      */
     public function __construct()
     {
-        return parent::__construct('Given serializer is not an instance of [' . SerializerAbstract::class . '].');
+        parent::__construct('Given serializer is not an instance of [' . SerializerAbstract::class . '].');
     }
 }
