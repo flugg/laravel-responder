@@ -2,8 +2,8 @@
 
 namespace Flugg\Responder\Traits;
 
-use Flugg\Responder\Exceptions\UnauthorizedException;
-use Flugg\Responder\Exceptions\ValidationFailedException;
+use Flugg\Responder\Exceptions\Http\UnauthorizedException;
+use Flugg\Responder\Exceptions\Http\ValidationFailedException;
 use Illuminate\Contracts\Validation\Validator;
 
 

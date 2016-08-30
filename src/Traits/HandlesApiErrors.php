@@ -100,7 +100,7 @@ trait HandlesApiErrors
     {
         return app('responder.error')
             ->setError($exception->getErrorCode(), $exception->getMessage())
-            ->addData($exception->getData())
+            ->addData($exception->getData() ?: [])
             ->respond($exception->getStatusCode());
     }
 }

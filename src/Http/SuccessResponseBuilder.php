@@ -5,7 +5,6 @@ namespace Flugg\Responder\Http;
 use Flugg\Responder\Contracts\Transformable;
 use Flugg\Responder\Exceptions\InvalidSerializerException;
 use Flugg\Responder\Exceptions\InvalidTransformerException;
-use Flugg\Responder\Exceptions\SerializerNotFoundException;
 use Flugg\Responder\ResourceFactory;
 use Flugg\Responder\ResourceResolver;
 use Flugg\Responder\Transformation;
