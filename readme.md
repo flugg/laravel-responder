@@ -274,7 +274,7 @@ When using Fractal, you include relations using the `parseIncludes()` method on 
 With Laravel Responder you don't have to do any of these things. It integrates neatly with Eloquent and automatically parses loaded relations from the model:
 
 ```php
-return Responder::success(User::with('roles.permissions')->all());
+return Responder::success(User::with('roles.permissions')->get());
 ```
 
 #### Setting Status Codes
