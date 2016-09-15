@@ -206,7 +206,7 @@ class SuccessResponseBuilder extends ResponseBuilder
             return $data;
         }
 
-        $model = $data[0];
+        $model = array_values($data)[0];
         if (! $model instanceof Model) {
             throw new InvalidArgumentException('You can only transform data containing Eloquent models.');
         }
