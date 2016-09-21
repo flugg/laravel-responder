@@ -207,7 +207,7 @@ public function index()
 
 This method returns an instance of `\Illuminate\Http\JsonResponse` and will transform and serialize the data before wrapping it in a JSON response.
 
-#### Setting Data
+#### Setting Transformation Data
 
 The first argument of the `success` method is the transformation data. The transformation data will be transformed if a transformer is set, and must be one of the following types:
 
@@ -274,7 +274,7 @@ When using Fractal, you include relations using the `parseIncludes()` method on 
 With Laravel Responder you don't have to do any of these things. It integrates neatly with Eloquent and automatically parses loaded relations from the model:
 
 ```php
-return Responder::success(User::with('roles.permissions')->all());
+return Responder::success(User::with('roles.permissions')->get());
 ```
 
 #### Setting Status Codes
