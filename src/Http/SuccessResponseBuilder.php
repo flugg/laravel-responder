@@ -11,6 +11,7 @@ use Flugg\Responder\Transformation;
 use Flugg\Responder\Transformer;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use League\Fractal\Manager;
 use League\Fractal\Resource\ResourceInterface;
@@ -262,7 +263,7 @@ class SuccessResponseBuilder extends ResponseBuilder
     {
         if ($transformer instanceof Transformer) {
             $transformer = $transformer->setRelations($this->resolveRelations($model));
-            $this->manager->parseIncludes($transformer->getRelations());
+            $this->manager->parseIncludes(array_merge($transformer->getRelations(), $this->resolveNestedRelations($model)));
 
         } elseif (! is_callable($transformer)) {
             throw new InvalidTransformerException($model);
@@ -280,6 +281,29 @@ class SuccessResponseBuilder extends ResponseBuilder
     protected function resolveRelations(Model $model):array
     {
         return array_keys($model->getRelations());
+    }
+
+    /**
+     * Resolve eager loaded relations from the model including any nested relations.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @return array
+     */
+    protected function resolveNestedRelations(Model $model):array
+    {
+        $relations = $model->getRelations();
+        $keys = array_keys($relations);
+
+        foreach ($relations as $key => $relation) {
+            $relation = $relation instanceof Collection ? $relation->first() : $relation;
+            if (! is_null($relation)) {
+                $keys = array_merge($keys, array_map(function ($nestedRelation) use ($key) {
+                    return $key . '.' . $nestedRelation;
+                }, $this->resolveNestedRelations($relation)));
+            }
+        }
+
+        return $keys;
     }
 
     /**
