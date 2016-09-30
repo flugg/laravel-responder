@@ -8,7 +8,7 @@
 
 ![Laravel Responder](http://goo.gl/HvmX4j)
 
-Laravel Responder is a package for your JSON APIs, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can [transform](http://fractal.thephpleague.com/transformers) your Eloquent models and [serialize](http://fractal.thephpleague.com/serializers) your success responses, but it can also help you build error responses, handle exceptions and integration test your API.
+Laravel Responder is a package for your JSON API, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can [transform](http://fractal.thephpleague.com/transformers) your Eloquent models and [serialize](http://fractal.thephpleague.com/serializers) your success responses, but it can also help you build error responses, handle exceptions and integration test your API.
 
 ## Table of Contents
 
