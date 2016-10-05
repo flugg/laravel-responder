@@ -243,7 +243,7 @@ class SuccessResponseBuilder extends ResponseBuilder
     protected function resolveTransformerFromModel(Model $model)
     {
         if (! $model instanceof Transformable) {
-            return function () use ($model) {
+            return function ($model) {
                 return $model->toArray();
             };
         }
