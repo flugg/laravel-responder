@@ -11,7 +11,6 @@ use Flugg\Responder\Transformation;
 use Flugg\Responder\Transformer;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use League\Fractal\Manager;
 use League\Fractal\Resource\ResourceInterface;
@@ -139,6 +138,10 @@ class SuccessResponseBuilder extends ResponseBuilder
             $resourceKey = $this->resolveResourceKey($model, $resourceKey);
         }
 
+        if ($transformer instanceof Transformer) {
+            $this->manager->parseIncludes(array_merge($transformer->getRelations(), $this->resolveNestedRelations($resource->getData())));
+        }
+
         $this->resource = $resource->setTransformer($transformer)->setResourceKey($resourceKey);
 
         return $this;
@@ -263,7 +266,6 @@ class SuccessResponseBuilder extends ResponseBuilder
     {
         if ($transformer instanceof Transformer) {
             $transformer = $transformer->setRelations($this->resolveRelations($model));
-            $this->manager->parseIncludes(array_merge($transformer->getRelations(), $this->resolveNestedRelations($model)));
 
         } elseif (! is_callable($transformer)) {
             throw new InvalidTransformerException($model);
@@ -286,17 +288,24 @@ class SuccessResponseBuilder extends ResponseBuilder
     /**
      * Resolve eager loaded relations from the model including any nested relations.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model $data
      * @return array
      */
-    protected function resolveNestedRelations(Model $model):array
+    protected function resolveNestedRelations($data):array
     {
-        $relations = $model->getRelations();
-        $keys = array_keys($relations);
+        $keys = [];
 
-        foreach ($relations as $key => $relation) {
-            $relation = $relation instanceof Collection ? $relation->first() : $relation;
-            if (! is_null($relation)) {
+        if ($data instanceof Model) {
+            $data = [$data];
+        } elseif (is_null($data)) {
+            return $keys;
+        }
+
+        foreach ($data as $model) {
+            $relations = $model->getRelations();
+            $keys = array_merge($keys, array_keys($relations));
+
+            foreach ($relations as $key => $relation) {
                 $keys = array_merge($keys, array_map(function ($nestedRelation) use ($key) {
                     return $key . '.' . $nestedRelation;
                 }, $this->resolveNestedRelations($relation)));

@@ -70,7 +70,7 @@ abstract class Transformer extends TransformerAbstract
             return false;
         }
 
-        return app(Responder::class)->transform($pivot, function () use ($pivot) {
+        return app(Responder::class)->transform($pivot, function ($pivot) {
             return $this->transformPivot($pivot);
         })->getResource();
     }
