@@ -413,7 +413,7 @@ php artisan make:transformer UserTransformer --pivot
 
 In a lot of cases you want to use the same transformer everytime you refer to a model. Instead of passing in a transformer for every response, you can map a transformer to a model, so the model is automatically transformed. 
 
-To map a transformer to a model, your model needs to implement `Flugg\Responder\Contract\Transformable`. The interface requires a static `transformer()` method, which should return a transformer:
+To map a transformer to a model, your model needs to implement `Flugg\Responder\Contracts\Transformable`. The interface requires a static `transformer()` method, which should return a transformer:
 
 ```php
 class Role extends Model implements Transformable
