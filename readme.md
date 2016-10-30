@@ -277,6 +277,8 @@ With Laravel Responder you don't have to do any of these things. It integrates n
 return Responder::success(User::with('roles.permissions')->get());
 ```
 
+You can also let the package automatically parse and include relations from a given GET parameter, just make sure you set the `load_relations_from_parameter` key in the configuration.
+
 #### Setting Status Codes
 
 The status code is set to `200` by default, but can easily be changed by adding a second argument to the `success()` method:
@@ -364,6 +366,12 @@ By using the `serializer()` method you can also explicitly set the serializer:
 return Responder::transform(User::all())->serializer(new JsonApiSerializer)->respond();
 ```
 
+You may also manually include relations by using the `include()` method, which is just a wrapper for Fractal's own `parseIncludes()` method.
+
+```php
+return Responder::transform(User::all())->include('roles.permissions')->toArray();
+```
+
 Instead of using `respond()`, you may also convert it to a few other types:
 
 ```php
@@ -407,6 +415,23 @@ You can also use the `--pivot` option to include an additional `transformPivot()
 
 ```shell
 php artisan make:transformer UserTransformer --pivot
+```
+
+#### Set Available Relations
+
+Just like you can set an `$availableIncludes` using Fractal, you have a `$relations` property on your transformers. By default it will allow all relations:
+
+```php
+protected $relations = ['*'];
+```
+
+You can also optionally create a method for every relation in your transformers, if you want to filter based on the parsed parameters. For instance, if you have a `roles` include, you can make a `roles()` method:
+
+```php
+public function roles(Order $order, ParamBag $paramBag)
+{
+    //
+}
 ```
 
 #### Mapping Transformers to Models
