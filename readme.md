@@ -428,11 +428,15 @@ protected $relations = ['*'];
 You can also optionally create a method for every relation in your transformers, if you want to filter based on the parsed parameters. For instance, if you have a `roles` include, you can make a `roles()` method:
 
 ```php
-public function roles(Order $order, ParamBag $paramBag)
+public function roles(User $user, ParamBag $paramBag)
 {
     //
 }
 ```
+
+***
+_Do note how the `roles()` method takes in a `User` model as first argument, you can learn more about it in [Fractal's documentation](http://fractal.thephpleague.com/transformers/)._
+***
 
 #### Mapping Transformers to Models
 
