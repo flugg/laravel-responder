@@ -41,6 +41,13 @@ class SuccessResponseBuilder extends ResponseBuilder
     protected $meta = [];
 
     /**
+     * The included relations.
+     *
+     * @var array
+     */
+    protected $relations = [];
+
+    /**
      * The Fractal resource instance containing the data and transformer.
      *
      * @var \League\Fractal\Resource\ResourceInterface
@@ -86,6 +93,19 @@ class SuccessResponseBuilder extends ResponseBuilder
     public function addMeta(array $data):SuccessResponseBuilder
     {
         $this->meta = array_merge($this->meta, $data);
+
+        return $this;
+    }
+
+    /**
+     * Set the serializer used to serialize the resource data.
+     *
+     * @param  array|string $relations
+     * @return self
+     */
+    public function include($relations):SuccessResponseBuilder
+    {
+        $this->relations = array_merge($this->relations, $relations);
 
         return $this;
     }
@@ -139,7 +159,9 @@ class SuccessResponseBuilder extends ResponseBuilder
         }
 
         if ($transformer instanceof Transformer) {
-            $this->manager->parseIncludes(array_merge($transformer->getRelations(), $this->resolveNestedRelations($resource->getData())));
+            $this->include($this->resolveNestedRelations($resource->getData()));
+            $this->manager->parseIncludes(array_merge($transformer->getRelations(), $this->relations));
+            $transformer->setRelations($this->manager->getRequestedIncludes());
         }
 
         $this->resource = $resource->setTransformer($transformer)->setResourceKey($resourceKey);
@@ -265,7 +287,8 @@ class SuccessResponseBuilder extends ResponseBuilder
     protected function parseTransformer($transformer, Model $model)
     {
         if ($transformer instanceof Transformer) {
-            $transformer = $transformer->setRelations($this->resolveRelations($model));
+            $relations = $transformer->allRelationsAllowed() ? $this->resolveRelations($model) : $transformer->getRelations();
+            $transformer = $transformer->setRelations($relations);
 
         } elseif (! is_callable($transformer)) {
             throw new InvalidTransformerException($model);
@@ -293,26 +316,21 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     protected function resolveNestedRelations($data):array
     {
-        $keys = [];
-
-        if ($data instanceof Model) {
-            $data = [$data];
-        } elseif (is_null($data)) {
-            return $keys;
+        if (is_null($data)) {
+            return [];
         }
 
-        foreach ($data as $model) {
-            $relations = $model->getRelations();
-            $keys = array_merge($keys, array_keys($relations));
+        $data = $data instanceof Model ? [$data] : $data;
 
-            foreach ($relations as $key => $relation) {
-                $keys = array_merge($keys, array_map(function ($nestedRelation) use ($key) {
+        return collect($data)->flatMap(function ($model) {
+            $relations = collect($model->getRelations());
+
+            return $relations->keys()->merge($relations->flatMap(function ($relation, $key) {
+                return collect($this->resolveNestedRelations($relation))->map(function ($nestedRelation) use ($key) {
                     return $key . '.' . $nestedRelation;
-                }, $this->resolveNestedRelations($relation)));
-            }
-        }
-
-        return $keys;
+                });
+            }));
+        })->toArray();
     }
 
     /**

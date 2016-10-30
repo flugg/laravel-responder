@@ -26,6 +26,19 @@ return [
     |
     */
 
-    'include_status_code' => true
+    'include_status_code' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Load Relations From Parameter
+    |--------------------------------------------------------------------------
+    |
+    | The responder will automatically parse and load relations from a query
+    | string parameter if the value below is a string value. If you don't
+    | want the package to auto load relations, you can set it to null.
+    |
+    */
+
+    'load_relations_from_parameter' => 'include'
 
 ];

@@ -9,6 +9,13 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 class DummyClass extends Transformer
 {
     /**
+     * A list of all available relations.
+     *
+     * @var array
+     */
+    protected $relations = ['*'];
+
+    /**
      * Transform the model data into a generic array.
      *
      * @param  DummyModelClass $DummyModelVariable

@@ -8,6 +8,7 @@ use Flugg\Responder\Http\ErrorResponseBuilder;
 use Flugg\Responder\Http\SuccessResponseBuilder;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application as Laravel;
+use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use Laravel\Lumen\Application as Lumen;
 use League\Fractal\Manager;
@@ -118,6 +119,10 @@ class ResponderServiceProvider extends BaseServiceProvider
     {
         $this->app->bind(SuccessResponseBuilder::class, function ($app) {
             $builder = new SuccessResponseBuilder($app[ResponseFactory::class], $app[ResourceFactory::class], $app[Manager::class]);
+
+            if ($parameter = $this->app->config->get('responder.includeFromParameter')) {
+                $builder->include($this->app[Request::class]->input($parameter, []));
+            }
 
             return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
         });

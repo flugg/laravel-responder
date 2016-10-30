@@ -17,13 +17,24 @@ use League\Fractal\TransformerAbstract;
 abstract class Transformer extends TransformerAbstract
 {
     /**
+     * A list of all available relations.
+     *
+     * @var array
+     */
+    protected $relations = ['*'];
+
+    /**
      * Get relations set on the transformer.
      *
      * @return array
      */
     public function getRelations():array
     {
-        return array_merge($this->getAvailableIncludes(), $this->getDefaultIncludes());
+        $relations = array_unique(array_merge($this->getAvailableIncludes(), $this->relations));
+
+        return array_filter($relations, function($relation) {
+            return $relation !== '*';
+        });
     }
 
     /**
@@ -37,6 +48,16 @@ abstract class Transformer extends TransformerAbstract
         $this->setAvailableIncludes(array_merge($this->availableIncludes, (array) $relations));
 
         return $this;
+    }
+
+    /**
+     * Check if the transformer has whitelisted all relations.
+     *
+     * @return bool
+     */
+    public function allRelationsAllowed():bool
+    {
+        return $this->relations == ['*'];
     }
 
     /**
@@ -55,7 +76,13 @@ abstract class Transformer extends TransformerAbstract
             return $this->includePivot($data->$includeName);
         }
 
-        return app(Responder::class)->transform($data->$includeName)->getResource();
+        $params = $scope->getManager()->getIncludeParams($scope->getIdentifier($includeName));
+
+        if (method_exists($this, $includeName)) {
+            return call_user_func([$this, $includeName], $data, $params);
+        } else {
+            return app(Responder::class)->transform($data->$includeName)->getResource();
+        }
     }
 
     /**

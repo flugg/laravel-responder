@@ -335,8 +335,8 @@ class SuccessResponseBuilderTest extends TestCase
         $responseBuilder->transform($model, $transformer);
 
         // Assert...
-        $this->assertEquals($responseBuilder->getResource()->getTransformer()->getRelations(), ['foo']);
-        $this->assertEquals($responseBuilder->getManager()->getRequestedIncludes(), ['foo']);
+        $this->assertEquals(['foo'], $responseBuilder->getResource()->getTransformer()->getRelations());
+        $this->assertEquals(['foo'], $responseBuilder->getManager()->getRequestedIncludes());
     }
 
     /**
@@ -356,8 +356,8 @@ class SuccessResponseBuilderTest extends TestCase
         $responseBuilder->transform($model, $transformer);
 
         // Assert...
-        $this->assertEquals($responseBuilder->getResource()->getTransformer()->getRelations(), ['bar', 'foo']);
-        $this->assertEquals($responseBuilder->getManager()->getRequestedIncludes(), ['bar', 'foo']);
+        $this->assertEquals(['bar', 'foo'], $responseBuilder->getResource()->getTransformer()->getRelations());
+        $this->assertEquals(['bar', 'foo'], $responseBuilder->getManager()->getRequestedIncludes());
     }
 
     /**
