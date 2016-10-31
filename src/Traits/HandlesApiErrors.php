@@ -26,7 +26,6 @@ use Illuminate\Validation\ValidationException;
  */
 trait HandlesApiErrors
 {
-
     /**
      * Transform a Laravel exception into an API exception.
      *
@@ -35,9 +34,7 @@ trait HandlesApiErrors
      */
     protected function transformException(Exception $exception)
     {
-        $request = Request::capture();
-
-        if ($request->wantsJson()) {
+        if (Request::capture()->wantsJson()) {
             $this->transformAuthException($exception);
             $this->transformEloquentException($exception);
             $this->transformValidationException($exception);
