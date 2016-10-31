@@ -13,6 +13,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -25,6 +26,7 @@ use Illuminate\Validation\ValidationException;
  */
 trait HandlesApiErrors
 {
+
     /**
      * Transform a Laravel exception into an API exception.
      *
@@ -33,9 +35,13 @@ trait HandlesApiErrors
      */
     protected function transformException(Exception $exception)
     {
-        $this->transformAuthException($exception);
-        $this->transformEloquentException($exception);
-        $this->transformValidationException($exception);
+        $request = Request::capture();
+
+        if ($request->wantsJson()) {
+            $this->transformAuthException($exception);
+            $this->transformEloquentException($exception);
+            $this->transformValidationException($exception);
+        }
     }
 
     /**
