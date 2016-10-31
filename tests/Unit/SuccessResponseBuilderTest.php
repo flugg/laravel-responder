@@ -357,7 +357,6 @@ class SuccessResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals(['bar', 'foo'], $responseBuilder->getResource()->getTransformer()->getRelations());
-        $this->assertEquals(['bar', 'foo'], $responseBuilder->getManager()->getRequestedIncludes());
     }
 
     /**

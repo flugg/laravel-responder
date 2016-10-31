@@ -188,6 +188,13 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     public function getResource():ResourceInterface
     {
+        $this->manager->parseIncludes($this->relations);
+        $transformer = $this->resource->getTransformer();
+
+        if ($transformer instanceof Transformer) {
+            $this->resource->setTransformer($transformer->setRelations($this->manager->getRequestedIncludes()));
+        }
+
         return $this->resource->setMeta($this->meta);
     }
 
@@ -363,12 +370,6 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     protected function serialize(ResourceInterface $resource):array
     {
-        $this->manager->parseIncludes($this->relations);
-
-        if ($transformer = $this->resource->getTransformer()) {
-            $this->resource->setTransformer($transformer->setRelations($this->manager->getRequestedIncludes()));
-        }
-
         return $this->manager->createData($resource)->toArray();
     }
 }
