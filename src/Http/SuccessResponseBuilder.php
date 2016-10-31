@@ -159,9 +159,11 @@ class SuccessResponseBuilder extends ResponseBuilder
         }
 
         if ($transformer instanceof Transformer) {
-            $this->include($this->resolveNestedRelations($resource->getData()));
-            $this->manager->parseIncludes(array_merge($transformer->getRelations(), $this->relations));
-            $transformer->setRelations($this->manager->getRequestedIncludes());
+            $this->include($relations = $this->resolveNestedRelations($resource->getData()));
+
+            if ($transformer->allRelationsAllowed()) {
+                $transformer->setRelations($relations);
+            }
         }
 
         $this->resource = $resource->setTransformer($transformer)->setResourceKey($resourceKey);
@@ -361,6 +363,12 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     protected function serialize(ResourceInterface $resource):array
     {
+        $this->manager->parseIncludes($this->relations);
+
+        if ($transformer = $this->resource->getTransformer()) {
+            $this->resource->setTransformer($transformer->setRelations($this->manager->getRequestedIncludes()));
+        }
+
         return $this->manager->createData($resource)->toArray();
     }
 }
