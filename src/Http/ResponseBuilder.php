@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder\Http;
 
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Http\JsonResponse;
@@ -36,16 +35,16 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
     /**
      * Response factory used to generate JSON responses.
      *
-     * @var \Illuminate\Contracts\Routing\ResponseFactory
+     * @var \Illuminate\Contracts\Routing\ResponseFactory|\Laravel\Lumen\Http\ResponseFactory $responseFactory
      */
     protected $responseFactory;
 
     /**
      * Constructor.
      *
-     * @param \Illuminate\Contracts\Routing\ResponseFactory $responseFactory
+     * @param \Illuminate\Contracts\Routing\ResponseFactory|\Laravel\Lumen\Http\ResponseFactory $responseFactory
      */
-    public function __construct(ResponseFactory $responseFactory)
+    public function __construct($responseFactory)
     {
         $this->responseFactory = $responseFactory;
     }

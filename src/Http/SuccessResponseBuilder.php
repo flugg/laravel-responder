@@ -9,7 +9,6 @@ use Flugg\Responder\ResourceFactory;
 use Flugg\Responder\ResourceResolver;
 use Flugg\Responder\Transformation;
 use Flugg\Responder\Transformer;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 use League\Fractal\Manager;
@@ -71,11 +70,11 @@ class SuccessResponseBuilder extends ResponseBuilder
     /**
      * SuccessResponseBuilder constructor.
      *
-     * @param \Illuminate\Contracts\Routing\ResponseFactory $responseFactory
-     * @param \Flugg\Responder\ResourceFactory              $resourceFactory
-     * @param \League\Fractal\Manager                       $manager
+     * @param \Illuminate\Contracts\Routing\ResponseFactory|\Laravel\Lumen\Http\ResponseFactory $responseFactory
+     * @param \Flugg\Responder\ResourceFactory                                                  $resourceFactory
+     * @param \League\Fractal\Manager                                                           $manager
      */
-    public function __construct(ResponseFactory $responseFactory, ResourceFactory $resourceFactory, Manager $manager)
+    public function __construct($responseFactory, ResourceFactory $resourceFactory, Manager $manager)
     {
         $this->resourceFactory = $resourceFactory;
         $this->manager = $manager;

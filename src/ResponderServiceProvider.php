@@ -6,7 +6,6 @@ use Flugg\Responder\Console\MakeTransformer;
 use Flugg\Responder\Contracts\Manager as ManagerContract;
 use Flugg\Responder\Http\ErrorResponseBuilder;
 use Flugg\Responder\Http\SuccessResponseBuilder;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -118,7 +117,7 @@ class ResponderServiceProvider extends BaseServiceProvider
     protected function registerResponseBuilders()
     {
         $this->app->bind(SuccessResponseBuilder::class, function ($app) {
-            $builder = new SuccessResponseBuilder($app[ResponseFactory::class], $app[ResourceFactory::class], $app[Manager::class]);
+            $builder = new SuccessResponseBuilder(response(), $app[ResourceFactory::class], $app[Manager::class]);
 
             if ($parameter = $this->app->config->get('responder.includeFromParameter')) {
                 $builder->include($this->app[Request::class]->input($parameter, []));
@@ -128,7 +127,7 @@ class ResponderServiceProvider extends BaseServiceProvider
         });
 
         $this->app->bind(ErrorResponseBuilder::class, function ($app) {
-            $builder = new ErrorResponseBuilder($app[ResponseFactory::class], $app['translator']);
+            $builder = new ErrorResponseBuilder(response(), $app['translator']);
 
             return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
         });

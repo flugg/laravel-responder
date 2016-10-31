@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder\Http;
 
-use Illuminate\Contracts\Routing\ResponseFactory;
 use InvalidArgumentException;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -61,10 +60,10 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Constructor.
      *
-     * @param \Illuminate\Contracts\Routing\ResponseFactory      $responseFactory
-     * @param \Symfony\Component\Translation\TranslatorInterface $translator
+     * @param \Illuminate\Contracts\Routing\ResponseFactory|\Laravel\Lumen\Http\ResponseFactory $responseFactory
+     * @param \Symfony\Component\Translation\TranslatorInterface                                $translator
      */
-    public function __construct(ResponseFactory $responseFactory, TranslatorInterface $translator)
+    public function __construct($responseFactory, TranslatorInterface $translator)
     {
         $this->translator = $translator;
 
