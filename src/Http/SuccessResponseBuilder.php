@@ -191,7 +191,7 @@ class SuccessResponseBuilder extends ResponseBuilder
         $this->manager->parseIncludes($this->relations);
         $transformer = $this->resource->getTransformer();
 
-        if ($transformer instanceof Transformer) {
+        if ($transformer instanceof Transformer && $transformer->allRelationsAllowed()) {
             $this->resource->setTransformer($transformer->setRelations($this->manager->getRequestedIncludes()));
         }
 
