@@ -20,10 +20,12 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        $this->transformException($exception);
+        if ($request->expectsJson()) {
+            $this->transformException($exception);
 
-        if ($exception instanceof ApiException) {
-            return $this->renderApiError($exception);
+            if ($exception instanceof ApiException) {
+                return $this->renderApiError($exception);
+            }
         }
 
         return parent::render($request, $exception);
