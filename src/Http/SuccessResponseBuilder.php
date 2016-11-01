@@ -104,7 +104,7 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     public function include($relations):SuccessResponseBuilder
     {
-        $this->relations = array_merge($this->relations, $relations);
+        $this->relations = array_merge($this->relations, (array) $relations);
 
         return $this;
     }

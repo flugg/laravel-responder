@@ -3,6 +3,7 @@
 namespace Flugg\Responder;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use League\Fractal\Resource\ResourceAbstract;
 use League\Fractal\Scope;
 use League\Fractal\TransformerAbstract;
 
@@ -79,7 +80,13 @@ abstract class Transformer extends TransformerAbstract
         $params = $scope->getManager()->getIncludeParams($scope->getIdentifier($includeName));
 
         if (method_exists($this, $includeName)) {
-            return call_user_func([$this, $includeName], $data, $params);
+            $include = call_user_func([$this, $includeName], $data, $params);
+
+            if ($include instanceof ResourceAbstract) {
+                return $include;
+            }
+
+            return app(Responder::class)->transform($include)->getResource();
         } else {
             return app(Responder::class)->transform($data->$includeName)->getResource();
         }

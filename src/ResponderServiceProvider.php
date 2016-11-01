@@ -119,7 +119,7 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->app->bind(SuccessResponseBuilder::class, function ($app) {
             $builder = new SuccessResponseBuilder(response(), $app[ResourceFactory::class], $app[Manager::class]);
 
-            if ($parameter = $this->app->config->get('responder.includeFromParameter')) {
+            if ($parameter = $app->config->get('responder.load_relations_from_parameter')) {
                 $builder->include($this->app[Request::class]->input($parameter, []));
             }
 
