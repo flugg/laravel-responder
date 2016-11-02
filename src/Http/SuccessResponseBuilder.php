@@ -338,7 +338,7 @@ class SuccessResponseBuilder extends ResponseBuilder
                     return $key . '.' . $nestedRelation;
                 });
             }));
-        })->toArray();
+        })->unique()->toArray();
     }
 
     /**
