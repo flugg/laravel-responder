@@ -46,7 +46,7 @@ abstract class Transformer extends TransformerAbstract
      */
     public function setRelations($relations)
     {
-        $this->setAvailableIncludes(array_merge($this->availableIncludes, (array) $relations));
+        $this->setAvailableIncludes(array_unique(array_merge($this->availableIncludes, (array) $relations)));
 
         return $this;
     }
