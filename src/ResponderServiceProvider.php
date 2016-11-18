@@ -159,7 +159,7 @@ class ResponderServiceProvider extends BaseServiceProvider
         ], 'config');
 
         $this->publishes([
-            __DIR__ . '/../resources/lang/en/errors.php' => app_path('resources/lang/en/errors.php')
+            __DIR__ . '/../resources/lang/en/errors.php' => base_path('resources/lang/en/errors.php')
         ], 'lang');
     }
 
