@@ -53,6 +53,10 @@ class Responder
      */
     public function error(string $errorCode = null, int $statusCode = null, $message = null):JsonResponse
     {
+        if ($error = config("responder.errors.$errorCode")) {
+            extract($error);
+        }
+
         return $this->errorResponse->setError($errorCode, $message)->respond($statusCode);
     }
 
