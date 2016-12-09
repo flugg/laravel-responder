@@ -93,7 +93,7 @@ If you like facades, you may also append the `Responder` facade to the `aliases`
 You may also publish the package configuration and language file using the Artisan command:
 
 ```shell
-php artisan vendor:publish
+php artisan vendor:publish --provider="Flugg\Responder\ResponderServiceProvider"
 ```
 
 This will publish a `responder.php` configuration file in your `config` folder. 
