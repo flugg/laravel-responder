@@ -30,13 +30,20 @@ abstract class ApiException extends HttpException
     protected $errorCode = 'error_occurred';
 
     /**
+     * The error message.
+     *
+     * @var string
+     */
+    protected $message;
+
+    /**
      * Create a new exception instance.
      *
      * @param mixed $message
      */
     public function __construct($message = null)
     {
-        parent::__construct($this->statusCode, $message);
+        parent::__construct($this->statusCode, $this->message ?? $message);
     }
 
     /**
