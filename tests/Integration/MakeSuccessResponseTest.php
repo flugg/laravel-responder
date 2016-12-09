@@ -209,7 +209,8 @@ class MakeSuccessResponseTest extends TestCase
                 'count' => 1,
                 'perPage' => 1,
                 'currentPage' => 1,
-                'totalPages' => 1
+                'totalPages' => 1,
+                'links' => []
             ]
         ]);
     }
