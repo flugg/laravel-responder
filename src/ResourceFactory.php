@@ -133,11 +133,9 @@ class ResourceFactory
 
         if ($resource instanceof CollectionResource) {
             $queryParams = array_diff_key(request()->all(), array_flip(['page']));
+            $paginator->appends($queryParams);
 
-            $paginator = new IlluminatePaginatorAdapter($paginator);
-            $paginator->getPaginator()->appends($queryParams);
-
-            $resource->setPaginator($paginator);
+            $resource->setPaginator(new IlluminatePaginatorAdapter($paginator));
         }
 
         return $resource;
