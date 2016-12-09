@@ -132,7 +132,12 @@ class ResourceFactory
         $resource = static::makeFromCollection($paginator->getCollection());
 
         if ($resource instanceof CollectionResource) {
-            $resource->setPaginator(new IlluminatePaginatorAdapter($paginator));
+            $queryParams = array_diff_key(request()->all(), array_flip(['page']));
+
+            $paginator = new IlluminatePaginatorAdapter($paginator);
+            $paginator->getPaginator()->appends($queryParams);
+
+            $resource->setPaginator($paginator);
         }
 
         return $resource;
