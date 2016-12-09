@@ -104,6 +104,10 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     public function include($relations):SuccessResponseBuilder
     {
+        if (is_string($relations)) {
+            $relations = explode(',', $relations);
+        }
+
         $this->relations = array_merge($this->relations, (array) $relations);
 
         return $this;
