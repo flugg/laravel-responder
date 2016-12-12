@@ -43,23 +43,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Error Presets
+    | Custom Exceptions
     |--------------------------------------------------------------------------
-    |
-    | These errors serve as presets to stop the continuous repetition of
-    | error codes and status messages.
-    |
-    | Using them is as easy as follows:
-    | return responder()->error('access_denied');
-    |
     */
 
-    'errors' => [
-        // 'access_denied' => [
-        //     'errorCode'  => 'ERR-ACCESS-DENIED',
-        //     'statusCode' => 403,
-        //     'message'    => 'Access Denied',
-        // ],
+    'exceptions' => [
+        // 'access_denied' => App\Exceptions\AccessDeniedException::class,
+        // ...
     ]
 
 ];
