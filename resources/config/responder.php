@@ -39,6 +39,17 @@ return [
     |
     */
 
-    'load_relations_from_parameter' => 'include'
+    'load_relations_from_parameter' => 'include',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Exceptions
+    |--------------------------------------------------------------------------
+    */
+
+    'exceptions' => [
+        // 'access_denied' => App\Exceptions\AccessDeniedException::class,
+        // ...
+    ]
 
 ];

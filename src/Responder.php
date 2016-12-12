@@ -53,6 +53,12 @@ class Responder
      */
     public function error(string $errorCode = null, int $statusCode = null, $message = null):JsonResponse
     {
+        if ($exception = config("responder.exceptions.$errorCode")) {
+            if (class_exists($exception)) {
+                throw new $exception();
+            }
+        }
+
         return $this->errorResponse->setError($errorCode, $message)->respond($statusCode);
     }
 
