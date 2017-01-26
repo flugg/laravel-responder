@@ -3,7 +3,6 @@
 namespace Flugg\Responder\Http;
 
 use InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * This class represents an error response. An error response is responsible for translating
@@ -53,7 +52,7 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Translator service used for translating stuff.
      *
-     * @var \Symfony\Component\Translation\TranslatorInterface
+     * @var \Symfony\Component\Translation\TranslatorInterface|Illuminate\Contracts\Translation\Translator
      */
     protected $translator;
 
@@ -61,9 +60,9 @@ class ErrorResponseBuilder extends ResponseBuilder
      * Constructor.
      *
      * @param \Illuminate\Contracts\Routing\ResponseFactory|\Laravel\Lumen\Http\ResponseFactory $responseFactory
-     * @param \Symfony\Component\Translation\TranslatorInterface                                $translator
+     * @param \Symfony\Component\Translation\TranslatorInterface|Illuminate\Contracts\Translation\Translator $translator
      */
-    public function __construct($responseFactory, TranslatorInterface $translator)
+    public function __construct($responseFactory, $translator)
     {
         $this->translator = $translator;
 
