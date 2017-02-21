@@ -17,6 +17,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Include Success Flag
+    |--------------------------------------------------------------------------
+    |
+    | Wether or not you want to include success flag in your JSON responses.
+    | If true the success flag is prepended to your success and error
+    | responses as either true or false respectively. This takes place right 
+    | after your data is serialized.
+    |
+    */
+
+    'include_success_flag' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Include Status Code
     |--------------------------------------------------------------------------
     |
