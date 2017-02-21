@@ -85,11 +85,11 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Set the error code and optionally an error message.
      *
-     * @param  string|null       $errorCode
+     * @param  mixed|null       $errorCode
      * @param  string|array|null $message
      * @return self
      */
-    public function setError(string $errorCode = null, $message = null):ErrorResponseBuilder
+    public function setError($errorCode = null, $message = null):ErrorResponseBuilder
     {
         $this->errorCode = $errorCode;
 
@@ -114,7 +114,6 @@ class ErrorResponseBuilder extends ResponseBuilder
         if ($statusCode < 400 || $statusCode >= 600) {
             throw new InvalidArgumentException("{$statusCode} is not a valid error HTTP status code.");
         }
-
         return parent::setStatus($statusCode);
     }
 
@@ -126,7 +125,6 @@ class ErrorResponseBuilder extends ResponseBuilder
     public function toArray():array
     {
         return [
-            'success' => false,
             'error' => $this->buildErrorData()
         ];
     }

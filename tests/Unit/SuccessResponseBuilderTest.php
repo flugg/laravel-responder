@@ -616,6 +616,26 @@ class SuccessResponseBuilderTest extends TestCase
     }
 
     /**
+     * Test that the [respond] method allows passing a success flag as third parameter.
+     * to the [respond] method.
+     *
+     * @test
+     */
+    public function respondMethodShouldAllowSettingSuccessFlag()
+    {
+        // Arrange...
+        $responseBuilder = $this->app->make('responder.success');
+
+        // Act...
+        $response = $responseBuilder->respond(201, [], true);
+        $responseArray = json_decode($response->content(), true);
+
+        // Assert...
+        $this->assertArrayHasKey('success', $responseArray);
+        $this->assertEquals(true, $responseArray['success']);
+    }
+
+    /**
      * Test that the [setStatus] method sets the HTTP status code on the response, providing
      * an alternative, more explicit way of setting the status code.
      *
@@ -683,7 +703,6 @@ class SuccessResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => true,
             'data' => null
         ], $array);
     }
@@ -724,7 +743,6 @@ class SuccessResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals(collect([
-            'success' => true,
             'data' => null
         ]), $collection);
     }
@@ -744,7 +762,6 @@ class SuccessResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals(json_encode([
-            'success' => true,
             'data' => null
         ]), $json);
     }

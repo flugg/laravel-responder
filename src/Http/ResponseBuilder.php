@@ -72,31 +72,18 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
      * @param  bool     $successFlag
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respond(int $statusCode = null, array $headers = [], bool $successFlag = false):JsonResponse
+    public function respond(int $statusCode = null, array $headers = [], bool $successFlag = true):JsonResponse
     {
         if (! is_null($statusCode)) {
             $this->setStatus($statusCode);
         }
-        $this->setSuccess($successFlag);
+        $this->successFlag = $successFlag;
 
         $data = $this->toArray();
         $data = $this->includeStatusCode($data);
         $data = $this->includeSuccessFlag($data);
 
         return $this->responseFactory->json($data, $this->statusCode, $headers);
-    }
-
-    /**
-     * Set the response success flag
-     *
-     * @param  bool $successFlag
-     * @return self
-     */
-    public function setSuccess(bool $successFlag):ResponseBuilder
-    {
-        $this->successFlag = $successFlag;
-
-        return $this;
     }
 
     /**

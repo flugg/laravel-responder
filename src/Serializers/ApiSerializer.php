@@ -49,7 +49,6 @@ class ApiSerializer extends ArraySerializer
     public function null()
     {
         return [
-            'success' => true,
             'data' => null
         ];
     }
