@@ -175,7 +175,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => null
         ], $array);
     }
@@ -195,7 +194,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => null
@@ -219,7 +217,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => 'Testing error'
@@ -245,7 +242,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => 'Testing error foo'
@@ -271,7 +267,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => 'Testing error 2'
@@ -294,7 +289,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals(collect([
-            'success' => false,
             'error' => null
         ]), $collection);
     }
@@ -314,7 +308,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals(json_encode([
-            'success' => false,
             'error' => null
         ]), $json);
     }
