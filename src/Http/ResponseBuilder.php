@@ -34,13 +34,6 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
     protected $includeStatusCode;
 
     /**
-     * The success flag property
-     *
-     * @var bool
-     */
-    protected $successFlag;
-
-    /**
      * The HTTP status code for the response.
      *
      * @var int
