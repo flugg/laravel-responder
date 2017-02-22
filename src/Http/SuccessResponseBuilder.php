@@ -147,7 +147,7 @@ class SuccessResponseBuilder extends ResponseBuilder
      *
      * @return bool
      */
-    public function isSuccessResponse():bool 
+    protected function isSuccessResponse():bool 
     {
         return true;
     }

@@ -95,7 +95,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
      *
      * @return bool
      */
-    abstract public function isSuccessResponse():bool;
+    abstract protected function isSuccessResponse():bool;
 
     /**
      * Set a flag indicating if success should be added to the response.
