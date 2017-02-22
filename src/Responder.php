@@ -59,7 +59,7 @@ class Responder
             }
         }
 
-        return $this->errorResponse->setError($errorCode, $message)->respond($statusCode, [], false);
+        return $this->errorResponse->setError($errorCode, $message)->respond($statusCode);
     }
 
     /**

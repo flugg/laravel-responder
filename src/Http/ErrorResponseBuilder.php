@@ -118,6 +118,16 @@ class ErrorResponseBuilder extends ResponseBuilder
     }
 
     /**
+     * Return response success flag as true
+     *
+     * @return bool
+     */
+    public function isSuccessResponse():bool 
+    {
+        return false;
+    }
+
+    /**
      * Serialize the data and return as an array.
      *
      * @return array
