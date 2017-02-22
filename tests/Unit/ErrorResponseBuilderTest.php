@@ -61,7 +61,7 @@ class ErrorResponseBuilderTest extends TestCase
     public function respondMethodShouldNotOutputSuccessFlagWhenDisabled()
     {
         $this->app['config']->set('responder.include_success_flag', false);
-        $responseBuilder = $this->app->make('responder.success');
+        $responseBuilder = $this->app->make('responder.error');
 
         $response = $responseBuilder->respond();
         $responseArray = json_decode($response->content(), true);
