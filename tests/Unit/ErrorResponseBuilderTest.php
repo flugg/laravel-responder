@@ -44,10 +44,29 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Act...
         $response = $responseBuilder->respond();
+        $responseArray = json_decode($response->content(), true);
 
         // Assert...
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals($response->status(), 500);
+        $this->assertArrayHasKey('success', $responseArray);
+        $this->assertEquals(false, $responseArray['success']);
+    }
+
+    /**
+     * Test that the [respond] method does not respond with success flag
+     *
+     * @test
+     */
+    public function respondMethodShouldNotOutputSuccessFlagWhenDisabled()
+    {
+        $this->app['config']->set('responder.include_success_flag', false);
+        $responseBuilder = $this->app->make('responder.success');
+
+        $response = $responseBuilder->respond();
+        $responseArray = json_decode($response->content(), true);
+
+        $this->assertArrayNotHasKey('success', $responseArray);
     }
 
     /**
