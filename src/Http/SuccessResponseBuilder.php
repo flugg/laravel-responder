@@ -143,6 +143,16 @@ class SuccessResponseBuilder extends ResponseBuilder
     }
 
     /**
+     * Return response success flag as true
+     *
+     * @return bool
+     */
+    protected function isSuccessResponse():bool 
+    {
+        return true;
+    }
+
+    /**
      * Set the transformation data. This will set a new resource instance on the response
      * builder depending on what type of data is provided.
      *

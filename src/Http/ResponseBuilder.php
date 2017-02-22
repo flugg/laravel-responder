@@ -18,6 +18,14 @@ use JsonSerializable;
  */
 abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
 {
+
+    /**
+     * Flag indicating if success flag should be added to the serialized data.
+     *
+     * @var bool
+     */
+    protected $includeSuccessFlag;
+
     /**
      * Flag indicating if status code should be added to the serialized data.
      *
@@ -62,7 +70,9 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
             $this->setStatus($statusCode);
         }
 
-        $data = $this->includeStatusCode($this->toArray());
+        $data = $this->toArray();
+        $data = $this->includeStatusCode($data);
+        $data = $this->includeSuccessFlag($data);
 
         return $this->responseFactory->json($data, $this->statusCode, $headers);
     }
@@ -76,6 +86,26 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
     public function setStatus(int $statusCode):ResponseBuilder
     {
         $this->statusCode = $statusCode;
+
+        return $this;
+    }
+
+    /**
+     * Return response success flag
+     *
+     * @return bool
+     */
+    abstract protected function isSuccessResponse():bool;
+
+    /**
+     * Set a flag indicating if success should be added to the response.
+     *
+     * @param  bool $includeSuccessFlag
+     * @return self
+     */
+    public function setIncludeSuccessFlag(bool $includeSuccessFlag):ResponseBuilder
+    {
+        $this->includeSuccessFlag = $includeSuccessFlag;
 
         return $this;
     }
@@ -130,6 +160,21 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
      * @return array
      */
     abstract public function toArray():array;
+
+    /**
+     * Include a status code to the serialized data if enabled.
+     *
+     * @param  array $data
+     * @return array
+     */
+    protected function includeSuccessFlag(array $data):array
+    {
+        if (! $this->includeSuccessFlag) {
+            return $data;
+        }
+
+        return array_merge(['success' => $this->isSuccessResponse()], $data);
+    }
 
     /**
      * Include a status code to the serialized data if enabled.

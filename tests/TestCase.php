@@ -57,6 +57,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        $this->app['config']->set('responder.include_success_flag', true);
         $this->app['config']->set('responder.include_status_code', false);
         $this->responder = $this->app[Responder::class];
 

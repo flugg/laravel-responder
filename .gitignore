@@ -6,3 +6,5 @@ composer.lock
 .*.swp
 .swo
 .swp
+*.sublime-project
+*.sublime-workspace

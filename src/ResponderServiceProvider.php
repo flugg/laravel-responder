@@ -123,12 +123,14 @@ class ResponderServiceProvider extends BaseServiceProvider
                 $builder->include($this->app[Request::class]->input($parameter, []));
             }
 
+            return $builder->setIncludeSuccessFlag($app->config->get('responder.include_success_flag'));
             return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
         });
 
         $this->app->bind(ErrorResponseBuilder::class, function ($app) {
             $builder = new ErrorResponseBuilder(response(), $app['translator']);
 
+            return $builder->setIncludeSuccessFlag($app->config->get('responder.include_success_flag'));
             return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
         });
     }

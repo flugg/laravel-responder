@@ -44,10 +44,29 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Act...
         $response = $responseBuilder->respond();
+        $responseArray = json_decode($response->content(), true);
 
         // Assert...
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals($response->status(), 500);
+        $this->assertArrayHasKey('success', $responseArray);
+        $this->assertEquals(false, $responseArray['success']);
+    }
+
+    /**
+     * Test that the [respond] method does not respond with success flag
+     *
+     * @test
+     */
+    public function respondMethodShouldNotOutputSuccessFlagWhenDisabled()
+    {
+        $this->app['config']->set('responder.include_success_flag', false);
+        $responseBuilder = $this->app->make('responder.success');
+
+        $response = $responseBuilder->respond();
+        $responseArray = json_decode($response->content(), true);
+
+        $this->assertArrayNotHasKey('success', $responseArray);
     }
 
     /**
@@ -155,7 +174,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => null
         ], $array);
     }
@@ -175,7 +193,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => null
@@ -199,7 +216,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => 'Testing error'
@@ -225,7 +241,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => 'Testing error foo'
@@ -251,7 +266,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
-            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => 'Testing error 2'
@@ -274,7 +288,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals(collect([
-            'success' => false,
             'error' => null
         ]), $collection);
     }
@@ -294,7 +307,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals(json_encode([
-            'success' => false,
             'error' => null
         ]), $json);
     }
