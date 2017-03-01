@@ -31,7 +31,7 @@ class ResourceFactory
      *
      * @var array
      */
-    const MAKE_METHODS = [
+    protected $methods = [
         Builder::class => 'makeFromBuilder',
         Collection::class => 'makeFromCollection',
         Pivot::class => 'makeFromPivot',
@@ -41,13 +41,23 @@ class ResourceFactory
     ];
 
     /**
+     * List of given request parameters.
+     *
+     * @var array
+     */
+    protected $parameters;
+
+    /**
      * Build a resource instance from the given data.
      *
      * @param  mixed|null $data
+     * @param  array      $parameters
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    public function make($data = null)
+    public function make($data = null, array $parameters = [])
     {
+        $this->parameters = $parameters;
+
         if (is_null($data)) {
             return new NullResource();
         } elseif (is_array($data)) {
@@ -68,7 +78,7 @@ class ResourceFactory
      */
     protected function getMakeMethod($data):string
     {
-        foreach (static::MAKE_METHODS as $class => $method) {
+        foreach ($this->methods as $class => $method) {
             if ($data instanceof $class) {
                 return $method;
             }
@@ -96,7 +106,7 @@ class ResourceFactory
      */
     protected function makeFromArray(array $array):ResourceInterface
     {
-        return empty($array) ? new NullResource() : new CollectionResource($array);
+        return new CollectionResource($array);
     }
 
     /**
@@ -107,7 +117,7 @@ class ResourceFactory
      */
     protected function makeFromCollection(Collection $collection):ResourceInterface
     {
-        return static::makeFromArray($collection->all());
+        return new CollectionResource($collection);
     }
 
     /**
@@ -132,10 +142,7 @@ class ResourceFactory
         $resource = static::makeFromCollection($paginator->getCollection());
 
         if ($resource instanceof CollectionResource) {
-            $queryParams = array_diff_key(request()->all(), array_flip(['page']));
-            $paginator->appends($queryParams);
-
-            $resource->setPaginator(new IlluminatePaginatorAdapter($paginator));
+            $resource->setPaginator(new IlluminatePaginatorAdapter($paginator->appends($this->parameters)));
         }
 
         return $resource;

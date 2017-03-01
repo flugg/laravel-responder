@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Traits;
+namespace Flugg\Responder\Http\Requests;
 
 use Flugg\Responder\Exceptions\Http\UnauthorizedException;
 use Flugg\Responder\Exceptions\Http\ValidationFailedException;

@@ -17,20 +17,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Include Success Flag
-    |--------------------------------------------------------------------------
-    |
-    | Wether or not you want to include success flag in your JSON responses.
-    | If true the success flag is prepended to your success and error
-    | responses as either true or false respectively. This takes place right 
-    | after your data is serialized.
-    |
-    */
-
-    'include_success_flag' => true,
-
-    /*
-    |--------------------------------------------------------------------------
     | Include Status Code
     |--------------------------------------------------------------------------
     |
@@ -57,13 +43,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Custom Exceptions
+    | Exception Mappings
     |--------------------------------------------------------------------------
+    |
+    | You may optionally map exceptions to error codes, allowing you to call
+    | the [error] method on the responder service to throw the exception.
+    | These can be used as an alternative to using the language lines.
+    |
     */
 
     'exceptions' => [
-        // 'access_denied' => App\Exceptions\AccessDeniedException::class,
-        // ...
+        // 'error_occured' => App\Exceptions\ErrorOccuredException::class,
     ]
 
 ];

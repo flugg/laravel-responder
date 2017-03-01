@@ -1,20 +1,20 @@
 <?php
 
-namespace Flugg\Responder\Traits;
+namespace Flugg\Responder\Http\Controllers;
 
 use Flugg\Responder\Http\SuccessResponseBuilder;
 use Flugg\Responder\Responder;
 use Illuminate\Http\JsonResponse;
 
 /**
- * Use this trait in your base controllere for quick access to the responder service
- * methods in your controllers.
+ * Use this trait in your base controller for quick access to the responder service
+ * in your controller methods.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-trait RespondsWithJson
+trait MakesApiResponses
 {
     /**
      * Generate an error JSON response.
@@ -24,7 +24,7 @@ trait RespondsWithJson
      * @param  mixed       $message
      * @return JsonResponse
      */
-    public function errorResponse(string $errorCode = null, int $statusCode = null, $message = null):JsonResponse
+    public function error(string $errorCode = null, int $statusCode = null, $message = null):JsonResponse
     {
         return app(Responder::class)->error($errorCode, $statusCode, $message);
     }
@@ -37,7 +37,7 @@ trait RespondsWithJson
      * @param  array      $meta
      * @return \Illuminate\Http\JsonResponse
      */
-    public function successResponse($data = null, $statusCode = null, array $meta = []):JsonResponse
+    public function success($data = null, $statusCode = null, array $meta = []):JsonResponse
     {
         return app(Responder::class)->success($data, $statusCode, $meta);
     }
@@ -47,7 +47,7 @@ trait RespondsWithJson
      *
      * @param  mixed|null           $data
      * @param  callable|string|null $transformer
-     * @return \Flugg\Responder\Http\SuccessResponse
+     * @return \Flugg\Responder\Http\SuccessResponseBuilder
      */
     public function transform($data = null, $transformer = null):SuccessResponseBuilder
     {

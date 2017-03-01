@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Traits;
+namespace Flugg\Responder\Exceptions;
 
 use Exception;
 use Flugg\Responder\Exceptions\Http\ApiException;
@@ -13,7 +13,6 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -29,12 +28,13 @@ trait HandlesApiErrors
     /**
      * Transform a Laravel exception into an API exception.
      *
-     * @param  Exception $exception
+     * @param  \Illuminate\Http\Request $request
+     * @param  Exception                $exception
      * @return void
      */
-    protected function transformException(Exception $exception)
+    protected function transformException($request, Exception $exception)
     {
-        if (Request::capture()->wantsJson()) {
+        if ($request->wantsJson()) {
             $this->transformAuthException($exception);
             $this->transformEloquentException($exception);
             $this->transformValidationException($exception);
