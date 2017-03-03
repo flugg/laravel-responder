@@ -24,7 +24,7 @@ class DummyClass extends Transformer
     public function transform(DummyModelClass $DummyModelVariable):array
     {
         return [
-            'id' => (int) $DummyModelVariable->id
+            'id' => (int) $DummyModelVariable->id,
         ];
     }
 
