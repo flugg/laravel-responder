@@ -59,7 +59,7 @@ class Transformation
      */
     public function run():Scope
     {
-        return $this->manager->createData($this->transformation->getResource());
+        return $this->manager->createData($this->resource);
     }
 
     /**
