@@ -153,7 +153,7 @@ class SuccessResponseBuilder extends ResponseBuilder
             $model->load($this->relations);
         }
 
-        return $this->transformation->setRelations()->run();
+        return $this->transformation->setRelations($this->relations)->run()->toArray();
     }
 
     /**

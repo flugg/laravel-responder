@@ -59,7 +59,7 @@ class Transformation
      */
     public function run():Scope
     {
-        return $this->manager->parseIncludes($this->relations)->createData($this->transformation->getResource());
+        return $this->manager->createData($this->transformation->getResource());
     }
 
     /**
@@ -99,7 +99,7 @@ class Transformation
      * @param  int   $level
      * @return \Flugg\Responder\Transformation
      */
-    public function setRelations(array $relations, int $level):Transformation
+    public function setRelations(array $relations, int $level = 0):Transformation
     {
         if (empty($this->manager->getRequestedIncludes())) {
             $this->manager->parseIncludes($relations);
