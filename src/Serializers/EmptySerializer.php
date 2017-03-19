@@ -45,7 +45,7 @@ class EmptySerializer extends ApiSerializer
      */
     public function null()
     {
-        return null;
+        return [];
     }
 
     /**
@@ -81,5 +81,17 @@ class EmptySerializer extends ApiSerializer
     public function cursor(CursorInterface $cursor)
     {
         return [];
+    }
+
+    /**
+     * Merges any relations into the data. The 'data' field is also removed.
+     *
+     * @param  array $transformedData
+     * @param  array $includedData
+     * @return array
+     */
+    public function mergeIncludes($transformedData, $includedData)
+    {
+        return array_merge($transformedData, $includedData);
     }
 }

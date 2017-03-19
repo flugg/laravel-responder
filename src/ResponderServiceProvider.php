@@ -102,18 +102,23 @@ class ResponderServiceProvider extends BaseServiceProvider
             return $this->app['request']->input($cursorName);
         });
 
-        Builder::macro('paginateByCursor', function ($cursor, $limit = 15, $columns = ['*'], $whereColumn = 'id') {
-            $total = $this->getCountForPagination($columns);
-            $currentCursor = $cursor ?: CursorPaginator::resolveCursor();
-
-            if ($currentCursor) {
-                $this->where($whereColumn, '>', $currentCursor);
+        Builder::macro('paginateByCursor', function ($limit = 15, $columns = ['*'], $whereColumn = 'id') {
+            if ($cursor = CursorPaginator::resolveCursor()) {
+                $this->where($whereColumn, '>', $cursor);
             }
 
-            $results = $this->take($limit)->get();
+            $results = $this->take($limit)->get($columns);
             $nextCursor = $results->count() < $limit ? null : $results->last()->{$whereColumn};
 
-            return new CursorPaginator($results, $total, $currentCursor, $nextCursor);
+            return new CursorPaginator($results, $cursor, $nextCursor);
+        });
+
+        Relation::macro('paginateByCursor', function ($limit = 15, $columns = ['*'], $whereColumn = 'id') {
+            $this->query->addSelect($this->shouldSelect($columns));
+
+            return tap($this->query->paginateByCursor($limit, $columns, $whereColumn), function ($paginator) {
+                $this->hydratePivotRelation($paginator->items());
+            });
         });
     }
 
@@ -127,7 +132,7 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->app->bind(SerializerAbstract::class, function ($app) {
             $serializer = $app->config->get('responder.serializer');
 
-            return new $serializer;
+            return $app->make($serializer);
         });
     }
 
