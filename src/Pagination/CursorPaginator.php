@@ -50,13 +50,13 @@ class CursorPaginator
     }
 
     /**
-     * Get the total number of items being paginated.
+     * Get the slice of items being paginated.
      *
-     * @return int
+     * @return array
      */
-    public function total()
+    public function items()
     {
-        return $this->total;
+        return $this->items->all();
     }
 
     /**
