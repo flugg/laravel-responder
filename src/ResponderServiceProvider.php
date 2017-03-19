@@ -8,6 +8,7 @@ use Flugg\Responder\Http\ErrorResponseBuilder;
 use Flugg\Responder\Http\SuccessResponseBuilder;
 use Flugg\Responder\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
