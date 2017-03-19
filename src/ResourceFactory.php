@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder;
 
+use Flugg\Responder\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -37,7 +38,8 @@ class ResourceFactory
         Pivot::class => 'makeFromPivot',
         Model::class => 'makeFromModel',
         Paginator::class => 'makeFromPaginator',
-        Relation::class => 'makeFromRelation'
+        CursorPaginator::class => 'makeFromCursor',
+        Relation::class => 'makeFromRelation',
     ];
 
     /**
@@ -143,6 +145,23 @@ class ResourceFactory
 
         if ($resource instanceof CollectionResource) {
             $resource->setPaginator(new IlluminatePaginatorAdapter($paginator->appends($this->parameters)));
+        }
+
+        return $resource;
+    }
+
+    /**
+     * Make resource from a cursor paginator.
+     *
+     * @param  \Flugg\Responder\Pagination\CursorPaginator $paginator
+     * @return \League\Fractal\Resource\ResourceInterface
+     */
+    protected function makeFromCursor(CursorPaginator $paginator):ResourceInterface
+    {
+        $resource = static::makeFromCollection($paginator->getCollection());
+
+        if ($resource instanceof CollectionResource) {
+            $resource->setCursor(new Cursor($paginator->cursor(), null, $paginator->nextCursor(), $paginator->count()));
         }
 
         return $resource;

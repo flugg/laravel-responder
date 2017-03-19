@@ -6,6 +6,8 @@ use Flugg\Responder\Console\MakeTransformer;
 use Flugg\Responder\Contracts\Manager as ManagerContract;
 use Flugg\Responder\Http\ErrorResponseBuilder;
 use Flugg\Responder\Http\SuccessResponseBuilder;
+use Flugg\Responder\Pagination\CursorPaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -94,8 +96,25 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->registerSuccessResponseBuilder();
         $this->registerErrorResponseBuilder();
         $this->registerResponder();
-
         $this->registerAliases();
+
+        CursorPaginator::cursorResolver(function ($cursorName) {
+            return $this->app['request']->input($cursorName);
+        });
+
+        Builder::macro('paginateByCursor', function ($cursor, $limit = 15, $columns = ['*'], $whereColumn = 'id') {
+            $total = $this->getCountForPagination($columns);
+            $currentCursor = $cursor ?: CursorPaginator::resolveCursor();
+
+            if ($currentCursor) {
+                $this->where($whereColumn, '>', $currentCursor);
+            }
+
+            $results = $this->take($limit)->get();
+            $nextCursor = $results->count() < $limit ? null : $results->last()->{$whereColumn};
+
+            return new CursorPaginator($results, $total, $currentCursor, $nextCursor);
+        });
     }
 
     /**
