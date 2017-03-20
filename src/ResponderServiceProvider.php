@@ -3,7 +3,6 @@
 namespace Flugg\Responder;
 
 use Flugg\Responder\Console\MakeTransformer;
-use Flugg\Responder\Contracts\Manager as ManagerContract;
 use Flugg\Responder\Http\ErrorResponseBuilder;
 use Flugg\Responder\Http\SuccessResponseBuilder;
 use Flugg\Responder\Pagination\CursorPaginator;
@@ -54,7 +53,7 @@ class ResponderServiceProvider extends BaseServiceProvider
 
         $this->mergeConfigFrom(__DIR__ . '/../resources/config/responder.php', 'responder');
         $this->commands([
-            MakeTransformer::class
+            MakeTransformer::class,
         ]);
 
         include __DIR__ . '/helpers.php';
@@ -109,7 +108,7 @@ class ResponderServiceProvider extends BaseServiceProvider
             }
 
             $results = $this->take($limit)->get($columns);
-            $nextCursor = $results->count() < $limit ? null : $results->last()->{$whereColumn};
+            $nextCursor = $results->count() < $limit ? null : $results->last()->{array_last(explode('.', $whereColumn))};
 
             return new CursorPaginator($results, $cursor, $nextCursor);
         });
