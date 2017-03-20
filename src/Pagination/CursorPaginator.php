@@ -112,7 +112,7 @@ class CursorPaginator
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
+     * @param  \Illuminate\Support\Collection $collection
      * @return $this
      */
     public function setCollection(Collection $collection)
