@@ -120,6 +120,7 @@ class ResponderServiceProvider extends BaseServiceProvider
             return tap($this->query->paginateByCursor($limit, $columns, "{$this->getRelated()->getTable()}.{$whereColumn}"), function ($paginator) {
                 $this->hydratePivotRelation($paginator->items());
             });
+        });
     }
 
     /**
