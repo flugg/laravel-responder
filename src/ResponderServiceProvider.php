@@ -114,7 +114,9 @@ class ResponderServiceProvider extends BaseServiceProvider
         });
 
         Relation::macro('paginateByCursor', function ($limit = 15, $columns = ['*'], $whereColumn = 'id') {
-            $this->query->addSelect($this->shouldSelect($columns));
+            if ($this->query instanceof BelongsToMany || $this->query instanceof HasManyThrough) {
+                $this->query->addSelect($this->shouldSelect($columns));
+            }
 
             return tap($this->query->paginateByCursor($limit, $columns, "{$this->getRelated()->getTable()}.{$whereColumn}"), function ($paginator) {
                 $this->hydratePivotRelation($paginator->items());
