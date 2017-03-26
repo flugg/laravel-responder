@@ -116,11 +116,13 @@ class ResponderServiceProvider extends BaseServiceProvider
         Relation::macro('paginateByCursor', function ($limit = 15, $columns = ['*'], $whereColumn = 'id') {
             if ($this->query instanceof BelongsToMany || $this->query instanceof HasManyThrough) {
                 $this->query->addSelect($this->shouldSelect($columns));
+
+                return tap($this->query->paginateByCursor($limit, $columns, "{$this->getRelated()->getTable()}.{$whereColumn}"), function ($paginator) {
+                    $this->hydratePivotRelation($paginator->items());
+                });
             }
 
-            return tap($this->query->paginateByCursor($limit, $columns, "{$this->getRelated()->getTable()}.{$whereColumn}"), function ($paginator) {
-                $this->hydratePivotRelation($paginator->items());
-            });
+            return $this->query->paginateByCursor($limit, $columns, $whereColumn);
         });
     }
 
