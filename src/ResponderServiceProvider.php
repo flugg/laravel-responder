@@ -110,7 +110,8 @@ class ResponderServiceProvider extends BaseServiceProvider
             }
 
             $results = $this->take($limit)->get($columns);
-            $nextCursor = $results->count() < $limit ? null : $results->last()->{array_last(explode('.', $whereColumn))};
+            $method = $constraint === '>' ? 'last' : 'first';
+            $nextCursor = $results->count() < $limit ? null : $results->$method()->{array_last(explode('.', $whereColumn))};
 
             return new CursorPaginator($results, $cursor, $nextCursor);
         });
