@@ -104,9 +104,9 @@ class ResponderServiceProvider extends BaseServiceProvider
             return $this->app['request']->input($cursorName);
         });
 
-        Builder::macro('paginateByCursor', function ($limit = 15, $columns = ['*'], $whereColumn = 'id') {
+        Builder::macro('paginateByCursor', function ($limit = 15, $columns = ['*'], $whereColumn = 'id', $constraint = '>') {
             if ($cursor = CursorPaginator::resolveCursor()) {
-                $this->where($whereColumn, '>', $cursor);
+                $this->where($whereColumn, $constraint, $cursor);
             }
 
             $results = $this->take($limit)->get($columns);
