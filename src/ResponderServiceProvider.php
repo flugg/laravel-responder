@@ -110,22 +110,21 @@ class ResponderServiceProvider extends BaseServiceProvider
             }
 
             $results = $this->take($limit)->get($columns);
-            $method = $constraint === '>' ? 'last' : 'first';
-            $nextCursor = $results->count() < $limit ? null : $results->$method()->{array_last(explode('.', $whereColumn))};
+            $nextCursor = $results->count() < $limit ? null : $results->last()->{array_last(explode('.', $whereColumn))};
 
             return new CursorPaginator($results, $cursor, $nextCursor);
         });
 
-        Relation::macro('paginateByCursor', function ($limit = 15, $columns = ['*'], $whereColumn = 'id') {
+        Relation::macro('paginateByCursor', function ($limit = 15, $columns = ['*'], $whereColumn = 'id', $constraint = '>') {
             if ($this->query instanceof BelongsToMany || $this->query instanceof HasManyThrough) {
                 $this->query->addSelect($this->shouldSelect($columns));
 
-                return tap($this->query->paginateByCursor($limit, $columns, "{$this->getRelated()->getTable()}.{$whereColumn}"), function ($paginator) {
+                return tap($this->query->paginateByCursor($limit, $columns, "{$this->getRelated()->getTable()}.{$whereColumn}"), $constraint, function ($paginator) {
                     $this->hydratePivotRelation($paginator->items());
                 });
             }
 
-            return $this->query->paginateByCursor($limit, $columns, $whereColumn);
+            return $this->query->paginateByCursor($limit, $columns, $whereColumn, $constraint);
         });
     }
 
