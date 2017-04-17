@@ -5,6 +5,7 @@ namespace Flugg\Responder\Http;
 use Flugg\Responder\Exceptions\InvalidSerializerException;
 use Flugg\Responder\Transformation;
 use Flugg\Responder\TransformationFactory;
+use Flugg\Responder\Transformer;
 use InvalidArgumentException;
 use League\Fractal\Serializer\SerializerAbstract;
 
@@ -150,10 +151,33 @@ class SuccessResponseBuilder extends ResponseBuilder
     public function toArray():array
     {
         if (! is_null($model = $this->transformation->getModel())) {
-            $model->load($this->relations);
+            $this->with($this->extractDefaultRelations($this->transformation->getResource()->getTransformer()));
+
+            $this->transformation->getResource()->getData()->load($this->relations);
         }
 
         return $this->transformation->setRelations($this->relations)->run()->toArray();
+    }
+
+    /**
+     * Extract default relations.
+     *
+     * @param  \Flugg\Responder\Transformer $transformer
+     * @return array
+     */
+    protected function extractDefaultRelations(Transformer $transformer):array
+    {
+        $relations = collect(array_keys($transformer->getDefaultRelations()));
+
+        foreach ($transformer->getDefaultRelations() as $relation => $relatedTransformer) {
+            $nestedRelations = collect($this->extractDefaultRelations(app($relatedTransformer)))->map(function ($nestedRelation) use ($relation) {
+                return "$relation.$nestedRelation";
+            });
+
+            $relations = $relations->merge($nestedRelations);
+        }
+
+        return $relations->all();
     }
 
     /**

@@ -26,6 +26,13 @@ abstract class Transformer extends TransformerAbstract
     protected $relations = ['*'];
 
     /**
+     * Include resources without needing it to be requested.
+     *
+     * @var array
+     */
+    protected $with = [];
+
+    /**
      * Cache of resources generated for every relation.
      *
      * @var array
@@ -42,6 +49,26 @@ abstract class Transformer extends TransformerAbstract
         return array_filter($this->relations, function ($relation) {
             return $relation !== '*';
         });
+    }
+
+    /**
+     * Get list of default relations.
+     *
+     * @return array
+     */
+    public function getDefaultRelations():array
+    {
+        return $this->with;
+    }
+
+    /**
+     * Getter for defaultIncludes.
+     *
+     * @return array
+     */
+    public function getDefaultIncludes()
+    {
+        return array_keys($this->with);
     }
 
     /**
