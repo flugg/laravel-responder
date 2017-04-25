@@ -88,7 +88,7 @@ trait ConvertsParameters
     protected function castBooleans($input):array
     {
         if ($this->castToBooleanIsDisabled()) {
-            return;
+            return [];
         }
 
         $casted = [];
