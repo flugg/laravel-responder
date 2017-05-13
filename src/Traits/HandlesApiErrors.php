@@ -4,6 +4,7 @@ namespace Flugg\Responder\Traits;
 
 use Exception;
 use Flugg\Responder\Exceptions\Http\ApiException;
+use Flugg\Responder\Exceptions\Http\RelationNotFoundException;
 use Flugg\Responder\Exceptions\Http\ResourceNotFoundException;
 use Flugg\Responder\Exceptions\Http\UnauthenticatedException;
 use Flugg\Responder\Exceptions\Http\UnauthorizedException;
@@ -11,7 +12,7 @@ use Flugg\Responder\Exceptions\Http\ValidationFailedException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\RelationNotFoundException;
+use Illuminate\Database\Eloquent\RelationNotFoundException as EloquentRelationNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -74,7 +75,7 @@ trait HandlesApiErrors
             throw new ResourceNotFoundException();
         }
 
-        if ($exception instanceof RelationNotFoundException) {
+        if ($exception instanceof EloquentRelationNotFoundException) {
             throw new RelationNotFoundException();
         }
     }
