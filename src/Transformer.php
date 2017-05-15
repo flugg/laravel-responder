@@ -93,18 +93,32 @@ abstract class Transformer extends TransformerAbstract
     protected function callIncludeMethod(Scope $scope, $includeName, $data)
     {
         if (key_exists($includeName, $this->relationsCache)) {
-            return $this->makeResourceFromCache($data->$includeName, $includeName);
+            return $this->makeResourceFromCache($this->filterRelation($data->$includeName, $includeName), $includeName);
         }
 
         if (method_exists($this, $includeName)) {
-            return $this->makeResourceFromMethod($data, $includeName, $scope);
+            return $this->makeResourceFromMethod($this->filterRelation($data, $includeName), $includeName, $scope);
         }
 
         if ($includeName === 'pivot') {
-            return $this->makeResourceFromPivot($data->pivot);
+            return $this->makeResourceFromPivot($this->filterRelation($data->pivot, $includeName));
         }
 
-        return $this->makeResource($data->$includeName, $includeName, $scope);
+        return $this->makeResource($this->filterRelation($data->$includeName, $includeName), $includeName, $scope);
+    }
+
+    /**
+     * Filter the relation data.
+     *
+     * @param  mixed  $data
+     * @param  string $key
+     * @return mixed
+     */
+    protected function filterRelation($data, string $key)
+    {
+        $method = 'filter' . ucfirst($key);
+
+        return method_exists($this, $method) ? $this->$method($data) : $data;
     }
 
     /**
@@ -143,7 +157,7 @@ abstract class Transformer extends TransformerAbstract
             return $result;
         }
 
-        return $this->makeResource($result, $method, $scope);
+        return $this->buildTransformation($result, $scope)->getResource();
     }
 
     /**
@@ -174,10 +188,7 @@ abstract class Transformer extends TransformerAbstract
      */
     protected function makeResource($data, string $relation, Scope $scope)
     {
-        $transformation = app(TransformationFactory::class)->make($data);
-        $level = count($scope->getParentScopes()) + 1;
-        $transformation->setRelations($scope->getManager()->getRequestedIncludes(), $level);
-
+        $transformation = $this->buildTransformation($data, $scope);
         $resource = $transformation->getResource();
 
         if ($transformation->getModel()) {
@@ -185,5 +196,21 @@ abstract class Transformer extends TransformerAbstract
         }
 
         return $resource;
+    }
+
+    /**
+     * Build a transformation from the data and scope.
+     *
+     * @param  mixed                 $data
+     * @param  \League\Fractal\Scope $scope
+     * @return \Flugg\Responder\Transformation
+     */
+    protected function buildTransformation($data, Scope $scope)
+    {
+        $transformation = app(TransformationFactory::class)->make($data);
+        $level = count($scope->getParentScopes()) + 1;
+        $transformation->setRelations($scope->getManager()->getRequestedIncludes(), $level);
+
+        return $transformation;
     }
 }
