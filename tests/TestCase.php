@@ -149,23 +149,10 @@ abstract class TestCase extends BaseTestCase
      */
     protected function mockBuilder(array $data = null)
     {
-        $builder = Mockery::spy(Builder::class);
-        $builder->shouldReceive('get')->andReturn(collect($data));
-
-        return $builder;
-    }
-
-    /**
-     * Create a mock of the Eloquent builder with a mock of the [paginate] method which
-     * returns an instance of [\Illuminate\Pagination\LengthAwarePaginator].
-     *
-     * @param  array $data
-     * @return \Mockery\MockInterface
-     */
-    protected function mockBuilderWithPaginator(array $data = null)
-    {
         $paginator = new LengthAwarePaginator($data, count($data), 15);
-        $builder = $this->mockBuilder($data);
+        $builder = Mockery::spy(Builder::class);
+
+        $builder->shouldReceive('get')->andReturn(collect($data));
         $builder->shouldReceive('paginate')->andReturn($paginator);
 
         return $builder;

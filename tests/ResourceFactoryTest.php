@@ -10,7 +10,7 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Resource\NullResource;
 
 /**
- * Collection of unit tests for the [\Flugg\Responder\ResourceFactory] class.
+ * Collection of unit tests testing the [\Flugg\Responder\ResourceFactory] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -21,40 +21,26 @@ class ResourceFactoryTest extends TestCase
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\NullResouce] instance
      * when no data is given.
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
      */
-    public function makeMethodShouldReturnNullResourceWhenGivenNull()
+    public function testMakeMethodShouldReturnNullResourceWhenGivenNull()
     {
-        // Arrange...
         $data = null;
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(NullResource::class, $resource);
     }
 
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\Item] instance when
-     * you pass in a single model.
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::getMakeMethod
-     * @covers \Flugg\Responder\ResourceFactory::makeFromModel
+     * you pass in an Eloquent model.
      */
-    public function makeMethodShouldReturnItemResourceWhenGivenModel()
+    public function testMakeMethodShouldReturnItemResourceWhenGivenModel()
     {
-        // Arrange...
         $data = $this->makeModel();
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(Item::class, $resource);
         $this->assertEquals($data, $resource->getData());
     }
@@ -62,20 +48,13 @@ class ResourceFactoryTest extends TestCase
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\Collection] instance
      * when you pass in an array.
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::makeFromArray
      */
-    public function makeMethodShouldReturnCollectionResourceWhenGivenArray()
+    public function testMakeMethodShouldReturnCollectionResourceWhenGivenArray()
     {
-        // Arrange...
         $data = [$this->makeModel()];
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(Collection::class, $resource);
         $this->assertEquals($data, $resource->getData());
     }
@@ -83,127 +62,80 @@ class ResourceFactoryTest extends TestCase
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\Collection] instance
      * when you pass in an empty array.
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::makeFromArray
      */
-    public function makeMethodShouldReturnCollectionResourceWhenGivenEmptyArray()
+    public function testMakeMethodShouldReturnCollectionResourceWhenGivenEmptyArray()
     {
-        // Arrange...
         $data = [];
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(Collection::class, $resource);
     }
 
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\Collection] instance
-     * when you pass in an Illuminate collection.
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::getMakeMethod
-     * @covers \Flugg\Responder\ResourceFactory::makeFromCollection
+     * when you pass in a collection.
      */
-    public function makeMethodShouldReturnCollectionResourceWhenGivenCollection()
+    public function testMakeMethodShouldReturnCollectionResourceWhenGivenCollection()
     {
-        // Arrange...
         $data = collect([$this->makeModel()]);
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(Collection::class, $resource);
         $this->assertEquals($data, $resource->getData());
     }
 
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\NullResource] instance
-     * when you pass in an empty Illuminate collection.
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::getMakeMethod
-     * @covers \Flugg\Responder\ResourceFactory::makeFromCollection
+     * when you pass in an empty collection.
      */
-    public function makeMethodShouldReturnCollectionResourceWhenGivenEmptyCollection()
+    public function testMakeMethodShouldReturnCollectionResourceWhenGivenEmptyCollection()
     {
-        // Arrange...
         $data = collect();
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
-        $this->assertInstanceOf(Collection::class, $resource);}
+        $this->assertInstanceOf(Collection::class, $resource);
+    }
 
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\Collection] instance
      * when you pass in an Eloquent query builder.
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::getMakeMethod
-     * @covers \Flugg\Responder\ResourceFactory::makeFromBuilder
      */
-    public function makeMethodShouldReturnCollectionResourceWhenGivenQueryBuilder()
+    public function testMakeMethodShouldReturnCollectionResourceWhenGivenQueryBuilder()
     {
-        // Arrange...
         $data = $this->mockBuilder([$this->makeModel()]);
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(Collection::class, $resource);
         $this->assertEquals($data->get(), $resource->getData());
     }
 
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\Collection] instance
-     * when you pass in an Eloquent query builder which gives no results.
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::getMakeMethod
-     * @covers \Flugg\Responder\ResourceFactory::makeFromBuilder
+     * when you pass in an Eloquent query builder with no results.
      */
-    public function makeMethodShouldReturnCollectionResourceWhenGivenEmptyQueryBuilder()
+    public function testMakeMethodShouldReturnCollectionResourceWhenGivenEmptyQueryBuilder()
     {
-        // Arrange...
         $data = $this->mockBuilder([]);
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(Collection::class, $resource);
     }
 
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\Collection] instance
-     * when you pass in an instance of [\Illuminate\Pagination\LengthAwarePaginator].
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::getMakeMethod
-     * @covers \Flugg\Responder\ResourceFactory::makeFromPaginator
+     * when you pass in a paginator.
      */
-    public function makeMethodShouldReturnCollectionResourceWhenGivenPaginator()
+    public function testMakeMethodShouldReturnCollectionResourceWhenGivenPaginator()
     {
-        // Arrange...
-        $builder = $this->mockBuilderWithPaginator([$this->makeModel()]);
-        $data = $builder->paginate();
+        $data = $this->mockBuilder([$this->makeModel()])->paginate();
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(Collection::class, $resource);
         $this->assertEquals($data->getCollection(), $resource->getData());
         $this->assertEquals(new IlluminatePaginatorAdapter($data), $resource->getPaginator());
@@ -211,68 +143,40 @@ class ResourceFactoryTest extends TestCase
 
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\Collection] instance
-     * when you pass in an instance of [\Illuminate\Pagination\LengthAwarePaginator] with
-     * no data.
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::getMakeMethod
-     * @covers \Flugg\Responder\ResourceFactory::makeFromPaginator
+     * when you pass in a paginator with no data.
      */
-    public function makeMethodShouldReturnCollectionResourceWhenGivenEmptyPaginator()
+    public function testMakeMethodShouldReturnCollectionResourceWhenGivenEmptyPaginator()
     {
-        // Arrange...
-        $builder = $this->mockBuilderWithPaginator([]);
-        $data = $builder->paginate();
+        $data = $this->mockBuilder([])->paginate();
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(Collection::class, $resource);
     }
 
     /**
-     * Test that the [make] method returns a [\League\Fractal\Resource\Collection] instance
-     * when you pass in an instance of [\Illuminate\Pagination\LengthAwarePaginator].
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::getMakeMethod
-     * @covers \Flugg\Responder\ResourceFactory::makeFromPaginator
+     * Test that the [make] method .
      */
-    public function makeMethodShouldAppendParametersToUrlWhenGivenPaginator()
+    public function testMakeMethodShouldAppendParametersToUrlWhenGivenPaginator()
     {
-        // Arrange...
-        $builder = $this->mockBuilderWithPaginator([$this->makeModel()]);
-        $data = $builder->paginate();
+        $data = $this->mockBuilder([$this->makeModel()])->paginate();
         $parameters = ['foo' => 1, 'page' => 1];
 
-        // Act...
         $resource = (new ResourceFactory())->make($data, $parameters);
 
-        // Assert...
         $this->assertEquals('/?foo=1&page=2', $resource->getPaginator()->getUrl(2));
     }
 
     /**
      * Test that the [make] method returns a [\League\Fractal\Resource\Collection] instance
-     * when you pass in an instance of [\Illuminate\Database\Eloquent\Relations\Relation].
-     *
-     * @test
-     * @covers \Flugg\Responder\ResourceFactory::make
-     * @covers \Flugg\Responder\ResourceFactory::getMakeMethod
-     * @covers \Flugg\Responder\ResourceFactory::makeFromRelation
+     * when you pass in a relationship instance.
      */
-    public function makeMethodShouldReturnCollectionResourceWhenGivenRelation()
+    public function testMakeMethodShouldReturnCollectionResourceWhenGivenRelation()
     {
-        // Arrange...
         $data = $this->mockRelation([$this->makeModel()]);
 
-        // Act...
         $resource = (new ResourceFactory())->make($data);
 
-        // Assert...
         $this->assertInstanceOf(Collection::class, $resource);
         $this->assertEquals($data->get(), $resource->getData());
     }

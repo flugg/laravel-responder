@@ -11,8 +11,7 @@ use League\Fractal\Resource\NullResource;
 use League\Fractal\Resource\ResourceInterface;
 
 /**
- * All transformer classes should extend this abstract base class. This class also
- * extends Fractal's abstract transformer.
+ * This class is responsible for building a transformation object from
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -21,7 +20,7 @@ use League\Fractal\Resource\ResourceInterface;
 class TransformationFactory
 {
     /**
-     * The Fractal manager responsible for transforming and serializing data.
+     * The Fractal manager used for transforming and serializing data.
      *
      * @var \League\Fractal\Manager
      */
@@ -35,9 +34,9 @@ class TransformationFactory
     protected $resourceFactory;
 
     /**
-     * SuccessResponseBuilder constructor.
+     * Construct the factory.
      *
-     * @param \League\Fractal\Manager                    $manager
+     * @param \League\Fractal\Manager          $manager
      * @param \Flugg\Responder\ResourceFactory $resourceFactory
      */
     public function __construct(Manager $manager, ResourceFactory $resourceFactory)
@@ -47,14 +46,14 @@ class TransformationFactory
     }
 
     /**
-     * Build a transformation object from the given parameters.
+     * A factory method to make a transformation object from the given data.
      *
-     * @param  mixed|null                                        $data
+     * @param  mixed                                             $data
      * @param  \Flugg\Responder\Transformer|callable|string|null $transformer
      * @param  string|null                                       $resourceKey
      * @return \Flugg\Responder\Transformation
      */
-    public function make($data = null, $transformer = null, string $resourceKey = null):Transformation
+    public function make($data = null, $transformer = null, string $resourceKey = null): Transformation
     {
         $resource = $this->resourceFactory->make($data);
 
@@ -72,10 +71,10 @@ class TransformationFactory
     /**
      * Make an empty transformation with no model, transformer or resource key.
      *
-     * @param \League\Fractal\Resource\ResourceInterface $resource
+     * @param  \League\Fractal\Resource\ResourceInterface $resource
      * @return \Flugg\Responder\Transformation
      */
-    protected function makeEmpty(ResourceInterface $resource):Transformation
+    protected function makeEmpty(ResourceInterface $resource): Transformation
     {
         return new Transformation($this->manager, $resource);
     }
@@ -89,7 +88,7 @@ class TransformationFactory
      * @param  string|null                                       $resourceKey
      * @return \Flugg\Responder\Transformation
      */
-    protected function makeWithModel(ResourceInterface $resource, Model $model, $transformer = null, string $resourceKey = null):Transformation
+    protected function makeWithModel(ResourceInterface $resource, Model $model, $transformer = null, string $resourceKey = null): Transformation
     {
         $resource->setTransformer($this->parseTransformer($transformer ?: $this->resolveTransformer($model)));
         $resource->setResourceKey($resourceKey ?: $this->resolveResourceKey($model));

@@ -69,7 +69,7 @@ class SuccessResponseBuilder extends ResponseBuilder
      * @param  string|null          $resourceKey
      * @return self
      */
-    public function transform($data = null, $transformer = null, string $resourceKey = null):SuccessResponseBuilder
+    public function transform($data = null, $transformer = null, string $resourceKey = null): SuccessResponseBuilder
     {
         $this->transformation = $this->transformationFactory->make($data, $transformer, $resourceKey);
 
