@@ -45,7 +45,7 @@ abstract class ApiException extends HttpException
     /**
      * Construct the exception class.
      *
-     * @param string $message
+     * @param string|null $message
      */
     public function __construct(string $message = null)
     {

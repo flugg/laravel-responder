@@ -73,3 +73,10 @@ coding_style:
 build:
     environment:
         php: 7.0.6
+    tests:
+        override:
+            -
+                command: 'vendor/bin/phpunit --coverage-clover=coverage'
+                coverage:
+                    file: 'coverage'
+                    format: 'clover'
