@@ -34,21 +34,21 @@ use Mockery;
 class HandlerTest extends TestCase
 {
     /**
-     * A mock of a request object.
+     * A mock of a request object class.
      *
      * @var \Mockery\MockInterface
      */
     protected $request;
 
     /**
-     * A mock of the IoC container.
+     * A mock of Laravel's container contract.
      *
      * @var \Mockery\MockInterface
      */
     protected $container;
 
     /**
-     * The exception handler.
+     * The exception handler being tested.
      *
      * @var \Flugg\Responder\Exceptions\Handler;
      */

@@ -3,6 +3,7 @@
 namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\ErrorFactory as ErrorFactoryContract;
+use Flugg\Responder\Contracts\ErrorMessageResolver;
 use Flugg\Responder\Contracts\ErrorSerializer;
 
 /**
@@ -17,7 +18,7 @@ class ErrorFactory implements ErrorFactoryContract
     /**
      * A resolver for resolving messages from error codes.
      *
-     * @var \Flugg\Responder\ErrorMessageResolver
+     * @var \Flugg\Responder\Contracts\ErrorMessageResolver
      */
     protected $messageResolver;
 
@@ -31,8 +32,8 @@ class ErrorFactory implements ErrorFactoryContract
     /**
      * Construct the factory class.
      *
-     * @param \Flugg\Responder\ErrorMessageResolver      $messageResolver
-     * @param \Flugg\Responder\Contracts\ErrorSerializer $serializer
+     * @param \Flugg\Responder\Contracts\ErrorMessageResolver $messageResolver
+     * @param \Flugg\Responder\Contracts\ErrorSerializer      $serializer
      */
     public function __construct(ErrorMessageResolver $messageResolver, ErrorSerializer $serializer)
     {

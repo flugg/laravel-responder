@@ -2,11 +2,11 @@
 
 namespace Flugg\Responder\Transformers;
 
+use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
 use Flugg\Responder\Contracts\Transformable;
 use Flugg\Responder\Exceptions\InvalidTransformerException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
-use Traversable;
 
 /**
  * This class is responsible for resolving transformers.
@@ -15,7 +15,7 @@ use Traversable;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformerResolver
+class TransformerResolver implements TransformerResolverContract
 {
     /**
      * An IoC container, used to resolve transformers.
@@ -23,13 +23,6 @@ class TransformerResolver
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
-
-    /**
-     * A registry singleton class, used to store transformer bindings.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $registry;
 
     /**
      * Transformable to transformer mappings.
@@ -41,19 +34,17 @@ class TransformerResolver
     /**
      * Construct the resolver class.
      *
-     * @param \Illuminate\Contracts\Container\Container         $container
-     * @param \Flugg\Responder\Transformers\TransformerRegistry $registry
+     * @param \Illuminate\Contracts\Container\Container $container
      */
-    public function __construct(Container $container, TransformerRegistry $registry)
+    public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->registry = $registry;
     }
 
     /**
-     * Register a transformable to transformer mapping.
+     * Register a transformable to transformer binding.
      *
-     * @param  array|string    $transformable
+     * @param  string|array    $transformable
      * @param  string|callback $transformer
      * @return void
      */
@@ -109,7 +100,7 @@ class TransformerResolver
      */
     protected function resolveTransformable($data)
     {
-        if ($data instanceof Traversable && count($data)) {
+        if (is_iterable($data)) {
             foreach ($data as $item) {
                 if ($item instanceof Transformable) {
                     return $item;

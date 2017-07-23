@@ -2,13 +2,13 @@
 
 namespace Flugg\Responder\Resources;
 
+use Flugg\Responder\Contracts\Resources\ResourceFactory as ResourceFactoryContract;
+use Flugg\Responder\Contracts\Transformers\TransformerResolver;
 use Flugg\Responder\Transformers\TransformerManager;
-use Flugg\Responder\Transformers\TransformerResolver;
 use League\Fractal\Resource\Collection as CollectionResource;
 use League\Fractal\Resource\Item as ItemResource;
 use League\Fractal\Resource\NullResource;
 use League\Fractal\Resource\ResourceInterface;
-use Traversable;
 
 /**
  * This class is responsible for making Fractal resources from a variety of data types.
@@ -17,7 +17,7 @@ use Traversable;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ResourceFactory
+class ResourceFactory implements ResourceFactoryContract
 {
     /**
      * A service class, used to normalize data.
@@ -29,15 +29,15 @@ class ResourceFactory
     /**
      * A manager class, used to manage transformers.
      *
-     * @var \Flugg\Responder\TransformerManager
+     * @var \Flugg\Responder\Contracts\Transformers\TransformerResolver
      */
     protected $transformerResolver;
 
     /**
      * Construct the factory class.
      *
-     * @param \Flugg\Responder\Resources\DataNormalizer         $normalizer
-     * @param \Flugg\Responder\Transformers\TransformerResolver $transformerResolver
+     * @param \Flugg\Responder\Resources\DataNormalizer                   $normalizer
+     * @param \Flugg\Responder\Contracts\Transformers\TransformerResolver $transformerResolver
      */
     public function __construct(DataNormalizer $normalizer, TransformerResolver $transformerResolver)
     {
@@ -92,7 +92,7 @@ class ResourceFactory
     {
         if (is_null($data)) {
             return new NullResource();
-        } elseif ($data instanceof Traversable) {
+        } elseif (is_iterable($data)) {
             return new CollectionResource($data, $transformer, $resourceKey);
         }
 

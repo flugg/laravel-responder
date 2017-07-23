@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Pagination;
 
+use Flugg\Responder\Contracts\Pagination\PaginatorFactory as PaginatorFactoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\Cursor;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
@@ -14,7 +15,7 @@ use League\Fractal\Pagination\PaginatorInterface;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class PaginatorFactory
+class PaginatorFactory implements PaginatorFactoryContract
 {
     /**
      * A list of query string values appended to the paginator links.

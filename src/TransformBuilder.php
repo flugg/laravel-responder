@@ -2,11 +2,11 @@
 
 namespace Flugg\Responder;
 
+use Flugg\Responder\Contracts\Pagination\PaginatorFactory;
+use Flugg\Responder\Contracts\Resources\ResourceFactory;
 use Flugg\Responder\Contracts\TransformFactory;
 use Flugg\Responder\Exceptions\InvalidSerializerException;
 use Flugg\Responder\Pagination\CursorPaginator;
-use Flugg\Responder\Pagination\PaginatorFactory;
-use Flugg\Responder\Resources\ResourceFactory;
 use Flugg\Responder\Transformers\Transformer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -27,21 +27,21 @@ class TransformBuilder
     /**
      * A factory class for making Fractal resources.
      *
-     * @var \Flugg\Responder\ResourceFactory
+     * @var \Flugg\Responder\Contracts\Resources\ResourceFactory
      */
     protected $resourceFactory;
 
     /**
      * A factory for making transformed arrays.
      *
-     * @var \Flugg\Responder\FractalTransformFactory
+     * @var \Flugg\Responder\Contracts\TransformFactory
      */
     private $transformFactory;
 
     /**
      * A factory used to build Fractal paginator adapters.
      *
-     * @var \Flugg\Responder\Pagination\PaginatorFactory
+     * @var \Flugg\Responder\Contracts\Pagination\PaginatorFactory
      */
     protected $paginatorFactory;
 
@@ -83,9 +83,9 @@ class TransformBuilder
     /**
      * Construct the builder class.
      *
-     * @param \Flugg\Responder\Resources\ResourceFactory   $resourceFactory
-     * @param \Flugg\Responder\Contracts\TransformFactory  $transformFactory
-     * @param \Flugg\Responder\Pagination\PaginatorFactory $paginatorFactory
+     * @param \Flugg\Responder\Contracts\Resources\ResourceFactory   $resourceFactory
+     * @param \Flugg\Responder\Contracts\TransformFactory            $transformFactory
+     * @param \Flugg\Responder\Contracts\Pagination\PaginatorFactory $paginatorFactory
      */
     public function __construct(ResourceFactory $resourceFactory, TransformFactory $transformFactory, PaginatorFactory $paginatorFactory)
     {

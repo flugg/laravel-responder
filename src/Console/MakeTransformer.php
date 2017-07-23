@@ -3,6 +3,7 @@
 namespace Flugg\Responder\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * An Artisan command class responsible for making transformer classes.
