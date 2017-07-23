@@ -72,7 +72,7 @@ coding_style:
                 true_false_null: lower
 build:
     environment:
-        php: 7.0.6
+        php: 7.1.0
     tests:
         override:
             -
