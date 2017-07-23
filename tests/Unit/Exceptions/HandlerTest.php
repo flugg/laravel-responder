@@ -141,7 +141,7 @@ class HandlerTest extends TestCase
         $this->assertSame($response, $result);
         $this->container->shouldHaveReceived('make')->with(ErrorResponseBuilder::class)->once();
         $responseBuilder->shouldHaveReceived('error')->with($errorCode, $message)->once();
-        $responseBuilder->shouldHaveReceived('addData')->with($data)->once();
+        $responseBuilder->shouldHaveReceived('data')->with($data)->once();
         $responseBuilder->shouldHaveReceived('respond')->with($status)->once();
     }
 

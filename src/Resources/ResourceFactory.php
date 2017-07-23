@@ -2,11 +2,8 @@
 
 namespace Flugg\Responder\Resources;
 
-use Flugg\Responder\Pagination\CursorFactory;
-use Flugg\Responder\Pagination\CursorPaginator;
-use Flugg\Responder\Pagination\PaginatorFactory;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
+use Flugg\Responder\Transformers\TransformerManager;
+use Flugg\Responder\Transformers\TransformerResolver;
 use League\Fractal\Resource\Collection as CollectionResource;
 use League\Fractal\Resource\Item as ItemResource;
 use League\Fractal\Resource\NullResource;
@@ -23,74 +20,82 @@ use Traversable;
 class ResourceFactory
 {
     /**
-     * A service class used to normalize the data into one of the supported data types.
+     * A service class, used to normalize data.
      *
      * @var \Flugg\Responder\DataNormalizer
      */
     protected $normalizer;
 
     /**
-     * A factory used to build Fractal paginator adapters.
+     * A manager class, used to manage transformers.
      *
-     * @var \Flugg\Responder\Pagination\PaginatorFactory
+     * @var \Flugg\Responder\TransformerManager
      */
-    protected $paginatorFactory;
+    protected $transformerResolver;
 
     /**
-     * A factory used to build Fractal cursor objects.
+     * Construct the factory class.
      *
-     * @var \Flugg\Responder\Pagination\CursorFactory
+     * @param \Flugg\Responder\Resources\DataNormalizer         $normalizer
+     * @param \Flugg\Responder\Transformers\TransformerResolver $transformerResolver
      */
-    protected $cursorFactory;
-
-    /**
-     * Construct the resource factory.
-     *
-     * @param \Flugg\Responder\Resources\DataNormalizer    $normalizer
-     * @param \Flugg\Responder\Pagination\PaginatorFactory $paginatorFactory
-     * @param \Flugg\Responder\Pagination\CursorFactory    $cursorFactory
-     */
-    public function __construct(DataNormalizer $normalizer, PaginatorFactory $paginatorFactory, CursorFactory $cursorFactory)
+    public function __construct(DataNormalizer $normalizer, TransformerResolver $transformerResolver)
     {
         $this->normalizer = $normalizer;
-        $this->paginatorFactory = $paginatorFactory;
-        $this->cursorFactory = $cursorFactory;
+        $this->transformerResolver = $transformerResolver;
     }
 
     /**
      * Make resource from the given data.
      *
-     * @param  mixed $data
+     * @param  mixed                                                          $data
+     * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
+     * @param  string|null                                                    $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    public function make($data = null): ResourceInterface
+    public function make($data = null, $transformer = null, string $resourceKey = null): ResourceInterface
     {
-        $normalizedData = $this->normalizer->normalize($data);
-        $resource = $this->instatiateResource($normalizedData);
-
-        if ($data instanceof CursorPaginator) {
-            $resource->setCursor($this->cursorFactory->make($data));
-        } elseif ($data instanceof LengthAwarePaginator) {
-            $resource->setPaginator($this->paginatorFactory->make($data));
+        if (is_null($data = $this->normalizer->normalize($data))) {
+            return $this->instatiateResource($data);
         }
 
-        return $resource;
+        $transformer = $this->resolveTransformer($data, $transformer);
+
+        return $this->instatiateResource($data, $transformer, $resourceKey);
     }
 
-    /**r
-     * Instatiate a new resource instance from the given data.
+    /**
+     * Resolve a transformer.
      *
-     * @param  mixed $data
+     * @param  mixed                                                          $data
+     * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
+     * @return \Flugg\Responder\Transformers\Transformer|callable
+     */
+    protected function resolveTransformer($data, $transformer)
+    {
+        if (isset($transformer)) {
+            return $this->transformerResolver->resolve($transformer);
+        }
+
+        return $this->transformerResolver->resolveFromData($data);
+    }
+
+    /**
+     * Instatiate a new resource instance.
+     *
+     * @param  mixed                                                   $data
+     * @param  \Flugg\Responder\Transformers\Transformer|callable|null $transformer
+     * @param  string|null                                             $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    protected function instatiateResource($data): ResourceInterface
+    protected function instatiateResource($data, $transformer = null, string $resourceKey = null): ResourceInterface
     {
         if (is_null($data)) {
             return new NullResource();
-        } elseif ($data instanceof Traversable && ! $data instanceof Model) {
-            return new CollectionResource($data);
+        } elseif ($data instanceof Traversable) {
+            return new CollectionResource($data, $transformer, $resourceKey);
         }
 
-        return new ItemResource($data);
+        return new ItemResource($data, $transformer, $resourceKey);
     }
 }

@@ -2,8 +2,7 @@
 
 namespace Flugg\Responder\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Console\GeneratorCommand;
 
 /**
  * An Artisan command class responsible for making transformer classes.
@@ -12,17 +11,14 @@ use Illuminate\Contracts\Filesystem\Filesystem;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class MakeTransformer extends Command
+class MakeTransformer extends GeneratorCommand
 {
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'make:transformer 
-                            {name : The name of the transformer class}
-                            {--pivot : Include a transformer method for pivot table data}
-                            {--model= : The namespace to the model being transformed}';
+    protected $name = 'make:transformer';
 
     /**
      * The console command description.
@@ -32,152 +28,80 @@ class MakeTransformer extends Command
     protected $description = 'Create a new transformer class';
 
     /**
-     * A filesystem service for accessing the filesystem.
+     * The type of class being generated.
      *
-     * @var \Illuminate\Contracts\Filesystem\Filesystem
+     * @var string
      */
-    protected $files;
+    protected $type = 'Transformer';
 
     /**
-     * Construct the console command class.
+     * Get the stub file for the generator.
      *
-     * @param \Illuminate\Contracts\Filesystem\Filesystem $files
-     */
-    public function __construct(Filesystem $files)
-    {
-        parent::__construct();
-
-        $this->files = $files;
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
-        $name = (string) $this->argument('name');
-        $path = $this->laravel->basePath() . '/app/Transformers/' . $name . '.php';
-
-        if ($this->files->exists($path)) {
-            return $this->error($name . ' already exists!');
-        }
-
-        $this->makeDirectory($path);
-
-        $stubPath = $this->option('pivot') ? 'resources/stubs/transformer.pivot.stub' : 'resources/stubs/transformer.stub';
-        $stub = $this->files->get(__DIR__ . '/../../' . $stubPath);
-
-        $this->files->put($path, $this->makeTransformer($name, $stub));
-
-        $this->info('Transformer created successfully.');
-    }
-
-    /**
-     * Build a transformers directory if one doesn't exist.
-     *
-     * @param  string $path
-     * @return void
-     */
-    protected function makeDirectory(string $path)
-    {
-        if (! $this->files->isDirectory(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0777, true, true);
-        }
-    }
-
-    /**
-     * Build the transformer class using the given name and stub.
-     *
-     * @param  string $name
-     * @param  string $stub
      * @return string
      */
-    protected function makeTransformer(string $name, string $stub): string
-    {
-        $stub = $this->replaceNamespace($stub);
-        $stub = $this->replaceClass($stub, $name);
-        $stub = $this->replaceModel($stub, $name);
-
-        return $stub;
-    }
-
-    /**
-     * Replace the namespace for the given stub.
-     *
-     * @param  string $stub
-     * @return string
-     */
-    protected function replaceNamespace(string $stub): string
-    {
-        if (method_exists($this->laravel, 'getNameSpace')) {
-            $namespace = $this->laravel->getNamespace() . 'Transformers';
-        } else {
-            $namespace = 'App\Transformers';
-        }
-
-        $stub = str_replace('DummyNamespace', $namespace, $stub);
-
-        return $stub;
-    }
-
-    /**
-     * Replace the class name for the given stub.
-     *
-     * @param  string $stub
-     * @param  string $name
-     * @return string
-     */
-    protected function replaceClass(string $stub, string $name): string
-    {
-        $stub = str_replace('DummyClass', $name, $stub);
-
-        return $stub;
-    }
-
-    /**
-     * Replace the model for the given stub.
-     *
-     * @param  string $stub
-     * @param  string $name
-     * @return string
-     */
-    protected function replaceModel(string $stub, string $name): string
-    {
-        $model = $this->getModelNamespace($name);
-        $class = $this->getClassFromNamespace($model);
-
-        $stub = str_replace('DummyModelNamespace', $model, $stub);
-        $stub = str_replace('DummyModelClass', $class, $stub);
-        $stub = str_replace('DummyModelVariable', camel_case($class), $stub);
-
-        return $stub;
-    }
-
-    /**
-     * Get the full class path for the model.
-     *
-     * @param  string $name
-     * @return string
-     */
-    protected function getModelNamespace(string $name): string
+    protected function getStub()
     {
         if ($this->option('model')) {
-            return $this->option('model');
+            return __DIR__ . '../../resources/stubs/transformer.model.stub';
         }
 
-        return 'App\\' . str_replace('Transformer', '', $name);
+        return __DIR__ . '../../resources/stubs/transformer.plain.stub';
     }
 
     /**
-     * Get the full class path for the transformer.
+     * Get the default namespace for the class.
      *
-     * @param  string $namespace
+     * @param  string $rootNamespace
      * @return string
      */
-    protected function getClassFromNamespace(string $namespace): string
+    protected function getDefaultNamespace($rootNamespace)
     {
-        return last(explode('\\', $namespace));
+        return $rootNamespace . '\Transformers';
+    }
+
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $replace = [];
+
+        if ($this->option('model')) {
+            $replace = $this->buildModelReplacements($replace);
+        }
+
+        return str_replace(array_keys($replace), array_values($replace), parent::buildClass($name));
+    }
+
+    /**
+     * Build the model replacement values.
+     *
+     * @param  array $replace
+     * @return array
+     */
+    protected function buildModelReplacements(array $replace)
+    {
+        $model = $this->qualifyClass($this->option('model'));
+
+        return array_merge($replace, [
+            'DummyFullModelClass' => $model,
+            'DummyModelClass' => class_basename($model),
+            'DummyModelVariable' => lcfirst(class_basename($model)),
+        ]);
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a model transformerl.'],
+        ];
     }
 }

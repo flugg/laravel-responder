@@ -21,7 +21,7 @@
     "require": {
         "php": "^7.0",
         "illuminate/support": "5.1.* || 5.2.* || 5.3.* || 5.4.*",
-        "league/fractal": "^0.14.0"
+        "league/fractal": "^0.16.0"
     },
     "require-dev": {
         "php": "^7.1",
@@ -47,7 +47,6 @@
     },
     "config": {
         "sort-packages": true
-        +
     },
     "extra": {
         "laravel": {

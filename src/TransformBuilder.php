@@ -4,7 +4,11 @@ namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\TransformFactory;
 use Flugg\Responder\Exceptions\InvalidSerializerException;
-use Flugg\Responder\Resources\ResourceBuilder;
+use Flugg\Responder\Pagination\CursorPaginator;
+use Flugg\Responder\Pagination\PaginatorFactory;
+use Flugg\Responder\Resources\ResourceFactory;
+use Flugg\Responder\Transformers\Transformer;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Pagination\Cursor;
@@ -21,18 +25,32 @@ use League\Fractal\Serializer\SerializerAbstract;
 class TransformBuilder
 {
     /**
-     * A builder for building Fractal resources.
+     * A factory class for making Fractal resources.
      *
-     * @var \Flugg\Responder\ResourceBuilder
+     * @var \Flugg\Responder\ResourceFactory
      */
-    protected $resourceBuilder;
+    protected $resourceFactory;
 
     /**
      * A factory for making transformed arrays.
      *
      * @var \Flugg\Responder\FractalTransformFactory
      */
-    private $factory;
+    private $transformFactory;
+
+    /**
+     * A factory used to build Fractal paginator adapters.
+     *
+     * @var \Flugg\Responder\Pagination\PaginatorFactory
+     */
+    protected $paginatorFactory;
+
+    /**
+     * The resource that's being built.
+     *
+     * @var \League\Fractal\Resource\ResourceInterface
+     */
+    protected $resource;
 
     /**
      * A serializer for formatting data after transforming.
@@ -56,15 +74,25 @@ class TransformBuilder
     protected $without = [];
 
     /**
+     * A list of sparse fieldsets.
+     *
+     * @var array
+     */
+    protected $only = [];
+
+    /**
      * Construct the builder class.
      *
-     * @param \Flugg\Responder\Resources\ResourceBuilder  $resourceBuilder
-     * @param \Flugg\Responder\Contracts\TransformFactory $factory
+     * @param \Flugg\Responder\Resources\ResourceFactory   $resourceFactory
+     * @param \Flugg\Responder\Contracts\TransformFactory  $transformFactory
+     * @param \Flugg\Responder\Pagination\PaginatorFactory $paginatorFactory
      */
-    public function __construct(ResourceBuilder $resourceBuilder, TransformFactory $factory)
+    public function __construct(ResourceFactory $resourceFactory, TransformFactory $transformFactory, PaginatorFactory $paginatorFactory)
     {
-        $this->resourceBuilder = $resourceBuilder;
-        $this->factory = $factory;
+        $this->resourceFactory = $resourceFactory;
+        $this->transformFactory = $transformFactory;
+        $this->paginatorFactory = $paginatorFactory;
+        $this->resource = $this->resourceFactory->make();
     }
 
     /**
@@ -77,20 +105,13 @@ class TransformBuilder
      */
     public function resource($data = null, $transformer = null, string $resourceKey = null): TransformBuilder
     {
-        $this->resourceBuilder->make($data, $transformer)->withResourceKey($resourceKey);
+        $this->resource = $this->resourceFactory->make($data, $transformer, $resourceKey);
 
-        return $this;
-    }
-
-    /**
-     * Manually set the paginator on the resource.
-     *
-     * @param  \League\Fractal\Pagination\IlluminatePaginatorAdapter $paginator
-     * @return self
-     */
-    public function paginator(IlluminatePaginatorAdapter $paginator): TransformBuilder
-    {
-        $this->resourceBuilder->withPaginator($paginator);
+        if ($data instanceof CursorPaginator) {
+            $this->cursor($this->paginatorFactory->makeCursor($data));
+        } elseif ($data instanceof LengthAwarePaginator) {
+            $this->paginator($this->paginatorFactory->make($data));
+        }
 
         return $this;
     }
@@ -103,7 +124,33 @@ class TransformBuilder
      */
     public function cursor(Cursor $cursor): TransformBuilder
     {
-        $this->resourceBuilder->withCursor($cursor);
+        $this->resource->setCursor($cursor);
+
+        return $this;
+    }
+
+    /**
+     * Manually set the paginator on the resource.
+     *
+     * @param  \League\Fractal\Pagination\IlluminatePaginatorAdapter $paginator
+     * @return self
+     */
+    public function paginator(IlluminatePaginatorAdapter $paginator): TransformBuilder
+    {
+        $this->resource->setPaginator($paginator);
+
+        return $this;
+    }
+
+    /**
+     * Add meta data appended to the response data.
+     *
+     * @param  array $meta
+     * @return self
+     */
+    public function meta(array $meta): TransformBuilder
+    {
+        $this->resource->setMeta($meta);
 
         return $this;
     }
@@ -135,14 +182,14 @@ class TransformBuilder
     }
 
     /**
-     * Add meta data appended to the response data.
+     * Filter fields to output using sparse fieldsets.
      *
-     * @param  array $meta
+     * @param  string[]|string $fields
      * @return self
      */
-    public function meta(array $meta): TransformBuilder
+    public function only($fields): TransformBuilder
     {
-        $this->resourceBuilder->withMeta($meta);
+        $this->only = array_merge($this->only, is_array($fields) ? $fields : func_get_args());
 
         return $this;
     }
@@ -176,19 +223,64 @@ class TransformBuilder
      */
     public function transform(): array
     {
-        $resource = $this->resourceBuilder->get();
+        $this->prepareRelations();
 
-        $this->with($relations = $resource->getTransformer()->extractDefaultRelations());
+        return $this->transformFactory->make($this->resource, $this->serializer, [
+            'includes' => $this->with,
+            'excludes' => $this->without,
+            'fields' => $this->only,
+        ]);
+    }
 
-        $data = $resource->getData();
-        if ($data instanceof Model || $data instanceof Collection) {
-            $data->load($relations);
+    /**
+     * Prepare requested relations for the transformation.
+     *
+     * @return void
+     */
+    protected function prepareRelations()
+    {
+        $this->setDefaultIncludes($this->resource->getTransformer());
+        $this->eagerLoadIfApplicable($this->resource->getData());
+
+        $this->with = $this->trimEagerLoadFunctions($this->with);
+    }
+
+    /**
+     * Set default includes extracted from the transformer.
+     *
+     * @param \Flugg\Responder\Transformers\Transformer|callable $transformer
+     * @return void
+     */
+    protected function setDefaultIncludes($transformer)
+    {
+        if ($transformer instanceof Transformer) {
+            $this->with($transformer->extractDefaultRelations());
         }
+    }
 
-        $with = collect($this->with)->map(function ($value, $key) {
+    /**
+     * Eager load relations on the given data, if it's an Eloquent model or collection.
+     *
+     * @param  mixed $data
+     * @return void
+     */
+    protected function eagerLoadIfApplicable($data)
+    {
+        if ($data instanceof Model || $data instanceof Collection) {
+            $data->load($this->with);
+        }
+    }
+
+    /**
+     * Remove eager load constraint functions from the given array.
+     *
+     * @param  array $relations
+     * @return void
+     */
+    protected function trimEagerLoadFunctions(array $relations)
+    {
+        return collect($relations)->map(function ($value, $key) {
             return is_numeric($key) ? $value : $key;
-        })->values();
-
-        return $this->factory->make($resource, $this->serializer, $with, $this->without);
+        })->values()->all();
     }
 }
