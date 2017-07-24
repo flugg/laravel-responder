@@ -70,7 +70,7 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerLaravelBindings()
     {
-        $this->app->bind(ResponseFactoryContract::class, function ($app) {
+        $this->app->singleton(ResponseFactoryContract::class, function ($app) {
             return $this->decorateResponseFactory($app->make(LaravelResponseFactory::class));
         });
     }
@@ -82,7 +82,7 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerLumenBindings()
     {
-        $this->app->bind(ResponseFactoryContract::class, function ($app) {
+        $this->app->singleton(ResponseFactoryContract::class, function ($app) {
             return $this->decorateResponseFactory($app->make(LumenResponseFactory::class));
         });
     }
@@ -125,11 +125,11 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerErrorBindings()
     {
-        $this->app->bind(ErrorMessageResolverContract::class, function () {
+        $this->app->singleton(ErrorMessageResolverContract::class, function () {
             return $app->make(ErrorMessageResolver::class);
         });
 
-        $this->app->bind(ErrorFactoryContract::class, function ($app) {
+        $this->app->singleton(ErrorFactoryContract::class, function ($app) {
             return $app->make(ErrorFactory::class);
         });
     }
@@ -153,7 +153,7 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerResourceBindings()
     {
-        $this->app->bind(ResourceFactoryContract::class, function ($app) {
+        $this->app->singleton(ResourceFactoryContract::class, function ($app) {
             return $app->make(ResourceFactory::class);
         });
     }
@@ -188,7 +188,7 @@ class ResponderServiceProvider extends BaseServiceProvider
                 ->only($app->make(Request::class)->input($app->config['responder.filter_fields_parameter'], []));
         });
 
-        $this->app->bind(TransformerResolverContract::class, function ($app) {
+        $this->app->singleton(TransformerResolverContract::class, function ($app) {
             return $app->make(TransformerResolver::class);
         });
     }
@@ -200,11 +200,11 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerServiceBindings()
     {
-        $this->app->bind(ResponderContract::class, function ($app) {
+        $this->app->singleton(ResponderContract::class, function ($app) {
             return $app->make(Responder::class);
         });
 
-        $this->app->bind(TransformerContract::class, function ($app) {
+        $this->app->singleton(TransformerContract::class, function ($app) {
             return $app->make(Transformer::class);
         });
     }
