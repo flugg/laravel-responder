@@ -50,7 +50,9 @@ class MakesApiResponsesTest extends TestCase
      */
     public function testErrorMethodShouldCallOnTheResponder()
     {
-        [$error, $message, $data] = ['error_occured', 'An error has occured.', ['foo' => 1]];
+        $error   = 'error_occured'; 
+        $message = 'An error has occured.'; 
+        $data    = ['foo' => 1];
         $this->responder->shouldReceive('error')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
 
         $result = $this->trait->error($error, $message, $data);
@@ -64,7 +66,9 @@ class MakesApiResponsesTest extends TestCase
      */
     public function testSuccessMethodShouldCallOnTheResponder()
     {
-        [$data, $transformer, $resourceKey] = [['foo' => 1], $this->mockTransformer(), 'foo'];
+        $data        = ['foo' => 1];
+        $transformer = $this->mockTransformer();
+        $resourceKey = 'foo';
         $this->responder->shouldReceive('success')->andReturn($responseBuilder = $this->mockSuccessResponseBuilder());
 
         $result = $this->trait->success($data, $transformer, $resourceKey);

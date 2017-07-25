@@ -101,9 +101,9 @@ class NullSerializerTest extends TestCase
      */
     public function testMergeIncludesMethodShouldMergeRelations()
     {
-        [$data, $relations] = [['foo' => 1], ['bar' => 2]];
-
-        $result = $this->serializer->mergeIncludes($data, $relations);
+        $data      = ['foo' => 1];
+        $relations = ['bar' => 2];
+        $result    = $this->serializer->mergeIncludes($data, $relations);
 
         $this->assertEquals(['foo' => 1, 'bar' => 2], $result);
     }

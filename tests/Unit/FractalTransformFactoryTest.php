@@ -50,7 +50,10 @@ class FractalTransformFactoryTest extends TestCase
      */
     public function testMakeMethodShouldCallOnManager()
     {
-        [$resource, $serializer] = [new NullResource(), Mockery::mock(SerializerAbstract::class)];
+        $resource   = new NullResource();
+        $serializer = Mockery::mock(SerializerAbstract::class);
+        $with    = ['foo'];
+        $without = ['bar'];
         $this->manager->shouldReceive('createData')->andReturn($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('toArray')->andReturn($data = ['foo' => 1]);
 

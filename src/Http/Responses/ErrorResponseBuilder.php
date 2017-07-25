@@ -108,7 +108,7 @@ class ErrorResponseBuilder extends ResponseBuilder
      * @return void
      * @throws \InvalidArgumentException
      */
-    protected function validateStatusCode(int $status): void
+    protected function validateStatusCode(int $status)
     {
         if ($status < 400 || $status >= 600) {
             throw new InvalidArgumentException("{$status} is not a valid error HTTP status code.");

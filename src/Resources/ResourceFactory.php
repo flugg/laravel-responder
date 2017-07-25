@@ -94,7 +94,7 @@ class ResourceFactory implements ResourceFactoryContract
     {
         if (is_null($data)) {
             return new NullResource();
-        } elseif (is_iterable($data)) {
+        } elseif (is_array($data) || $data instanceof Traversable) {
             return new CollectionResource($data, $transformer, $resourceKey);
         }
 

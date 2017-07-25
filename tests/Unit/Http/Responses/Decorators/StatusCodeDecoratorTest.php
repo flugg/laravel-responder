@@ -46,8 +46,8 @@ class StatusCodeDecoratorTest extends TestCase
      */
     public function testMakeMethodShouldAppendStatusCodeToResponseData()
     {
-        [$data, $status] = [['foo' => 1], 201];
-
+        $data     = ['foo' => 1]; 
+        $status   = 201;
         $response = $this->responseDecorator->make($data, $status);
 
         $this->assertEquals(json_encode(array_merge(['status' => $status], $data)), $response->getContent());
