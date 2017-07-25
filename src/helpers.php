@@ -3,20 +3,6 @@
 use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Contracts\Transformer;
 
-if (! function_exists('is_iterable')) {
-
-    /**
-     * A helper to mimic php 7.1 is_iterable
-     * @see    http://php.net/manual/en/function.is-iterable.php
-     * @param  mixed $var
-     * @return boolean
-     */
-    function is_iterable($var): bool
-    {
-        return is_array($var) || $var instanceof Traversable;
-    }
-}
-
 if (! function_exists('responder')) {
 
     /**
