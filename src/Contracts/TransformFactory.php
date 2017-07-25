@@ -19,9 +19,8 @@ interface TransformFactory
      *
      * @param  \League\Fractal\Resource\ResourceInterface    $resource
      * @param  \League\Fractal\Serializer\SerializerAbstract $serializer
-     * @param  string[]                                      $with
-     * @param  string[]                                      $without
+     * @param  array                                         $options
      * @return array
      */
-    public function make(ResourceInterface $resource, SerializerAbstract $serializer, array $with = [], array $without = []): array;
+    public function make(ResourceInterface $resource, SerializerAbstract $serializer, array $options = []): array;
 }

@@ -149,13 +149,13 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the [addData] method adds error data that is sent to the error factory.
+     * Test that the [data] method adds error data that is sent to the error factory.
      */
-    public function testAddDataMethodSetsErrorData()
+    public function testDataMethodSetsErrorData()
     {
         $this->errorFactory->shouldReceive('make')->andReturn([]);
 
-        $this->responseBuilder->addData($data = ['foo' => 1])->toArray();
+        $this->responseBuilder->data($data = ['foo' => 1])->toArray();
 
         $this->errorFactory->shouldHaveReceived('make')->with(null, null, $data)->once();
     }

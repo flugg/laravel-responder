@@ -101,7 +101,7 @@ trait HandlesApiErrors
     {
         return $this->container->make(ErrorResponseBuilder::class)
             ->error($exception->errorCode(), $exception->message())
-            ->addData($exception->data())
+            ->data($exception->data())
             ->respond($exception->statusCode());
     }
 }

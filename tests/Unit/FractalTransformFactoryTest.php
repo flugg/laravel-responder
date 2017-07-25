@@ -57,12 +57,17 @@ class FractalTransformFactoryTest extends TestCase
         $this->manager->shouldReceive('createData')->andReturn($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('toArray')->andReturn($data = ['foo' => 1]);
 
-        $result = $this->factory->make($resource, $serializer, $with, $without);
+        $result = $this->factory->make($resource, $serializer, [
+            'includes' => $with = ['foo'],
+            'excludes' => $without = ['bar'],
+            'fields' => $fields = ['baz']
+        ]);
 
         $this->assertEquals($data, $result);
         $this->manager->shouldHaveReceived('setSerializer')->with($serializer)->once();
         $this->manager->shouldHaveReceived('parseIncludes')->with($with)->once();
         $this->manager->shouldHaveReceived('parseExcludes')->with($without)->once();
+        $this->manager->shouldHaveReceived('parseFieldsets')->with($fields)->once();
         $this->manager->shouldHaveReceived('createData')->with($resource)->once();
     }
 }

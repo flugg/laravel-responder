@@ -6,6 +6,7 @@
     <a href="license.md"><img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square" alt="Software License"></a>
     <a href="https://travis-ci.org/flugger/laravel-responder"><img src="https://img.shields.io/travis/flugger/laravel-responder/master.svg?style=flat-square" alt="Build Status"></a>
     <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/?branch=master"><img src="https://img.shields.io/scrutinizer/g/flugger/laravel-responder.svg?style=flat-square" alt="Code Quality"></a>
+    <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/code-structure/master"><img src="https://img.shields.io/scrutinizer/coverage/g/flugger/laravel-responder.svg?style=flat-square" alt="Test Coverage"></a>
     <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PRMC9WLJY8E46&lc=NO&item_name=Laravel%20Responder&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"><img src="https://img.shields.io/badge/donate-PayPal-yellow.svg?style=flat-square" alt="Donate"></a>
 </p>
 
@@ -13,7 +14,7 @@ Laravel Responder is a package for your JSON API, integrating [Fractal](https://
 
 # Table of Contents
 
-- [Philosophy](#philosophy)
+- [Introduction](#philosophy)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -28,12 +29,12 @@ Laravel Responder is a package for your JSON API, integrating [Fractal](https://
 - [Contributing](#contributing)
 - [License](#license)
 
-# Philosophy
+# Introduction
 
-A good API should return consistent data, and coupling the response data to the database makes it harder to update the code in the future. Adding a transformer layer over the controller, transforming the data before the response is returned, gives us a consistent way of handling the response data. 
+Laravel is an excellent tool for building APIs, however, it's quite common to display the database columns directly in the responses. This couples your database to your API and makes it harder to make changes in the future. 
 
-Since Laravel doesn't provide a transformation layer out of the box, we would have to use something like Fractal. Fractal solves some of the shortcomings of Laravel, however, it's often a bit cumbersome to integrate into the framework:
-
+Fractal, a popular PHP package from [The PHP League](https://thephpleague.com/), solves this problem by introducing a new transformation layer. However, while Fractal can improve your API, it can be a bit cumbersome to integrate into the framework:
+ 
 ```php
  public function index()
  {
@@ -44,9 +45,7 @@ Since Laravel doesn't provide a transformation layer out of the box, we would ha
  }
 ```
 
-Admittely, the Fractal manager could be moved outside the controller and the array could be returned directly. However, as soon as you want a different status code than the default `200`, you will probably want to wrap it in a `response()->json` call anyway.
-
-The point is, we all get a little spoiled by Laravel's magic. Wouldn't it be sweet if the above could be rewritten as following:
+We all get a little spoiled by Laravel's magic. Wouldn't it be neat if the above could be refactored to:
 
 ```php
 public function index()
@@ -55,7 +54,21 @@ public function index()
 }
 ```
 
-The package will call on Fractal behind the scenes to automatically transform and serialize the data. No longer will you have to instantiate different Fractal resources depending on if it's a model or a collection, the package deals with all of it automatically under the hood.
+The package allows you to do this, and so much more.
+
+## Philosophy
+
+My mission with this package is to create an extremely high-quality package that feels like pure Laravel. A package that lets you embrace the power of Fractal, but hide it all behind beautiful abstractions.
+
+### Comparison to Spatie's Package
+
+There are tons of Laravel packages integrating Fractal, but [Laravel Fratal](https://github.com/spatie/laravel-fractal) by Spatie is definitely the most popular one. This package does all the same things as Spatie's, however, in addition, it has tons of other distinct features:
+ 
+ - Automatic eager loading
+ - Easily transform without serializing
+ - Streamlined success- and error responses
+ - Serializers for error responses
+ - Automatic resource caching in transformers
 
 # Requirements
 

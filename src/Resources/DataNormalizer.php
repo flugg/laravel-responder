@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Collection;
 
 /**
  * This class is responsible for normalizing resource data.
@@ -22,72 +21,51 @@ use Illuminate\Support\Collection;
 class DataNormalizer
 {
     /**
-     *
+     * Normalize the data for a resource.
      *
      * @param  mixed $data
      * @return mixed
      */
     public function normalize($data = null)
     {
-        if (is_array($data)) {
-            return new Collection($data);
-        }
-
-        foreach ($this->getMethodMappings() as $method => $types) {
-            if (in_array(get_class($data), $types)) {
-                return $this->$method($data);
-            }
+        if ($data instanceof Builder || $data instanceof CursorPaginator) {
+            return $data->get();
+        } elseif ($data instanceof Paginator) {
+            return $data->getCollection();
+        } elseif ($data instanceof Relation) {
+            return $this->normalizeRelation($data);
         }
 
         return $data;
     }
 
     /**
-     *
-     *
-     * @return array
-     */
-    protected function getMethodMappings(): array
-    {
-        return [
-            'normalizeBuilder' => [Builder::class],
-            'normalizePaginator' => [Paginator::class, CursorPaginator::class],
-            'normalizeRelation' => [Relation::class],
-        ];
-    }
-
-    /**
-     *
-     *
-     * @param  \Illuminate\Database\Query\Builder $builder
-     * @return \Illuminate\Support\Collection
-     */
-    protected function normalizeBuilder(Builder $builder): Collection
-    {
-        return $builder->get();
-    }
-
-    /**
-     *
-     *
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Flugg\Responder\Pagination\CursorPaginator $paginator
-     * @return \Illuminate\Support\Collection
-     */
-    protected function normalizePaginator($paginator): Collection
-    {
-        return $paginator->getCollection();
-    }
-
-    /**
-     *
+     * Normalize a relationship.
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|null
      */
-    protected function normalizeRelation(Relation $relation): Collection
+    protected function normalizeRelation(Relation $relation)
     {
-        $single = in_array(get_class($relation), [BelongsTo::class, HasOne::class, MorphOne::class, MorphTo::class]);
+        return $this->isSingularRelation($relation) ? $relation->first() : $relation->get();
+    }
 
-        return $single ? $relation->first() : $relation->get();
+    /**
+     * Indicates if a relationship is singular.
+     *
+     * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
+     * @return bool
+     */
+    protected function isSingularRelation(Relation $relation): bool
+    {
+        $singularRelations = [BelongsTo::class, HasOne::class, MorphOne::class, MorphTo::class];
+
+        foreach ($singularRelations as $singularRelation) {
+            if ($relation instanceof $singularRelation) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

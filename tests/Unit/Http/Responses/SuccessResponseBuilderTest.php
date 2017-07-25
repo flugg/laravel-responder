@@ -153,14 +153,14 @@ class SuccessResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the parameters sent to the [addMeta] method is forwarded to the transform builder.
+     * Test that the parameters sent to the [meta] method is forwarded to the transform builder.
      */
-    public function testAddMetaMethodShouldAddMetaToTheTransformBuilder()
+    public function testMetaMethodShouldAddMetaToTheTransformBuilder()
     {
-        $responseBuilder = $this->responseBuilder->addMeta($meta = ['foo' => 1]);
+        $responseBuilder = $this->responseBuilder->meta($meta = ['foo' => 1]);
 
         $this->assertSame($responseBuilder, $this->responseBuilder);
-        $this->transformBuilder->shouldHaveReceived('addMeta')->with($meta)->once();
+        $this->transformBuilder->shouldHaveReceived('meta')->with($meta)->once();
     }
 
     /**

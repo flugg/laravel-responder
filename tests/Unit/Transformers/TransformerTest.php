@@ -16,13 +16,6 @@ use Mockery;
 class TransformerTest extends TestCase
 {
     /**
-     * Mock of the resource builder.
-     *
-     * @var \Mockery\MockInterface
-     */
-    protected $resourceBuilder;
-
-    /**
      * The transformer being tested.
      *
      * @var \Flugg\Responder\Transformers\Transformer
@@ -38,7 +31,6 @@ class TransformerTest extends TestCase
     {
         parent::setUp();
 
-        $this->resourceBuilder = $this->mockResourceBuilder();
         $this->transformer = Mockery::mock(Transformer::class);
     }
 

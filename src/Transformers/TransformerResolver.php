@@ -2,79 +2,94 @@
 
 namespace Flugg\Responder\Transformers;
 
+use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
 use Flugg\Responder\Contracts\Transformable;
 use Flugg\Responder\Exceptions\InvalidTransformerException;
-use Traversable;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Support\Arrayable;
 
 /**
- * This class is responsible for resolving a transformer from a data set.
+ * This class is responsible for resolving transformers.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformerResolver
+class TransformerResolver implements TransformerResolverContract
 {
+    /**
+     * An IoC container, used to resolve transformers.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
     /**
      * Transformable to transformer mappings.
      *
      * @var array
      */
-    protected $transformables = [];
+    protected $bindings = [];
 
     /**
-     * Register a transformable to transformer mapping.
+     * Construct the resolver class.
      *
-     * @param string          $transformable
-     * @param string|callback $transformer
-     * @return void
+     * @param \Illuminate\Contracts\Container\Container $container
      */
-    public function transformable(string $transformable, $transformer)
+    public function __construct(Container $container)
     {
-        $this->transformables = array_merge($this->transformables, [$transformable => $transformer]);
+        $this->container = $container;
     }
 
     /**
-     * Register multiple transformable to transformer mappings.
+     * Register a transformable to transformer binding.
      *
-     * @param  array $transformables
+     * @param  string|array    $transformable
+     * @param  string|callback $transformer
      * @return void
      */
-    public function transformables(array $transformables)
+    public function bind($transformable, $transformer)
     {
-        foreach ($transformables as $transformable => $transformer) {
-            $this->transformable($transformables);
+        $this->bindings = array_merge($this->bindings, is_array($transformable) ? $transformable : [
+            $transformable => $transformer,
+        ]);
+    }
+
+    /**
+     * Resolve a transformer.
+     *
+     * @param  \Flugg\Responder\Transformers\Transformer|string|callable $transformer
+     * @return \Flugg\Responder\Transformers\Transformer|callable
+     * @throws \Flugg\Responder\Exceptions\InvalidTransformerException
+     */
+    public function resolve($transformer)
+    {
+        if (is_string($transformer)) {
+            return $this->container->make($transformer);
         }
+
+        if (! is_callable($transformer) && ! $transformer instanceof Transformer) {
+            throw new InvalidTransformerException;
+        }
+
+        return $transformer;
     }
 
     /**
-     * Resolve a transformer from a transformable.
+     * Resolve a transformer from the given data.
      *
-     * @param  \Flugg\Responder\Contracts\Transformable $transformable
-     * @return callable|\Flugg\Responder\Transformers\Transformer
+     * @param  mixed $data
+     * @return \Flugg\Responder\Transformers\Transformer|callable|null
      */
-    public function resolve(Transformable $transformable)
+    public function resolveFromData($data)
     {
-        if (is_null($transformer)) {
-            $transformable = $this->resolveTransformable($data);
-
-            if (! $transformer = $this->resolveTransformer($transformable)) {
-                return;
+        if ($transformable = $this->resolveTransformable($data)) {
+            if ($transformer = $this->resolveTransformer()) {
+                return $this->resolve($transformer);
             }
         }
 
-        return $this->parse($transformer);
-    }
-
-    /**
-     * Resolve a transformer class instance.
-     *
-     * @param  string $transformer
-     * @return callable|\Flugg\Responder\Transformers\Transformer|null
-     */
-    public function resolveTransformer(string $transformer)
-    {
-        return $this->container->make($transformer);
+        return $this->makeClosureTransformer();
     }
 
     /**
@@ -83,29 +98,43 @@ class TransformerResolver
      * @param  mixed $data
      * @return \Flugg\Responder\Contracts\Transformable|null
      */
-    public function resolveTransformable($data)
+    protected function resolveTransformable($data)
     {
-        if ($data instanceof Traversable && count($data)) {
-            $data = array_values($data)[0];
+        if (is_iterable($data)) {
+            foreach ($data as $item) {
+                if ($item instanceof Transformable) {
+                    return $item;
+                }
+            }
         }
 
         return $data instanceof Transformable ? $data : null;
     }
 
     /**
-     * Register model to transformer mappings.
+     * Resolve a transformer from the transformable.
      *
-     * @param  \Flugg\Responder\Transformers\Transformer|string|callable $transformer
-     * @return \Flugg\Responder\Transformers\Transformer|callable
-     * @throws \Flugg\Responder\Exceptions\InvalidTransformerException
+     * @param  \Flugg\Responder\Contracts\Transformable $transformable
+     * @return \Flugg\Responder\Contracts\Transformable|null
      */
-    protected function parse($transformer)
+    protected function resolveTransformer(Transformable $transformable)
     {
-
-        if (is_callable($transformer) || $transformer instanceof Transformer) {
-            return $transformer;
+        if (key_exists($this->bindings, get_class($transformable))) {
+            return $this->bindings[get_class($transformable)];
         }
 
-        throw new InvalidTransformerException;
+        return $transformable->transformer();
+    }
+
+    /**
+     * Make a simple closure transformer.
+     *
+     * @return callable
+     */
+    protected function makeClosureTransformer(): callable
+    {
+        return function ($data) {
+            return $data instanceof Arrayable ? $data->toArray() : $data;
+        };
     }
 }

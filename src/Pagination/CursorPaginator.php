@@ -30,6 +30,13 @@ class CursorPaginator
     protected $cursor;
 
     /**
+     * The previous cursor reference.
+     *
+     * @var int|string|null
+     */
+    protected $previousCursor;
+
+    /**
      * The next cursor reference.
      *
      * @var int|string|null
@@ -46,15 +53,18 @@ class CursorPaginator
     /**
      * Create a new paginator instance.
      *
-     * @param mixed           $data
-     * @param int|string|null $cursor
-     * @param int|string|null $nextCursor
+     * @param \Illuminate\Support\Collection|array|null $data
+     * @param int|string|null                           $cursor
+     * @param int|string|null                           $previousCursor
+     * @param int|string|null                           $nextCursor
      */
-    public function __construct($data, $cursor, $nextCursor)
+    public function __construct($data, $cursor, $previousCursor, $nextCursor)
     {
         $this->cursor = $cursor;
+        $this->previousCursor = $previousCursor;
         $this->nextCursor = $nextCursor;
-        $this->items = $data instanceof Collection ? $data : Collection::make($data);
+
+        $this->set($data);
     }
 
     /**
@@ -72,7 +82,17 @@ class CursorPaginator
      *
      * @return int|string|null
      */
-    public function nextCursor()
+    public function previous()
+    {
+        return $this->previousCursor;
+    }
+
+    /**
+     * Retireve the next cursor reference.
+     *
+     * @return int|string|null
+     */
+    public function next()
     {
         return $this->nextCursor;
     }
@@ -92,7 +112,7 @@ class CursorPaginator
      *
      * @return \Illuminate\Support\Collection
      */
-    public function getCollection(): Collection
+    public function get(): Collection
     {
         return $this->items;
     }
@@ -100,12 +120,12 @@ class CursorPaginator
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection $collection
+     * @param  \Illuminate\Support\Collection|array|null $data
      * @return self
      */
-    public function setCollection(Collection $collection): CursorPaginator
+    public function set($data): CursorPaginator
     {
-        $this->items = $collection;
+        $this->items = $data instanceof Collection ? $data : Collection::make($data);;
 
         return $this;
     }
