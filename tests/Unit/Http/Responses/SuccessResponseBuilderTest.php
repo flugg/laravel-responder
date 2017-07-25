@@ -61,7 +61,9 @@ class SuccessResponseBuilderTest extends TestCase
      */
     public function testTransformMethodShouldMakeResourceWithTheTransformBuilder()
     {
-        [$data, $transformer, $resourceKey] = [['foo' => 1], Mockery::mock(BaseTransformer::class), 'foo'];
+        $data        = ['foo' => 1]; 
+        $transformer = Mockery::mock(BaseTransformer::class); 
+        $resourceKey = 'foo';
 
         $responseBuilder = $this->responseBuilder->transform($data, $transformer, $resourceKey);
 
@@ -73,8 +75,9 @@ class SuccessResponseBuilderTest extends TestCase
      * Test that the [respond] method calls on the response factory to generate a JSON response.
      */
     public function testRespondMethodShouldMakeAResponseUsingTheResponseFactory()
-    {
-        [$status, $headers] = [201, ['x-foo' => 1]];
+    { 
+        $status  = 201;
+        $headers = ['x-foo' => 1];
         $this->transformBuilder->shouldReceive('transform')->andReturn($data = ['foo' => 1]);
         $this->responseFactory->shouldReceive('make')
             ->andReturn($response = new JsonResponse($data, $status, $headers));

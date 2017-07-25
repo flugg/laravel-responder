@@ -57,7 +57,9 @@ class ErrorFactoryTest extends TestCase
      */
     public function testMakeMethodSerializesErrorDataUsingTheSerializer()
     {
-        [$code, $message, $data] = ['test_error', 'A test error has occured.', ['foo' => 1]];
+        $code    = 'test_error';
+        $message = 'A test error has occured.';
+        $data    = ['foo' => 1];
         $this->serializer->shouldReceive('format')->andReturn($error = ['bar' => 2]);
 
         $result = $this->factory->make($code, $message, $data);

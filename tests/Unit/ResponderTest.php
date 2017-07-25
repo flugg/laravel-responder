@@ -55,9 +55,9 @@ class ResponderTest extends TestCase
      */
     public function testErrorMethodShouldCallOnTheErrorResponseBuilder()
     {
-        [$error, $message] = ['error_occured', 'An error has occured.'];
-
-        $result = $this->responder->error($error, $message);
+        $error   = 'error_occured';
+        $message = 'An error has occured.';
+        $result  = $this->responder->error($error, $message);
 
         $this->assertSame($this->errorResponseBuilder, $result);
         $this->errorResponseBuilder->shouldHaveReceived('error')->with($error, $message)->once();
@@ -68,9 +68,10 @@ class ResponderTest extends TestCase
      */
     public function testSuccessMethodShouldCallOnTheErrorResponseBuilder()
     {
-        [$data, $transformer, $resourceKey] = [['foo' => 1], $this->mockTransformer(), 'foo'];
-
-        $result = $this->responder->success($data, $transformer, $resourceKey);
+        $data        = ['foo' => 1];
+        $transformer = $this->mockTransformer();
+        $resourceKey = 'foo';
+        $result      = $this->responder->success($data, $transformer, $resourceKey);
 
         $this->assertSame($this->successResponseBuilder, $result);
         $this->successResponseBuilder->shouldHaveReceived('transform')->with($data, $transformer, $resourceKey)->once();

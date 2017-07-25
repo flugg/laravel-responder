@@ -61,7 +61,8 @@ class ErrorResponseBuilderTest extends TestCase
      */
     public function testRespondMethodShouldMakeAResponseUsingTheResponseFactory()
     {
-        [$status, $headers] = [400, ['x-foo' => 1]];
+        $status  = 400; 
+        $headers = ['x-foo' => 1];
         $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
         $this->responseFactory->shouldReceive('make')
             ->andReturn($response = new JsonResponse($error, $status, $headers));
@@ -138,7 +139,8 @@ class ErrorResponseBuilderTest extends TestCase
      */
     public function testErrorMethodSetsErrorCodeAndMessage()
     {
-        [$code, $message] = ['test_error', 'A test error has occured.'];
+        $code    = 'test_error'; 
+        $message = 'A test error has occured.';
         $this->errorFactory->shouldReceive('make')->andReturn([]);
 
         $this->responseBuilder->error($code, $message)->toArray();

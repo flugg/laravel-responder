@@ -61,9 +61,10 @@ class TransformBuilderTest extends TestCase
      */
     public function testResourceMethodMakesAResource()
     {
-        [$data, $transformer, $resourceKey] = [['foo' => 1], $this->mockTransformer(), 'foo'];
-
-        $result = $this->builder->resource($data, $transformer, $resourceKey);
+        $data        = ['foo' => 1];
+        $transformer = $this->mockTransformer();
+        $resourceKey = 'foo';
+        $result      = $this->builder->resource($data, $transformer, $resourceKey);
 
         $this->assertSame($this->builder, $result);
         $this->resourceBuilder->shouldHaveReceived('make')->with($data, $transformer)->once();

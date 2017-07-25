@@ -38,7 +38,9 @@ class ErrorSerializerTest extends TestCase
      */
     public function testFormatMethodSerializesErrorData()
     {
-        [$code, $message, $data] = ['test_error', 'A test error has occured.', ['foo' => 1]];
+        $code    = 'test_error'; 
+        $message = 'A test error has occured.'; 
+        $data    = ['foo' => 1];
 
         $formattedData = $this->serializer->format($code, $message, $data);
 

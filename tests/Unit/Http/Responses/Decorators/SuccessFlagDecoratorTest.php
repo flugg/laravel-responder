@@ -46,8 +46,8 @@ class SuccessFlagDecoratorTest extends TestCase
      */
     public function testMakeMethodShouldAppendSuccessFlagToResponseData()
     {
-        [$data, $status] = [['foo' => 1], 201];
-
+        $data     = ['foo' => 1]; 
+        $status   = 201;
         $response = $this->responseDecorator->make($data, $status);
 
         $this->assertEquals(json_encode(array_merge(['success' => true], $data)), $response->getContent());
