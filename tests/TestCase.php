@@ -82,9 +82,9 @@ abstract class TestCase extends BaseTestCase
         $transformBuilder = Mockery::mock(TransformBuilder::class);
 
         $transformBuilder->shouldReceive('resource')->andReturnSelf();
+        $transformBuilder->shouldReceive('meta')->andReturnSelf();
         $transformBuilder->shouldReceive('with')->andReturnSelf();
         $transformBuilder->shouldReceive('without')->andReturnSelf();
-        $transformBuilder->shouldReceive('addMeta')->andReturnSelf();
         $transformBuilder->shouldReceive('serializer')->andReturnSelf();
 
         return $transformBuilder;
@@ -107,22 +107,6 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Create a mock of a resource builder.
-     *
-     * @return \Mockery\MockInterface
-     */
-    protected function mockResourceBuilder(): MockInterface
-    {
-        $resourceBuilder = Mockery::mock(ResourceBuilder::class);
-
-        $resourceBuilder->shouldReceive('make')->andReturnSelf();
-        $resourceBuilder->shouldReceive('withResourceKey')->andReturnSelf();
-        $resourceBuilder->shouldReceive('withMeta')->andReturnSelf();
-
-        return $resourceBuilder;
-    }
-
-    /**
      * Create a mock of an error response builder.
      *
      * @return \Mockery\MockInterface
@@ -132,7 +116,7 @@ abstract class TestCase extends BaseTestCase
         $responseBuilder = Mockery::mock(ErrorResponseBuilder::class);
 
         $responseBuilder->shouldReceive('error')->andReturnSelf();
-        $responseBuilder->shouldReceive('addData')->andReturnSelf();
+        $responseBuilder->shouldReceive('data')->andReturnSelf();
 
         return $responseBuilder;
     }
@@ -147,7 +131,7 @@ abstract class TestCase extends BaseTestCase
         $responseBuilder = Mockery::mock(SuccessResponseBuilder::class);
 
         $responseBuilder->shouldReceive('transform')->andReturnSelf();
-        $responseBuilder->shouldReceive('addMeta')->andReturnSelf();
+        $responseBuilder->shouldReceive('meta')->andReturnSelf();
 
         return $responseBuilder;
     }
@@ -161,9 +145,10 @@ abstract class TestCase extends BaseTestCase
     {
         $responseBuilder = Mockery::mock(Manager::class);
 
-        $responseBuilder->shouldReceive('setSerializer')->andReturnSelf();
-        $responseBuilder->shouldReceive('parseIncludes')->andReturnSelf();
-        $responseBuilder->shouldReceive('parseExcludes')->andReturnSelf();
+        $responseBuilder->shouldReceive('setSerializer')->andReturnSelf()->byDefault();
+        $responseBuilder->shouldReceive('parseIncludes')->andReturnSelf()->byDefault();
+        $responseBuilder->shouldReceive('parseExcludes')->andReturnSelf()->byDefault();
+        $responseBuilder->shouldReceive('parseFieldsets')->andReturnSelf()->byDefault();
 
         return $responseBuilder;
     }

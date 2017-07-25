@@ -84,7 +84,7 @@ class ErrorResponseBuilder extends ResponseBuilder
      * @param  array $data
      * @return self
      */
-    public function addData(array $data): ErrorResponseBuilder
+    public function data(array $data): ErrorResponseBuilder
     {
         $this->data = array_merge((array) $this->data, $data);
 

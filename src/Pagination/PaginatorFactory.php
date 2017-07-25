@@ -2,7 +2,9 @@
 
 namespace Flugg\Responder\Pagination;
 
+use Flugg\Responder\Contracts\Pagination\PaginatorFactory as PaginatorFactoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use League\Fractal\Pagination\Cursor;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Pagination\PaginatorInterface;
 
@@ -13,7 +15,7 @@ use League\Fractal\Pagination\PaginatorInterface;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class PaginatorFactory
+class PaginatorFactory implements PaginatorFactoryContract
 {
     /**
      * A list of query string values appended to the paginator links.
@@ -43,5 +45,18 @@ class PaginatorFactory
         $paginator->appends($this->parameters);
 
         return new IlluminatePaginatorAdapter($paginator);
+    }
+
+    /**
+     * Make a Fractal paginator adapter from a Laravel paginator.
+     *
+     * @param  \Flugg\Responder\Pagination\CursorPaginator $paginator
+     * @return \League\Fractal\Pagination\Cursor
+     */
+    public function makeCursor(CursorPaginator $paginator): Cursor
+    {
+        $paginator->appends($this->parameters);
+
+        return new Cursor($paginator->cursor(), $paginator->previous(), $paginator->next(), $paginator->get()->count());
     }
 }

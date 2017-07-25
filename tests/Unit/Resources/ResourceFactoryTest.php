@@ -3,18 +3,14 @@
 namespace Flugg\Responder\Tests\Unit\Resources;
 
 use Flugg\Responder\Pagination\CursorFactory;
-use Flugg\Responder\Pagination\CursorPaginator;
-use Flugg\Responder\Pagination\PaginatorFactory;
 use Flugg\Responder\Resources\DataNormalizer;
 use Flugg\Responder\Resources\ResourceFactory;
 use Flugg\Responder\Tests\TestCase;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Flugg\Responder\Transformers\TransformerManager;
+use Flugg\Responder\Transformers\TransformerResolver;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use League\Fractal\Pagination\Cursor;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use League\Fractal\Resource\Collection as CollectionResource;
-use League\Fractal\Resource\Item as ItemResource;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
 use League\Fractal\Resource\NullResource;
 use Mockery;
 
@@ -28,28 +24,21 @@ use Mockery;
 class ResourceFactoryTest extends TestCase
 {
     /**
-     * The resource data normalier mock.
+     * Mock of a resource data normalizer class.
      *
      * @var \Mockery\MockInterface
      */
-    protected $dataNormalizer;
+    protected $normalizer;
 
     /**
-     * The paginator factory mock.
+     * Mock of a transformer resolver class.
      *
      * @var \Mockery\MockInterface
      */
-    protected $paginatorFactory;
+    protected $transformerResolver;
 
     /**
-     * The cursor factory mock.
-     *
-     * @var \Mockery\MockInterface
-     */
-    protected $cursorFactory;
-
-    /**
-     * The resource factory.
+     * The resource factory being tested.
      *
      * @var \Flugg\Responder\Resources\ResourceFactory
      */
@@ -64,99 +53,70 @@ class ResourceFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->dataNormalizer = Mockery::mock(DataNormalizer::class);
-        $this->paginatorFactory = Mockery::mock(PaginatorFactory::class);
-        $this->cursorFactory = Mockery::mock(CursorFactory::class);
-        $this->factory = new ResourceFactory($this->dataNormalizer, $this->paginatorFactory, $this->cursorFactory);
+        $this->normalizer = Mockery::mock(DataNormalizer::class);
+        $this->transformerResolver = Mockery::mock(TransformerResolver::class);
+        $this->factory = new ResourceFactory($this->normalizer, $this->transformerResolver);
     }
 
     /**
      *
      */
-    public function testMakeFromNullMethodReturnsANullResource()
+    public function testMakeMethodMakesANullResourceWhenGivenNoArguments()
     {
-        $this->dataNormalizer->shouldReceive('normalize')->andReturn(null);
+        $this->normalizer->shouldReceive('normalize')->andReturn(null);
 
         $resource = $this->factory->make();
 
         $this->assertInstanceOf(NullResource::class, $resource);
-        $this->dataNormalizer->shouldHaveReceived('normalize')->with(null);
+        $this->normalizer->shouldHaveReceived('normalize')->with(null);
     }
 
     /**
      *
      */
-    public function testMakeFromModel()
+    public function testMakeMethodMakesACollectionResourceWhenGivenArray()
     {
-        $model = Mockery::mock(Model::class);
-        $this->dataNormalizer->shouldReceive('normalize')->andReturn($model);
+        $this->normalizer->shouldReceive('normalize')->andReturn($data = ['foo', 'bar']);
+        $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
 
-        $resource = $this->factory->make($model);
+        $resource = $this->factory->make($data, $transformer, $resourceKey = 'bar');
 
-        $this->assertInstanceOf(ItemResource::class, $resource);;
-        $this->assertSame($model, $resource->getData());;
-        $this->dataNormalizer->shouldHaveReceived('normalize')->with($model);
+        $this->assertInstanceOf(Collection::class, $resource);
+        $this->assertEquals($data, $resource->getData());
+        $this->assertSame($transformer, $resource->getTransformer());
+        $this->assertEquals($resourceKey, $resource->getResourceKey());
+        $this->normalizer->shouldHaveReceived('normalize')->with($data)->once();
+        $this->transformerResolver->shouldHaveReceived('resolve')->with($transformer)->once();
     }
 
     /**
      *
      */
-    public function testMakeFromColl()
+    public function testMakeMethodMakesAnItemResourceWhenGivenArray()
     {
-        $collection = new Collection(['foo' => 1]);
-        $this->dataNormalizer->shouldReceive('normalize')->andReturn($collection);
+        $this->normalizer->shouldReceive('normalize')->andReturn($data = Mockery::mock(Model::class));
+        $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
 
-        $resource = $this->factory->make($collection);
+        $resource = $this->factory->make($data, $transformer, $resourceKey = 'bar');
 
-        $this->assertInstanceOf(CollectionResource::class, $resource);;
-        $this->assertSame($collection, $resource->getData());;
-        $this->dataNormalizer->shouldHaveReceived('normalize')->with($collection);
+        $this->assertInstanceOf(Item::class, $resource);
+        $this->assertEquals($data, $resource->getData());
+        $this->assertSame($transformer, $resource->getTransformer());
+        $this->assertEquals($resourceKey, $resource->getResourceKey());
+        $this->normalizer->shouldHaveReceived('normalize')->with($data)->once();
+        $this->transformerResolver->shouldHaveReceived('resolve')->with($transformer)->once();
     }
 
     /**
      *
      */
-    public function testMakeFromArr()
+    public function testMakeMethodResolvesTransformerFromDataWhenGivenNoTransformer()
     {
-        $array = ['foo' => 1];
-        $this->dataNormalizer->shouldReceive('normalize')->andReturn($array);
+        $this->normalizer->shouldReceive('normalize')->andReturn($data = Mockery::mock(Model::class));
+        $this->transformerResolver->shouldReceive('resolveFromData')->andReturn($transformer = $this->mockTransformer());
 
-        $resource = $this->factory->make($array);
+        $this->factory->make($data);
 
-        $this->assertInstanceOf(CollectionResource::class, $resource);;
-        $this->assertEquals($array, $resource->getData());;
-        $this->dataNormalizer->shouldHaveReceived('normalize')->with($array);
-    }
-
-    /**
-     *
-     */
-    public function testPaginator()
-    {
-        $paginator = Mockery::mock(LengthAwarePaginator::class);
-        $this->dataNormalizer->shouldReceive('normalize')->andReturn($collection = new Collection(['foo' => 1]));
-        $this->paginatorFactory->shouldReceive('make')->andReturn($adapter = Mockery::mock(IlluminatePaginatorAdapter::class));
-
-        $resource = $this->factory->make($paginator);
-
-        $this->assertSame($adapter, $resource->getPaginator());;
-        $this->assertSame($collection, $resource->getData());;
-        $this->dataNormalizer->shouldHaveReceived('normalize')->with($paginator);
-    }
-
-    /**
-     *
-     */
-    public function testCursor()
-    {
-        $paginator = Mockery::mock(CursorPaginator::class);
-        $this->dataNormalizer->shouldReceive('normalize')->andReturn($collection = new Collection(['foo' => 1]));
-        $this->cursorFactory->shouldReceive('make')->andReturn($cursor = Mockery::mock(Cursor::class));
-
-        $resource = $this->factory->make($paginator);
-
-        $this->assertSame($cursor, $resource->getCursor());;
-        $this->assertSame($collection, $resource->getData());;
-        $this->dataNormalizer->shouldHaveReceived('normalize')->with($paginator);
+        $this->transformerResolver->shouldHaveReceived('resolveFromData')->with($data)->once();
     }
 }

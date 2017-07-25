@@ -34,21 +34,21 @@ use Mockery;
 class HandlerTest extends TestCase
 {
     /**
-     * A mock of a request object.
+     * A mock of a request object class.
      *
      * @var \Mockery\MockInterface
      */
     protected $request;
 
     /**
-     * A mock of the IoC container.
+     * A mock of Laravel's container contract.
      *
      * @var \Mockery\MockInterface
      */
     protected $container;
 
     /**
-     * The exception handler.
+     * The exception handler being tested.
      *
      * @var \Flugg\Responder\Exceptions\Handler;
      */
@@ -141,7 +141,7 @@ class HandlerTest extends TestCase
         $this->assertSame($response, $result);
         $this->container->shouldHaveReceived('make')->with(ErrorResponseBuilder::class)->once();
         $responseBuilder->shouldHaveReceived('error')->with($errorCode, $message)->once();
-        $responseBuilder->shouldHaveReceived('addData')->with($data)->once();
+        $responseBuilder->shouldHaveReceived('data')->with($data)->once();
         $responseBuilder->shouldHaveReceived('respond')->with($status)->once();
     }
 
