@@ -94,7 +94,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
      * @param  int $status
      * @return void
      */
-    protected function setStatusCode(int $status): void
+    protected function setStatusCode(int $status)
     {
         $this->validateStatusCode($this->status = $status);
     }
@@ -112,5 +112,5 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
      * @param  int $status
      * @return void
      */
-    abstract protected function validateStatusCode(int $status): void;
+    abstract protected function validateStatusCode(int $status);
 }

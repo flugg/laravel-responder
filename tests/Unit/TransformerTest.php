@@ -49,7 +49,9 @@ class TransformerTest extends TestCase
      */
     public function testTransformMethodShouldCallOnTransformBuilder()
     {
-        [$data, $transformer, $relations] = [['foo' => 1], $this->mockTransformer(), ['foo', 'bar']];
+        $data        = ['foo' => 1];
+        $transformer = $this->mockTransformer();
+        $relations   = ['foo', 'bar'];
         $this->transformBuilder->shouldReceive('transform')->andReturn($data);
 
         $transformation = $this->transformer->transform($data, $transformer, $relations);

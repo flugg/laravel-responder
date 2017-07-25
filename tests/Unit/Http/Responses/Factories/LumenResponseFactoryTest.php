@@ -54,8 +54,9 @@ class LumenResponseFactoryTest extends TestCase
      */
     public function testMakeMethodShouldCreateJsonResponse()
     {
-        [$data, $status, $headers] = [['foo' => 1], 201, ['x-foo' => 1]];
-
+        $data    = ['foo' => 1]; 
+        $status  = 201;
+        $headers = ['x-foo' => 1];
         $response = $this->responseFactory->make($data, $status, $headers);
 
         $this->assertInstanceOf(JsonResponse::class, $response);

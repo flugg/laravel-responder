@@ -61,7 +61,10 @@ class HelpersTest extends TestCase
      */
     public function testTransformFunctionShouldUseTheTransformerServiceToTransform()
     {
-        [$data, $transformer, $with, $without] = [['foo' => 1], $this->mockTransformer(), ['foo'], ['bar']];
+        $data        = ['foo' => 1]; 
+        $transformer = $this->mockTransformer(); 
+        $with        = ['foo']; 
+        $without     = ['bar'];
         $this->transformer->shouldReceive('transform')->andReturn($transformedData = ['bar' => 2]);
 
         $result = transform($data, $transformer, $with, $without);

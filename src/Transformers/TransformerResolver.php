@@ -100,7 +100,7 @@ class TransformerResolver implements TransformerResolverContract
      */
     protected function resolveTransformable($data)
     {
-        if (is_iterable($data)) {
+        if (is_array($data) || $data instanceof Traversable) {
             foreach ($data as $item) {
                 if ($item instanceof Transformable) {
                     return $item;
