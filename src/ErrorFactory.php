@@ -3,7 +3,7 @@
 namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\ErrorFactory as ErrorFactoryContract;
-use Flugg\Responder\Contracts\ErrorMessageResolver;
+use Flugg\Responder\Contracts\ErrorMessageResolver as ErrorMessageResolverContract;
 use Flugg\Responder\Contracts\ErrorSerializer;
 
 /**
@@ -35,7 +35,7 @@ class ErrorFactory implements ErrorFactoryContract
      * @param \Flugg\Responder\Contracts\ErrorMessageResolver $messageResolver
      * @param \Flugg\Responder\Contracts\ErrorSerializer      $serializer
      */
-    public function __construct(ErrorMessageResolver $messageResolver, ErrorSerializer $serializer)
+    public function __construct(ErrorMessageResolverContract $messageResolver, ErrorSerializer $serializer)
     {
         $this->messageResolver = $messageResolver;
         $this->serializer = $serializer;
