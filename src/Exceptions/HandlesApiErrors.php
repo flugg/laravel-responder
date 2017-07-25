@@ -4,6 +4,7 @@ namespace Flugg\Responder\Exceptions;
 
 use Exception;
 use Flugg\Responder\Exceptions\Http\ApiException;
+use Flugg\Responder\Exceptions\Http\PageNotFoundException;
 use Flugg\Responder\Exceptions\Http\RelationNotFoundException;
 use Flugg\Responder\Exceptions\Http\ResourceNotFoundException;
 use Flugg\Responder\Exceptions\Http\UnauthenticatedException;
@@ -16,9 +17,10 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException as BaseRelationNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * A trait to be used by an exception handler to handle automatic handling of error responses.
+ * A trait used by exception handlers to handle automatic handling of error responses.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -34,20 +36,19 @@ trait HandlesApiErrors
      */
     protected function transformException(Exception $exception)
     {
-        $this->transformAuthException($exception);
+        $this->transformHttpException($exception);
         $this->transformEloquentException($exception);
         $this->transformValidationException($exception);
     }
 
     /**
-     * Convert a Laravel auth exception to an API exception.
+     * Convert a Laravel HTTP exception to an API exception.
      *
      * @param  \Exception $exception
      * @return void
-     * @throws UnauthenticatedException
-     * @throws UnauthorizedException
+     * @throws \Flugg\Responder\Exceptions\Http\PageNotFoundException
      */
-    protected function transformAuthException(Exception $exception)
+    protected function transformHttpException(Exception $exception)
     {
         if ($exception instanceof AuthenticationException) {
             throw new UnauthenticatedException;
@@ -56,15 +57,19 @@ trait HandlesApiErrors
         if ($exception instanceof AuthorizationException) {
             throw new UnauthorizedException;
         }
+
+        if ($exception instanceof NotFoundHttpException) {
+            throw new PageNotFoundException;
+        }
     }
 
     /**
      * Convert an Eloquent exception to an API exception.
      *
-     * @param  Exception $exception
+     * @param  \Exception $exception
      * @return void
-     * @throws ResourceNotFoundException
-     * @throws RelationNotFoundException
+     * @throws \Flugg\Responder\Exceptions\Http\ResourceNotFoundException
+     * @throws \Flugg\Responder\Exceptions\Http\RelationNotFoundException
      */
     protected function transformEloquentException(Exception $exception)
     {
@@ -80,9 +85,9 @@ trait HandlesApiErrors
     /**
      * Convert a Laravel validation exception to an API exception.
      *
-     * @param  Exception $exception
+     * @param  \Exception $exception
      * @return void
-     * @throws ValidationFailedException
+     * @throws \Flugg\Responder\Exceptions\Http\ValidationFailedException
      */
     protected function transformValidationException(Exception $exception)
     {

@@ -119,4 +119,18 @@ class ResourceFactoryTest extends TestCase
 
         $this->transformerResolver->shouldHaveReceived('resolveFromData')->with($data)->once();
     }
+
+    /**
+     *
+     */
+    public function testMakeMethodAllowsRecievingAResource()
+    {
+        $this->transformerResolver->shouldReceive('resolveFromData')->andReturn($transformer = $this->mockTransformer());
+
+        $resource = $this->factory->make(new Item($data = Mockery::mock(Model::class)));
+
+        $this->assertInstanceOf(Item::class, $resource);
+        $this->assertSame($transformer, $resource->getTransformer());
+        $this->transformerResolver->shouldHaveReceived('resolveFromData')->with($data)->once();
+    }
 }

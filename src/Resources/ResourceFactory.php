@@ -55,7 +55,9 @@ class ResourceFactory implements ResourceFactoryContract
      */
     public function make($data = null, $transformer = null, string $resourceKey = null): ResourceInterface
     {
-        if (is_null($data = $this->normalizer->normalize($data))) {
+        if ($data instanceof ResourceInterface) {
+            return $data->setTransformer($this->resolveTransformer($data->getData(), $transformer));
+        } elseif (is_null($data = $this->normalizer->normalize($data))) {
             return $this->instatiateResource($data);
         }
 
