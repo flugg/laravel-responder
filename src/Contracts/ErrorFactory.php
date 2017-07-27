@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Contracts;
 
 /**
- * A factory contract for creating error arrays.
+ * A contract for creating errors.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

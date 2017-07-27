@@ -7,7 +7,7 @@ use Flugg\Responder\Http\Responses\SuccessResponseBuilder;
 use Flugg\Responder\Responder;
 
 /**
- * A trait to be used by controllers to easily make API responses.
+ * A trait to be used by controllers to easily make success- and error responses.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -15,18 +15,6 @@ use Flugg\Responder\Responder;
  */
 trait MakesApiResponses
 {
-    /**
-     * Build an error response.
-     *
-     * @param  string|null $errorCode
-     * @param  string|null $message
-     * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
-     */
-    public function error(string $errorCode = null, string $message = null): ErrorResponseBuilder
-    {
-        return app(Responder::class)->error(...func_get_args());
-    }
-
     /**
      * Build a successful response.
      *
@@ -38,5 +26,17 @@ trait MakesApiResponses
     public function success($data = null, $transformer = null, string $resourceKey = null): SuccessResponseBuilder
     {
         return app(Responder::class)->success(...func_get_args());
+    }
+
+    /**
+     * Build an error response.
+     *
+     * @param  string|null $errorCode
+     * @param  string|null $message
+     * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
+     */
+    public function error(string $errorCode = null, string $message = null): ErrorResponseBuilder
+    {
+        return app(Responder::class)->error(...func_get_args());
     }
 }

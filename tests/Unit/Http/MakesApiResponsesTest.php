@@ -46,22 +46,6 @@ class MakesApiResponsesTest extends TestCase
     }
 
     /**
-     * Test that the parameters sent to the [error] method is forwarded to the responder service.
-     */
-    public function testErrorMethodShouldCallOnTheResponder()
-    {
-        $error   = 'error_occured'; 
-        $message = 'An error has occured.'; 
-        $data    = ['foo' => 1];
-        $this->responder->shouldReceive('error')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
-
-        $result = $this->trait->error($error, $message, $data);
-
-        $this->assertSame($responseBuilder, $result);
-        $this->responder->shouldHaveReceived('error')->with($error, $message, $data)->once();
-    }
-
-    /**
      * Test that the parameters sent to the [success] method is forwarded to the responder service.
      */
     public function testSuccessMethodShouldCallOnTheResponder()
@@ -75,5 +59,21 @@ class MakesApiResponsesTest extends TestCase
 
         $this->assertSame($responseBuilder, $result);
         $this->responder->shouldHaveReceived('success')->with($data, $transformer, $resourceKey)->once();
+    }
+
+    /**
+     * Test that the parameters sent to the [error] method is forwarded to the responder service.
+     */
+    public function testErrorMethodShouldCallOnTheResponder()
+    {
+        $error   = 'error_occured'; 
+        $message = 'An error has occured.'; 
+        $data    = ['foo' => 1];
+        $this->responder->shouldReceive('error')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
+
+        $result = $this->trait->error($error, $message, $data);
+
+        $this->assertSame($responseBuilder, $result);
+        $this->responder->shouldHaveReceived('error')->with($error, $message, $data)->once();
     }
 }

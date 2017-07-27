@@ -7,7 +7,7 @@ use Flugg\Responder\Exceptions\Http\ApiException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 /**
- * An exception handler responsible for rendering error responses.
+ * An exception handler responsible for handling exceptions.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -15,7 +15,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
  */
 class Handler extends ExceptionHandler
 {
-    use HandlesApiErrors;
+    use ConvertsExceptions;
 
     /**
      * Render an exception into an HTTP response.
@@ -26,10 +26,10 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        $this->transformException($exception);
+        $this->convertDefaultException($exception);
 
         if ($exception instanceof ApiException) {
-            return $this->renderApiError($exception);
+            return $this->renderResponse($exception);
         }
 
         return parent::render($request, $exception);

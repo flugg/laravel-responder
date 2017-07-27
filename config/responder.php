@@ -4,12 +4,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Serializer Class Path
+    | Serializer Class Paths
     |--------------------------------------------------------------------------
     |
-    | The full class path to the serializer class you would like the package
-    | to use when generating successful JSON responses. You may change it
-    | to one of Fractal's serializers or create a custom one yourself.
+    | The full class path to the serializer classes you want to use for both
+    | success- and error responses. The success serializer must implement
+    | Fractal's serializer. You can override these for every response.
     |
     */
 
@@ -23,9 +23,9 @@ return [
     | Response Decorators
     |--------------------------------------------------------------------------
     |
-    | Wether or not you want to include status codes in your JSON responses.
-    | If true the status code is prepended to both your success and error
-    | responses. This takes place right after your data is serialized.
+    | Response decorators are used to decorate both your success- and error
+    | responses. A decorator can be disabled by removing it from the list
+    | below. You may additionally add your own decorators to the list.
     |
     */
 
@@ -36,12 +36,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Autoload Relations With Query String Parameter
+    | Autoload Relationships With Query String
     |--------------------------------------------------------------------------
     |
-    | The responder will automatically parse and load relations from a query
-    | string parameter if the value below is a string value. If you don't
-    | want the package to auto load relations, you can set it to null.
+    | The package can automatically load relationships from the query string
+    | and will look for a query string parameter with the name configured
+    | below. You can set the value to null to disable the autoloading.
     |
     */
 
@@ -49,12 +49,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Filter Fields With Query String Parameter
+    | Filter Fields With Query String
     |--------------------------------------------------------------------------
     |
-    | The responder will automatically parse and load relations from a query
-    | string parameter if the value below is a string value. If you don't
-    | want the package to auto load relations, you can set it to null.
+    | The package can automatically filter the fields of transformed data
+    | from a query string parameter configured below. The technique is
+    | also known as sparse fieldsets. Set it to null to disable it.
     |
     */
 
@@ -65,12 +65,12 @@ return [
     | Recursion Limit
     |--------------------------------------------------------------------------
     |
-    | The responder will automatically parse and load relations from a query
-    | string parameter if the value below is a string value. If you don't
-    | want the package to auto load relations, you can set it to null.
+    | When transforming data, you may be including relations recursively.
+    | By setting the value below, you can limit the amount of times it
+    | should include relationships recursively. Five might be good.
     |
     */
 
-    'recursion_limit' => 10,
+    'recursion_limit' => 5,
 
 ];

@@ -3,8 +3,7 @@
 namespace Flugg\Responder\Exceptions\Http;
 
 /**
- * An exception thrown whan a resource is not found. This exception replaces
- * [\Illuminate\Database\Eloquent\ModelNotFoundException].
+ * An exception thrown whan a page is not found.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

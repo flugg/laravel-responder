@@ -6,7 +6,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * An abstract exception responsible for holding error response data.
- * You can convert exceptions to a JSON response by extending this class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

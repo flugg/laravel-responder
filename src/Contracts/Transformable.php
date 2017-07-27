@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Contracts;
 
 /**
- * A contract indicating that the class is transformable.
+ * A contract for making the class transformable.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

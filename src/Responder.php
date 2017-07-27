@@ -16,13 +16,6 @@ use Flugg\Responder\Http\Responses\SuccessResponseBuilder;
 class Responder implements ResponderContract
 {
     /**
-     * A builder for building error responses.
-     *
-     * @var \Flugg\Responder\Http\Responses\ErrorResponseBuilder
-     */
-    protected $errorResponseBuilder;
-
-    /**
      * A builder for building success responses.
      *
      * @var \Flugg\Responder\Http\Responses\SuccessResponseBuilder
@@ -30,27 +23,22 @@ class Responder implements ResponderContract
     protected $successResponseBuilder;
 
     /**
-     * Construct the service class.
+     * A builder for building error responses.
      *
-     * @param \Flugg\Responder\Http\Responses\ErrorResponseBuilder   $errorResponseBuilder
-     * @param \Flugg\Responder\Http\Responses\SuccessResponseBuilder $successResponseBuilder
+     * @var \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */
-    public function __construct(ErrorResponseBuilder $errorResponseBuilder, SuccessResponseBuilder $successResponseBuilder)
-    {
-        $this->errorResponseBuilder = $errorResponseBuilder;
-        $this->successResponseBuilder = $successResponseBuilder;
-    }
+    protected $errorResponseBuilder;
 
     /**
-     * Build an error response.
+     * Construct the service class.
      *
-     * @param  string|null $errorCode
-     * @param  string|null $message
-     * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
+     * @param \Flugg\Responder\Http\Responses\SuccessResponseBuilder $successResponseBuilder
+     * @param \Flugg\Responder\Http\Responses\ErrorResponseBuilder   $errorResponseBuilder
      */
-    public function error(string $errorCode = null, string $message = null): ErrorResponseBuilder
+    public function __construct(SuccessResponseBuilder $successResponseBuilder, ErrorResponseBuilder $errorResponseBuilder)
     {
-        return $this->errorResponseBuilder->error($errorCode, $message);
+        $this->successResponseBuilder = $successResponseBuilder;
+        $this->errorResponseBuilder = $errorResponseBuilder;
     }
 
     /**
@@ -64,5 +52,17 @@ class Responder implements ResponderContract
     public function success($data = null, $transformer = null, string $resourceKey = null): SuccessResponseBuilder
     {
         return $this->successResponseBuilder->transform($data, $transformer, $resourceKey);
+    }
+
+    /**
+     * Build an error response.
+     *
+     * @param  string|null $errorCode
+     * @param  string|null $message
+     * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
+     */
+    public function error(string $errorCode = null, string $message = null): ErrorResponseBuilder
+    {
+        return $this->errorResponseBuilder->error($errorCode, $message);
     }
 }

@@ -830,9 +830,100 @@ The error data will be appended to the response data. Assuming we're using the d
 }
 ```
 
-### Using Exceptions
+### Serializing Response Data
 
-An exception class is a convenient place to store information about an error. The package provides an abstract exception class `Flugg\Responder\Exceptions\Http\ApiException`, which has knowledge about a status code, an error code and an error message. Continuing on our product example from above, we could create our own `ApiException` class:
+## Handling Exceptions
+
+No matter how much we try to avoid them, exceptions do happen. Responding to the exceptions in an elegant manner will improve the user experience of your API. The package can enhance your exception handler to automatically turn exceptions in to error responses. If you want to take use of this, you can either use the package's exception handler or include a trait as described in further details below.
+
+#### Option 1: Replace `Handler` Class
+
+To use the package's exception handler you need to replace the default import in `app/Exceptions/Handler.php`:
+
+```php
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+```
+
+With the package's handler class:
+
+```php
+use Flugg\Responder\Exceptions\Handler as ExceptionHandler;
+```
+
+***
+This will not work with Lumen as its exception handler is incompatible with Laravel's. You can instead use the second option below.
+***
+
+#### Option 2: The `ConvertsExceptions` Trait
+
+The package's exception handler uses the `Flugg\Responder\Exceptions\ConvertsExceptions` trait to load of most of its work. Instead of replacing the exception handler, you can use the trait in your own handler class. To replicate the behavior of the exception handler, you would also have to add the following code to the `render` method:
+
+```php
+public function render($request, Exception $exception)
+{
+    $this->convertLaravelException($exception);
+
+    if ($exception instanceof ApiException) {
+        return $this->renderResponse($exception);
+    }
+
+    return parent::render($request, $exception);
+}
+```
+
+### Converting Exceptions
+
+Once you've implemented one of the above options, the package will convert some of Laravel's exceptions to an exception extending `Flugg\Responder\Exceptions\Http\ApiException`. It will then convert these to an error response. The table below shows which Laravel exceptions are converted and what they are converted to. All the exceptions on the right is under the `Flugg\Responder\Exceptions\Http` namespace and extends `Flugg\Responder\Exceptions\Http\ApiException`. All exceptions extending the `ApiException` class will be automatically converted to an error response. 
+
+| Caught Exceptions                                               | Converted To                 |
+| --------------------------------------------------------------- | ---------------------------- |
+| `Illuminate\Auth\AuthenticationException`                       | `UnauthenticatedException`   |
+| `Illuminate\Auth\Access\AuthorizationException`                 | `UnauthorizedException`      |
+| `Symfony\Component\HttpKernel\Exception\NotFoundHttpException`  | `PageNotFoundException`      |
+| `Illuminate\Database\Eloquent\ModelNotFoundException`           | `PageNotFoundException`      |
+| `Illuminate\Database\Eloquent\RelationNotFoundException`        | `RelationNotFoundException`  |
+| `Illuminate\Validation\ValidationException`                     | `ValidationFailedException`  |
+
+You can disable the conversions of some of the exceptions above using the `$dontConvert` property:
+
+```php
+/**
+ * A list of Laravel exception types that should not be converted.
+ *
+ * @var array
+ */
+protected $dontConvert = [
+    ModelNotFoundException::class,
+];
+```
+
+***
+If you're using the trait option, you can also disable all the default conversions by removing the call to `convertLaravelException` in the `render` method.
+***
+
+#### Convert Custom Exceptions
+
+In addition to letting the package convert Laravel exceptions, you can also convert your own exceptions using the `convert` method in the `render` method:
+
+```php
+$this->convert($exception, [
+    InvalidValueException => PageNotFoundException,
+]);
+```
+
+You can optionally give it a closure that throws the new exception, if you want to give it constructor parameters: 
+
+```php
+$this->convert($exception, [
+    MaintenanceModeException => function ($exception) {
+        throw new ServerDownException($exception->retryAfter);
+    },
+]);
+```
+
+### Creating API Exceptions
+
+An exception class is a convenient place to store information about an error. The package provides an abstract exception class `Flugg\Responder\Exceptions\Http\ApiException`, which has knowledge about status code, an error code and an error message. Continuing on our product example from above, we could create our own `ApiException` class:
 
 ```php
 <?php
@@ -882,41 +973,11 @@ public function data()
 }
 ```
 
-Once you've created your exception class, you can send in its class name as the first parameter to the `error` method to have it parse all the error information:
-
-```php
-return responder()->error(SoldOutException::class)->respond();
-```
-
-#### Render Exceptions To Responses
-
-Instead of passing the exception as a parameter to the `error` method, you can configure the exception handler to render any thrown API exception to an error response automatically. You can do so by replacing the following line in `app/Exceptions/Handler.php`:
-
-```php
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-```
-
-With the package's exception handler:
-
-```php
-use Flugg\Responder\Exceptions\Handler as ExceptionHandler;
-```
-
-***
-_Already extending another package's exception handler? The handler uses a trait to handle most of the work, you can use this trait and copy over the code from the `render` method in `Flugg\Responder\Exceptions\Handler` instead._
-***
-
-Once you use the package's exception handler, you can instead of using the `error` method, just throw the exception directly:
+If you're letting the package handle exceptions, you can now throw the exception anywhere in your application and it will automatically be rendered to an error response.
 
 ```php
 throw new SoldOutException();
 ```
-
-#### Overriding Laravel's Errors
-
-Including rendering API exceptions to error responses, the exception handler will also transform
-
-### Serializing Response Data
 
 # Configuration
 
@@ -945,4 +1006,3 @@ If you find bugs or have suggestions for improvements, feel free to submit an is
 Laravel Responder is free software distributed under the terms of the MIT license. See [license.md](license.md) for more details.
 
 # Donating
-

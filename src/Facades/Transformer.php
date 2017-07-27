@@ -6,7 +6,7 @@ use Flugg\Responder\Contracts\Transformer as TransformerContract;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * A facade class responsible for transforming data without serializing.
+ * A facade class responsible for giving easy access to the transformer service.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

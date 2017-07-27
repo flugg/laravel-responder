@@ -6,7 +6,7 @@ use Flugg\Responder\Transformers\Transformer;
 use RuntimeException;
 
 /**
- * An exception thrown when the given transformer is not a valid transformer.
+ * An exception thrown when given invalid transformers.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

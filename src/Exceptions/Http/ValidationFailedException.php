@@ -5,7 +5,7 @@ namespace Flugg\Responder\Exceptions\Http;
 use Illuminate\Contracts\Validation\Validator;
 
 /**
- * An exception thrown whan validation fails. This exception replaces
+ * An exception thrown whan validation fails. This exception replaces Laravel's
  * [\Illuminate\Validation\ValidationException].
  *
  * @package flugger/laravel-responder

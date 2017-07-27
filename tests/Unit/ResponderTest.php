@@ -16,18 +16,18 @@ use Illuminate\Http\JsonResponse;
 class ResponderTest extends TestCase
 {
     /**
-     * Mock of the error response builder.
-     *
-     * @var \Mockery\MockInterface
-     */
-    protected $errorResponseBuilder;
-
-    /**
      * Mock of the success response builder.
      *
      * @var \Mockery\MockInterface
      */
     protected $successResponseBuilder;
+
+    /**
+     * Mock of the error response builder.
+     *
+     * @var \Mockery\MockInterface
+     */
+    protected $errorResponseBuilder;
 
     /**
      * The responder service.
@@ -45,22 +45,9 @@ class ResponderTest extends TestCase
     {
         parent::setUp();
 
-        $this->errorResponseBuilder = $this->mockErrorResponseBuilder();
         $this->successResponseBuilder = $this->mockSuccessResponseBuilder();
-        $this->responder = new Responder($this->errorResponseBuilder, $this->successResponseBuilder);
-    }
-
-    /**
-     * Test that the parameters sent to the [error] method is forwarded to the error response builder.
-     */
-    public function testErrorMethodShouldCallOnTheErrorResponseBuilder()
-    {
-        $error   = 'error_occured';
-        $message = 'An error has occured.';
-        $result  = $this->responder->error($error, $message);
-
-        $this->assertSame($this->errorResponseBuilder, $result);
-        $this->errorResponseBuilder->shouldHaveReceived('error')->with($error, $message)->once();
+        $this->errorResponseBuilder = $this->mockErrorResponseBuilder();
+        $this->responder = new Responder($this->successResponseBuilder, $this->errorResponseBuilder);
     }
 
     /**
@@ -75,5 +62,18 @@ class ResponderTest extends TestCase
 
         $this->assertSame($this->successResponseBuilder, $result);
         $this->successResponseBuilder->shouldHaveReceived('transform')->with($data, $transformer, $resourceKey)->once();
+    }
+
+    /**
+     * Test that the parameters sent to the [error] method is forwarded to the error response builder.
+     */
+    public function testErrorMethodShouldCallOnTheErrorResponseBuilder()
+    {
+        $error   = 'error_occured';
+        $message = 'An error has occured.';
+        $result  = $this->responder->error($error, $message);
+
+        $this->assertSame($this->errorResponseBuilder, $result);
+        $this->errorResponseBuilder->shouldHaveReceived('error')->with($error, $message)->once();
     }
 }

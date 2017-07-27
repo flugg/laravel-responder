@@ -5,7 +5,7 @@ namespace Flugg\Responder\Contracts\Resources;
 use League\Fractal\Resource\ResourceInterface;
 
 /**
- * A factory contract for creating resources.
+ * A contract for creating resources.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

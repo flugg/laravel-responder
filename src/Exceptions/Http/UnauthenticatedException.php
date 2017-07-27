@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Exceptions\Http;
 
 /**
- * An exception thrown whan a user is unauthenticated. This exception replaces
+ * An exception thrown whan a user is unauthenticated. This exception replaces Laravel's
  * [\Illuminate\Auth\AuthenticationException].
  *
  * @package flugger/laravel-responder

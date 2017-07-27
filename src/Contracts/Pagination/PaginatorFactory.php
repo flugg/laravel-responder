@@ -8,7 +8,7 @@ use League\Fractal\Pagination\Cursor;
 use League\Fractal\Pagination\PaginatorInterface;
 
 /**
- * A factory contract for creating paginator adapters.
+ * A contract for creating pagination adapters.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

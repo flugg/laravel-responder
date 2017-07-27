@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Contracts;
 
 /**
- * A contract for formatting an error array.
+ * A contract for formatting error arrays.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

@@ -6,7 +6,7 @@ use League\Fractal\Serializer\SerializerAbstract;
 use RuntimeException;
 
 /**
- * An exception thrown when the serializer is not a valid serializer class.
+ * An exception thrown when given invalid serializers.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

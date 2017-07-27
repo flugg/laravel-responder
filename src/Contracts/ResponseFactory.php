@@ -5,7 +5,7 @@ namespace Flugg\Responder\Contracts;
 use Illuminate\Http\JsonResponse;
 
 /**
- * A factory contract for creating JSON responses.
+ * A contract for creating JSON responses.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>

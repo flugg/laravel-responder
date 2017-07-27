@@ -5,6 +5,7 @@ namespace Flugg\Responder\Tests\Unit;
 use Exception;
 use Flugg\Responder\Exceptions\Handler;
 use Flugg\Responder\Exceptions\Http\ApiException;
+use Flugg\Responder\Exceptions\Http\PageNotFoundException;
 use Flugg\Responder\Exceptions\Http\RelationNotFoundException;
 use Flugg\Responder\Exceptions\Http\ResourceNotFoundException;
 use Flugg\Responder\Exceptions\Http\UnauthenticatedException;
@@ -96,7 +97,7 @@ class HandlerTest extends TestCase
     public function testRenderMethodTransformsModelNotFoundExceptions()
     {
         $exception = new ModelNotFoundException;
-        $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(PageNotFoundException::class);
 
         $this->handler->render($this->request, $exception);
     }

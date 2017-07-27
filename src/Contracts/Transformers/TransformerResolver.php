@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Contracts\Transformers;
 
 /**
- * A factory contract for resolving transformers.
+ * A contract for resolving transformers.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
