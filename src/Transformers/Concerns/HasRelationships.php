@@ -2,6 +2,8 @@
 
 namespace Flugg\Responder\Transformers\Concerns;
 
+use Closure;
+
 /**
  * A trait to be used by a transformer to handle relations
  *
@@ -54,7 +56,13 @@ trait HasRelationships
      */
     public function getDefaultRelations(): array
     {
-        return array_keys($this->load);
+        return collect($this->load)->keys()->mapWithKeys(function ($relation) {
+            if (method_exists($this, $method = 'load' . ucfirst($relation))) {
+                return [$relation => $this->makeEagerLoadCallback($method)];
+            }
+
+            return $relation;
+        });
     }
 
     /**
@@ -71,5 +79,18 @@ trait HasRelationships
                     return "$relation.$nestedRelation";
                 });
         }))->all();
+    }
+
+    /**
+     * Extract a deep list of default relations, recursively.
+     *
+     * @param  string $method
+     * @return \Closure
+     */
+    public function makeEagerLoadCallback(string $method): Closure
+    {
+        return function ($query) use ($method) {
+            return $this->$method($query);
+        };
     }
 }

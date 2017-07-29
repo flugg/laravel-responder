@@ -18,7 +18,7 @@ use Mockery;
 class NullSerializerTest extends TestCase
 {
     /**
-     * The null serializer being tested.
+     * The [NullSerializer] class being tested.
      *
      * @var \Flugg\Responder\Serializers\NullSerializer
      */
@@ -37,9 +37,9 @@ class NullSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [collection] method returns the given data untouched.
      */
-    public function testCollectionMethodShouldReturnDataUntouched()
+    public function testCollectionMethodShouldReturnDataDirectly()
     {
         $result = $this->serializer->collection(null, $data = ['foo' => 1]);
 
@@ -47,9 +47,9 @@ class NullSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [item] method returns the given data untouched.
      */
-    public function testItemMethodShouldReturnDataUntouched()
+    public function testItemMethodShouldReturnDataDirectly()
     {
         $result = $this->serializer->item(null, $data = ['foo' => 1]);
 
@@ -57,7 +57,7 @@ class NullSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [null] method returns an empty array.
      */
     public function testNullMethodShouldReturnAnEmptyArray()
     {
@@ -67,7 +67,7 @@ class NullSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [meta] method returns an empty array.
      */
     public function testMetaMethodShouldReturnAnEmptyArray()
     {
@@ -77,7 +77,7 @@ class NullSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [paginator] method returns an empty array.
      */
     public function testPaginatorMethodShouldReturnAnEmptyArray()
     {
@@ -87,7 +87,7 @@ class NullSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [cursor] method returns an empty array.
      */
     public function testCursorMethodShouldReturnAnEmptyArray()
     {
@@ -97,13 +97,11 @@ class NullSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [mergeIncludes] method merges relations.
      */
     public function testMergeIncludesMethodShouldMergeRelations()
     {
-        $data      = ['foo' => 1];
-        $relations = ['bar' => 2];
-        $result    = $this->serializer->mergeIncludes($data, $relations);
+        $result = $this->serializer->mergeIncludes($data = ['foo' => 1], $relations = ['bar' => 2]);
 
         $this->assertEquals(['foo' => 1, 'bar' => 2], $result);
     }

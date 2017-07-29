@@ -15,7 +15,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Pagination\Cursor;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use League\Fractal\Resource\NullResource;
 use League\Fractal\Serializer\JsonApiSerializer;
 use Mockery;
 use stdClass;
@@ -30,42 +29,42 @@ use stdClass;
 class TransformBuilderTest extends TestCase
 {
     /**
-     * Mock of a resource factory class.
+     * A mock of a [ResourceFactory] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $resourceFactory;
 
     /**
-     * Mock of a transform factory class.
+     * A mock of a [TransformFactory] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $transformFactory;
 
     /**
-     * Mock of a paginator factory class.
+     * A mock of a [PaginatorFactory] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $paginatorFactory;
 
     /**
-     * Mock of a default resource.
+     * A mock of a [ResourceInterface] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $resource;
 
     /**
-     * Mock of a default success serializer.
+     * A mock of a [SerializerAbstract] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $serializer;
 
     /**
-     * The transform builder class being tested.
+     * The [TransformBuilder] class being tested.
      *
      * @var \Flugg\Responder\TransformBuilder
      */
@@ -81,66 +80,56 @@ class TransformBuilderTest extends TestCase
         parent::setUp();
 
         $this->resourceFactory = Mockery::mock(ResourceFactory::class);
-        $this->resourceFactory->shouldReceive('make')->andReturn($this->resource = Mockery::mock(NullResource::class));
-        $this->resource->shouldReceive('getData')->andReturnNull()->byDefault();
-        $this->resource->shouldReceive('getTransformer')->andReturnNull()->byDefault();
-        $this->resource->shouldReceive('setMeta')->andReturnSelf()->byDefault();
-        $this->resource->shouldReceive('setCursor')->andReturnSelf()->byDefault();
-        $this->resource->shouldReceive('setPaginator')->andReturnSelf()->byDefault();
-
         $this->transformFactory = Mockery::mock(TransformFactory::class);
         $this->paginatorFactory = Mockery::mock(PaginatorFactory::class);
-
+        $this->resourceFactory->shouldReceive('make')->andReturn($this->resource = $this->mockResource());
         $this->builder = new TransformBuilder($this->resourceFactory, $this->transformFactory, $this->paginatorFactory);
         $this->builder->serializer($this->serializer = Mockery::mock(SuccessSerializer::class));
     }
 
     /**
-     *
+     * Assert that the [resource] method uses the [ResourceFactory] to create resources.
      */
-    public function testResourceMethodMakesAResource()
+    public function testResourceMethodUsesResourceFactory()
     {
-        $data        = ['foo' => 1];
-        $transformer = $this->mockTransformer();
-        $resourceKey = 'foo';
-        $result      = $this->builder->resource($data, $transformer, $resourceKey);
+        $result = $this->builder->resource($data = ['foo' => 1], $transformer = $this->mockTransformer(), $resourceKey = 'foo');
 
         $this->assertSame($this->builder, $result);
         $this->resourceFactory->shouldHaveReceived('make')->with($data, $transformer, $resourceKey)->once();
     }
 
     /**
-     *
+     * Assert that the [resource] method sets cursor on the resource if data is an instance
+     * of [CursorPaginator].
      */
-    public function testResourceSetsCursorIfDataIsACursorPaginator()
+    public function testResourceMethodSetsCursorOnResource()
     {
-        $data = Mockery::mock(CursorPaginator::class);
         $cursor = Mockery::mock(Cursor::class);
         $this->paginatorFactory->shouldReceive('makeCursor')->andReturn($cursor);
 
-        $this->builder->resource($data);
+        $this->builder->resource($data = Mockery::mock(CursorPaginator::class));
 
         $this->resource->shouldHaveReceived('setCursor')->with($cursor)->once();
     }
 
     /**
-     *
+     * Assert that the [resource] method sets paginator on the resource if data is an instance
+     * of [LengthAwarePaginator].
      */
-    public function testResourceSetsPaginatorIfDataIsAPaginator()
+    public function testResourceMethodSetsPagintorOnResource()
     {
-        $data = Mockery::mock(LengthAwarePaginator::class);
         $paginator = Mockery::mock(IlluminatePaginatorAdapter::class);
         $this->paginatorFactory->shouldReceive('make')->andReturn($paginator);
 
-        $this->builder->resource($data);
+        $this->builder->resource($data = Mockery::mock(LengthAwarePaginator::class));
 
         $this->resource->shouldHaveReceived('setPaginator')->with($paginator)->once();
     }
 
     /**
-     *
+     * Assert that the [cursor] method allows manually setting cursor on resource.
      */
-    public function testCursorMethodAllowsToManuallySetCursor()
+    public function testCursorMethodSetsCursorsOnResource()
     {
         $cursor = Mockery::mock(Cursor::class);
         $this->paginatorFactory->shouldReceive('makeCursor')->andReturn($cursor);
@@ -151,9 +140,9 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [paginator] method allows manually setting paginator on resource.
      */
-    public function testPaginatorMethodAllowsToManuallySetPaginator()
+    public function testPaginatorMethodSetsPaginatorsOnResource()
     {
         $paginator = Mockery::mock(IlluminatePaginatorAdapter::class);
         $this->paginatorFactory->shouldReceive('make')->andReturn($paginator);
@@ -164,9 +153,9 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [meta] method adds meta data to the resource.
      */
-    public function testMetaMethodAddsMetaToTheResourceBuilder()
+    public function testMetaMethodAddsMetaDataToResource()
     {
         $result = $this->builder->meta($meta = ['foo' => 1]);
 
@@ -175,9 +164,9 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [transform] method transforms data using [TransformFactory].
      */
-    public function testTransformMethodShouldUseTransformFactory()
+    public function testTransformMethodUsesTransformFactoryToTransformData()
     {
         $this->transformFactory->shouldReceive('make')->andReturn($data = ['foo' => 123]);
 
@@ -192,9 +181,10 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [serializer] method sets the serializer that is sent to the
+     * [TransformFactory].
      */
-    public function testSerializerMethodChangesTheSerializerSentToTheTransformFactory()
+    public function testSerializerMethodSetsSerializerSentToTransformFactory()
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -208,9 +198,9 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [serializer] method allows class name strings.
      */
-    public function testSerializerMethodAcceptsClassNameString()
+    public function testSerializerMethodAllowsClassNameStrings()
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -224,7 +214,8 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [serializer] method throws [InvalidSerializerException] exception when
+     * given an invalid serializer.
      */
     public function testSerializerMethodThrowsExceptionWhenGivenInvalidSerializer()
     {
@@ -234,7 +225,8 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [with] method sets the included relationships that are sent to the
+     * [TransformFactory].
      */
     public function testWithMethodSetsIncludedRelationsSentToFactory()
     {
@@ -250,9 +242,10 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [with] method allows to be called multiple times and accepts strings
+     * as parameters.
      */
-    public function testWithMethodCanBeCalledMultipleTimesAndAllowsString()
+    public function testWithMethodAllowsMultipleCallsAndStrings()
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -266,7 +259,8 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [without] method sets the excluded relationships that are sent to the
+     * [TransformFactory].
      */
     public function testWithoutMethodSetsExcludedRelationsSentToFactory()
     {
@@ -282,9 +276,10 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [with] method allows to be called multiple times and accepts strings
+     * as parameters.
      */
-    public function testWithoutMethodCanBeCalledMultipleTimesAndAllowsStrings()
+    public function testWithoutMethodAllowsMultipleCallsAndStrings()
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -298,9 +293,10 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [transform] method extracts default relationships from transformer and
+     * automatically eager loads all relationships.
      */
-    public function testItEagerLoadsData()
+    public function testTransformMethodExtractsAndEagerLoadsRelations()
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
@@ -319,7 +315,8 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [only] method sets the filtered fields that are sent to the
+     * [TransformFactory].
      */
     public function testOnlyMethodSetsFilteredFieldsSentToFactory()
     {
@@ -335,9 +332,10 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [only] method allows to be called multiple times and accepts strings
+     * as parameters.
      */
-    public function testOnlyMethodCanBeCalledMultipleTimesAndAllowsString()
+    public function testOnlyMethodAllowsMultipleCallsAndStrings()
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 

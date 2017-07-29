@@ -5,7 +5,6 @@ namespace Flugg\Responder\Transformers\Concerns;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\ParamBag;
-use League\Fractal\Scope;
 
 /**
  * A trait to be used by a transformer to make resources for relations
@@ -19,7 +18,7 @@ trait MakesResources
     /**
      * A list of cached related resources.
      *
-     * @var \League\Fractal\ResourceInterface
+     * @var \League\Fractal\ResourceInterface[]
      */
     protected $resources = [];
 
@@ -68,46 +67,14 @@ trait MakesResources
      * Make a related resource.
      *
      * @param  string                  $relation
-     * @param  mixed                   $data
-     * @param \League\Fractal\ParamBag $parameters
      * @return \League\Fractal\Resource\ResourceInterface|false
      */
-    protected function makeResource(string $relation, $data, ParamBag $parameters)
+    protected function makeResource(string $relation, $data)
     {
-        if (method_exists($this, $method = 'include' . ucfirst($relation))) {
-            return $this->$method($data, $parameters);
-        }
-
-        return $data instanceof Model ? $this->makeResourceFromModel() : false;
-    }
-
-    /**
-     * Make a related resource from model data.
-     *
-     * @param  string                              $relation
-     * @param  \Illuminate\Database\Eloquent\Model $model
-     * @return \League\Fractal\Resource\ResourceInterface|bool
-     */
-    protected function makeResourceFromModel(string $relation, Model $model)
-    {
-        $data = $model->$relation;
-
         if (key_exists($relation, $this->resources)) {
             return $this->resources[$relation]->setData($data);
         }
 
         return $this->resource($data);
-    }
-
-    /**
-     * Get parameters for a relation.
-     *
-     * @param  \League\Fractal\Scope $scope
-     * @param  string                $relation
-     * @return \League\Fractal\ParamBag
-     */
-    protected function getScopedParameters(Scope $scope, string $relation): ParamBag
-    {
-        return $scope->getManager()->getIncludeParams($scope->getIdentifier($relation));
     }
 }

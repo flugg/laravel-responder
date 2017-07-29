@@ -2,10 +2,9 @@
 
 namespace Flugg\Responder\Tests\Unit;
 
-use Flugg\Responder\Http\MakesApiResponses;
+use Flugg\Responder\Http\MakesResponses;
 use Flugg\Responder\Responder;
 use Flugg\Responder\Tests\TestCase;
-use Illuminate\Http\JsonResponse;
 use Mockery;
 
 /**
@@ -15,19 +14,19 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class MakesApiResponsesTest extends TestCase
+class MakesResponsesTest extends TestCase
 {
     /**
-     * The mock of the responder service.
+     * A mock of a [Responder] service class.
      *
      * @var \Mockery\MockInterface
      */
     protected $responder;
 
     /**
-     * The controller trait being tested.
+     * The [MakesResponses] trait being tested.
      *
-     * @var \Flugg\Responder\Http\MakesApiResponses
+     * @var \Flugg\Responder\Http\MakesResponses
      */
     protected $trait;
 
@@ -42,36 +41,32 @@ class MakesApiResponsesTest extends TestCase
 
         $this->responder = Mockery::mock(Responder::class);
         $this->app->instance(Responder::class, $this->responder);
-        $this->trait = $this->getMockForTrait(MakesApiResponses::class);
+        $this->trait = $this->getMockForTrait(MakesResponses::class);
     }
 
     /**
-     * Test that the parameters sent to the [success] method is forwarded to the responder service.
+     * Assert that the parameters sent to the [success] method is forwarded to the
+     * responder service.
      */
-    public function testSuccessMethodShouldCallOnTheResponder()
+    public function testSuccessMethodShouldCallOnResponder()
     {
-        $data        = ['foo' => 1];
-        $transformer = $this->mockTransformer();
-        $resourceKey = 'foo';
         $this->responder->shouldReceive('success')->andReturn($responseBuilder = $this->mockSuccessResponseBuilder());
 
-        $result = $this->trait->success($data, $transformer, $resourceKey);
+        $result = $this->trait->success($data = ['foo' => 1], $transformer = $this->mockTransformer(), $key = 'foo');
 
         $this->assertSame($responseBuilder, $result);
-        $this->responder->shouldHaveReceived('success')->with($data, $transformer, $resourceKey)->once();
+        $this->responder->shouldHaveReceived('success')->with($data, $transformer, $key)->once();
     }
 
     /**
-     * Test that the parameters sent to the [error] method is forwarded to the responder service.
+     * Assert that the parameters sent to the [error] method is forwarded to the
+     * responder service.
      */
-    public function testErrorMethodShouldCallOnTheResponder()
+    public function testErrorMethodShouldCallOnResponder()
     {
-        $error   = 'error_occured'; 
-        $message = 'An error has occured.'; 
-        $data    = ['foo' => 1];
         $this->responder->shouldReceive('error')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
 
-        $result = $this->trait->error($error, $message, $data);
+        $result = $this->trait->error($error = 'error_occured', $message = 'An error has occured.', $data = ['foo' => 1]);
 
         $this->assertSame($responseBuilder, $result);
         $this->responder->shouldHaveReceived('error')->with($error, $message, $data)->once();

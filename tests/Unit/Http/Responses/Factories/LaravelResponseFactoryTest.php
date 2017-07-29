@@ -9,8 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Mockery;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Responses\Factories-
- * \LaravelResponseFactory] class.
+ * Unit tests for the [Flugg\Responder\Http\Responses\Factories\LaravelResponseFactory] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -19,14 +18,14 @@ use Mockery;
 class LaravelResponseFactoryTest extends TestCase
 {
     /**
-     * The base Laravel response factory mock.
+     * A mock of a Laravel's [ResponseFactory].
      *
      * @var \Mockery\MockInterface
      */
     protected $baseResponseFactory;
 
     /**
-     * The response factory adapter interface.
+     * The [ResponseFactory] adapter class being tested.
      *
      * @var \Flugg\Responder\Http\Responses\Factories\LaravelResponseFactory
      */
@@ -50,14 +49,11 @@ class LaravelResponseFactoryTest extends TestCase
     }
 
     /**
-     * Test that the [make] method decorates the response data with info about status code.
+     * Assert that the [make] method creates JSON responses using Laravel's [ResponseFactory].
      */
-    public function testMakeMethodShouldCreateJsonResponse()
+    public function testMakeMethodShouldCreateJsonResponses()
     {
-        $data    = ['foo' => 1]; 
-        $status  = 201;
-        $headers = ['x-foo' => 1];
-        $response = $this->responseFactory->make($data, $status, $headers);
+        $response = $this->responseFactory->make($data = ['foo' => 1], $status = 201, $headers = ['x-foo' => 1]);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals($data, $response->getData(true));

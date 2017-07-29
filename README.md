@@ -10,7 +10,7 @@
     <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PRMC9WLJY8E46&lc=NO&item_name=Laravel%20Responder&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"><img src="https://img.shields.io/badge/donate-PayPal-yellow.svg?style=flat-square" alt="Donate"></a>
 </p>
 
-Laravel Responder is a package for your JSON API, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can transform and serialize your success responses, as well as help you create error responses, handle exceptions and test your responses.
+Laravel Responder is a package for your JSON API, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can transform your data using transformers, create and serialize success- and error responses, handle exceptions and giving you tools to test your responses.
 
 # Table of Contents
 
@@ -31,21 +31,18 @@ Laravel Responder is a package for your JSON API, integrating [Fractal](https://
 
 # Introduction
 
-Laravel is an excellent tool for building APIs, however, it's quite common to display the database columns directly in the responses. This couples your database to your API and makes it harder to make changes in the future. 
+Laravel lets you return models directly from a controller method to convert it to JSON. This is a quick way to build APIs, but leaves your database columns exposed. [Fractal](fractal.thephpleague.com), a popular PHP package from [The PHP League](https://thephpleague.com/), solves this by introducing transformers. However, it can be a bit cumbersome to integrate into the framework as seen below:
 
-Fractal, a popular PHP package from [The PHP League](https://thephpleague.com/), solves this problem by introducing a new transformation layer. However, while Fractal can improve your API, it can be a bit cumbersome to integrate into the framework:
- 
 ```php
  public function index()
  {
-    $manager = new Manager();
-    $resource = new Collection(User::get(), new UserTransformer());
+    $resource = new Collection(User::all(), new UserTransformer());
 
-    return response()->json($manager->createData($resource)->toArray());
+    return response()->json((new Manager)->createData($resource)->toArray());
  }
 ```
 
-We all get a little spoiled by Laravel's magic. Wouldn't it be neat if the above could be refactored to:
+Not _that_ bad, but we all get a little spoiled by Laravel's magic. Wouldn't it be better if we could refactor it to:
 
 ```php
 public function index()
@@ -54,21 +51,7 @@ public function index()
 }
 ```
 
-The package allows you to do this, and so much more.
-
-## Philosophy
-
-My mission with this package is to create an extremely high-quality package that feels like pure Laravel. A package that lets you embrace the power of Fractal, but hide it all behind beautiful abstractions.
-
-### Comparison to Spatie's Package
-
-There are tons of Laravel packages integrating Fractal, but [Laravel Fratal](https://github.com/spatie/laravel-fractal) by Spatie is definitely the most popular one. This package does all the same things as Spatie's, however, in addition, it has tons of other distinct features:
- 
- - Automatic eager loading
- - Easily transform without serializing
- - Streamlined success- and error responses
- - Serializers for error responses
- - Automatic resource caching in transformers
+The package will allow you to do this and much more. The goal has been to create a high-quality package that feels like native Laravel. A package that lets you embrace the power of Fractal, while hiding it behind beautiful abstractions. There has also been put a lot of focus and thought to the documentation. Happy exploration!
 
 # Requirements
 
@@ -78,7 +61,7 @@ This package requires:
 
 # Installation
 
-Install the package through Composer:
+To get started, install the package through Composer:
 
 ```shell
 composer require flugger/laravel-responder
@@ -86,11 +69,11 @@ composer require flugger/laravel-responder
 
 ## Laravel
 
-The package supports auto-discovery, so if you use Laravel 5.5 or later you may skip registering the provider and facades.
+The package supports auto-discovery, so if you use Laravel 5.5 or later you may skip registering the service provider and facades and instead run `php artisan package:discover`.
 
 #### Register Service Provider
 
-After updating Composer, append the following service provider to the `providers` key in `config/app.php`:
+Append the following line to the `providers` key in `config/app.php` to register the package:
 
 ```php
 Flugg\Responder\ResponderServiceProvider::class,
@@ -107,19 +90,19 @@ If you like facades, you may also append the `Responder` and `Transformer` facad
 
 #### Publish Package Assets _(optional)_
 
-You may also publish the package configuration and language file using the Artisan command:
+You may additionally publish the package configuration and language file using the `vendor:publish` Artisan command:
 
 ```shell
 php artisan vendor:publish --provider="Flugg\Responder\ResponderServiceProvider"
 ```
 
-This will publish a `responder.php` configuration file in your `config` folder. It will also publish an `errors.php` file inside your `lang/en` folder which can be used to store error messages.
+This will publish a `responder.php` configuration file in your `config` folder. It will also publish an `errors.php` file inside your `lang/en` folder which can be used for storing error messages.
 
 ## Lumen
 
 #### Register Service Provider
 
-Register the package service provider by adding the following line to `app/bootstrap.php`:
+Add the following line to `app/bootstrap.php` to register the package:
 
 ```php
 $app->register(Flugg\Responder\ResponderServiceProvider::class);
@@ -127,7 +110,7 @@ $app->register(Flugg\Responder\ResponderServiceProvider::class);
 
 #### Register Facades _(optional)_
 
-You may also add the following line to `app/bootstrap.php` to register the facades:
+You may also add the following lines to `app/bootstrap.php` to register the facades:
 
 ```php
 class_alias(Flugg\Responder\Facades\Responder::class, 'Responder');
@@ -136,7 +119,7 @@ class_alias(Flugg\Responder\Facades\Transformer::class, 'Transformer');
 
 #### Publish Package Assets _(optional)_
 
-Since there's no `php artisan vendor:publish` command in Lumen, you will have to create your own `config/responder.php` file if you want to configure the package. Do also note that Lumen has no `resources/lang` folder out of the box. However you're free to create a `resources/lang/en/errors.php` file, and it will be picked up by the package.
+Seeing there is no `vendor:publish` command in Lumen, you will have to create your own `config/responder.php` file if you want to configure the package.
 
 # Usage
 
@@ -144,14 +127,11 @@ This documentation assumes some knowledge of how [Fractal](https://github.com/th
 
 ## Creating Responses
 
-The package allows you to create success- and error responses. 
-The package provides a `Flugg\Responder\Responder` service class for building API responses, which has a `success` and `error` method to build success- and error responses respectively.
+The package has a `Responder` service class, which has a `success` and `error` method to build success- and error responses respectively. To begin creating responses, pick one of the options below:
 
-Before you can begin creating responses, you need to retrieve an instance of the responder service. In good Laravel spirit you have multiple ways of achieving the same thing:
+#### Option 1: Inject `Responder` Service
 
-#### Option 1: The `Responder` Service
-
-You may inject the service class directly into your controller methods:
+You may inject the `Flugg\Responder\Responder` service class directly into your controller methods:
 
 ```php
 public function index(Responder $responder)
@@ -166,33 +146,35 @@ You can also use the `error` method to create error responses:
 return $responder->error();
 ```
 
-#### Option 2: The `responder` Helper
+***
+_Alternatively, you can type hint the `Flugg\Responder\Contract\Responder` interface instead._
+***
 
-If you're a fan of Laravel's `response` function, you may like the `responder` helper function:
+#### Option 2: Use `responder` Helper
+
+If you're a fan of Laravel's `response` helper function, you may like the `responder` helper function:
 
 ```php
 return responder()->success();
 ```
-
 ```php
 return responder()->error();
 ```
 
-#### Option 3: The `Responder` Facade
+#### Option 3: Use `Responder` Facade
 
 Optionally, you may use the `Responder` facade to create responses:
 
 ```php
 return Responder::success();
 ```
-
 ```php
-return Responder::error();
+return Responder->error();
 ```
 
-#### Option 4: The `MakesApiResponses` Trait
+#### Option 4: Use `MakesApiResponses` Trait
 
-Lastly, the package provides a `Flugg\Responder\Http\MakesApiResponses` trait you can use in your controllers giving you access to two methods:
+Lastly, the package provides a `Flugg\Responder\Http\MakesResponses` trait you can use in your controllers:
 
 ```php
 return $this->success();
@@ -203,12 +185,12 @@ return $this->error();
 ```
 
 ***
-_Which option you pick is up to you, they are all equivalent, the important thing is to stay consistent. The helper function will be used for the rest of the documentation._
+_Which option you pick is up to you, they are all equivalent, the important thing is to stay consistent. The helper function (option 2) will be used for the remaining of the documentation._
 ***
 
 ### Building Responses
 
-The `success` and `error` methods return a `SuccessResponseBuilder` and `ErrorResponseBuilder` respectively, which both extend an abstract `ResponseBuilder` class, giving them common behavior and syntax. Laravel will know how to serialize a response builder to JSON, however, you can respond with an instance of `Illuminate\Http\JsonResponse` using the `respond` method:
+The `success` and `error` methods return a `SuccessResponseBuilder` and `ErrorResponseBuilder` respectively, which both extend an abstract `ResponseBuilder`, giving them common behaviors. They will be converted to JSON when returned from a controller, however, you can explicitly create an instance of `Illuminate\Http\JsonResponse` using `respond`:
 
 ```php
 return responder()->success()->respond();
@@ -218,7 +200,7 @@ return responder()->success()->respond();
 return responder()->error()->respond();
 ```
 
-The status code is set to `200` by default, but can be changed by filling the first argument. You can also set a list of headers as the second argument:
+The status code is set to `200` by default, but can be modified by filling the first argument. You can also set a list of headers as the second argument:
 
 ```php
 return responder()->success()->respond(201, ['x-foo' => true]);
@@ -229,12 +211,12 @@ return responder()->error()->respond(404, ['x-foo' => false]);
 ```
 
 ***
-_You should consider always using the `respond` method for consistency's sake._
+_Consider always using the `respond` method for consistency's sake._
 ***
 
 ### Casting Response Data
 
-Instead of converting the response to an instance of `Illuminate\Http\JsonResponse` using the `respond` method, you can cast the response data to a few other types, like an array:
+Instead of converting the response to a `JsonResponse` using the `respond` method, you can cast the response data to a few other types, like an array:
 
 ```php
 return responder()->success()->toArray();
@@ -248,7 +230,7 @@ You also have a `toCollection` and `toJson` method at your disposal.
 
 ### Decorating Response
 
-A response decorator allows for last minute changes to the response before it's returned. The package comes with two response decorators out of the box adding a `status` and `success` field to the response output for additional information. The `decorators` key in the configuration file defines a list of all enabled response decorators:
+A response decorator allows for last minute changes to the response before it's returned. The package comes with two response decorators out of the box adding a `status` and `success` field to the response output. The `decorators` key in the configuration file defines a list of all enabled response decorators:
 
 ```php
 'decorators' => [
@@ -267,7 +249,7 @@ As briefly demonstrated above, success responses are created using the `success`
 return responder()->success()->respond();
 ```
 
-Sticking to the default configuration, the above code would output the following JSON:
+Assuming no changes to the configuration file, the above code would output the following JSON:
 
 ```json
 {
@@ -279,13 +261,13 @@ Sticking to the default configuration, the above code would output the following
 
 ### Setting Response Data
 
-The `success` method accepts the response data as the first argument:
+The `success` method takes the response data as the first argument:
 
 ```php
 return responder()->success(Product::all())->respond();
 ```
 
-It accepts the same data types as you would normally return from your controllers. However, in addition, it supports query builder and relationship instances:
+It accepts the same data types as you would normally return from your controllers, however, it also supports query builder and relationship instances:
 
 ```php
 return responder()->success(Product::where('id', 1))->respond();
@@ -296,12 +278,12 @@ return responder()->success(Product::first()->orders())->respond();
 ```
 
 ***
-_The package will automatically call on the `get` method to convert them to collections._
+_The package will run the queries and convert them to collections behind the scenes._
 ***
 
 ### Transforming Response Data
 
-The response data will be transformed with Fractal if you attach a transformer to the response. There are two ways to attach a transformer; either _explicitly_ by setting it on the response, or _implicitly_ by binding a transformer to a model. Let's look at both ways in greater detail.
+The response data will be transformed with Fractal if you attach a transformer to the response. There are two ways to attach a transformer; either _explicitly_ by setting it on the response, or _implicitly_ by binding a transformer to a model. Let's look at both ways in greater details.
 
 #### Set Transformer On Response
 
@@ -355,14 +337,14 @@ public function transformer()
 _You're not limited to returning a class name string, you can return a transformer instance or closure transformer just like the second parameter of the `success` method._
 ***
 
-Instead of implementing the `Transformable` contract for all models, an alternative approach is to bind the transformers using the `bind` method on the `TransformerManager` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
+Instead of implementing the `Transformable` contract for all models, an alternative approach is to bind the transformers using the `bind` method on the `TransformerResolver` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
 
 ```php
-use Flugg\Responder\Transformers\TransformerManager;
+use Flugg\Responder\Transformers\TransformerResolver;
 
 public function boot()
 {
-    $this->app->make(TransformerManager)->bind([
+    $this->app->make(TransformerResolver)->bind([
         \App\User::class => \App\Transformers\UserTransformer::class,
         \App\Post::class => \App\Transformers\PostTransformer::class,
     ]);
@@ -377,7 +359,7 @@ return responder()->success(Post::all())->respond();
 
 ### Paginating Response Data
 
-You can of course send a paginator as the data to the `success` method. This will set the paginator and transform the data automatically, as well as append any query string parameters to the paginator links.
+Sending a paginator to the `success` method will set pagination meta data and transform the data automatically, as well as append any query string parameters to the paginator links.
 
 ```php
 return responder()->success(Product::paginate())->respond();
@@ -431,23 +413,23 @@ _These examples are dumbed down for brevity. For more information about paginato
 
 ### Including Relationships
 
-If you've attached a transformer class with the response, you can include and transform related models using the `with` method:
+If a transformer is attached to the response, you can include and transform relationships using the `with` method:
 
 ```php
-return responder()->success(Post::all())->with('comments')->respond();
+return responder()->success(Post::all())->with('user')->respond();
 ```
 
-You can also send in multiple arguments and nested relations using dot notation:
+You can send multiple arguments and nested relations using dot notation:
 
 ```php
-return responder()->success(Post::all())->with('comments.user', 'user')->respond();
+return responder()->success(Post::all())->with('user', 'comments.user')->respond();
 ```
 
-All included relationships will be automatically eager loaded if the configuration key `eager_load_relations` is set to `true`. Just like you would when using `with` or `load` to eager load with Laravel, you may also give the relation a closure with access to the query builder to specify additional constraints. Like in the example below where we're only including related comments posted by the authenticated user:
+All relationships will be automatically eager loaded, and just like you would when using `with` or `load` to eager load with Laravel, you may use a closure to specify additional query constraints. Like in the example below, where we're only including related comments posted by the authenticated user:
 
 ```php
 return responder()->success(Post::all())->with(['comments' => function ($query) {
-    $query->where('user_id', auth()->id());
+    $query->where('user_id', Auth::id());
 }])->respond();
 ```
 

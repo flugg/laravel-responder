@@ -17,14 +17,14 @@ use Mockery;
 class ErrorMessageResolverTest extends TestCase
 {
     /**
-     * A translator mock.
+     * A mock of a [Translator] service class.
      *
      * @var \Mockery\MockInterface
      */
     protected $translator;
 
     /**
-     * The error message resolver.
+     * The [ErrorMessageResolver] class being tested.
      *
      * @var \Flugg\Responder\ErrorMessageResolver
      */
@@ -44,9 +44,9 @@ class ErrorMessageResolverTest extends TestCase
     }
 
     /**
-     * Test that the [resolve] method should use the Laravel translator to resolve a message.
+     * Assert that the [resolve] method uses the translator to resolve a message.
      */
-    public function testResolveMethodShouldFindMessageUsingTheTranslator()
+    public function testResolveMethodShouldResolveMessageFromTranslator()
     {
         $this->translator->shouldReceive('has')->andReturn(true);
         $this->translator->shouldReceive('trans')->andReturn($message = 'A test error has occured.');
@@ -59,14 +59,14 @@ class ErrorMessageResolverTest extends TestCase
     }
 
     /**
-     * Test that the [resolve] method should use the Laravel translator to resolve a message.
+     * Assert that the [resolve] method returns [null] if the translator can't resolve message.
      */
-    public function testResolveMethodReturnsNullIfTranslatorKeyIsNotSet()
+    public function testResolveMethodReturnsNullIfNoTranslatorKeyIsSet()
     {
         $this->translator->shouldReceive('has')->andReturn(false);
 
         $message = $this->messageResolver->resolve('test_error');
 
-        $this->assertEquals(null, $message);
+        $this->assertNull($message);
     }
 }

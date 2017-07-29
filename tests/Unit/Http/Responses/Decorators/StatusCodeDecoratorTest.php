@@ -15,14 +15,14 @@ use Flugg\Responder\Tests\TestCase;
 class StatusCodeDecoratorTest extends TestCase
 {
     /**
-     * The response factory mock.
+     * A mock of a [ResponseFactory] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $responseFactory;
 
     /**
-     * The status code response decorator.
+     * The [StatusCodeResponseDecorator] class being tested.
      *
      * @var \Flugg\Responder\Http\Responses\Decorators\StatusCodeDecorator
      */
@@ -42,13 +42,12 @@ class StatusCodeDecoratorTest extends TestCase
     }
 
     /**
-     * Test that the [make] method decorates the response data with info about status code.
+     * Assert that the [make] method decorates the response data with information about
+     * status code.
      */
-    public function testMakeMethodShouldAppendStatusCodeToResponseData()
+    public function testMakeMethodShouldAppendStatusCodeFieldToResponseData()
     {
-        $data     = ['foo' => 1]; 
-        $status   = 201;
-        $response = $this->responseDecorator->make($data, $status);
+        $response = $this->responseDecorator->make($data = ['foo' => 1], $status = 201);
 
         $this->assertEquals(json_encode(array_merge(['status' => $status], $data)), $response->getContent());
     }

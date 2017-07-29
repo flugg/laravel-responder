@@ -17,7 +17,7 @@ use Mockery;
 class ResponderTest extends TestCase
 {
     /**
-     * The mock of the responder service.
+     * A mock of a [Responder] service class.
      *
      * @var \Mockery\MockInterface
      */
@@ -37,9 +37,10 @@ class ResponderTest extends TestCase
     }
 
     /**
-     * Test that the parameters sent to the [error] method is forwarded to the responder service.
+     * Assert that the parameters sent to the [error] method is forwarded to the
+     * responder service.
      */
-    public function testErrorMethodShouldCallOnTheResponder()
+    public function testErrorMethodShouldCallOnResponder()
     {
         $this->responder->shouldReceive('error')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
 
@@ -50,9 +51,10 @@ class ResponderTest extends TestCase
     }
 
     /**
-     * Test that the parameters sent to the [success] method is forwarded to the responder service.
+     * Assert that the parameters sent to the [success] method is forwarded to the
+     * responder service.
      */
-    public function testSuccessMethodShouldCallOnTheResponder()
+    public function testSuccessMethodShouldCallOnResponder()
     {
         $this->responder->shouldReceive('success')->andReturn($responseBuilder = $this->mockSuccessResponseBuilder());
 

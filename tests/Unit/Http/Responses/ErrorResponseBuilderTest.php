@@ -12,8 +12,7 @@ use InvalidArgumentException;
 use Mockery;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Responses-
- * \ErrorResponseBuilderTest] class.
+ * Unit tests for the [Flugg\Responder\Http\Responses\ErrorResponseBuilder] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -22,21 +21,21 @@ use Mockery;
 class ErrorResponseBuilderTest extends TestCase
 {
     /**
-     * The response factory mock.
+     * A mock of a [ResponseFactory] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $responseFactory;
 
     /**
-     * The error factory mock.
+     * A mock of an [ErrorFactory] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $errorFactory;
 
     /**
-     * The error response builder.
+     * The [ErrorResponseBuilder] class being tested.
      *
      * @var \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */
@@ -57,15 +56,13 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the [respond] method calls on the response factory to generate a JSON response.
+     * Assert that the [respond] generates JSON responses using the [ResponseFactory].
      */
-    public function testRespondMethodShouldMakeAResponseUsingTheResponseFactory()
+    public function testRespondMethodShouldMakeJsonResponses()
     {
-        $status  = 400; 
-        $headers = ['x-foo' => 1];
-        $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
-        $this->responseFactory->shouldReceive('make')
-            ->andReturn($response = new JsonResponse($error, $status, $headers));
+        $response = new JsonResponse($error = ['foo' => 1], $status = 400, $headers = ['x-foo' => 1]);
+        $this->errorFactory->shouldReceive('make')->andReturn($error);
+        $this->responseFactory->shouldReceive('make')->andReturn($response);
 
         $result = $this->responseBuilder->respond($status, $headers);
 
@@ -74,9 +71,10 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the [respond] method throws exception if status code is not a valid error code.
+     * Assert that the [respond] method throws an [InvalidArgumentException] exception if
+     * status code is not a valid error code.
      */
-    public function testRespondMethodThrowsExceptionIfStatusCodeIsInvalid()
+    public function testRespondMethodThrowsExceptionIfGivenInvalidStatusCode()
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -84,10 +82,10 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the [toArray] method formats the error output using the error factory and
+     * Assert that the [toArray] method formats the error output using the [ErrorFactory] and
      * returns the result as an array.
      */
-    public function testToArrayMethodShouldFormatErrorWithTheErrorFactoryAndReturnArray()
+    public function testToArrayMethodShouldFormatErrorUsingErrorFactory()
     {
         $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
 
@@ -97,10 +95,10 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the [toCollection] method formats the error output using the error factory
+     * Assert that the [toCollection] method formats the error output using the [ErrorFactory]
      * and returns the result as a collection.
      */
-    public function testToCollectionMethodShouldFormatErrorWithTheErrorFactoryAndReturnCollection()
+    public function testToCollectionMethodShouldFormatErrorAndReturnCollection()
     {
         $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
 
@@ -110,10 +108,10 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the [toJson] method formats the error output using the error factory and
+     * Assert that the [toJson] method formats the error output using the [ErrorFactory] and
      * returns the result as JSON.
      */
-    public function testToJsonMethodShouldFormatErrorWithTheErrorFactoryAndReturnJson()
+    public function testToJsonMethodShouldFormatErrorAndReturnJson()
     {
         $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
 
@@ -123,9 +121,9 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the [toJson] method accepts an argument for setting encoding options.
+     * Assert that the [toJson] method accepts an argument for setting encoding options.
      */
-    public function testToJsonMethodShouldAllowSettingOptions()
+    public function testToJsonMethodShouldAllowSettingEncodingOptions()
     {
         $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
 
@@ -135,21 +133,20 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the [error] method sets the error code and message that is sent to the error factory.
+     * Assert that the [error] method sets the error code and message that is sent to the
+     * [ErrorFactory].
      */
     public function testErrorMethodSetsErrorCodeAndMessage()
     {
-        $code    = 'test_error'; 
-        $message = 'A test error has occured.';
         $this->errorFactory->shouldReceive('make')->andReturn([]);
 
-        $this->responseBuilder->error($code, $message)->toArray();
+        $this->responseBuilder->error($code = 'test_error', $message = 'A test error has occured.')->toArray();
 
         $this->errorFactory->shouldHaveReceived('make')->with($code, $message, null)->once();
     }
 
     /**
-     * Test that the [data] method adds error data that is sent to the error factory.
+     * Assert that the [data] method adds error data that is sent to the [ErrorFactory]
      */
     public function testDataMethodSetsErrorData()
     {

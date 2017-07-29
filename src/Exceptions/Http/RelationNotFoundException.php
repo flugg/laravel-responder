@@ -9,7 +9,7 @@ namespace Flugg\Responder\Exceptions\Http;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class RelationNotFoundException extends ApiException
+class RelationNotFoundException extends HttpException
 {
     /**
      * An HTTP status code.

@@ -10,7 +10,7 @@ namespace Flugg\Responder\Exceptions\Http;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class UnauthorizedException extends ApiException
+class UnauthorizedException extends HttpException
 {
     /**
      * An HTTP status code.

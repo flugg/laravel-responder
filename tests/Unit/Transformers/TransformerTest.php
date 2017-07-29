@@ -16,7 +16,7 @@ use Mockery;
 class TransformerTest extends TestCase
 {
     /**
-     * The transformer being tested.
+     * The [Transformer] class being tested.
      *
      * @var \Flugg\Responder\Transformers\Transformer
      */
@@ -35,11 +35,13 @@ class TransformerTest extends TestCase
     }
 
     /**
-     * Test that the [allRelationsAllowed] method returns true if the relations array is set to a wildcard.
+     * Assert that the [allRelationsAllowed] method returns true if the [relations] property
+     * is set to a wildcard.
      */
-    public function testAllRelationsAllowedMethodShouldReturnTrueOnWildcard()
+    public function testAllRelationsAllowedMethodShouldReturnTrueIfWildcard()
     {
-        $transformer = new class extends Transformer {
+        $transformer = new class extends Transformer
+        {
             protected $relations = ['*'];
         };
 
@@ -49,11 +51,13 @@ class TransformerTest extends TestCase
     }
 
     /**
-     * Test that the [allRelationsAllowed] method returns false if the relations array is not set to a wildcard.
+     * Assert that the [allRelationsAllowed] method returns false if the [relations] property
+     * is not set to a wildcard.
      */
-    public function testAllRelationsAllowedMethodShouldReturnFalseIfNotWildcard()
+    public function testAllRelationsAllowedMethodShouldReturnFalseUnlessWildcard()
     {
-        $transformer = new class extends Transformer {
+        $transformer = new class extends Transformer
+        {
             protected $relations = ['foo'];
         };
 
@@ -63,11 +67,13 @@ class TransformerTest extends TestCase
     }
 
     /**
-     * Test that the [allRelationsAllowed] method returns false if the relations array is not set to a wildcard.
+     * Assert that the [allRelationsAllowed] method returns false if the [relations] property
+     * is not set to a wildcard.
      */
     public function testGetRelations()
     {
-        $transformer = new class extends Transformer {
+        $transformer = new class extends Transformer
+        {
             protected $relations = ['foo', 'bar'];
         };
 

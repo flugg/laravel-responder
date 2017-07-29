@@ -19,14 +19,14 @@ use Mockery;
 class FractalTransformFactoryTest extends TestCase
 {
     /**
-     * The Fractal manager mock.
+     * A mock a Fractal's [Manager] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $manager;
 
     /**
-     * The Fractal transform factory.
+     * The [TransformFactory] class being tested.
      *
      * @var \Flugg\Responder\FractalTransformFactory
      */
@@ -46,21 +46,17 @@ class FractalTransformFactoryTest extends TestCase
     }
 
     /**
-     * Test that the [make] method is used to transform data using the Fractal manager.
+     * Assert that the [make] method uses the manager to transform data.
      */
     public function testMakeMethodShouldCallOnManager()
     {
-        $resource   = new NullResource();
-        $serializer = Mockery::mock(SerializerAbstract::class);
-        $with    = ['foo'];
-        $without = ['bar'];
         $this->manager->shouldReceive('createData')->andReturn($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('toArray')->andReturn($data = ['foo' => 1]);
 
-        $result = $this->factory->make($resource, $serializer, [
+        $result = $this->factory->make($resource = new NullResource(), $serializer = Mockery::mock(SerializerAbstract::class), [
             'includes' => $with = ['foo'],
             'excludes' => $without = ['bar'],
-            'fields' => $fields = ['baz']
+            'fields' => $fields = ['baz'],
         ]);
 
         $this->assertEquals($data, $result);

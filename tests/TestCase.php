@@ -11,14 +11,14 @@ use Flugg\Responder\TransformBuilder;
 use Flugg\Responder\Transformers\Transformer;
 use Illuminate\Http\JsonResponse;
 use League\Fractal\Manager;
+use League\Fractal\Resource\NullResource;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 /**
- * This is the base test case class and is where the testing environment bootstrapping
- * takes place. All other testing classes should extend this class.
+ * The base test case class, responsible for bootstrapping the testing environment.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -57,7 +57,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Create a mock of a transformer just returning the unmodified data directly.
+     * Create a mock of a [Transformer] returning the data directly.
      *
      * @return \Mockery\MockInterface
      */
@@ -73,7 +73,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Create a mock of a transform builder.
+     * Create a mock of a [TransformBuilder].
      *
      * @return \Mockery\MockInterface
      */
@@ -91,7 +91,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Create a mock of a response factory.
+     * Create a mock of a [ResponseFactory]].
      *
      * @return \Mockery\MockInterface
      */
@@ -107,7 +107,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Create a mock of an error response builder.
+     * Create a mock of an [ErrorResponseBuilder].
      *
      * @return \Mockery\MockInterface
      */
@@ -122,7 +122,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Create a mock of a success response builder.
+     * Create a mock of a [SuccessResponseBuilder].
      *
      * @return \Mockery\MockInterface
      */
@@ -137,7 +137,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Create a mock of a Fractal manager.
+     * Create a mock of a Fractal [Manager].
      *
      * @return \Mockery\MockInterface
      */
@@ -151,5 +151,24 @@ abstract class TestCase extends BaseTestCase
         $responseBuilder->shouldReceive('parseFieldsets')->andReturnSelf()->byDefault();
 
         return $responseBuilder;
+    }
+
+    /**
+     * Create a mock of a [ResourceInterface].
+     *
+     * @param  string|null $className
+     * @return \Mockery\MockInterface
+     */
+    protected function mockResource(string $className = null): MockInterface
+    {
+        $resource = Mockery::mock($className ?: NullResource::class);
+
+        $resource->shouldReceive('getData')->andReturnNull()->byDefault();
+        $resource->shouldReceive('getTransformer')->andReturnNull()->byDefault();
+        $resource->shouldReceive('setMeta')->andReturnSelf()->byDefault();
+        $resource->shouldReceive('setCursor')->andReturnSelf()->byDefault();
+        $resource->shouldReceive('setPaginator')->andReturnSelf()->byDefault();
+
+        return $resource;
     }
 }

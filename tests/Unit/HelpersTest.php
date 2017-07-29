@@ -8,7 +8,7 @@ use Flugg\Responder\Tests\TestCase;
 use Mockery;
 
 /**
- * Unit tests for the helpers file.
+ * Unit tests for the helper functions.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -17,14 +17,14 @@ use Mockery;
 class HelpersTest extends TestCase
 {
     /**
-     * The mock of the responder service.
+     * A mock of a [Responder] service class.
      *
      * @var \Mockery\MockInterface
      */
     protected $responder;
 
     /**
-     * The mock of the transformer service.
+     * A mock of a [Transformer] service class.
      *
      * @var \Mockery\MockInterface
      */
@@ -47,9 +47,10 @@ class HelpersTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [responder] function should resolve the responder service from the
+     * service container.
      */
-    public function testResponderFunctionShouldResolveResponderFromTheContainer()
+    public function testResponderFunctionShouldResolveResponderService()
     {
         $result = responder();
 
@@ -57,17 +58,14 @@ class HelpersTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [transform] function should use the transformer service to transform
+     * the data.
      */
-    public function testTransformFunctionShouldUseTheTransformerServiceToTransform()
+    public function testTransformFunctionShouldTransformData()
     {
-        $data        = ['foo' => 1]; 
-        $transformer = $this->mockTransformer(); 
-        $with        = ['foo']; 
-        $without     = ['bar'];
         $this->transformer->shouldReceive('transform')->andReturn($transformedData = ['bar' => 2]);
 
-        $result = transform($data, $transformer, $with, $without);
+        $result = transform($data = ['foo' => 1], $transformer = $this->mockTransformer(), $with = ['foo'], $without = ['bar']);
 
         $this->assertEquals($transformedData, $result);
         $this->transformer->shouldHaveReceived('transform')->with($data, $transformer, $with, $without);

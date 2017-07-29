@@ -3,14 +3,9 @@
 namespace Flugg\Responder\Tests\Unit\Pagination;
 
 use Flugg\Responder\Pagination\CursorPaginator;
-use Flugg\Responder\Pagination\PaginatorFactory;
 use Flugg\Responder\Tests\TestCase;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use League\Fractal\Pagination\CursorInterface;
-use League\Fractal\Pagination\PaginatorInterface;
 use LogicException;
-use Mockery;
 
 /**
  * Unit tests for the [Flugg\Responder\Pagination\PaginatorFactory] class.
@@ -22,7 +17,8 @@ use Mockery;
 class CursorPaginatorTest extends TestCase
 {
     /**
-     *
+     * Assert that the [previous], [cursor] and [next] methods allow you to get information
+     * about the cursor.
      */
     public function testYouCanGetCursorInformationFromPaginator()
     {
@@ -34,7 +30,7 @@ class CursorPaginatorTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [items] and [get] methods allow you to get data from paginator.
      */
     public function testYouCanGetDataFromPaginator()
     {
@@ -45,7 +41,7 @@ class CursorPaginatorTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [set] method allows you to get override the cursor data.
      */
     public function testSetMethodAllowsYouToOverrideData()
     {
@@ -58,7 +54,8 @@ class CursorPaginatorTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [resolveCursor] method throws a [LogicException] exception if no
+     * resolver has been set.
      */
     public function testResolveCursorMethodThrowsExceptionIfNoResolverIsFound()
     {
@@ -69,11 +66,11 @@ class CursorPaginatorTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [cursorResolver] sets a resolver for the [resolveCursor] method.
      */
     public function testYouCanSetACursorResolver()
     {
-        CursorPaginator::cursorResolver($resolver = function($cursor) {
+        CursorPaginator::cursorResolver($resolver = function ($cursor) {
             return $cursor;
         });
 

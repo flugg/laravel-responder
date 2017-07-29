@@ -18,21 +18,21 @@ use Mockery;
 class ErrorFactoryTest extends TestCase
 {
     /**
-     * The error message resolver mock.
+     * A mock of an [ErrorMessageResolver] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $messageResolver;
 
     /**
-     * The error serializer mock.
+     * A mock of an [ErrorSerializer] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $serializer;
 
     /**
-     * The error factory.
+     * The [ErrorFactory] class being tested.
      *
      * @var \Flugg\Responder\ErrorFactory
      */
@@ -53,23 +53,20 @@ class ErrorFactoryTest extends TestCase
     }
 
     /**
-     * Test that the [make] method uses the error serializer to serialize the error data.
+     * Assert that the [make] method uses the [ErrorSerializer] to serialize the error data.
      */
     public function testMakeMethodSerializesErrorDataUsingTheSerializer()
     {
-        $code    = 'test_error';
-        $message = 'A test error has occured.';
-        $data    = ['foo' => 1];
         $this->serializer->shouldReceive('format')->andReturn($error = ['bar' => 2]);
 
-        $result = $this->factory->make($code, $message, $data);
+        $result = $this->factory->make($code = 'test_error', $message = 'A test error has occured.', $data = ['foo' => 1]);
 
         $this->assertEquals($error, $result);
         $this->serializer->shouldHaveReceived('format')->with($code, $message, $data)->once();
     }
 
     /**
-     * Test that the [make] method resolves a message using the error message resolver when
+     * Assert that the [make] method resolves a message using the [ErrorMessageResolver] when
      * none is given.
      */
     public function testMakeMethodShouldResolveMessageFromMessageResolver()
@@ -84,9 +81,9 @@ class ErrorFactoryTest extends TestCase
     }
 
     /**
-     * Test that the [make] method allows skipping all parameters returning a null error.
+     * Assert that the [make] method allows skipping all parameters.
      */
-    public function testMakeMethodAllowsSkippingErrorCodeParameter()
+    public function testMakeMethodAllowsNoParameters()
     {
         $this->serializer->shouldReceive('format')->andReturn($error = ['foo' => 1]);
 

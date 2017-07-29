@@ -12,7 +12,7 @@ use Illuminate\Contracts\Validation\Validator;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ValidationFailedException extends ApiException
+class ValidationFailedException extends HttpException
 {
     /**
      * An HTTP status code.

@@ -9,7 +9,7 @@ namespace Flugg\Responder\Exceptions\Http;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class PageNotFoundException extends ApiException
+class PageNotFoundException extends HttpException
 {
     /**
      * An HTTP status code.

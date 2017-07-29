@@ -24,21 +24,21 @@ use Mockery;
 class ResourceFactoryTest extends TestCase
 {
     /**
-     * Mock of a resource data normalizer class.
+     * A mock of a [DataNormalizer] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $normalizer;
 
     /**
-     * Mock of a transformer resolver class.
+     * A mock of a [TransformerResolver] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $transformerResolver;
 
     /**
-     * The resource factory being tested.
+     * The [ResourceFactory] class being tested.
      *
      * @var \Flugg\Responder\Resources\ResourceFactory
      */
@@ -59,9 +59,9 @@ class ResourceFactoryTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [make] method makes a [NullResource] resource when given no arguments.
      */
-    public function testMakeMethodMakesANullResourceWhenGivenNoArguments()
+    public function testMakeMethodShouldMakeNullResourcesWhenGivenNoArguments()
     {
         $this->normalizer->shouldReceive('normalize')->andReturn(null);
 
@@ -72,9 +72,9 @@ class ResourceFactoryTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [make] method makes a [Collection] resource when given an array.
      */
-    public function testMakeMethodMakesACollectionResourceWhenGivenArray()
+    public function testMakeMethodShouldMakeCollectionResourcesWhenGivenArrays()
     {
         $this->normalizer->shouldReceive('normalize')->andReturn($data = ['foo', 'bar']);
         $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
@@ -90,9 +90,9 @@ class ResourceFactoryTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [make] method makes an [Item] resource when given a model.
      */
-    public function testMakeMethodMakesAnItemResourceWhenGivenArray()
+    public function testMakeMethodShouldMakeItemResourcesWhenGivenModels()
     {
         $this->normalizer->shouldReceive('normalize')->andReturn($data = Mockery::mock(Model::class));
         $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
@@ -108,12 +108,14 @@ class ResourceFactoryTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [make] method resolves a transformer using the [TransformerResolver]
+     * if no transformer is given.
      */
-    public function testMakeMethodResolvesTransformerFromDataWhenGivenNoTransformer()
+    public function testMakeMethodResolvesTransformerWhenNotGivenOne()
     {
         $this->normalizer->shouldReceive('normalize')->andReturn($data = Mockery::mock(Model::class));
-        $this->transformerResolver->shouldReceive('resolveFromData')->andReturn($transformer = $this->mockTransformer());
+        $this->transformerResolver->shouldReceive('resolveFromData')
+            ->andReturn($transformer = $this->mockTransformer());
 
         $this->factory->make($data);
 
@@ -121,11 +123,12 @@ class ResourceFactoryTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [make] method allows instances of [ResourceInterface] as data.
      */
-    public function testMakeMethodAllowsRecievingAResource()
+    public function testMakeMethodShouldAllowResources()
     {
-        $this->transformerResolver->shouldReceive('resolveFromData')->andReturn($transformer = $this->mockTransformer());
+        $this->transformerResolver->shouldReceive('resolveFromData')
+            ->andReturn($transformer = $this->mockTransformer());
 
         $resource = $this->factory->make(new Item($data = Mockery::mock(Model::class)));
 

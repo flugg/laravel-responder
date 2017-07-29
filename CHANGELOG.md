@@ -1,47 +1,65 @@
-# 2.0.0 (2017-07-01)
+# 2.0.0 (2017-08-01)
+
+Version `2.0.0` has been a complete rewrite of the package and brings a lot new stuff to the table, including this very new changelog. The documentation has also been revamped and explains all the new features in greater details. If you're upgrading from an earlier version, make sure to remove your `config/responder.php` file and rerun `php artisan vendor:publish --provider="Flugg\Responder\ResponderServiceProvider"` to publish the new configuration file. 
 
 ### Breaking Changes
 
-* Requires Fractal `^0.16.0` instead of `^.14.0` 
-* The configuration file has been updated, remove existing `config/responder.php` file and run `php artisan vendor:publish --provider="Flugg\Responder\ResponderServiceProvider"` again
-* Base transformer `Flugg\Responder\Transformer` moved to `Flugg\Responder\Transformers\Transformer`
-* `Flugg\Responder\Traits` no longer exists, all traits have been moved to folders to better reflect the Laravel folder structure
-* `Flugg\Responder\Traits\ConvertsParameter` has been removed, use the new `Flugg\Responder\Http\Middlewares\ConvertToSnakeCase` middleware instead
-* `Flugg\Responder\Traits\HandlesApiErrors` has been moved to `Flugg\Responder\Exceptions\HandlesApiErrors`
-* `Flugg\Responder\Traits\ThrowsApiErrors.php` has been moved to `Flugg\Responder\Http\Requests\ThrowsApiErrors.php`
-* `Flugg\Responder\Traits\MakesApiRequests` has been moved to `Flugg\Responder\Testing\MakesApiRequests`
-* `Flugg\Responder\Traits\RespondsWithJson` has been moved (and renamed) to `Flugg\Responder\Http\Controllers\MakesApiResponses`
-* The `successResponse` method has been renamed to `success`
-* The `errorResponse` method has been renamed to `error`
-* You can no longer skip the data parameter for the `success` method, to allow the package to support primitives in the future
-* `Flugg\Responder\Http\SuccessResponseBuilder` has been moved to `Flugg\Responder\Http\Responses\SuccessResponseBuilder`
-* The `include` method of `Flugg\Responder\Http\Responses\SuccessResponseBuilder` has been renamed to `with`
-* `getManager` and `getResource` removed from `Flugg\Responder\Http\Responses\SuccessResponseBuilder`
-* Renamed dynamic relation methods in transformers from `relationName` to `includeRelationName`
-* `Flugg\Responder\Serializers\ApiSerializer` has been renamed to `Flugg\Responder\Serializers\SuccessSerializer`
-* The `transformer` method of the `Flugg\Responder\Contracts\Transformable` interface has been changed from static to non-static
+* Fractal requirement changed to `0.16.0`  
+* Moved `Flugg\Responder\Transformer` to `Flugg\Responder\Transformers\Transformer`
+* Changed `Flugg\Responder\Traits\RespondsWithJson` to `Flugg\Responder\Http\Controllers\MakesResponses`
+* Changed `Flugg\Responder\Traits\HandlesApiErrors` to `Flugg\Responder\Exceptions\ConvertsExceptions`
+* Moved `Flugg\Responder\Traits\MakesApiRequests` to `Flugg\Responder\Testing\MakesApiRequests`
+* Removed `Flugg\Responder\Traits\ConvertsParameter`, use new `ConvertToSnakeCase` middleware instead
+* Removed `Flugg\Responder\Traits\ThrowsApiErrors`, manually override form requests to replicate
+* Changed `Flugg\Responder\Exceptions\Http\ApiException` to `Flugg\Responder\Exceptions\Http\HttpException` 
+* Removed `Flugg\Responder\Exceptions\Http\ResourceNotFoundException`, handler now points to `PageNotFoundException`
+* Renamed `Flugg\Responder\Serializers\ApiSerializer` to `Flugg\Responder\Serializers\SuccessSerializer`
+* Renamed `successResponse` method of the `MakesResponses` trait to `success`
+* Renamed `errorResponse` method of the `MakesResponses` trait to `error`
+* Return `SuccessResponseBuilder` from `success` method instead of `JsonResponse`
+* Return `ErrorResponseBuilder` from `error` method instead of `JsonResponse`
+* Renamed `include` method to `with` on `SuccessResponseBuilder`
+* Renamed `addMeta` method to `meta` on `SuccessResponseBuilder`
+* Removed `transform` method on `SuccessResponseBuilder`, use `success` instead
+* Removed `getManager` and `getResource` methods from `SuccessResponseBuilder`
+* Changed `transformer` method of the `Transformable` interface to non-static
+* Added an `include` prefix to include methods in transformers
+* Renamed `transformException` of exception handler trait to `convertDefaultException`
+* Renamed `renderApiError` of exception handler trait to `renderResponse`
 
 ### Features
 
-* The package now has a changelog
-* The documentation has been completely revamped
-* Introduced a configuration option to set recursion limit
-* Introduced configurable response decorators
+* Added configurable response decorators
+* Added a `recursion_limit` configuration option
 * Allow transforming raw arrays and collections
-* Allow sending resources into the `success` method
-* Relations are now automatically eager loaded
-* Allow filtering transformation data with a GET parameter automatically
+* Allow sending transformers to the `success` method
+* Allow sending resources as data to the `success` method
+* Added a `only` method to `SuccessResponseBuilder` to replicate Fractal's `parseFieldsets`
+* Added a `cursor` method to `SuccessResponseBuilder` for setting cursors
+* Added a `paginator` method to `SuccessResponseBuilder` for setting paginators
+* Added a `without` method to `SuccessResponseBuilder` to replicate Fractal's `parseExcludes` 
+* Relationships are now automatically eager loaded
+* Changed `with` method to allow eager loading closures
+* Added a `filter_fields_parameter` configuration option for automatic data filtering
+* Added a `PageNotFoundException` exception
+* Added a `page_not_found` default error code
+* Added a `ConvertToSnakeCase` middleware to convert request parameters to snake case
+* Added a `Flugg\Responder\Transformer` service to transform without serializing
+* Added a `Transformer` facade to transform without serializing
+* Added a `transform` helper method to transform without serializing
+* Added a `NullSerializer` serializer to serialize without modifying the data
+* Added an `ErrorSerializer` contract for serializing errors
+* Added a default `Flugg\Responder\Serializers\ErrorSerializer`
+* Added a `$load` property to transformers to replicate Fractal's `$defaultIncludes` 
+* Added a dynamic method in transformers to filter relations: `filterRelationName`
+* Allow converting custom exceptions using the `convert` method of the `ConvertsExceptions` trait
 * Added a shortcut `-m` to the `--model` modifier of the `make:transformer` command
-* Added a new middleware to convert incoming request parameters to snake case: `Flugg\Responder\Http\Middlewares\ConvertToSnakeCase`
-* Added a new transformer service to transform without serializing: `Flugg\Responder\Transformer`
-* Added a new helper method to transform without serializing: `transform`
-* Added a new facade to transform without serializing: `Flugg\Responder\Facades\Transformer`
-* Added a new serializer to serialize without modifying the data: `Flugg\Responder\Serializers\NullSerializer`
-* Added an error serializer: `Flugg\Responder\Serializers\ErrorSerializer`
-* Added a new `$load` property to transformers to replicate Fractal's `$defaultIncludes`, including eager loading support
-* Added a new `without` method to `Flugg\Responder\Http\Responses\SuccessResponseBuilder` to replicate Fractal's `parseExcludes` 
-* Added a new `only` method to `Flugg\Responder\Http\Responses\SuccessResponseBuilder` to replicate Fractal's newly introduced `parseFieldsets` 
-* Introduced a new dynamic method in transformers to filter relations: `filterRelationName`
+* Added a `--plain` (and `-p`) option to `make:transformer` to make plain transformers
+* Added possibility to bind transformers to models using the `TransformerResolver` class
+* Added possibility to bind error messages to error codes using tne `ErrorMessageResolver` class
+* Decoupled Fractal from the package by introducing a `TransformFactory` adapter
+* Changed `success` to transform using an item resource if passed a has-one relation
+* Added a `resource` method to the base `Transformer` for creating related resources
 
 ### Bug Fixes
 
@@ -50,5 +68,5 @@
 
 ### Performance Improvements
 
-* Add a new caching layer to the transformers, increasing performance with deeply nested relations
+* Add a new caching layer to transformers, increasing performance with deeply nested relations
 * The relation inclusion code has been drastically improved

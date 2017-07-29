@@ -3,13 +3,13 @@
 namespace Flugg\Responder\Exceptions;
 
 use Exception;
-use Flugg\Responder\Exceptions\Http\ApiException;
+use Flugg\Responder\Contracts\Responder;
+use Flugg\Responder\Exceptions\Http\HttpException;
 use Flugg\Responder\Exceptions\Http\PageNotFoundException;
 use Flugg\Responder\Exceptions\Http\RelationNotFoundException;
 use Flugg\Responder\Exceptions\Http\UnauthenticatedException;
 use Flugg\Responder\Exceptions\Http\UnauthorizedException;
 use Flugg\Responder\Exceptions\Http\ValidationFailedException;
-use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -55,7 +55,7 @@ trait ConvertsExceptions
     }
 
     /**
-     * Convert a Laravel exception to an API exception.
+     * Convert a default exception to an API exception.
      *
      * @param  \Exception $exception
      * @return void
@@ -77,12 +77,12 @@ trait ConvertsExceptions
     /**
      * Render an error response from an API exception.
      *
-     * @param  \Flugg\Responder\Exceptions\Http\ApiException $exception
+     * @param  \Flugg\Responder\Exceptions\Http\HttpException $exception
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function renderResponse(ApiException $exception): JsonResponse
+    protected function renderResponse(HttpException $exception): JsonResponse
     {
-        return $this->container->make(ErrorResponseBuilder::class)
+        return $this->container->make(Responder::class)
             ->error($exception->errorCode(), $exception->message())
             ->data($exception->data())
             ->respond($exception->statusCode());

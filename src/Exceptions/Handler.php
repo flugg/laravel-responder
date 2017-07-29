@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Exceptions;
 
 use Exception;
-use Flugg\Responder\Exceptions\Http\ApiException;
+use Flugg\Responder\Exceptions\Http\HttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 /**
@@ -28,7 +28,7 @@ class Handler extends ExceptionHandler
     {
         $this->convertDefaultException($exception);
 
-        if ($exception instanceof ApiException) {
+        if ($exception instanceof HttpException) {
             return $this->renderResponse($exception);
         }
 

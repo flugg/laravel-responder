@@ -9,8 +9,7 @@ use Laravel\Lumen\Http\ResponseFactory;
 use Mockery;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Responses\Factories-
- * \LumenResponseFactory] class.
+ * Unit tests for the [Flugg\Responder\Http\Responses\Factories\LumenResponseFactory] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -19,16 +18,16 @@ use Mockery;
 class LumenResponseFactoryTest extends TestCase
 {
     /**
-     * The base Lumen response factory mock.
+     * A mock of a Lumen's [ResponseFactory] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $baseResponseFactory;
 
     /**
-     * The response factory adapter interface.
+     * The [ResponseFactory] adapter class being tested.
      *
-     * @var \Flugg\Responder\Http\Responses\Factories\LaravelResponseFactory
+     * @var \Flugg\Responder\Http\Responses\Factories\LumenResponseFactory
      */
     protected $responseFactory;
 
@@ -50,14 +49,11 @@ class LumenResponseFactoryTest extends TestCase
     }
 
     /**
-     * Test that the [make] method decorates the response data with info about status code.
+     * Assert that the [make] method creates JSON responses using Lumen's [ResponseFactory].
      */
-    public function testMakeMethodShouldCreateJsonResponse()
+    public function testMakeMethodShouldCreateJsonResponses()
     {
-        $data    = ['foo' => 1]; 
-        $status  = 201;
-        $headers = ['x-foo' => 1];
-        $response = $this->responseFactory->make($data, $status, $headers);
+        $response = $this->responseFactory->make($data = ['foo' => 1], $status = 201, $headers = ['x-foo' => 1]);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals($data, $response->getData(true));

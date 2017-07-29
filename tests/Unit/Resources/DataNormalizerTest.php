@@ -4,22 +4,14 @@ namespace Flugg\Responder\Tests\Unit\Resources;
 
 use Flugg\Responder\Pagination\CursorFactory;
 use Flugg\Responder\Pagination\CursorPaginator;
-use Flugg\Responder\Pagination\PaginatorFactory;
 use Flugg\Responder\Resources\DataNormalizer;
-use Flugg\Responder\Resources\ResourceFactory;
 use Flugg\Responder\Tests\TestCase;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
-use League\Fractal\Pagination\Cursor;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use League\Fractal\Resource\Collection as CollectionResource;
-use League\Fractal\Resource\Item as ItemResource;
-use League\Fractal\Resource\NullResource;
 use Mockery;
 
 /**
@@ -32,7 +24,7 @@ use Mockery;
 class DataNormalizerTest extends TestCase
 {
     /**
-     * The data normalizer being tested.
+     * The [DataNormalizer] class being tested.
      *
      * @var \Flugg\Responder\Resources\ResourceFactory
      */
@@ -51,9 +43,9 @@ class DataNormalizerTest extends TestCase
     }
 
     /**
-     *
+     * Assert the the [normalize] method converts query builder instances to collections.
      */
-    public function testNormalizeMethodNormalizesABuilderIntoACollection()
+    public function testNormalizeMethodShouldConvertQueryBuildersToCollections()
     {
         $builder = Mockery::mock(Builder::class);
         $builder->shouldReceive('get')->andReturn($collection = new Collection);
@@ -64,22 +56,9 @@ class DataNormalizerTest extends TestCase
     }
 
     /**
-     *
+     * Assert the the [normalize] method converts paginator instances to collections.
      */
-    public function testNormalizeMethodNormalizesACursorPaginatorIntoACollection()
-    {
-        $paginator = Mockery::mock(CursorPaginator::class);
-        $paginator->shouldReceive('get')->andReturn($collection = new Collection);
-
-        $data = $this->normalizer->normalize($paginator);
-
-        $this->assertSame($collection, $data);
-    }
-
-    /**
-     *
-     */
-    public function testNormalizeMethodNormalizesAPaginatorIntoACollection()
+    public function testNormalizeMethodShouldConvertPaginatorsToCollections()
     {
         $paginator = Mockery::mock(Paginator::class);
         $paginator->shouldReceive('getCollection')->andReturn($collection = new Collection);
@@ -90,9 +69,22 @@ class DataNormalizerTest extends TestCase
     }
 
     /**
-     *
+     * Assert the the [normalize] method converts cursor paginator instances to collections.
      */
-    public function testNormalizeMethodNormalizesARelationIntoACollection()
+    public function testNormalizeMethodShouldConvertCursorPaginatorsToCollections()
+    {
+        $paginator = Mockery::mock(CursorPaginator::class);
+        $paginator->shouldReceive('get')->andReturn($collection = new Collection);
+
+        $data = $this->normalizer->normalize($paginator);
+
+        $this->assertSame($collection, $data);
+    }
+
+    /**
+     * Assert the the [normalize] method converts relationship instances to collections.
+     */
+    public function testNormalizeMethodShouldConvertRelationsToCollections()
     {
         $relation = Mockery::mock(HasMany::class);
         $relation->shouldReceive('get')->andReturn($collection = new Collection);
@@ -103,9 +95,9 @@ class DataNormalizerTest extends TestCase
     }
 
     /**
-     *
+     * Assert the the [normalize] method converts singular relationship instances to models.
      */
-    public function testNormalizeMethodNormalizesASingularRelationIntoAModel()
+    public function testNormalizeMethodShouldConvertSingularRelationsToModels()
     {
         $relation = Mockery::mock(HasOne::class);
         $relation->shouldReceive('first')->andReturn($model = Mockery::mock(Model::class));
@@ -116,9 +108,9 @@ class DataNormalizerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [normalize] methods leaves other data types untouched.
      */
-    public function testNormalizeMethodShouldLeaveOtherDataUntouched()
+    public function testNormalizeMethodShouldReturnDataDirectlyIfUnknownType()
     {
         $data = $this->normalizer->normalize($array = ['foo' => 123]);
 

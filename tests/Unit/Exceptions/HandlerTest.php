@@ -3,8 +3,9 @@
 namespace Flugg\Responder\Tests\Unit;
 
 use Exception;
+use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Exceptions\Handler;
-use Flugg\Responder\Exceptions\Http\ApiException;
+use Flugg\Responder\Exceptions\Http\HttpException;
 use Flugg\Responder\Exceptions\Http\PageNotFoundException;
 use Flugg\Responder\Exceptions\Http\RelationNotFoundException;
 use Flugg\Responder\Exceptions\Http\ResourceNotFoundException;
@@ -35,21 +36,21 @@ use Mockery;
 class HandlerTest extends TestCase
 {
     /**
-     * A mock of a request object class.
+     * A mock of a [Request] object.
      *
      * @var \Mockery\MockInterface
      */
     protected $request;
 
     /**
-     * A mock of Laravel's container contract.
+     * A mock of a [Container] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $container;
 
     /**
-     * The exception handler being tested.
+     * The [Handler] class being tested.
      *
      * @var \Flugg\Responder\Exceptions\Handler;
      */
@@ -70,9 +71,10 @@ class HandlerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [render] method converts [AuthenticationException] exceptions to
+     * the package's [UnauthenticatedException].
      */
-    public function testRenderMethodTransformsUnauthenticationExceptions()
+    public function testRenderMethodConvertsUnauthenticationExceptions()
     {
         $exception = new AuthenticationException;
         $this->expectException(UnauthenticatedException::class);
@@ -81,9 +83,10 @@ class HandlerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [render] method converts [AuthorizationException] exceptions to
+     * the package's [UnauthorizedException].
      */
-    public function testRenderMethodTransformsUnauthorizedExceptions()
+    public function testRenderMethodConvertsUnauthorizedExceptions()
     {
         $exception = new AuthorizationException;
         $this->expectException(UnauthorizedException::class);
@@ -92,9 +95,10 @@ class HandlerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [render] method converts [ModelNotFoundException] exceptions to
+     * the package's [PageNotFoundException].
      */
-    public function testRenderMethodTransformsModelNotFoundExceptions()
+    public function testRenderMethodConvertsModelNotFoundExceptions()
     {
         $exception = new ModelNotFoundException;
         $this->expectException(PageNotFoundException::class);
@@ -103,9 +107,10 @@ class HandlerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [render] method converts [RelationNotFoundException] exceptions to
+     * the package's [RelationNotFoundException].
      */
-    public function testRenderMethodTransformsRelationNotFoundExceptions()
+    public function testRenderMethodConvertsRelationNotFoundExceptions()
     {
         $exception = new BaseRelationNotFoundException;
         $this->expectException(RelationNotFoundException::class);
@@ -114,9 +119,10 @@ class HandlerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [render] method converts [ValidationException] exceptions to
+     * the package's [ValidationFailedException].
      */
-    public function testRenderMethodTransformsValidationExceptions()
+    public function testRenderMethodConvertsValidationExceptions()
     {
         $exception = new ValidationException($validator = Mockery::mock(Validator::class));
         $this->expectException(ValidationFailedException::class);
@@ -125,11 +131,11 @@ class HandlerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [render] method converts [HttpException] exceptions to responses.
      */
-    public function testRenderMethodConvertsExceptionToJsonResponse()
+    public function testRenderMethodConvertsHttpExceptionsToResponses()
     {
-        $exception = Mockery::mock(ApiException::class);
+        $exception = Mockery::mock(HttpException::class);
         $exception->shouldReceive('errorCode')->andReturn($errorCode = 'test_error');
         $exception->shouldReceive('message')->andReturn($message = 'A test error has occured.');
         $exception->shouldReceive('data')->andReturn($data = ['foo' => 1]);
@@ -140,20 +146,18 @@ class HandlerTest extends TestCase
         $result = $this->handler->render($this->request, $exception);
 
         $this->assertSame($response, $result);
-        $this->container->shouldHaveReceived('make')->with(ErrorResponseBuilder::class)->once();
+        $this->container->shouldHaveReceived('make')->with(Responder::class)->once();
         $responseBuilder->shouldHaveReceived('error')->with($errorCode, $message)->once();
         $responseBuilder->shouldHaveReceived('data')->with($data)->once();
         $responseBuilder->shouldHaveReceived('respond')->with($status)->once();
     }
 
     /**
-     *
+     * Assert that the [render] method leaves other exceptions untouched.
      */
-    public function testItShouldNotTouchNonApiExceptions()
+    public function testItShouldNotConvertNonHttpExceptions()
     {
-        $exception = new Exception;
-
-        $result = $this->handler->render($this->request, $exception);
+        $result = $this->handler->render($this->request, $exception = new Exception);
 
         $this->assertInstanceOf(Response::class, $result);
     }

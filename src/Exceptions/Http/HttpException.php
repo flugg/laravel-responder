@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Exceptions\Http;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 
 /**
  * An abstract exception responsible for holding error response data.
@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-abstract class ApiException extends HttpException
+abstract class HttpException extends BaseHttpException
 {
     /**
      * An HTTP status code.
@@ -42,13 +42,21 @@ abstract class ApiException extends HttpException
     protected $data = null;
 
     /**
+     * Attached headers.
+     *
+     * @var array
+     */
+    protected $headers = [];
+
+    /**
      * Construct the exception class.
      *
      * @param string|null $message
+     * @param array|null  $headers
      */
-    public function __construct(string $message = null)
+    public function __construct(string $message = null, array $headers = null)
     {
-        parent::__construct($this->status, $this->message ?? $message);
+        parent::__construct($this->status, $message ?? $this->message, null, $headers ?? $this->headers);
     }
 
     /**
@@ -89,5 +97,15 @@ abstract class ApiException extends HttpException
     public function data()
     {
         return $this->data;
+    }
+
+    /**
+     * Retrieve attached headers.
+     *
+     * @return array|null
+     */
+    public function headers()
+    {
+        return $this->headers;
     }
 }

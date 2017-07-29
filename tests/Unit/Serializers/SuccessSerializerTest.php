@@ -10,7 +10,7 @@ use League\Fractal\Resource\Item;
 use Mockery;
 
 /**
- * Unit tests for the [Flugg\Responder\Serializers\SuccessSerializerTest] class.
+ * Unit tests for the [Flugg\Responder\Serializers\SuccessSerializer] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -19,9 +19,9 @@ use Mockery;
 class SuccessSerializerTest extends TestCase
 {
     /**
-     * The error serializer being tested.
+     * The [SuccessSerializer] class being tested.
      *
-     * @var \Flugg\Responder\Serializers\SuccessSerializerTest
+     * @var \Flugg\Responder\Serializers\SuccessSerializer
      */
     protected $serializer;
 
@@ -38,9 +38,9 @@ class SuccessSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [collection] method wraps the data in a [data] field.
      */
-    public function testCollectionMethodShouldWrapDataInADataArray()
+    public function testCollectionMethodShouldWrapDataInADataField()
     {
         $result = $this->serializer->collection(null, $data = ['foo' => 1]);
 
@@ -48,9 +48,9 @@ class SuccessSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [item] method wraps the data in a [data] field.
      */
-    public function testItemMethodShouldWrapDataInADataArray()
+    public function testItemMethodShouldWrapDataInADataField()
     {
         $result = $this->serializer->item(null, $data = ['foo' => 1]);
 
@@ -58,9 +58,9 @@ class SuccessSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [null] method wraps [null] in a [data] field.
      */
-    public function testNullMethodShouldReturnNullWrappedInADataArray()
+    public function testNullMethodShouldWrapNullInADataField()
     {
         $result = $this->serializer->null();
 
@@ -68,9 +68,9 @@ class SuccessSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [meta] method returns the given data untouched.
      */
-    public function testMetaMethodShouldReturnDataUntouched()
+    public function testMetaMethodShouldReturnDataDirectly()
     {
         $result = $this->serializer->meta($meta = ['foo' => 1]);
 
@@ -78,7 +78,7 @@ class SuccessSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [paginator] method returns a formatted pagination meta data.
      */
     public function testPaginatorMethodShouldReturnAFormattedArray()
     {
@@ -108,7 +108,7 @@ class SuccessSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [paginator] method returns a formatted cursor meta data.
      */
     public function testCursorMethodShouldReturnAFormattedArray()
     {
@@ -130,7 +130,7 @@ class SuccessSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [sideloadIncludes] method returns true.
      */
     public function testSideloadIncludesMethodShouldReturnTrue()
     {
@@ -140,20 +140,17 @@ class SuccessSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [mergeIncludes] method merges relations and strips away extra data fields.
      */
-    public function testMergeIncludesMethodShouldMergeRelationsAndStripAwayDataKeys()
+    public function testMergeIncludesMethodShouldMergeRelationsAndStripDataFields()
     {
-        $data = ['foo' => 1];
-        $relations = ['bar' => ['data' => 2]];
-
-        $result = $this->serializer->mergeIncludes($data, $relations);
+        $result = $this->serializer->mergeIncludes($data = ['foo' => 1], $relations = ['bar' => ['data' => 2]]);
 
         $this->assertEquals(['foo' => 1, 'bar' => 2], $result);
     }
 
     /**
-     *
+     * Assert that the [includedData] method returns an empty array.
      */
     public function testIncludedDataMethodShouldReturnAnEmptyArray()
     {

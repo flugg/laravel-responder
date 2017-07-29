@@ -5,8 +5,6 @@ namespace Flugg\Responder\Tests\Unit;
 use Flugg\Responder\Serializers\NullSerializer;
 use Flugg\Responder\Tests\TestCase;
 use Flugg\Responder\Transformer;
-use Flugg\Responder\Transformers\Transformer as BaseTransformer;
-use Mockery;
 
 /**
  * Unit tests for the [Flugg\Responder\Transformer] class.
@@ -18,14 +16,14 @@ use Mockery;
 class TransformerTest extends TestCase
 {
     /**
-     * The transform builder mock.
+     * A mock of a [TransformBuilder] class.
      *
      * @var \Mockery\MockInterface
      */
     protected $transformBuilder;
 
     /**
-     * The transformer service.
+     * The [Transformer] service class being tested.
      *
      * @var \Flugg\Responder\Transformer
      */
@@ -45,16 +43,15 @@ class TransformerTest extends TestCase
     }
 
     /**
-     * Test that the parameters sent to the [transform] method is forwarded to the transform builder.
+     * Assert that the parameters sent to the [transform] method is forwarded to the
+     * transform builder.
      */
     public function testTransformMethodShouldCallOnTransformBuilder()
     {
-        $data        = ['foo' => 1];
-        $transformer = $this->mockTransformer();
-        $relations   = ['foo', 'bar'];
-        $this->transformBuilder->shouldReceive('transform')->andReturn($data);
+        $transformer = $transformer = $this->mockTransformer();
+        $this->transformBuilder->shouldReceive('transform')->andReturn($data = ['foo' => 1]);
 
-        $transformation = $this->transformer->transform($data, $transformer, $relations);
+        $transformation = $this->transformer->transform($data, $transformer, $relations = ['foo', 'bar']);
 
         $this->assertEquals($data, $transformation);
         $this->transformBuilder->shouldHaveReceived('resource')->with($data, $transformer)->once();

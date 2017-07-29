@@ -13,7 +13,7 @@ use Flugg\Responder\Responder;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-trait MakesApiResponses
+trait MakesResponses
 {
     /**
      * Build a successful response.

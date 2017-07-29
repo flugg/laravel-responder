@@ -15,7 +15,7 @@ use Flugg\Responder\Tests\TestCase;
 class ErrorSerializerTest extends TestCase
 {
     /**
-     * The error serializer being tested.
+     * The [ErrorSerializer] class being tested.
      *
      * @var \Flugg\Responder\Serializers\ErrorSerializer
      */
@@ -34,15 +34,11 @@ class ErrorSerializerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the [format] method serializes the error data.
      */
     public function testFormatMethodSerializesErrorData()
     {
-        $code    = 'test_error'; 
-        $message = 'A test error has occured.'; 
-        $data    = ['foo' => 1];
-
-        $formattedData = $this->serializer->format($code, $message, $data);
+        $formattedData = $this->serializer->format($code = 'test_error', $message = 'A test error has occured.', $data = ['foo' => 1]);
 
         $this->assertEquals([
             'error' => [

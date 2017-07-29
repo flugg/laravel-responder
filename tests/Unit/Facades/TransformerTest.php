@@ -17,7 +17,7 @@ use Mockery;
 class TransformerTest extends TestCase
 {
     /**
-     * The mock of the transformer service.
+     * A mock of a [Transformer] service class.
      *
      * @var \Mockery\MockInterface
      */
@@ -37,9 +37,10 @@ class TransformerTest extends TestCase
     }
 
     /**
-     *
+     * Assert that the parameters sent to the [transform] method is forwarded to the
+     * transformer service.
      */
-    public function testTransformMethodShouldCallOnTheTransformer()
+    public function testTransformMethodShouldCallOnTransformer()
     {
         $this->transformer->shouldReceive('transform')->andReturn($transformedData = ['bar' => 2]);
 
