@@ -134,7 +134,7 @@ class TransformBuilderTest extends TestCase
         $cursor = Mockery::mock(Cursor::class);
         $this->paginatorFactory->shouldReceive('makeCursor')->andReturn($cursor);
 
-        $this->builder->cursor($cursor);
+        $this->builder->resource()->cursor($cursor);
 
         $this->resource->shouldHaveReceived('setCursor')->with($cursor)->once();
     }
@@ -147,7 +147,7 @@ class TransformBuilderTest extends TestCase
         $paginator = Mockery::mock(IlluminatePaginatorAdapter::class);
         $this->paginatorFactory->shouldReceive('make')->andReturn($paginator);
 
-        $this->builder->paginator($paginator);
+        $this->builder->resource()->paginator($paginator);
 
         $this->resource->shouldHaveReceived('setPaginator')->with($paginator)->once();
     }
@@ -157,7 +157,7 @@ class TransformBuilderTest extends TestCase
      */
     public function testMetaMethodAddsMetaDataToResource()
     {
-        $result = $this->builder->meta($meta = ['foo' => 1]);
+        $result = $this->builder->resource()->meta($meta = ['foo' => 1]);
 
         $this->assertSame($this->builder, $result);
         $this->resource->shouldHaveReceived('setMeta')->with($meta)->once();
@@ -170,13 +170,13 @@ class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn($data = ['foo' => 123]);
 
-        $result = $this->builder->transform();
+        $result = $this->builder->resource()->transform();
 
         $this->assertEquals($data, $result);
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => [],
             'excludes' => [],
-            'fields' => [],
+            'fieldsets' => [],
         ])->once();
     }
 
@@ -188,12 +188,12 @@ class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
-        $this->builder->serializer($serializer = new JsonApiSerializer)->transform();
+        $this->builder->resource()->serializer($serializer = new JsonApiSerializer)->transform();
 
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $serializer, [
             'includes' => [],
             'excludes' => [],
-            'fields' => [],
+            'fieldsets' => [],
         ])->once();
     }
 
@@ -204,12 +204,12 @@ class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
-        $this->builder->serializer($serializer = JsonApiSerializer::class)->transform();
+        $this->builder->resource()->serializer($serializer = JsonApiSerializer::class)->transform();
 
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $serializer, [
             'includes' => [],
             'excludes' => [],
-            'fields' => [],
+            'fieldsets' => [],
         ])->once();
     }
 
@@ -232,12 +232,12 @@ class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
-        $this->builder->with($relations = ['foo', 'bar'])->transform();
+        $this->builder->resource()->with($relations = ['foo', 'bar'])->transform();
 
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => $relations,
             'excludes' => [],
-            'fields' => [],
+            'fieldsets' => [],
         ])->once();
     }
 
@@ -249,12 +249,12 @@ class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
-        $this->builder->with('foo')->with('bar', 'baz')->transform();
+        $this->builder->resource()->with('foo')->with('bar', 'baz')->transform();
 
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo', 'bar', 'baz'],
             'excludes' => [],
-            'fields' => [],
+            'fieldsets' => [],
         ])->once();
     }
 
@@ -266,12 +266,12 @@ class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
-        $this->builder->without($relations = ['foo', 'bar'])->transform();
+        $this->builder->resource()->without($relations = ['foo', 'bar'])->transform();
 
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => [],
             'excludes' => $relations,
-            'fields' => [],
+            'fieldsets' => [],
         ])->once();
     }
 
@@ -283,12 +283,12 @@ class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
-        $this->builder->without('foo')->without('bar', 'baz')->transform();
+        $this->builder->resource()->without('foo')->without('bar', 'baz')->transform();
 
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => [],
             'excludes' => ['foo', 'bar', 'baz'],
-            'fields' => [],
+            'fieldsets' => [],
         ])->once();
     }
 
@@ -303,14 +303,15 @@ class TransformBuilderTest extends TestCase
         $model->shouldReceive('load')->andReturnSelf();
         $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
         $transformer->shouldReceive('extractDefaultRelations')->andReturn($default = ['baz']);
+        $transformer->shouldReceive('setRelations')->andReturnNull();
 
-        $this->builder->with($relations = ['foo' => function () { }, 'bar'])->transform();
+        $this->builder->resource()->with($relations = ['foo' => function () { }, 'bar'])->transform();
 
         $model->shouldHaveReceived('load')->with(array_merge($relations, $default))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo', 'bar', 'baz'],
             'excludes' => [],
-            'fields' => [],
+            'fieldsets' => [],
         ])->once();
     }
 
@@ -322,12 +323,12 @@ class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
-        $this->builder->only($fields = ['foo', 'bar'])->transform();
+        $this->builder->resource()->only($fields = ['foo', 'bar'])->transform();
 
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => [],
             'excludes' => [],
-            'fields' => $fields,
+            'fieldsets' => $fields,
         ])->once();
     }
 
@@ -339,12 +340,12 @@ class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
-        $this->builder->only('foo')->only('bar', 'baz')->transform();
+        $this->builder->resource()->only('foo')->only('bar', 'baz')->transform();
 
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => [],
             'excludes' => [],
-            'fields' => ['foo', 'bar', 'baz'],
+            'fieldsets' => ['foo', 'bar', 'baz'],
         ])->once();
     }
 }

@@ -20,9 +20,9 @@ Laravel Responder is a package for your JSON API, integrating [Fractal](https://
 - [Usage](#usage)
     - [Creating Responses](#creating-responses)
     - [Creating Success Responses](#creating-success-responses)
+    - [Creating Error Responses](#creating-error-responses)
     - [Creating Transformers](#creating-transformers)
     - [Transforming Data](#creating-transformers)
-    - [Creating Error Responses](#creating-error-responses)
     - [Handling Exceptions](#handling-exceptions)
     - [Testing Responses](#testing-responses)
 - [Configuration](#configuration)
@@ -127,7 +127,7 @@ This documentation assumes some knowledge of how [Fractal](https://github.com/th
 
 ## Creating Responses
 
-The package has a `Responder` service class, which has a `success` and `error` method to build success- and error responses respectively. To begin creating responses, pick one of the options below:
+The package has a `Responder` service class, which has a `success` and `error` method to build success- and error responses respectively. To use the service and begin creating responses, pick one of the options below:
 
 #### Option 1: Inject `Responder` Service
 
@@ -147,7 +147,7 @@ return $responder->error();
 ```
 
 ***
-_Alternatively, you can type hint the `Flugg\Responder\Contract\Responder` interface instead._
+_Alternatively, you can type hint the `Flugg\Responder\Contract\Responder` interface for the same result._
 ***
 
 #### Option 2: Use `responder` Helper
@@ -190,7 +190,7 @@ _Which option you pick is up to you, they are all equivalent, the important thin
 
 ### Building Responses
 
-The `success` and `error` methods return a `SuccessResponseBuilder` and `ErrorResponseBuilder` respectively, which both extend an abstract `ResponseBuilder`, giving them common behaviors. They will be converted to JSON when returned from a controller, however, you can explicitly create an instance of `Illuminate\Http\JsonResponse` using `respond`:
+The `success` and `error` methods return a `SuccessResponseBuilder` and `ErrorResponseBuilder` respectively, which both extend an abstract `ResponseBuilder`, giving them common behaviors. They will be converted to JSON when returned from a controller, but you can explicitly create an instance of `Illuminate\Http\JsonResponse` with the `respond` method:
 
 ```php
 return responder()->success()->respond();
@@ -200,7 +200,7 @@ return responder()->success()->respond();
 return responder()->error()->respond();
 ```
 
-The status code is set to `200` by default, but can be modified by filling the first argument. You can also set a list of headers as the second argument:
+The status code is set to `200` by default, but can be changed by setting the first parameter. You can also pass a list of headers as the second argument:
 
 ```php
 return responder()->success()->respond(201, ['x-foo' => true]);
@@ -239,7 +239,14 @@ A response decorator allows for last minute changes to the response before it's 
 ],
 ```
 
-You may disable a decorator by removing it from the list, or add your own by extending the abstract `Flugg\Responder\Http\Responses\Decorators\ResponseDecorator` class.
+You may disable a decorator by removing it from the list, or add your own decorator extending the abstract class `Flugg\Responder\Http\Responses\Decorators\ResponseDecorator`. You can also add additional decorators per response:
+
+```php
+return responder()->success()->decorator(ExampleDecorator::class)->respond();
+```
+```php
+return responder()->error()->decorator(ExampleDecorator::class)->respond();
+```
 
 ## Creating Success Responses
 
@@ -249,12 +256,12 @@ As briefly demonstrated above, success responses are created using the `success`
 return responder()->success()->respond();
 ```
 
-Assuming no changes to the configuration file, the above code would output the following JSON:
+Assuming no changes have been made to the configuration, the above code would output the following JSON:
 
 ```json
 {
-    "success": true,
     "status": 200,
+    "success": true,
     "data": null
 }
 ```
@@ -274,7 +281,7 @@ return responder()->success(Product::where('id', 1))->respond();
 ```
 
 ```php
-return responder()->success(Product::first()->orders())->respond();
+return responder()->success(Product::first()->shipments())->respond();
 ```
 
 ***
@@ -283,40 +290,38 @@ _The package will run the queries and convert them to collections behind the sce
 
 ### Transforming Response Data
 
-The response data will be transformed with Fractal if you attach a transformer to the response. There are two ways to attach a transformer; either _explicitly_ by setting it on the response, or _implicitly_ by binding a transformer to a model. Let's look at both ways in greater details.
+The response data will be transformed with Fractal if you've attached a transformer to the response. There are two ways to attach a transformer; either _explicitly_ by setting it on the response, or _implicitly_ by binding it to a model. Let's look at both ways in greater details.
 
-#### Set Transformer On Response
+#### Setting Transformer On Response
 
-You can attach a transformer to the response by sending a second argument to the `success` method. For instance, below we're attaching a simple closure transformer, transforming a list of products to only output their ids:
+You can attach a transformer to the response by sending a second argument to the `success` method. For instance, below we're attaching a simple closure transformer, transforming a list of products to only output their names:
 
 ```php
 return responder()->success(Product::all(), function ($product) {
-    return [
-        'id' => (int) $product->id,
-    ];
+    return ['name' => $product->name];
 })->respond();
 ```
 
 You may also transform using a dedicated transformer class:
 
 ```php
-return responder()->success(Post::all(), PostTransformer::class)->respond();
+return responder()->success(Product::all(), ProductTransformer::class)->respond();
 ```
 
 ```php
-return responder()->success(Post::all(), new PostTransformer)->respond();
+return responder()->success(Product::all(), new ProductTransformer)->respond();
 ```
 
 ***
 _You can read more about creating dedicated transformer classes in the [Creating Transformers](#creating-transformers) chapter._
 ***
 
-#### Bind Transformer To Model
+#### Binding Transformer To Model
 
-If no transformer is set, the package will search the response data for an item implementing the `Flugg\Responder\Contracts\Transformable` interface to resolve a transformer from. You can take use of this by implementing the `Transformable` interface in your models:
+If no transformer is set, the package will search the response data for an element implementing the `Flugg\Responder\Contracts\Transformable` interface to resolve a transformer from. You can take use of this by implementing the `Transformable` interface in your models:
 
 ```php
-class Post extends Model implements Transformable {}
+class Product extends Model implements Transformable {}
 ```
 
 You can satisfy the contract by adding a `transformer` method that returns the corresponding transformer:
@@ -329,12 +334,12 @@ You can satisfy the contract by adding a `transformer` method that returns the c
  */
 public function transformer()
 {
-    return PostTransformer::class;
+    return ProductTransformer::class;
 }
 ```
 
 ***
-_You're not limited to returning a class name string, you can return a transformer instance or closure transformer just like the second parameter of the `success` method._
+_You're not limited to returning a class name string, you can return a transformer instance or closure transformer, just like the second parameter of the `success` method._
 ***
 
 Instead of implementing the `Transformable` contract for all models, an alternative approach is to bind the transformers using the `bind` method on the `TransformerResolver` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
@@ -345,8 +350,8 @@ use Flugg\Responder\Transformers\TransformerResolver;
 public function boot()
 {
     $this->app->make(TransformerResolver)->bind([
-        \App\User::class => \App\Transformers\UserTransformer::class,
         \App\Post::class => \App\Transformers\PostTransformer::class,
+        \App\User::class => \App\Transformers\UserTransformer::class,
     ]);
 }
 ```
@@ -357,6 +362,10 @@ After you've bound a transformer to a model you can skip the second parameter an
 return responder()->success(Post::all())->respond();
 ```
 
+***
+_As you might have noticed, unlike Fractal, you don't need to worry about creating resource objects like `Item` and `Collection`. The package will make one for you based on the data type, however, you may wrap your data in a resource to override this._
+***
+
 ### Paginating Response Data
 
 Sending a paginator to the `success` method will set pagination meta data and transform the data automatically, as well as append any query string parameters to the paginator links.
@@ -365,7 +374,7 @@ Sending a paginator to the `success` method will set pagination meta data and tr
 return responder()->success(Product::paginate())->respond();
 ```
 
-Assuming there are no products and the default configuration is used, the outputted JSON would look like:
+Assuming there are no products and the default configuration is used, the JSON output would look like:
 
 ```json
 {
@@ -382,13 +391,9 @@ Assuming there are no products and the default configuration is used, the output
 }
 ```
 
-***
-_Laravel currently has no built-in support for cursors and so there is no data type you can send in to automatically parse cursors. However, this will probably be possible in a future release._
-***
-
 #### Setting Paginator On Response
 
-Instead of sending in a paginator as data, you may set the data and paginator seperately, like you traditionally would with Fractal. The `paginator` method expects an instance of `League\Fractal\Pagination\IlluminatePaginatorAdapter`:
+Instead of sending a paginator as data, you may set the data and paginator seperately, like you traditionally would with Fractal. You can manually set a paginator using the `paginator` method, which expects an instance of `League\Fractal\Pagination\IlluminatePaginatorAdapter`:
 
 ```php
 $paginator = Product::paginate();
@@ -399,21 +404,17 @@ return responder()->success($paginator->getCollection())->paginator($adapter)->r
 
 #### Setting Cursor On Response
 
-Just like with paginators, you can manually set a cursor. The `cursor` method expects an instance of `League\Fractal\Pagination\Cursor`:
+You can also set cursors using the `cursor` method, which expects an instance of `League\Fractal\Pagination\Cursor`:
 
 ```php
-$cursor = new Cursor(1, null, 2, Product::count());
+$cursor = new Cursor(request()->cursor, request()->previous, request()->next, Product::count());
 
 return responder()->success(Product::all())->cursor($cursor)->respond();
 ```
 
-***
-_These examples are dumbed down for brevity. For more information about paginators and cursors, check [Fractal's documentation](http://fractal.thephpleague.com/pagination)._
-***
-
 ### Including Relationships
 
-If a transformer is attached to the response, you can include and transform relationships using the `with` method:
+If a transformer class is attached to the response, you can include relationships using the `with` method:
 
 ```php
 return responder()->success(Post::all())->with('user')->respond();
@@ -425,7 +426,7 @@ You can send multiple arguments and nested relations using dot notation:
 return responder()->success(Post::all())->with('user', 'comments.user')->respond();
 ```
 
-All relationships will be automatically eager loaded, and just like you would when using `with` or `load` to eager load with Laravel, you may use a closure to specify additional query constraints. Like in the example below, where we're only including related comments posted by the authenticated user:
+All relationships will be automatically eager loaded, and just like you would when using `with` or `load` to eager load with Eloquent, you may use a callback to specify additional query constraints. Like in the example below, where we're only including related comments posted by the authenticated user:
 
 ```php
 return responder()->success(Post::all())->with(['comments' => function ($query) {
@@ -441,17 +442,17 @@ In your transformer classes, you may specify relations to automatically load. Yo
 return responder()->success(Post::all())->without('comments')->respond();
 ```
 
-#### Autoload From Query String
+#### Including From Query String
 
-Relations will be automatically loaded from a query string parameter if the `load_relations_parameter` configuration key is set to a string. The key is set to `'with'` by default, allowing you to include relations using `with` as a query string parameter:
+Relationships are loaded from a query string parameter if the `load_relations_parameter` configuration key is set to a string. By default, it's set to `with`, allowing you to automatically include relations from the query string:
 
 ```
-GET /users?with=comments.user,user
+GET /users?with=user,comments.user
 ```
 
 ### Filtering Transform Data
 
-The technique of filtering the data to only return what we need is called sparse fieldsets and can be specified using the `only` method:
+The technique of filtering the transformed data to only return what we need is called sparse fieldsets and can be specified using the `only` method:
 
 ```php
 return responder()->success(Product::all())->only('id', 'name')->respond();
@@ -459,10 +460,10 @@ return responder()->success(Product::all())->only('id', 'name')->respond();
 
 ### Adding Meta Data
 
-Sometimes you want to return additional information that's not directly tied to your response data. You can do this using the `meta` method:
+Sometimes you may want to attach additional data to your response. You can do this using the `meta` method:
 
 ```php
-return responder()->success(Post::all())->meta('count', Post::count())->respond();
+return responder()->success(Product::all())->meta('count', Product::count())->respond();
 ```
 
 When using the default serializer, the meta data will simply be appended to the response array:
@@ -478,7 +479,7 @@ When using the default serializer, the meta data will simply be appended to the 
 
 ### Serializing Response Data
 
-After the data has been transformed, it will be serialized using the set `serializer` key in the configuration file, which defaults to the package's own `Flugg\Responder\Serializers\SuccessSerializer`. You can overwrite this on your response using the `serializer` method:
+After the data has been transformed, it will be serialized using the set success serializer in the configuration file, which defaults to the package's own `Flugg\Responder\Serializers\SuccessSerializer`. You can overwrite this on your responses using the `serializer` method:
 
 ```php
 return responder()->success()->serializer(JsonApiSerializer::class)->respond();
@@ -492,7 +493,7 @@ Above we're using Fractal's `JsonApiSerializer` class. Fractal also ships with a
 
 ## Creating Transformers
 
-Creating transformer classes give you a convenient location to transform data and allow you to reuse a transformer at different places in your application. It also allows you to include and transform relations. You can create a transformer using the Artisan command `make:transformer`
+A dedicated transformer class gives you a convenient location to transform data and allows you to use the same transformer multiple times. It also allows you to include and transform relationships. You can create a transformer using the `make:transformer` Artisan command:
 
 ```shell
 php artisan make:transformer UserTransformer
@@ -505,6 +506,7 @@ The command will generate a new `UserTransformer.php` file in the `app/Transform
 
 namespace App\Transformers;
 
+use App\User;
 use Flugg\Responder\Transformers\Transformer;
 
 class UserTransformer extends Transformer
@@ -526,48 +528,33 @@ class UserTransformer extends Transformer
     /**
      * Transform the model.
      *
-     * @param  mixed $data
+     * @param  \App\User $user
      * @return array
      */
-    public function transform($data):array
+    public function transform(User $user): array
     {
         return [
-            //
+            'id' => (int) $user->id,
         ];
     }
 }
 ```
 
-All transformers should extend `Flugg\Responder\Transformers\Transformer`, which in return extends Fractal's base transformer. 
-
-#### Creating Model Transformer
-
-The transformer file generated above is a raw transformer expecting any type of data in the `transform` method. However, we can create a model transformer by specifying the `--model` or `-m` modifier:
-
-```shell
-php artisan make:transformer UserTransformer --model
-```
-
-This will automatically resolve a model from the transformer name given. For instance, given the example above, the package will extract `User` from `UserTransformer` and assume the models live directly in the `app` folder (as per Laravel's convention). If you store your models somewhere else, you may also specify the model path:
+It will automatically resolve a model name from the name provided. For instance, in the example above, the package will extract `User` from `UserTransformer` and assume the models live directly in the `app` folder (as per Laravel's convention). If you store them somewhere else, you can use the `--model` (or `-m`) option to override it: 
 
 ```shell
 php artisan make:transformer UserTransformer --model="App\Models\User"
 ```
 
-This will add the model as a typehint to the `transform` method and add an `id` field as example:
+#### Creating Plain Transformers
 
-```php
-public function transform(User $user):array
-{
-    return [
-        'id' => (int) $user->id,
-    ];
-}
+The transformer file generated above is a model transformer expecting an `App\User` model for the `transform` method. However, we can create a plain transformer by applying the `--plain` (or `-p`) modifier:
+
+```shell
+php artisan make:transformer UserTransformer --plain
 ```
 
-***
-_Remember, you will still have to add a [transformer binding](#bind-transformers-to-data) if you want the model to be transformed without specifying transformer._
-***
+This will remove the typehint from the `transform` method and add less boilerplate code.
 
 ### Including Relationships
 
@@ -775,7 +762,7 @@ return [
 ];
 ```
 
-#### Set Messages On `ErrorMessageResolver`
+#### Register Messages On `ErrorMessageResolver`
 
 Instead of implementing the `Transformable` contract for all models, an alternative approach is to bind the transformers using the `bind` method on the `TransformerManager` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
 
@@ -833,19 +820,19 @@ use Flugg\Responder\Exceptions\Handler as ExceptionHandler;
 ```
 
 ***
-This will not work with Lumen as its exception handler is incompatible with Laravel's. You can instead use the second option below.
+This will not work with Lumen as its exception handler is incompatible with Laravel's. Look instead at the second option below.
 ***
 
-#### Option 2: The `ConvertsExceptions` Trait
+#### Option 2: Use `ConvertsExceptions` Trait
 
 The package's exception handler uses the `Flugg\Responder\Exceptions\ConvertsExceptions` trait to load of most of its work. Instead of replacing the exception handler, you can use the trait in your own handler class. To replicate the behavior of the exception handler, you would also have to add the following code to the `render` method:
 
 ```php
 public function render($request, Exception $exception)
 {
-    $this->convertLaravelException($exception);
+    $this->convertDefaultException($exception);
 
-    if ($exception instanceof ApiException) {
+    if ($exception instanceof HttpException) {
         return $this->renderResponse($exception);
     }
 
@@ -870,7 +857,7 @@ You can disable the conversions of some of the exceptions above using the `$dont
 
 ```php
 /**
- * A list of Laravel exception types that should not be converted.
+ * A list of default exception types that should not be converted.
  *
  * @var array
  */
@@ -880,7 +867,7 @@ protected $dontConvert = [
 ```
 
 ***
-If you're using the trait option, you can also disable all the default conversions by removing the call to `convertLaravelException` in the `render` method.
+If you're using the trait option, you can disable all the default conversions by removing the call to `convertDefaultException` in the `render` method.
 ***
 
 #### Convert Custom Exceptions

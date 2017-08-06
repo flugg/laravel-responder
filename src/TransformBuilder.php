@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Pagination\Cursor;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use League\Fractal\Resource\NullResource;
 use League\Fractal\Serializer\SerializerAbstract;
 
 /**
@@ -92,7 +93,6 @@ class TransformBuilder
         $this->resourceFactory = $resourceFactory;
         $this->transformFactory = $transformFactory;
         $this->paginatorFactory = $paginatorFactory;
-        $this->resource = $this->resourceFactory->make();
     }
 
     /**
@@ -101,9 +101,9 @@ class TransformBuilder
      * @param  mixed                                                          $data
      * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
      * @param  string|null                                                    $resourceKey
-     * @return self
+     * @return $this
      */
-    public function resource($data = null, $transformer = null, string $resourceKey = null): TransformBuilder
+    public function resource($data = null, $transformer = null, string $resourceKey = null)
     {
         $this->resource = $this->resourceFactory->make($data, $transformer, $resourceKey);
 
@@ -120,9 +120,9 @@ class TransformBuilder
      * Manually set the cursor on the resource.
      *
      * @param  \League\Fractal\Pagination\Cursor $cursor
-     * @return self
+     * @return $this
      */
-    public function cursor(Cursor $cursor): TransformBuilder
+    public function cursor(Cursor $cursor)
     {
         $this->resource->setCursor($cursor);
 
@@ -133,9 +133,9 @@ class TransformBuilder
      * Manually set the paginator on the resource.
      *
      * @param  \League\Fractal\Pagination\IlluminatePaginatorAdapter $paginator
-     * @return self
+     * @return $this
      */
-    public function paginator(IlluminatePaginatorAdapter $paginator): TransformBuilder
+    public function paginator(IlluminatePaginatorAdapter $paginator)
     {
         $this->resource->setPaginator($paginator);
 
@@ -145,12 +145,12 @@ class TransformBuilder
     /**
      * Add meta data appended to the response data.
      *
-     * @param  array $meta
-     * @return self
+     * @param  array $data
+     * @return $this
      */
-    public function meta(array $meta): TransformBuilder
+    public function meta(array $data)
     {
-        $this->resource->setMeta($meta);
+        $this->resource->setMeta($data);
 
         return $this;
     }
@@ -159,9 +159,9 @@ class TransformBuilder
      * Include relations to the transform.
      *
      * @param  string[]|string $relations
-     * @return self
+     * @return $this
      */
-    public function with($relations): TransformBuilder
+    public function with($relations)
     {
         $this->with = array_merge($this->with, is_array($relations) ? $relations : func_get_args());
 
@@ -172,9 +172,9 @@ class TransformBuilder
      * Exclude relations from the transform.
      *
      * @param  string[]|string $relations
-     * @return self
+     * @return $this
      */
-    public function without($relations): TransformBuilder
+    public function without($relations)
     {
         $this->without = array_merge($this->without, is_array($relations) ? $relations : func_get_args());
 
@@ -185,9 +185,9 @@ class TransformBuilder
      * Filter fields to output using sparse fieldsets.
      *
      * @param  string[]|string $fields
-     * @return self
+     * @return $this
      */
-    public function only($fields): TransformBuilder
+    public function only($fields)
     {
         $this->only = array_merge($this->only, is_array($fields) ? $fields : func_get_args());
 
@@ -198,10 +198,10 @@ class TransformBuilder
      * Set the serializer.
      *
      * @param  \League\Fractal\Serializer\SerializerAbstract|string $serializer
-     * @return self
+     * @return $this
      * @throws \Flugg\Responder\Exceptions\InvalidSerializerException
      */
-    public function serializer($serializer): TransformBuilder
+    public function serializer($serializer)
     {
         if (is_string($serializer)) {
             $serializer = new $serializer;
@@ -223,61 +223,43 @@ class TransformBuilder
      */
     public function transform(): array
     {
-        $this->prepareRelations();
+        $this->prepareRelations($this->resource->getData(), $this->resource->getTransformer());
 
-        return $this->transformFactory->make($this->resource, $this->serializer, [
+        return $this->transformFactory->make($this->resource ?: new NullResource, $this->serializer, [
             'includes' => $this->with,
             'excludes' => $this->without,
-            'fields' => $this->only,
+            'fieldsets' => $this->only,
         ]);
     }
 
     /**
      * Prepare requested relations for the transformation.
      *
+     * @param  mixed                                                          $data
+     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
      * @return void
      */
-    protected function prepareRelations()
-    {
-        $this->setDefaultIncludes($this->resource->getTransformer());
-        $this->eagerLoadIfApplicable($this->resource->getData());
-
-        $this->with = $this->trimEagerLoadFunctions($this->with);
-    }
-
-    /**
-     * Set default includes extracted from the transformer.
-     *
-     * @param \Flugg\Responder\Transformers\Transformer|callable $transformer
-     * @return void
-     */
-    protected function setDefaultIncludes($transformer)
+    protected function prepareRelations($data, $transformer)
     {
         if ($transformer instanceof Transformer) {
+            $transformer->setRelations($this->with);
             $this->with($transformer->extractDefaultRelations());
         }
-    }
 
-    /**
-     * Eager load relations on the given data, if it's an Eloquent model or collection.
-     *
-     * @param  mixed $data
-     * @return void
-     */
-    protected function eagerLoadIfApplicable($data)
-    {
         if ($data instanceof Model || $data instanceof Collection) {
             $data->load($this->with);
         }
+
+        $this->with = $this->stripRelations($this->with);
     }
 
     /**
-     * Remove eager load constraint functions from the given array.
+     * Remove eager load constraint functions from the given relations.
      *
      * @param  array $relations
      * @return void
      */
-    protected function trimEagerLoadFunctions(array $relations)
+    protected function stripRelations(array $relations)
     {
         return collect($relations)->map(function ($value, $key) {
             return is_numeric($key) ? $value : $key;

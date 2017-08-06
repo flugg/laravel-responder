@@ -73,8 +73,8 @@ class SuccessSerializer extends ArraySerializer
 
         return [
             'pagination' => [
-                'total' => $pagination['total'],
                 'count' => $pagination['count'],
+                'total' => $pagination['total'],
                 'perPage' => $pagination['per_page'],
                 'currentPage' => $pagination['current_page'],
                 'totalPages' => $pagination['total_pages'],

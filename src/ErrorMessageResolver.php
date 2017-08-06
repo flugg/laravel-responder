@@ -22,6 +22,13 @@ class ErrorMessageResolver implements ErrorMessageResolverContract
     protected $translator;
 
     /**
+     * A list of registered messages mapped to error codes.
+     *
+     * @var array
+     */
+    protected $messages = [];
+
+    /**
      * Construct the resolver class.
      *
      * @param \Illuminate\Contracts\Translation\Translator $translator
@@ -32,6 +39,20 @@ class ErrorMessageResolver implements ErrorMessageResolverContract
     }
 
     /**
+     * Register a message mapped to an error code.
+     *
+     * @param  string $errorCode
+     * @param  string $message
+     * @return void
+     */
+    public function register(string $errorCode, string $message)
+    {
+        $this->messages = array_merge($this->messages, is_array($errorCode) ? $errorCode : [
+            $errorCode => $message,
+        ]);
+    }
+
+    /**
      * Resolve a message from the given error code.
      *
      * @param  string $errorCode
@@ -39,10 +60,14 @@ class ErrorMessageResolver implements ErrorMessageResolverContract
      */
     public function resolve(string $errorCode)
     {
-        if (! $this->translator->has($errorCode = "errors.$errorCode")) {
-            return null;
+        if (key_exists($errorCode, $this->messages)) {
+            return $this->messages[$errorCode];
         }
 
-        return $this->translator->trans($errorCode);
+        if ($this->translator->has($errorCode = "errors.$errorCode")) {
+            return $this->translator->trans($errorCode);
+        }
+
+        return null;
     }
 }

@@ -2,13 +2,15 @@
 
 namespace Flugg\Responder\Transformers;
 
+use Closure;
 use Flugg\Responder\Transformers\Concerns\HasRelationships;
 use Flugg\Responder\Transformers\Concerns\MakesResources;
 use Flugg\Responder\Transformers\Concerns\OverridesFractal;
+use Illuminate\Contracts\Container\Container;
 use League\Fractal\TransformerAbstract;
 
 /**
- * An abstract transformer class responsible for transforming data.
+ * An abstract base transformer class responsible for transforming data.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -19,4 +21,32 @@ abstract class Transformer extends TransformerAbstract
     use HasRelationships;
     use MakesResources;
     use OverridesFractal;
+
+    /**
+     * The container resolver callback.
+     *
+     * @var \Closure|null
+     */
+    protected static $containerResolver;
+
+    /**
+     * Set a container using a resolver callback.
+     *
+     * @param  \Closure $resolver
+     * @return void
+     */
+    public static function containerResolver(Closure $resolver)
+    {
+        static::$containerResolver = $resolver;
+    }
+
+    /**
+     * Resolve a container using the resolver callback.
+     *
+     * @return \Flugg\Responder\Resources\ResourceBuilder|\Illuminate\Contracts\Container\Container
+     */
+    protected function resolveContainer(): Container
+    {
+        return call_user_func(static::$containerResolver);
+    }
 }

@@ -17,12 +17,12 @@ use League\Fractal\Serializer\SerializerAbstract;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  *
- * @method self meta(array $meta)
- * @method self with(array | string $meta)
- * @method self without(array | string $meta)
- * @method self serializer(SerializerAbstract | string $serializer)
- * @method self paginator(IlluminatePaginatorAdapter $paginator)
- * @method self cursor(Cursor $cursor)
+ * @method $this meta(array $meta)
+ * @method $this with(array | string $relations)
+ * @method $this without(array | string $relations)
+ * @method $this serializer(SerializerAbstract | string $serializer)
+ * @method $this paginator(IlluminatePaginatorAdapter $paginator)
+ * @method $this cursor(Cursor $cursor)
  */
 class SuccessResponseBuilder extends ResponseBuilder
 {

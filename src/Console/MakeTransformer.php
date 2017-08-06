@@ -43,11 +43,11 @@ class MakeTransformer extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('model')) {
-            return __DIR__ . '/../../resources/stubs/transformer.model.stub';
+        if ($this->option('plain')) {
+            return __DIR__ . '/../../resources/stubs/transformer.plain.stub';
         }
 
-        return __DIR__ . '/../../resources/stubs/transformer.plain.stub';
+        return __DIR__ . '/../../resources/stubs/transformer.model.stub';
     }
 
     /**

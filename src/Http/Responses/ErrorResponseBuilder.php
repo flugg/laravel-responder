@@ -68,9 +68,9 @@ class ErrorResponseBuilder extends ResponseBuilder
      *
      * @param  string|null $errorCode
      * @param  string|null $message
-     * @return self
+     * @return $this
      */
-    public function error(string $errorCode = null, string $message = null): ErrorResponseBuilder
+    public function error(string $errorCode = null, string $message = null)
     {
         $this->errorCode = $errorCode;
         $this->message = $message;
@@ -82,9 +82,9 @@ class ErrorResponseBuilder extends ResponseBuilder
      * Add additional data to the error.
      *
      * @param  array $data
-     * @return self
+     * @return $this
      */
-    public function data(array $data): ErrorResponseBuilder
+    public function data(array $data)
     {
         $this->data = array_merge((array) $this->data, $data);
 

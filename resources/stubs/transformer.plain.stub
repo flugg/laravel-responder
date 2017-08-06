@@ -4,14 +4,14 @@ namespace DummyNamespace;
 
 use Flugg\Responder\Transformers\Transformer;
 
-class UserTransformer extends Transformer
+class DummyClass extends Transformer
 {
     /**
      * List of available relations.
      *
      * @var string[]
      */
-    protected $relations = ['*'];
+    protected $relations = [];
 
     /**
      * List of autoloaded default relations.

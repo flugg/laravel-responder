@@ -7,17 +7,19 @@ use Flugg\Responder\Contracts\ErrorFactory as ErrorFactoryContract;
 use Flugg\Responder\Contracts\ErrorMessageResolver as ErrorMessageResolverContract;
 use Flugg\Responder\Contracts\ErrorSerializer as ErrorSerializerContract;
 use Flugg\Responder\Contracts\Pagination\PaginatorFactory as PaginatorFactoryContract;
-use Flugg\Responder\Contracts\Resources\TransformerResolver as ResourceFactoryContract;
-use Flugg\Responder\Contracts\Resources\TransformerResolver as TransformerResolverContract;
+use Flugg\Responder\Contracts\Resources\ResourceFactory as ResourceFactoryContract;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Contracts\ResponseFactory as ResponseFactoryContract;
 use Flugg\Responder\Contracts\Transformer as TransformerContract;
+use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
 use Flugg\Responder\Contracts\TransformFactory as TransformFactoryContract;
 use Flugg\Responder\Http\Responses\Factories\LaravelResponseFactory;
 use Flugg\Responder\Http\Responses\Factories\LumenResponseFactory;
 use Flugg\Responder\Pagination\PaginatorFactory;
 use Flugg\Responder\Resources\ResourceFactory;
+use Flugg\Responder\Transformers\Transformer;
 use Flugg\Responder\Transformers\TransformerResolver;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -60,6 +62,7 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->registerResourceBindings();
         $this->registerPaginationBindings();
         $this->registerTransformationBindings();
+        $this->registerTransformerBindings();
         $this->registerServiceBindings();
     }
 
@@ -125,7 +128,7 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerErrorBindings()
     {
-        $this->app->singleton(ErrorMessageResolverContract::class, function () {
+        $this->app->singleton(ErrorMessageResolverContract::class, function ($app) {
             return $app->make(ErrorMessageResolver::class);
         });
 
@@ -142,7 +145,7 @@ class ResponderServiceProvider extends BaseServiceProvider
     protected function registerFractalBindings()
     {
         $this->app->bind(Manager::class, function ($app) {
-            return $app->make(Manager::class)->setRecursionLimit($app->config['responder.recursion_limit']);
+            return (new Manager)->setRecursionLimit($app->config['responder.recursion_limit']);
         });
     }
 
@@ -165,31 +168,46 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerPaginationBindings()
     {
-        $this->app->bind(PaginatorFactoryContract::class, function ($app) {
+        $this->app->singleton(PaginatorFactoryContract::class, function ($app) {
             return new PaginatorFactory($app->make(Request::class)->query());
         });
     }
 
     /**
-     * Register transformation Bindings.
+     * Register transformation bindings.
      *
      * @return void
      */
     protected function registerTransformationBindings()
     {
-        $this->app->bind(TransformFactoryContract::class, function () {
+        $this->app->singleton(TransformFactoryContract::class, function ($app) {
             return $app->make(FractalTransformFactory::class);
         });
 
         $this->app->bind(TransformBuilder::class, function ($app) {
-            return $app->make(TransformBuilder::class)
-                ->serializer($app->make(SerializerAbstract::class))
+            return (new TransformBuilder($app->make(ResourceFactoryContract::class), $app->make(TransformFactoryContract::class), $app->make(PaginatorFactoryContract::class)))->serializer($app->make(SerializerAbstract::class))
                 ->with($app->make(Request::class)->input($app->config['responder.load_relations_parameter'], []))
                 ->only($app->make(Request::class)->input($app->config['responder.filter_fields_parameter'], []));
         });
 
         $this->app->singleton(TransformerResolverContract::class, function ($app) {
             return $app->make(TransformerResolver::class);
+        });
+    }
+
+    /**
+     * Register transformer bindings.
+     *
+     * @return void
+     */
+    protected function registerTransformerBindings()
+    {
+        $this->app->singleton(TransformerResolverContract::class, function ($app) {
+            return $app->make(TransformerResolver::class);
+        });
+
+        Transformer::containerResolver(function () {
+            return $this->app->make(Container::class);
         });
     }
 
@@ -235,9 +253,8 @@ class ResponderServiceProvider extends BaseServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../resources/config/responder.php' => config_path('responder.php'),
+                __DIR__ . '/../config/responder.php' => config_path('responder.php'),
             ], 'config');
-
             $this->publishes([
                 __DIR__ . '/../resources/lang/en/errors.php' => base_path('resources/lang/en/errors.php'),
             ], 'lang');

@@ -42,6 +42,23 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
     }
 
     /**
+     * Decorate the response with the given decorator.
+     *
+     * @param  string[]|string $decorator
+     * @return $this
+     */
+    public function decorator($decorator)
+    {
+        $decorators = is_array($decorator) ? $decorator : func_get_args();
+
+        foreach ($decorators as $decorator) {
+            $this->responseFactory = new $decorator($this->responseFactory);
+        };
+
+        return $this;
+    }
+
+    /**
      * Respond with a successful response.
      *
      * @param  int|null $status
@@ -54,7 +71,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
             $this->setStatusCode($status);
         }
 
-        return $this->responseFactory->make($this->toArray(), $this->status, $headers);
+        return $this->responseFactory->make($this->getOutput(), $this->status, $headers);
     }
 
     /**
@@ -64,7 +81,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
      */
     public function toArray(): array
     {
-        return $this->getOutput();
+        return $this->respond()->getData(true);
     }
 
     /**

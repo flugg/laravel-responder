@@ -72,30 +72,12 @@ class ResourceFactoryTest extends TestCase
     }
 
     /**
-     * Assert that the [make] method makes a [Collection] resource when given an array.
-     */
-    public function testMakeMethodShouldMakeCollectionResourcesWhenGivenArrays()
-    {
-        $this->normalizer->shouldReceive('normalize')->andReturn($data = ['foo', 'bar']);
-        $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
-
-        $resource = $this->factory->make($data, $transformer, $resourceKey = 'bar');
-
-        $this->assertInstanceOf(Collection::class, $resource);
-        $this->assertEquals($data, $resource->getData());
-        $this->assertSame($transformer, $resource->getTransformer());
-        $this->assertEquals($resourceKey, $resource->getResourceKey());
-        $this->normalizer->shouldHaveReceived('normalize')->with($data)->once();
-        $this->transformerResolver->shouldHaveReceived('resolve')->with($transformer)->once();
-    }
-
-    /**
      * Assert that the [make] method makes an [Item] resource when given a model.
      */
     public function testMakeMethodShouldMakeItemResourcesWhenGivenModels()
     {
-        $this->normalizer->shouldReceive('normalize')->andReturn($data = Mockery::mock(Model::class));
         $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
+        $this->normalizer->shouldReceive('normalize')->andReturn($data = Mockery::mock(Model::class));
 
         $resource = $this->factory->make($data, $transformer, $resourceKey = 'bar');
 
@@ -108,14 +90,48 @@ class ResourceFactoryTest extends TestCase
     }
 
     /**
+     * Assert that the [make] method makes a [Collection] resource when given arrays
+     * containing arrays or objects.
+     */
+    public function testMakeMethodShouldMakeCollectionResourcesWhenGivenArraysWithNonScalars()
+    {
+        $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
+        $this->normalizer->shouldReceive('normalize')->andReturn($data = [
+            'foo' => ['foo' => 1],
+            'bar' => ['bar' => 2],
+        ]);
+
+        $resource = $this->factory->make($data, $transformer, $resourceKey = 'bar');
+
+        $this->assertInstanceOf(Collection::class, $resource);
+        $this->assertEquals($data, $resource->getData());
+        $this->assertSame($transformer, $resource->getTransformer());
+        $this->assertEquals($resourceKey, $resource->getResourceKey());
+        $this->normalizer->shouldHaveReceived('normalize')->with($data)->once();
+        $this->transformerResolver->shouldHaveReceived('resolve')->with($transformer)->once();
+    }
+
+    /**
+     * Assert that the [make] method makes a [Item] resource when given an array.
+     */
+    public function testMakeMethodShouldMakeItemResourcesWhenGivenArraysWithScalars()
+    {
+        $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
+        $this->normalizer->shouldReceive('normalize')->andReturn($data = ['foo' => 1, 'bar' => 2]);
+
+        $resource = $this->factory->make($data, $transformer, $resourceKey = 'bar');
+
+        $this->assertInstanceOf(Item::class, $resource);
+    }
+
+    /**
      * Assert that the [make] method resolves a transformer using the [TransformerResolver]
      * if no transformer is given.
      */
     public function testMakeMethodResolvesTransformerWhenNotGivenOne()
     {
+        $this->transformerResolver->shouldReceive('resolveFromData')->andReturn($transformer = $this->mockTransformer());
         $this->normalizer->shouldReceive('normalize')->andReturn($data = Mockery::mock(Model::class));
-        $this->transformerResolver->shouldReceive('resolveFromData')
-            ->andReturn($transformer = $this->mockTransformer());
 
         $this->factory->make($data);
 
@@ -127,8 +143,7 @@ class ResourceFactoryTest extends TestCase
      */
     public function testMakeMethodShouldAllowResources()
     {
-        $this->transformerResolver->shouldReceive('resolveFromData')
-            ->andReturn($transformer = $this->mockTransformer());
+        $this->transformerResolver->shouldReceive('resolveFromData')->andReturn($transformer = $this->mockTransformer());
 
         $resource = $this->factory->make(new Item($data = Mockery::mock(Model::class)));
 

@@ -2,11 +2,12 @@
 
 namespace Flugg\Responder\Transformers;
 
-use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
 use Flugg\Responder\Contracts\Transformable;
+use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
 use Flugg\Responder\Exceptions\InvalidTransformerException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
+use Traversable;
 
 /**
  * This class is responsible for resolving transformers.
@@ -44,11 +45,11 @@ class TransformerResolver implements TransformerResolverContract
     /**
      * Register a transformable to transformer binding.
      *
-     * @param  string|array    $transformable
-     * @param  string|callback $transformer
+     * @param  string|array         $transformable
+     * @param  string|callback|null $transformer
      * @return void
      */
-    public function bind($transformable, $transformer)
+    public function bind($transformable, $transformer = null)
     {
         $this->bindings = array_merge($this->bindings, is_array($transformable) ? $transformable : [
             $transformable => $transformer,
@@ -83,17 +84,14 @@ class TransformerResolver implements TransformerResolverContract
      */
     public function resolveFromData($data)
     {
-        if ($transformable = $this->resolveTransformable($data)) {
-            if ($transformer = $this->resolveTransformer()) {
-                return $this->resolve($transformer);
-            }
-        }
+        $transformable = $this->resolveTransformable($data);
+        $transformer = $this->resolveTransformer($transformable);
 
-        return $this->makeClosureTransformer();
+        return $this->resolve($transformer);
     }
 
     /**
-     * Resolve a transformable from the transformation data.
+     * Resolve a transformable from the given data.
      *
      * @param  mixed $data
      * @return \Flugg\Responder\Contracts\Transformable|null
@@ -102,37 +100,29 @@ class TransformerResolver implements TransformerResolverContract
     {
         if (is_array($data) || $data instanceof Traversable) {
             foreach ($data as $item) {
-                if ($item instanceof Transformable) {
-                    return $item;
-                }
+                return $item;
             }
         }
 
-        return $data instanceof Transformable ? $data : null;
+        return $data;
     }
 
     /**
-     * Resolve a transformer from the transformable.
+     * Resolve a transformer from the transformable element.
      *
-     * @param  \Flugg\Responder\Contracts\Transformable $transformable
-     * @return \Flugg\Responder\Contracts\Transformable|null
+     * @param  mixed $transformable
+     * @return \Flugg\Responder\Contracts\Transformable|callable|null
      */
-    protected function resolveTransformer(Transformable $transformable)
+    protected function resolveTransformer($transformable)
     {
-        if (key_exists($this->bindings, get_class($transformable))) {
+        if (is_object($transformable) && key_exists(get_class($transformable), $this->bindings)) {
             return $this->bindings[get_class($transformable)];
         }
 
-        return $transformable->transformer();
-    }
+        if ($transformable instanceof Transformable) {
+            return $transformable->transformer();
+        }
 
-    /**
-     * Make a simple closure transformer.
-     *
-     * @return callable
-     */
-    protected function makeClosureTransformer(): callable
-    {
         return function ($data) {
             return $data instanceof Arrayable ? $data->toArray() : $data;
         };

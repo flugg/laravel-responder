@@ -5,7 +5,7 @@ namespace DummyNamespace;
 use DummyFullModelClass;
 use Flugg\Responder\Transformers\Transformer;
 
-class UserTransformer extends Transformer
+class DummyClass extends Transformer
 {
     /**
      * List of available relations.

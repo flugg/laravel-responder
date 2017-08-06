@@ -2,12 +2,13 @@
 
 namespace Flugg\Responder\Transformers\Concerns;
 
-use Closure;
+use Flugg\Responder\Contracts\Resources\ResourceFactory;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Model;
-use League\Fractal\ParamBag;
+use League\Fractal\Resource\ResourceInterface;
 
 /**
- * A trait to be used by a transformer to make resources for relations
+ * A trait to be used by a transformer to make related resources.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -23,58 +24,73 @@ trait MakesResources
     protected $resources = [];
 
     /**
-     * The resource builder resolver callback.
-     *
-     * @var \Closure|null
-     */
-    protected static $resourceBuilderResolver;
-
-    /**
-     * Set a resource builder using a resolver callback.
+     * Make a resource.
      *
      * @param  null                                                           $data
      * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
      * @param  string|null                                                    $resourceKey
-     * @return void
+     * @return \League\Fractal\Resource\ResourceInterface
      */
-    public function resource($data = null, $transformer = null, string $resourceKey = null)
+    protected function resource($data = null, $transformer = null, string $resourceKey = null): ResourceInterface
     {
-        return static::resolveResourceBuilder()->make($data, $transformer)->withResourceKey($resourceKey)->get();
+        $resourceFactory = $this->resolveContainer()->make(ResourceFactory::class);
+
+        return $resourceFactory->make($data, $transformer, $resourceKey);
     }
 
     /**
-     * Set a resource builder using a resolver callback.
+     * Include a related resource.
      *
-     * @param  \Closure $resolver
-     * @return void
+     * @param  string $identifier
+     * @param  mixed  $data
+     * @param  array  $parameters
+     * @return \League\Fractal\Resource\ResourceInterface
+     * @throws \LogicException
      */
-    public static function resourceBuilderResolver(Closure $resolver)
+    protected function includeResource(string $identifier, $data, array $parameters): ResourceInterface
     {
-        static::$resourceBuilderResolver = $resolver;
-    }
-
-    /**
-     * Resolve a resource builder using the resolver.
-     *
-     * @return \Flugg\Responder\Resources\ResourceBuilder
-     */
-    protected static function resolveResourceBuilder()
-    {
-        return call_user_func(static::$currentCursorResolver, $name);
-    }
-
-    /**
-     * Make a related resource.
-     *
-     * @param  string                  $relation
-     * @return \League\Fractal\Resource\ResourceInterface|false
-     */
-    protected function makeResource(string $relation, $data)
-    {
-        if (key_exists($relation, $this->resources)) {
-            return $this->resources[$relation]->setData($data);
+        if (method_exists($this, $method = 'include' . ucfirst($identifier))) {
+            $resource = $this->$method($data, $parameters);
+        } elseif ($data instanceof Model) {
+            $resource = $this->includeResourceFromModel($data, $identifier);
+        } else {
+            throw new LogicException('Relation [' . $identifier . '] not found in [' . get_class($this) . '].');
         }
 
-        return $this->resource($data);
+        return $resource;
     }
+
+    /**
+     * Include a related resource from a model.
+     *
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param string                              $identifier
+     * @return \League\Fractal\Resource\ResourceInterface
+     */
+    protected function includeResourceFromModel(Model $model, string $identifier): ResourceInterface
+    {
+        $data = $this->resolveRelation($model, $identifier);
+
+        if (key_exists($identifier, $this->resources)) {
+            return $this->resources[$identifier]->setData($data);
+        }
+
+        return $this->resources[$identifier] = $this->resource($data, null, $identifier);
+    }
+
+    /**
+     * Resolve a container using the resolver callback.
+     *
+     * @return \Illuminate\Contracts\Container\Container
+     */
+    protected abstract function resolveContainer(): Container;
+
+    /**
+     * Resolve relation data from a model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param  string                              $identifier
+     * @return mixed
+     */
+    protected abstract function resolveRelation(Model $model, string $identifier);
 }

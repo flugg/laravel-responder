@@ -2,10 +2,9 @@
 
 namespace Flugg\Responder\Transformers\Concerns;
 
-use Illuminate\Database\Eloquent\Model;
-use League\Fractal\ParamBag;
+use Illuminate\Support\Collection;
+use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Scope;
-use LogicException;
 
 /**
  * A trait to be used by a transformer to override Fractal's transformer methods.
@@ -23,7 +22,11 @@ trait OverridesFractal
      */
     public function getAvailableIncludes()
     {
-        return $this->availableIncludes ?: [];
+        if ($this->allowsAllRelations()) {
+            return $this->resolveScopedIncludes($this->getCurrentScope());
+        }
+
+        return $this->getRelations();
     }
 
     /**
@@ -33,88 +36,89 @@ trait OverridesFractal
      */
     public function getDefaultIncludes()
     {
-        return array_keys($this->load ?: []);
+        return $this->getDefaultRelations();
     }
 
     /**
      * Overrides Fractal's method for including a relation.
      *
      * @param  \League\Fractal\Scope $scope
-     * @param  string                $relation
+     * @param  string                $identifier
      * @param  mixed                 $data
      * @return \League\Fractal\Resource\ResourceInterface
-     * @throws \LogicException
      */
-    protected function callIncludeMethod(Scope $scope, $relation, $data)
+    protected function callIncludeMethod(Scope $scope, $identifier, $data)
     {
-        $parameters = $this->getScopedParameters($scope, $relation);
+        $parameters = $this->resolveScopedParameters($scope, $identifier);
 
-        if ($method = $this->getIncludeMethod($relation)) {
-            return $this->$method($this->filterData($data, $relation), $parameters);
-        } elseif ($data instanceof Model) {
-            return $this->makeResource($relation, $this->filterData($data->$relation, $relation));
-        }
-
-        throw new LogicException('Cannot resolve relation [' . $relation . '] in [' . self::class . ']');
+        return $this->includeResource($identifier, $data, $parameters);
     }
 
     /**
-     * Get scoped parameters for a relation.
+     * Resolve scoped includes for the given scope.
      *
      * @param  \League\Fractal\Scope $scope
-     * @param  string                $relation
-     * @return \League\Fractal\ParamBag
+     * @return array
      */
-    protected function getScopedParameters(Scope $scope, string $relation): ParamBag
+    protected function resolveScopedIncludes(Scope $scope): array
     {
-        return $scope->getManager()->getIncludeParams($scope->getIdentifier($relation));
+        $level = count($scope->getParentScopes());
+        $includes = $scope->getManager()->getRequestedIncludes();
+
+        return Collection::make($includes)->map(function ($include) {
+            return explode('.', $include);
+        })->filter(function ($include) use ($level) {
+            return count($include) > $level;
+        })->pluck($level)->unique()->all();
     }
 
     /**
-     * Get the name of an existing include method.
+     * Resolve scoped parameters for the given scope.
      *
-     * @param  string $relation
-     * @return string|null
+     * @param  \League\Fractal\Scope $scope
+     * @param  string                $identifier
+     * @return array
      */
-    protected function getIncludeMethod(string $relation)
+    protected function resolveScopedParameters(Scope $scope, string $identifier): array
     {
-        return method_exists($this, $method = 'include' . ucfirst($relation)) ? $method : null;
+        return iterator_to_array($scope->getManager()->getIncludeParams($scope->getIdentifier($identifier)));
     }
 
     /**
-     * Filter data using a filter method.
+     * Get the current scope of the transformer.
      *
+     * @return \League\Fractal\Scope
+     */
+    public abstract function getCurrentScope();
+
+    /**
+     * Indicates if all relations are allowed.
+     *
+     * @return bool
+     */
+    public abstract function allowsAllRelations(): bool;
+
+    /**
+     * Get a list of whitelisted relations.
+     *
+     * @return string[]
+     */
+    public abstract function getRelations(): array;
+
+    /**
+     * Get a list of default relations.
+     *
+     * @return string[]
+     */
+    public abstract function getDefaultRelations(): array;
+
+    /**
+     * Include a related resource.
+     *
+     * @param  string $identifier
      * @param  mixed  $data
-     * @param  string $relation
-     * @return mixed
+     * @param  array  $parameters
+     * @return \League\Fractal\Resource\ResourceInterface
      */
-    protected function filterData($data, string $relation)
-    {
-        if (! $method = $this->getFilterMethod($relation)) {
-            return $data;
-        }
-
-        return $method($data);
-
-    }
-
-    /**
-     * Get the name of an existing filter method.
-     *
-     * @param  string $relation
-     * @return string|null
-     */
-    protected function getFilterMethod(string $relation)
-    {
-        return method_exists($this, $method = 'filter' . ucfirst($relation)) ? $method : null;
-    }
-
-    /**
-     * Make a related resource.
-     *
-     * @param  string $relation
-     * @param  mixed  $data
-     * @return \League\Fractal\Resource\ResourceInterface|false
-     */
-    protected abstract function makeResource(string $relation, $data);
+    protected abstract function includeResource(string $identifier, $data, array $parameters): ResourceInterface;
 }
