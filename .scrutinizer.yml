@@ -21,7 +21,6 @@ checks:
         verify_property_names: false
         properties_in_camelcaps: true
         parameters_in_camelcaps: true
-        encourage_single_quotes: true
 build:
     environment:
         php: 7.1.0

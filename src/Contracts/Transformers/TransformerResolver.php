@@ -33,7 +33,7 @@ interface TransformerResolver
      * Resolve a transformer from the given data.
      *
      * @param  mixed $data
-     * @return \Flugg\Responder\Transformers\Transformer|callable|null
+     * @return \Flugg\Responder\Transformers\Transformer|callable
      */
     public function resolveFromData($data);
 }

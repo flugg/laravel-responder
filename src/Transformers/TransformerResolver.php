@@ -80,7 +80,7 @@ class TransformerResolver implements TransformerResolverContract
      * Resolve a transformer from the given data.
      *
      * @param  mixed $data
-     * @return \Flugg\Responder\Transformers\Transformer|callable|null
+     * @return \Flugg\Responder\Transformers\Transformer|callable
      */
     public function resolveFromData($data)
     {
@@ -94,7 +94,7 @@ class TransformerResolver implements TransformerResolverContract
      * Resolve a transformable from the given data.
      *
      * @param  mixed $data
-     * @return \Flugg\Responder\Contracts\Transformable|null
+     * @return mixed
      */
     protected function resolveTransformable($data)
     {
@@ -111,7 +111,7 @@ class TransformerResolver implements TransformerResolverContract
      * Resolve a transformer from the transformable element.
      *
      * @param  mixed $transformable
-     * @return \Flugg\Responder\Contracts\Transformable|callable|null
+     * @return \Flugg\Responder\Contracts\Transformable|callable
      */
     protected function resolveTransformer($transformable)
     {

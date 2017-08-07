@@ -17,7 +17,7 @@ use Flugg\Responder\Http\Responses\Factories\LaravelResponseFactory;
 use Flugg\Responder\Http\Responses\Factories\LumenResponseFactory;
 use Flugg\Responder\Pagination\PaginatorFactory;
 use Flugg\Responder\Resources\ResourceFactory;
-use Flugg\Responder\Transformers\Transformer;
+use Flugg\Responder\Transformers\Transformer as BaseTransformer;
 use Flugg\Responder\Transformers\TransformerResolver;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as Laravel;
@@ -206,7 +206,7 @@ class ResponderServiceProvider extends BaseServiceProvider
             return $app->make(TransformerResolver::class);
         });
 
-        Transformer::containerResolver(function () {
+        BaseTransformer::containerResolver(function () {
             return $this->app->make(Container::class);
         });
     }

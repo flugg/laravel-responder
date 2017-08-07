@@ -7,12 +7,13 @@ use Flugg\Responder\Contracts\Resources\ResourceFactory;
 use Flugg\Responder\Contracts\TransformFactory;
 use Flugg\Responder\Exceptions\InvalidSerializerException;
 use Flugg\Responder\Pagination\CursorPaginator;
-use Flugg\Responder\Transformers\Transformer;
+use Flugg\Responder\Transformers\Transformer as BaseTransformer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Pagination\Cursor;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use League\Fractal\Resource\Collection as CollectionResource;
 use League\Fractal\Resource\NullResource;
 use League\Fractal\Serializer\SerializerAbstract;
 
@@ -124,7 +125,9 @@ class TransformBuilder
      */
     public function cursor(Cursor $cursor)
     {
-        $this->resource->setCursor($cursor);
+        if ($this->resource instanceof CollectionResource) {
+            $this->resource->setCursor($cursor);
+        }
 
         return $this;
     }
@@ -137,7 +140,9 @@ class TransformBuilder
      */
     public function paginator(IlluminatePaginatorAdapter $paginator)
     {
-        $this->resource->setPaginator($paginator);
+        if ($this->resource instanceof CollectionResource) {
+            $this->resource->setPaginator($paginator);
+        }
 
         return $this;
     }
@@ -241,7 +246,7 @@ class TransformBuilder
      */
     protected function prepareRelations($data, $transformer)
     {
-        if ($transformer instanceof Transformer) {
+        if ($transformer instanceof BaseTransformer) {
             $this->with($transformer->extractDefaultRelations());
         }
 

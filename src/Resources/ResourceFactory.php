@@ -23,7 +23,7 @@ class ResourceFactory implements ResourceFactoryContract
     /**
      * A service class, used to normalize data.
      *
-     * @var \Flugg\Responder\DataNormalizer
+     * @var \Flugg\Responder\Resources\DataNormalizer
      */
     protected $normalizer;
 

@@ -17,7 +17,7 @@ abstract class ResponseDecorator implements ResponseFactory
     /**
      * The factory being decorated.
      *
-     * @var \Flugg\Responder\Http\Responses\Factories\ResponseFactory
+     * @var \Flugg\Responder\Contracts\ResponseFactory
      */
     protected $factory;
 

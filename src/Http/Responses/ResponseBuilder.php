@@ -20,7 +20,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
     /**
      * A factory for making responses.
      *
-     * @var \Flugg\Responder\Http\Responses\Factories\ResponseFactory
+     * @var \Flugg\Responder\Contracts\ResponseFactory
      */
     protected $responseFactory;
 

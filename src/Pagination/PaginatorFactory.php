@@ -55,8 +55,6 @@ class PaginatorFactory implements PaginatorFactoryContract
      */
     public function makeCursor(CursorPaginator $paginator): Cursor
     {
-        $paginator->appends($this->parameters);
-
         return new Cursor($paginator->cursor(), $paginator->previous(), $paginator->next(), $paginator->get()->count());
     }
 }
