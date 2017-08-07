@@ -249,7 +249,18 @@ class TransformBuilder
             $data->load($this->with);
         }
 
-        $this->with = collect($this->with)->map(function ($value, $key) {
+        $this->with = $this->stripEagerLoadConstraints($this->with);
+    }
+
+    /**
+     * Remove eager load constraint functions from the given relations.
+     *
+     * @param  array $relations
+     * @return array
+     */
+    protected function stripEagerLoadConstraints(array $relations): array
+    {
+        return collect($relations)->map(function ($value, $key) {
             return is_numeric($key) ? $value : $key;
         })->values()->all();
     }
