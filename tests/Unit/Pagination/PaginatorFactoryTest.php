@@ -42,7 +42,6 @@ class PaginatorFactoryTest extends TestCase
     {
         $factory = new PaginatorFactory($parameters = ['foo' => 1]);
         $paginator = Mockery::mock(CursorPaginator::class);
-        $paginator->shouldReceive('appends')->andReturnSelf();
         $paginator->shouldReceive('cursor')->andReturn($current = 2);
         $paginator->shouldReceive('previous')->andReturn($previous = 1);
         $paginator->shouldReceive('next')->andReturn($next = 3);
@@ -55,6 +54,5 @@ class PaginatorFactoryTest extends TestCase
         $this->assertEquals($previous, $result->getPrev());
         $this->assertEquals($next, $result->getNext());
         $this->assertEquals(3, $result->getCount());
-        $paginator->shouldHaveReceived('appends')->with($parameters)->once();
     }
 }

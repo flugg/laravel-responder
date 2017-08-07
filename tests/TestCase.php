@@ -11,7 +11,7 @@ use Flugg\Responder\TransformBuilder;
 use Flugg\Responder\Transformers\Transformer;
 use Illuminate\Http\JsonResponse;
 use League\Fractal\Manager;
-use League\Fractal\Resource\NullResource;
+use League\Fractal\Resource\Collection;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
@@ -161,7 +161,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function mockResource(string $className = null): MockInterface
     {
-        $resource = Mockery::mock($className ?: NullResource::class);
+        $resource = Mockery::mock($className ?: Collection::class);
 
         $resource->shouldReceive('getData')->andReturnNull()->byDefault();
         $resource->shouldReceive('getTransformer')->andReturnNull()->byDefault();
