@@ -48,7 +48,7 @@ class DataNormalizer
      */
     protected function normalizeRelation(Relation $relation)
     {
-        if ($this->isInstanceOf($data, [BelongsTo::class, HasOne::class, MorphOne::class, MorphTo::class])) {
+        if ($this->isInstanceOf($relation, [BelongsTo::class, HasOne::class, MorphOne::class, MorphTo::class])) {
             return $relation->first();
         }
 
