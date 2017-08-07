@@ -247,7 +247,7 @@ class TransformBuilder
     protected function prepareRelations($data, $transformer)
     {
         if ($transformer instanceof BaseTransformer) {
-            $this->with($transformer->extractDefaultRelations());
+            $this->with($transformer->getDefaultRelations());
         }
 
         if ($data instanceof Model || $data instanceof Collection) {

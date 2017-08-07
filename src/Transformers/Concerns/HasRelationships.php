@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Transformers\Concerns;
 
-use Closure;
+use Flugg\Responder\Contracts\Transformers\TransformerResolver;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -31,89 +31,62 @@ trait HasRelationships
     protected $load = [];
 
     /**
-     * Indicates if all relations are allowed.
+     * Get a list of default relations with eager load constraints.
      *
-     * @return bool
-     */
-    public function allowsAllRelations(): bool
-    {
-        return $this->relations == ['*'];
-    }
-
-    /**
-     * Get a list of whitelisted relations.
-     *
-     * @return string[]
-     */
-    public function getRelations(): array
-    {
-        return array_filter($this->relations, function ($relation) {
-            return $relation != '*';
-        });
-    }
-
-    /**
-     * Get a list of default relations.
-     *
-     * @return string[]
+     * @return array
      */
     public function getDefaultRelations(): array
     {
-        return array_keys($this->load);
+        $this->load = Collection::make($this->load)->mapWithKeys(function ($transformer, $relation) {
+            return is_numeric($relation) ? [$transformer => null] : [$relation => $transformer];
+        })->all();
+
+        return array_merge($this->getScopedDefaultRelations(), $this->getNestedDefaultRelations());
     }
 
     /**
-     * Extract a deep list of default relations, recursively.
+     * Get a list of scoped default relationships with eager load constraints.
      *
-     * @return string[]
+     * @return array
      */
-    public function extractDefaultRelations(): array
+    public function getScopedDefaultRelations(): array
     {
-        return collect($this->getDefaultRelationsWithEagerLoads())
-            ->merge(collect($this->load)->map(function ($transformer, $relation) {
-                return collect($this->resolveContainer()->make($transformer)->extractDefaultRelations())
-                    ->keys()
-                    ->map(function ($nestedRelation) use ($relation) {
-                        return "$relation.$nestedRelation";
-                    });
-            }))
-            ->all();
-    }
+        $relations = [];
 
-    /**
-     *
-     *
-     * @return string[]
-     */
-    protected function getDefaultRelationsWithEagerLoads(): array
-    {
-        return collect($this->load)->keys()->mapWithKeys(function ($relation) {
+        foreach (array_keys($this->load) as $relation) {
             if (method_exists($this, $method = 'load' . ucfirst($relation))) {
-                return [$relation => $this->makeEagerLoadCallback($method)];
+                $relations[$relation] = function ($query) use ($method) {
+                    return $this->$method($query);
+                };
+            } else {
+                $relations[] = $relation;
             }
+        }
 
-            return [$relation => function () { }];
+        return $relations;
+    }
+
+    /**
+     * Get a list of nested default relationships with eager load constraints.
+     *
+     * @return array
+     */
+    protected function getNestedDefaultRelations(): array
+    {
+        return Collection::make($this->load)->filter(function ($transformer) {
+            return ! is_null($transformer);
+        })->flatMap(function ($transformer, $relation) {
+            return array_map(function ($nestedRelation) use ($relation) {
+                return "$relation.$nestedRelation";
+            }, $this->resolveTransformer($transformer)->getDefaultRelations());
         })->all();
     }
 
     /**
+     * Resolve a relationship from a model instance.
      *
-     *
-     * @param  string $method
-     * @return \Closure
-     */
-    protected function makeEagerLoadCallback(string $method): Closure
-    {
-        return function ($query) use ($method) {
-            return $this->$method($query);
-        };
-    }
-
-    /**
-     *
-     *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param  string                             $identifier
+     * @param  \Illuminate\Database\Eloquent\Model $model
+     * @param  string                              $identifier
      * @return mixed
      */
     protected function resolveRelation(Model $model, string $identifier)
@@ -123,6 +96,19 @@ trait HasRelationships
         }
 
         return $model->$identifier;
+    }
+
+    /**
+     * Resolve a related transformer from a class name string.
+     *
+     * @param  string $transformer
+     * @return mixed
+     */
+    protected function resolveTransformer(string $transformer)
+    {
+        $resolver = $this->resolveContainer()->make(TransformerResolver::class);
+
+        return $resolver->resolve($transformer);
     }
 
     /**

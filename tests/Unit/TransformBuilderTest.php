@@ -302,7 +302,7 @@ class TransformBuilderTest extends TestCase
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
         $model->shouldReceive('load')->andReturnSelf();
         $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
-        $transformer->shouldReceive('extractDefaultRelations')->andReturn($default = ['baz']);
+        $transformer->shouldReceive('getDefaultRelations')->andReturn($default = ['baz']);
         $transformer->shouldReceive('setRelations')->andReturnNull();
 
         $this->builder->resource()->with($relations = ['foo' => function () { }, 'bar'])->transform();

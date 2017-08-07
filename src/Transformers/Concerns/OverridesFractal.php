@@ -22,11 +22,17 @@ trait OverridesFractal
      */
     public function getAvailableIncludes()
     {
-        if ($this->allowsAllRelations()) {
+        if (! isset($this->relations)) {
+            return [];
+        }
+
+        if ($this->relations == ['*']) {
             return $this->resolveScopedIncludes($this->getCurrentScope());
         }
 
-        return $this->getRelations();
+        return array_filter($this->relations, function ($relation) {
+            return $relation != '*';
+        });
     }
 
     /**
@@ -36,7 +42,7 @@ trait OverridesFractal
      */
     public function getDefaultIncludes()
     {
-        return $this->getDefaultRelations();
+        return array_keys($this->load ?? []);
     }
 
     /**
@@ -90,27 +96,6 @@ trait OverridesFractal
      * @return \League\Fractal\Scope
      */
     public abstract function getCurrentScope();
-
-    /**
-     * Indicates if all relations are allowed.
-     *
-     * @return bool
-     */
-    public abstract function allowsAllRelations(): bool;
-
-    /**
-     * Get a list of whitelisted relations.
-     *
-     * @return string[]
-     */
-    public abstract function getRelations(): array;
-
-    /**
-     * Get a list of default relations.
-     *
-     * @return string[]
-     */
-    public abstract function getDefaultRelations(): array;
 
     /**
      * Include a related resource.

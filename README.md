@@ -10,7 +10,7 @@
     <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PRMC9WLJY8E46&lc=NO&item_name=Laravel%20Responder&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"><img src="https://img.shields.io/badge/donate-PayPal-yellow.svg?style=flat-square" alt="Donate"></a>
 </p>
 
-Laravel Responder is a package for your REST API, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can transform your data using transformers, create and serialize success- and error responses, handle exceptions and giving you tools to test your responses.
+Laravel Responder is a package for building API responses, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can transform your data using transformers, create and serialize success- and error responses, handle exceptions and assist you with testing your responses.
 
 # Table of Contents
 
@@ -31,7 +31,7 @@ Laravel Responder is a package for your REST API, integrating [Fractal](https://
 
 # Introduction
 
-Laravel lets you return models directly from a controller method to convert it to JSON. This is a quick way to build APIs, but leaves your database columns exposed. [Fractal](fractal.thephpleague.com), a popular PHP package from [The PHP League](https://thephpleague.com/), solves this by introducing transformers. However, it can be a bit cumbersome to integrate into the framework as seen below:
+Laravel lets you return models directly from a controller method to convert it to JSON. This is a quick way to build APIs but leaves your database columns exposed. [Fractal](https://fractal.thephpleague.com), a popular PHP package from [The PHP League](https://thephpleague.com/), solves this by introducing transformers. However, it can be a bit cumbersome to integrate into the framework as seen below:
 
 ```php
  public function index()
@@ -69,8 +69,6 @@ composer require flugger/laravel-responder
 
 ## Laravel
 
-The package supports auto-discovery, so if you use Laravel 5.5 or later you may skip registering the service provider and facades and instead run `php artisan package:discover`.
-
 #### Register Service Provider
 
 Append the following line to the `providers` key in `config/app.php` to register the package:
@@ -78,6 +76,10 @@ Append the following line to the `providers` key in `config/app.php` to register
 ```php
 Flugg\Responder\ResponderServiceProvider::class,
 ```
+
+***
+_The package supports auto-discovery, so if you use Laravel 5.5 or later you may skip registering the service provider and facades and instead run `php artisan package:discover`._
+***
 
 #### Register Facades _(optional)_
 
@@ -145,10 +147,6 @@ You can also use the `error` method to create error responses:
 ```php
 return $responder->error();
 ```
-
-***
-_Alternatively, you can type hint the `Flugg\Responder\Contract\Responder` interface for the same result._
-***
 
 #### Option 2: Use `responder` Helper
 
@@ -290,7 +288,7 @@ _The package will run the queries and convert them to collections behind the sce
 
 ### Transforming Response Data
 
-The response data will be transformed with Fractal if you've attached a transformer to the response. There are two ways to attach a transformer; either _explicitly_ by setting it on the response, or _implicitly_ by binding it to a model. Let's look at both ways in greater details.
+The response data will be transformed with Fractal if you've attached a transformer to the response. There are two ways to attach a transformer; either _explicitly_ by setting it on the response, or _implicitly_ by binding it to a model. Let's look at both ways in greater detail.
 
 #### Setting Transformer On Response
 
@@ -350,8 +348,8 @@ use Flugg\Responder\Transformers\TransformerResolver;
 public function boot()
 {
     $this->app->make(TransformerResolver)->bind([
-        \App\Post::class => \App\Transformers\PostTransformer::class,
-        \App\User::class => \App\Transformers\UserTransformer::class,
+        \App\Product::class => \App\Transformers\ProductTransformer::class,
+        \App\Shipment::class => \App\Transformers\ShipmentTransformer::class,
     ]);
 }
 ```
@@ -359,7 +357,7 @@ public function boot()
 After you've bound a transformer to a model you can skip the second parameter and still transform the data:
 
 ```php
-return responder()->success(Post::all())->respond();
+return responder()->success(Product::all())->respond();
 ```
 
 ***
@@ -404,12 +402,18 @@ return responder()->success($paginator->getCollection())->paginator($adapter)->r
 
 #### Setting Cursor On Response
 
-You can also set cursors using the `cursor` method, which expects an instance of `League\Fractal\Pagination\Cursor`:
+You can also set cursors using the `cursor` method, expecting an instance of `League\Fractal\Pagination\Cursor`:
 
 ```php
-$cursor = new Cursor(request()->cursor, request()->previous, request()->next, Product::count());
+if ($request->has('cursor')) {
+    $products = Product::where('id', '>', request()->cursor)->take(request()->limit)->get();
+} else {
+    $products = Product::take(request()->limit)->get();
+}
 
-return responder()->success(Product::all())->cursor($cursor)->respond();
+$cursor = new Cursor(request()->cursor, request()->previous, $products->last()->id ?? null, Product::count());
+
+return responder()->success($products)->cursor($cursor)->respond();
 ```
 
 ### Including Relationships
@@ -417,21 +421,29 @@ return responder()->success(Product::all())->cursor($cursor)->respond();
 If a transformer class is attached to the response, you can include relationships using the `with` method:
 
 ```php
-return responder()->success(Post::all())->with('user')->respond();
+return responder()->success(Product::all())->with('shipments')->respond();
 ```
 
-You can send multiple arguments and nested relations using dot notation:
+You can send multiple arguments and specify nested relations using dot notation:
 
 ```php
-return responder()->success(Post::all())->with('user', 'comments.user')->respond();
+return responder()->success(Product::all())->with('shipments', 'orders.customer')->respond();
 ```
 
-All relationships will be automatically eager loaded, and just like you would when using `with` or `load` to eager load with Eloquent, you may use a callback to specify additional query constraints. Like in the example below, where we're only including related comments posted by the authenticated user:
+All relationships will be automatically eager loaded, and just like you would when using `with` or `load` to eager load with Eloquent, you may use a callback to specify additional query constraints. Like in the example below, where we're only including related shipments that hasn't yet been shipped:
 
 ```php
-return responder()->success(Post::all())->with(['comments' => function ($query) {
-    $query->where('user_id', Auth::id());
+return responder()->success(Product::all())->with(['shipments' => function ($query) {
+    $query->whereNull('shipped_at');
 }])->respond();
+```
+
+#### Including From Query String
+
+Relationships are loaded from a query string parameter if the `load_relations_parameter` configuration key is set to a string. By default, it's set to `with`, allowing you to automatically include relations from the query string:
+
+```
+GET /products?with=shipments,orders.customer
 ```
 
 #### Excluding Default Relations
@@ -442,15 +454,7 @@ In your transformer classes, you may specify relations to automatically load. Yo
 return responder()->success(Post::all())->without('comments')->respond();
 ```
 
-#### Including From Query String
-
-Relationships are loaded from a query string parameter if the `load_relations_parameter` configuration key is set to a string. By default, it's set to `with`, allowing you to automatically include relations from the query string:
-
-```
-GET /users?with=user,comments.user
-```
-
-### Filtering Transform Data
+### Filtering Transformed Data
 
 The technique of filtering the transformed data to only return what we need is called sparse fieldsets and can be specified using the `only` method:
 
@@ -458,9 +462,23 @@ The technique of filtering the transformed data to only return what we need is c
 return responder()->success(Product::all())->only('id', 'name')->respond();
 ```
 
+#### Filtering From Query String
+
+Relationships are loaded from a query string parameter if the `load_relations_parameter` configuration key is set to a string. By default, it's set to `with`, allowing you to automatically include relations from the query string:
+
+```
+GET /products?only=id,name
+```
+
+When including relationships, you may optionally set the parameter to an array where each array key represents the resource keys for the resources being filtered:
+
+```
+GET /products?with=shipments&only[products]=id,name&only[shipments]=id
+```
+
 ### Adding Meta Data
 
-Sometimes you may want to attach additional data to your response. You can do this using the `meta` method:
+You may want to attach additional meta data to your response. You can do this using the `meta` method:
 
 ```php
 return responder()->success(Product::all())->meta('count', Product::count())->respond();
@@ -479,7 +497,7 @@ When using the default serializer, the meta data will simply be appended to the 
 
 ### Serializing Response Data
 
-After the data has been transformed, it will be serialized using the set success serializer in the configuration file, which defaults to the package's own `Flugg\Responder\Serializers\SuccessSerializer`. You can overwrite this on your responses using the `serializer` method:
+After the data has been transformed, it will be serialized using the specified success serializer in the configuration file, which defaults to the package's own `Flugg\Responder\Serializers\SuccessSerializer`. You can overwrite this on your responses using the `serializer` method:
 
 ```php
 return responder()->success()->serializer(JsonApiSerializer::class)->respond();
