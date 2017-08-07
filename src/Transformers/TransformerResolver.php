@@ -19,7 +19,7 @@ use Traversable;
 class TransformerResolver implements TransformerResolverContract
 {
     /**
-     * An IoC container, used to resolve transformers.
+     * A container used to resolve transformers.
      *
      * @var \Illuminate\Contracts\Container\Container
      */
@@ -123,6 +123,16 @@ class TransformerResolver implements TransformerResolverContract
             return $transformable->transformer();
         }
 
+        return $this->resolveFallbackTransformer();
+    }
+
+    /**
+     * Resolve a fallback closure transformer just returning the data directly.
+     *
+     * @return callable
+     */
+    protected function resolveFallbackTransformer()
+    {
         return function ($data) {
             return $data instanceof Arrayable ? $data->toArray() : $data;
         };

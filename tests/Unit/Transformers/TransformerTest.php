@@ -13,7 +13,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformerTest extends TestCase
+class TransformerTest
 {
     /**
      * The [Transformer] class being tested.

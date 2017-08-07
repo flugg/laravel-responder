@@ -43,7 +43,7 @@ abstract class Transformer extends TransformerAbstract
     /**
      * Resolve a container using the resolver callback.
      *
-     * @return \Flugg\Responder\Resources\ResourceBuilder|\Illuminate\Contracts\Container\Container
+     * @return \Illuminate\Contracts\Container\Container
      */
     protected function resolveContainer(): Container
     {

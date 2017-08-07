@@ -242,7 +242,6 @@ class TransformBuilder
     protected function prepareRelations($data, $transformer)
     {
         if ($transformer instanceof Transformer) {
-            $transformer->setRelations($this->with);
             $this->with($transformer->extractDefaultRelations());
         }
 
@@ -250,18 +249,7 @@ class TransformBuilder
             $data->load($this->with);
         }
 
-        $this->with = $this->stripRelations($this->with);
-    }
-
-    /**
-     * Remove eager load constraint functions from the given relations.
-     *
-     * @param  array $relations
-     * @return void
-     */
-    protected function stripRelations(array $relations)
-    {
-        return collect($relations)->map(function ($value, $key) {
+        $this->with = collect($this->with)->map(function ($value, $key) {
             return is_numeric($key) ? $value : $key;
         })->values()->all();
     }
