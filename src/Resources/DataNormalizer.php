@@ -4,6 +4,7 @@ namespace Flugg\Responder\Resources;
 
 use Flugg\Responder\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -28,7 +29,7 @@ class DataNormalizer
      */
     public function normalize($data = null)
     {
-        if ($data instanceof Builder || $data instanceof CursorPaginator) {
+        if ($this->isInstanceOf($data, [Builder::class, EloquentBuilder::class, CursorPaginator::class])) {
             return $data->get();
         } elseif ($data instanceof Paginator) {
             return $data->getCollection();
@@ -47,21 +48,24 @@ class DataNormalizer
      */
     protected function normalizeRelation(Relation $relation)
     {
-        return $this->isSingularRelation($relation) ? $relation->first() : $relation->get();
+        if ($this->isInstanceOf($data, [BelongsTo::class, HasOne::class, MorphOne::class, MorphTo::class])) {
+            return $relation->first();
+        }
+
+        return $relation->get();
     }
 
     /**
-     * Indicates if a relationship is singular.
+     * Indicates if the given data is an instance of any of the given class names.
      *
-     * @param  \Illuminate\Database\Eloquent\Relations\Relation $relation
+     * @param  mixed $data
+     * @param  array $classes
      * @return bool
      */
-    protected function isSingularRelation(Relation $relation): bool
+    protected function isInstanceOf($data, array $classes): bool
     {
-        $singularRelations = [BelongsTo::class, HasOne::class, MorphOne::class, MorphTo::class];
-
-        foreach ($singularRelations as $singularRelation) {
-            if ($relation instanceof $singularRelation) {
+        foreach ($classes as $class) {
+            if ($data instanceof $class) {
                 return true;
             }
         }
