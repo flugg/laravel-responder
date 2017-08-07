@@ -10,7 +10,7 @@
     <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PRMC9WLJY8E46&lc=NO&item_name=Laravel%20Responder&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"><img src="https://img.shields.io/badge/donate-PayPal-yellow.svg?style=flat-square" alt="Donate"></a>
 </p>
 
-Laravel Responder is a package for your JSON API, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can transform your data using transformers, create and serialize success- and error responses, handle exceptions and giving you tools to test your responses.
+Laravel Responder is a package for your REST API, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can transform your data using transformers, create and serialize success- and error responses, handle exceptions and giving you tools to test your responses.
 
 # Table of Contents
 
