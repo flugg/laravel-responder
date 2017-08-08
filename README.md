@@ -26,6 +26,7 @@ Laravel Responder is a package for building API responses, integrating [Fractal]
     - [Handling Exceptions](#handling-exceptions)
     - [Testing Responses](#testing-responses)
 - [Contributing](#contributing)
+- [Donating](#contributing)
 - [License](#license)
 
 # Introduction
@@ -995,10 +996,10 @@ vendor/bin/phpunit
 
 If you find bugs or have suggestions for improvements, feel free to submit an issue on Github. However, if it's a security related issue, please send an email to flugged@gmail.com instead.
 
-# License
-
-Laravel Responder is free software distributed under the terms of the MIT license. See [license.md](license.md) for more details.
-
 # Donating
 
 The package is completely free to use, however, a lot of time has been put into making it. If you want to show your appreciation by leaving a small donation, you can do so by clicking [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PRMC9WLJY8E46&lc=NO&item_name=Laravel%20Responder&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted). Thanks!
+
+# License
+
+Laravel Responder is free software distributed under the terms of the MIT license. See [license.md](license.md) for more details.
