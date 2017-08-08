@@ -82,7 +82,7 @@ trait ConvertsExceptions
      */
     protected function renderResponse(HttpException $exception): JsonResponse
     {
-        return $this->container->make(Responder::class)
+        return app(Responder::class)
             ->error($exception->errorCode(), $exception->message())
             ->data($exception->data())
             ->respond($exception->statusCode());
