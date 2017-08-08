@@ -25,7 +25,6 @@ Laravel Responder is a package for building API responses, integrating [Fractal]
     - [Transforming Data](#creating-transformers)
     - [Handling Exceptions](#handling-exceptions)
     - [Testing Responses](#testing-responses)
-- [Configuration](#configuration)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -451,7 +450,7 @@ GET /products?with=shipments,orders.customer
 In your transformer classes, you may specify relations to automatically load. You may disable any of these relations using the `without` method:
 
 ```php
-return responder()->success(Post::all())->without('comments')->respond();
+return responder()->success(Product::all())->without('comments')->respond();
 ```
 
 ### Filtering Transformed Data
@@ -523,10 +522,10 @@ Above we're using Fractal's `JsonApiSerializer` class. Fractal also ships with a
 A dedicated transformer class gives you a convenient location to transform data and allows you to use the same transformer multiple times. It also allows you to include and transform relationships. You can create a transformer using the `make:transformer` Artisan command:
 
 ```shell
-php artisan make:transformer UserTransformer
+php artisan make:transformer ProductTransformer
 ```
 
-The command will generate a new `UserTransformer.php` file in the `app/Transformers` folder:
+The command will generate a new `ProductTransformer.php` file in the `app/Transformers` folder:
 
 ```php
 <?php
@@ -536,7 +535,7 @@ namespace App\Transformers;
 use App\User;
 use Flugg\Responder\Transformers\Transformer;
 
-class UserTransformer extends Transformer
+class ProductTransformer extends Transformer
 {
     /**
      * List of available relations.
@@ -555,58 +554,58 @@ class UserTransformer extends Transformer
     /**
      * Transform the model.
      *
-     * @param  \App\User $user
+     * @param  \App\Product $product
      * @return array
      */
-    public function transform(User $user): array
+    public function transform(Product $product): array
     {
         return [
-            'id' => (int) $user->id,
+            'id' => (int) $product->id,
         ];
     }
 }
 ```
 
-It will automatically resolve a model name from the name provided. For instance, in the example above, the package will extract `User` from `UserTransformer` and assume the models live directly in the `app` folder (as per Laravel's convention). If you store them somewhere else, you can use the `--model` (or `-m`) option to override it: 
+It will automatically resolve a model name from the name provided. For instance, in the example above, the package will extract `Product` from `ProductTransformer` and assume the models live directly in the `app` folder (as per Laravel's convention). If you store them somewhere else, you can use the `--model` (or `-m`) option to override it: 
 
 ```shell
-php artisan make:transformer UserTransformer --model="App\Models\User"
+php artisan make:transformer ProductTransformer --model="App\Models\Product"
 ```
 
 #### Creating Plain Transformers
 
-The transformer file generated above is a model transformer expecting an `App\User` model for the `transform` method. However, we can create a plain transformer by applying the `--plain` (or `-p`) modifier:
+The transformer file generated above is a model transformer expecting an `App\Product` model for the `transform` method. However, we can create a plain transformer by applying the `--plain` (or `-p`) modifier:
 
 ```shell
-php artisan make:transformer UserTransformer --plain
+php artisan make:transformer ProductTransformer --plain
 ```
 
 This will remove the typehint from the `transform` method and add less boilerplate code.
 
 ### Including Relationships
 
-All transformers generated through the `make:transformer` command will include a `$relations` and `$with` property, which are the equivalent to Fractal's `$availableIncludes` and `$defaultIncludes`. Fractal also requires you to to create methods in your transformer for all included relation. While this package also allows you to create such methods, it doesn't require it if you're transforming models. 
+All transformers generated through the `make:transformer` command will include a `$relations` and `$load` property, which are the equivalent to Fractal's `$availableIncludes` and `$defaultIncludes`. Fractal also requires you to to create methods in your transformer for all included relation. While this package also allows you to create such methods, it doesn't require it if you're transforming models. 
 
-For instance, if you're including a `user` relation in a `PostTransformer`, the package will assume you have a `user` relationship method in your `Post` model and automatically fetch the relation. You can overwrite this by creating an `includeUser` method in `PostTransformer`, just like you would with Fractal:
+For instance, if you're including a `shipments` relation in a `ProductTransformer`, the package will assume you have a `shipments` relationship method in your `Product` model and automatically fetch the relation. You can overwrite this by creating an `includeShipments` method in `ProductTransformer`, just like you would with Fractal:
 
 ```php
 /**
- * Include related user.
+ * Include related shipments.
  *
- * @param  \App\Post                     $post
- * @param  \League\Fractal\ParamBag|null $parameters
- * @return \League\Fractal\ItemResource
+ * @param  \App\Product $product
+ * @param  array|null   $parameters
+ * @return \League\Fractal\ResourceInterface
  */
-public function includeUser(Post $post, ParamBag $parameters = null)
+public function includeShipments(Product $product, array $parameters = null)
 {
-    return $this->resource($post->user);
+    return $this->resource($product->shipments);
 }
 ```
 
-The `resource` method used above replaces Fractal's `item` and `collection` methods in the Transformer for creating a resource. It will automatically figure out wether it should be an item or collection resource based on the data. It will also resolve a transformer from the `User` model, if a transformer binding is set, just like the `success` method. In fact, it accepts the exact same arguments as the `success` method:
+The `resource` method used above replaces Fractal's `item` and `collection` methods in the Transformer for creating a resource. It will automatically figure out wether it should be an item or collection resource based on the data. It will also resolve a transformer from the `Shipment` model, if a transformer binding is set, just like the `success` method. In fact, it accepts the exact same arguments as the `success` method:
 
 ```php
-return $this->resource($post->user, new UserTransformer);
+return $this->resource($product->shipments, new ShipmentTransformer);
 ```
 
 ***
@@ -624,7 +623,7 @@ protected $relations = ['*'];
 If you only want to whitelist certain relations, you can instead set a list of relations you want to make available:
 
 ```php
-protected $relations = ['user', 'comments'];
+protected $relations = ['shipments', 'orders'];
 ```
 
 ***
@@ -633,40 +632,40 @@ _**Security warning:** Since the transformer doesn't know what relations exists 
 
 #### Setting Default Relationships
 
-The `$with` property specifies a list of relations to be autoloaded every time you transform data with the transformer. By mapping a transformer to the relation the package will also be able to automatically eager load all default relations, including nested ones:
+The `$load` property specifies a list of relations to be autoloaded every time you transform data with the transformer. By mapping a transformer to the relation the package will also be able to automatically eager load all default relations, including nested ones:
 
 ```php
-protected $with = [
-    'user' => UserTransformer::class,
-    'comments' => CommentTransformer::class,
+protected $load = [
+    'shipments' => ShipmentTransformer::class,
+    'orders' => OrderTransformer::class,
 ];
 ```
 
 If you're transforming non-model data or don't care about the eager loading, you can skip the transformer mapping and just specify a list of relations:
 
 ```php
-protected $with = ['user', 'comments'];
+protected $load = ['shipments', 'orders'];
 ```
 
 ***
-_You don't have to add relations to both `$relations` and `$with`, all relations in `$with` will be available by nature._
+_You don't have to add relations to both `$relations` and `$load`, all relations in `$load` will be available by nature._
 ***
 
 ### Filtering Relationships
 
-After a relation has been included, you can make any last second changes to it using a filter method. For instance, below we're filtering the comments collection to only include comments containing the word "Laravel".
+After a relation has been included, you can make any last second changes to it using a filter method. For instance, below we're filtering the list of related shipments to only include shipments that has not been shipped:
 
 ```php
 /**
- * Filter included comments.
+ * Filter included shipments.
  *
- * @param  \Illuminate\Database\Eloquent\Collection $comments
- * @return \Illuminate\Database\Eloquent\Collection
+ * @param  \Illuminate\Database\Eloquent\Collection $shipments
+ * @return \Illuminate\Support\Collection
  */
-public function filterComments($comments)
+public function filterShipments($shipments)
 {
-    return $comments->filter(function ($comment) {
-        return str_contains($comment->body, 'Laravel');
+    return $shipments->filter(function ($shipment) {
+        return is_null($shipment->shipped_at);
     });
 }
 ```
@@ -680,19 +679,19 @@ We've already looked at how to transform data when creating success responses, h
 You can use the `transform` helper function to transform data without creating a response:
 
 ```php
-transform(Post::all());
+transform(Product::all());
 ```
 
 Unlike the `success` method, this wont serialize the data. However, it will resolve a transformer from the model if a binding is set, and you can overwrite the transformer by setting a second parameter. You can also specify a list of included relations as a third argument:
 
 ```php
-transform(Post::all(), new PostTransformer, ['comments']);
+transform(Product::all(), new ProductTransformer, ['comments']);
 ```
 
 In addition, if you want to blacklist any of the default loaded relations, you can fill the fourth parameter:
 
 ```php
-transform(Post::all(), new PostTransformer, ['comments'], ['user']);
+transform(Product::all(), new ProductTransformer, ['shipments'], ['orders']);
 ```
 
 #### Option 2: The `Transformer` Facade
@@ -700,7 +699,7 @@ transform(Post::all(), new PostTransformer, ['comments'], ['user']);
 Instead of using the `transform` helper function, you can use the `Transformer` facade to do the same thing:
 
 ```php
-Transformer::transform(Post::all(), new PostTransformer, ['comments'], ['user']);
+Transformer::transform(Product::all(), new ProductTransformer, ['comments'], ['user']);
 ```
 
 #### Option 3: The `Transformer` Service
@@ -710,20 +709,17 @@ Both the helper method and facade uses the `Flugg\Responder\Transformer` service
 ```php
 public function __construct(Transformer $transformer)
 {
-    $transformer->transform(Post::all(), new PostTransformer, ['comments'], ['user']);
+    $transformer->transform(Product::all(), new ProductTransformer, ['comments'], ['user']);
 }
 ```
 
 ### Transforming To Camel Case
 
-Model attributes are traditionally specified in snake case, however, you might prefer to use camel case in your response data. A transformer makes for a perfect location to convert the attributes, like the `userId` field in the example below:
+Model attributes are traditionally specified in snake case, however, you might prefer to use camel case in your response data. A transformer makes for a perfect location to convert the attributes, like the `soldOut` field in the example below:
 
 ```php
-return responder()->transform($post, function ($post) {
-    return [
-        'id' => (int) $post->id,
-        'userId' => (int) $post->user_id,
-    ];    
+return responder()->transform(Product::all(), function ($product) {
+    return ['soldOut' => (bool) $product->sold_out];    
 })->respond();
 ```
 
@@ -883,7 +879,7 @@ public function render($request, Exception $exception)
 
 ### Converting Exceptions
 
-Once you've implemented one of the above options, the package will convert some of Laravel's exceptions to an exception extending `Flugg\Responder\Exceptions\Http\ApiException`. It will then convert these to an error response. The table below shows which Laravel exceptions are converted and what they are converted to. All the exceptions on the right is under the `Flugg\Responder\Exceptions\Http` namespace and extends `Flugg\Responder\Exceptions\Http\ApiException`. All exceptions extending the `ApiException` class will be automatically converted to an error response. 
+Once you've implemented one of the above options, the package will convert some of Laravel's exceptions to an exception extending `Flugg\Responder\Exceptions\Http\HttpException`. It will then convert these to an error response. The table below shows which Laravel exceptions are converted and what they are converted to. All the exceptions on the right is under the `Flugg\Responder\Exceptions\Http` namespace and extends `Flugg\Responder\Exceptions\Http\HttpException`. All exceptions extending the `HttpException` class will be automatically converted to an error response. 
 
 | Caught Exceptions                                               | Converted To                 |
 | --------------------------------------------------------------- | ---------------------------- |
@@ -931,18 +927,18 @@ $this->convert($exception, [
 ]);
 ```
 
-### Creating API Exceptions
+### Creating HTTP Exceptions
 
-An exception class is a convenient place to store information about an error. The package provides an abstract exception class `Flugg\Responder\Exceptions\Http\ApiException`, which has knowledge about status code, an error code and an error message. Continuing on our product example from above, we could create our own `ApiException` class:
+An exception class is a convenient place to store information about an error. The package provides an abstract exception class `Flugg\Responder\Exceptions\Http\HttpException`, which has knowledge about status code, an error code and an error message. Continuing on our product example from above, we could create our own `HttpException` class:
 
 ```php
 <?php
 
 namespace App\Exceptions;
 
-use Flugg\Responder\Exceptions\Http\ApiException;
+use Flugg\Responder\Exceptions\Http\HttpException;
 
-class SoldOutException extends ApiException
+class SoldOutException extends HttpException
 {
     /**
      * An HTTP status code.
@@ -989,18 +985,6 @@ If you're letting the package handle exceptions, you can now throw the exception
 throw new SoldOutException();
 ```
 
-# Configuration
-
-If you've published vendor assets as described in the [installation guide](#installation), you will have access to a `responder.php` file in you `config` folder. You may update this file to change how the package should operate. We'll go through each configuration key.
-
-#### Serializer Class Path
-
-This key represents the full class path to the serializer class you would like the package to use when generating successful JSON responses. You may leave it with the default `Flugg\Responder\Serializers\ApiSerializer`, change it to one of [Fractal's serializers](http://fractal.thephpleague.com/serializers/), or create a [custom one yourself](#custom-serializers).
-
-#### Include Status Code
-
-The package will include a status code for both success- and error responses. You can disable this by setting this key to `false`.
-
 # Contributing
 
 Contributions are more than welcome and you're free to create a pull request on Github. You can run tests with the following command:
@@ -1016,3 +1000,5 @@ If you find bugs or have suggestions for improvements, feel free to submit an is
 Laravel Responder is free software distributed under the terms of the MIT license. See [license.md](license.md) for more details.
 
 # Donating
+
+The package is completely free to use, however, a lot of time has been put into making it. If you want to show your appreciation by leaving a small donation, you can do so by clicking [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PRMC9WLJY8E46&lc=NO&item_name=Laravel%20Responder&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted). Thanks!
