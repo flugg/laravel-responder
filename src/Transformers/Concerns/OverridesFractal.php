@@ -24,9 +24,7 @@ trait OverridesFractal
     {
         if (! isset($this->relations)) {
             return [];
-        }
-
-        if ($this->relations == ['*']) {
+        } elseif ($this->relations == ['*']) {
             return $this->resolveScopedIncludes($this->getCurrentScope());
         }
 
@@ -42,7 +40,9 @@ trait OverridesFractal
      */
     public function getDefaultIncludes()
     {
-        return array_keys($this->load ?? []);
+        return Collection::make($this->load)->map(function ($transformer, $relation) {
+            return is_numeric($relation) ? $transformer : $relation;
+        })->all();
     }
 
     /**

@@ -35,35 +35,38 @@ trait HasRelationships
      *
      * @return array
      */
-    public function getDefaultRelations(): array
+    public function defaultRelations(): array
     {
         $this->load = Collection::make($this->load)->mapWithKeys(function ($transformer, $relation) {
             return is_numeric($relation) ? [$transformer => null] : [$relation => $transformer];
         })->all();
 
-        return array_merge($this->getScopedDefaultRelations(), $this->getNestedDefaultRelations());
+        $relations = $this->addEagerLoadConstraints(array_keys($this->load));
+
+        return array_merge($relations, $this->getNestedDefaultRelations());
     }
 
     /**
-     * Get a list of scoped default relationships with eager load constraints.
+     * Add eager load constraints to a list of relations.
      *
+     * @param  array $relations
      * @return array
      */
-    public function getScopedDefaultRelations(): array
+    protected function addEagerLoadConstraints(array $relations): array
     {
-        $relations = [];
+        $eagerLoads = [];
 
-        foreach (array_keys($this->load) as $relation) {
+        foreach ($relations as $relation) {
             if (method_exists($this, $method = 'load' . ucfirst($relation))) {
-                $relations[$relation] = function ($query) use ($method) {
+                $eagerLoads[$relation] = function ($query) use ($method) {
                     return $this->$method($query);
                 };
             } else {
-                $relations[] = $relation;
+                $eagerLoads[] = $relation;
             }
         }
 
-        return $relations;
+        return $eagerLoads;
     }
 
     /**

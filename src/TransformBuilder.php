@@ -247,7 +247,7 @@ class TransformBuilder
     protected function prepareRelations($data, $transformer)
     {
         if ($transformer instanceof BaseTransformer) {
-            $this->with($transformer->getDefaultRelations());
+            $this->includeTransformerRelations($transformer);
         }
 
         if ($data instanceof Model || $data instanceof Collection) {
@@ -255,6 +255,24 @@ class TransformBuilder
         }
 
         $this->with = $this->stripEagerLoadConstraints($this->with);
+    }
+
+    /**
+     * Include default relationships and add eager load constraints from transformer.
+     *
+     * @param  \Flugg\Responder\Transformers\Transformer $transformer
+     * @return void
+     */
+    protected function includeTransformerRelations(BaseTransformer $transformer)
+    {
+        $relations = array_filter(array_keys($this->with), function ($relation) {
+            return ! is_numeric($relation);
+        });
+
+        $this->with(Collection::make($transformer->defaultRelations())
+            ->filter(function ($constrain, $relation) use ($relations) {
+                return ! in_array(is_numeric($relation) ? $constrain : $relation, $relations);
+            })->all());
     }
 
     /**

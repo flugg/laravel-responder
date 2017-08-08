@@ -71,7 +71,9 @@ trait MakesResources
     {
         $data = $this->resolveRelation($model, $identifier);
 
-        if (key_exists($identifier, $this->resources)) {
+        if (! count($data)) {
+            return $this->resource($data, null, $identifier);
+        } elseif (key_exists($identifier, $this->resources)) {
             return $this->resources[$identifier]->setData($data);
         }
 
