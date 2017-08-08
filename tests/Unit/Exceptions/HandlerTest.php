@@ -68,6 +68,7 @@ class HandlerTest extends TestCase
         $this->container = Mockery::mock(Container::class);
         $this->request = Mockery::mock(Request::class);
         $this->handler = new Handler($this->container);
+        $this->app->instance(Container::class, $this->container);
     }
 
     /**
@@ -140,14 +141,14 @@ class HandlerTest extends TestCase
         $exception->shouldReceive('message')->andReturn($message = 'A test error has occured.');
         $exception->shouldReceive('data')->andReturn($data = ['foo' => 1]);
         $exception->shouldReceive('statusCode')->andReturn($status = 404);
-        $this->container->shouldReceive('make')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
+        $this->app->instance(Responder::class, $responder = Mockery::mock(Responder::class));
+        $responder->shouldReceive('error')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
         $responseBuilder->shouldReceive('respond')->andReturn($response = new JsonResponse);
 
         $result = $this->handler->render($this->request, $exception);
 
         $this->assertSame($response, $result);
-        $this->container->shouldHaveReceived('make')->with(Responder::class)->once();
-        $responseBuilder->shouldHaveReceived('error')->with($errorCode, $message)->once();
+        $responder->shouldHaveReceived('error')->with($errorCode, $message)->once();
         $responseBuilder->shouldHaveReceived('data')->with($data)->once();
         $responseBuilder->shouldHaveReceived('respond')->with($status)->once();
     }

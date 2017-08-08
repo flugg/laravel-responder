@@ -585,7 +585,9 @@ This will remove the typehint from the `transform` method and add less boilerpla
 
 ### Including Relationships
 
-All transformers generated through the `make:transformer` command will include a `$relations` and `$with` property, which are the equivalent to Fractal's `$availableIncludes` and `$defaultIncludes`. Fractal also requires you to to create methods in your transformer for all included relation. While this package also allows you to create such methods, it doesn't require it if you're transforming models. For instance, if you're including a `user` relation in a `PostTransformer`, the package will assume you have a `user` relationship method in your `Post` model and automatically fetch the relation. You can overwrite this by creating an `includeUser` method in `PostTransformer`, just like you would with Fractal:
+All transformers generated through the `make:transformer` command will include a `$relations` and `$with` property, which are the equivalent to Fractal's `$availableIncludes` and `$defaultIncludes`. Fractal also requires you to to create methods in your transformer for all included relation. While this package also allows you to create such methods, it doesn't require it if you're transforming models. 
+
+For instance, if you're including a `user` relation in a `PostTransformer`, the package will assume you have a `user` relationship method in your `Post` model and automatically fetch the relation. You can overwrite this by creating an `includeUser` method in `PostTransformer`, just like you would with Fractal:
 
 ```php
 /**
