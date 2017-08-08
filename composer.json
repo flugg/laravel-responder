@@ -25,6 +25,7 @@
         "league/fractal": "^0.16.0"
     },
     "require-dev": {
+        "php": "^7.0",
         "illuminate/database": "5.4.*",
         "orchestra/testbench": "~3.0",
         "mockery/mockery": "^0.9.5",
