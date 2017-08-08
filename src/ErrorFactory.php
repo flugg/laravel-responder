@@ -4,6 +4,7 @@ namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\ErrorFactory as ErrorFactoryContract;
 use Flugg\Responder\Contracts\ErrorMessageResolver as ErrorMessageResolverContract;
+use Flugg\Responder\Contracts\ErrorSerializer;
 use Flugg\Responder\Contracts\ErrorSerializer as ErrorSerializerContract;
 
 /**
@@ -23,38 +24,30 @@ class ErrorFactory implements ErrorFactoryContract
     protected $messageResolver;
 
     /**
-     * A serializer for formatting errors.
-     *
-     * @var \Flugg\Responder\Contracts\ErrorSerializer
-     */
-    protected $serializer;
-
-    /**
      * Construct the factory class.
      *
      * @param \Flugg\Responder\Contracts\ErrorMessageResolver $messageResolver
-     * @param \Flugg\Responder\Contracts\ErrorSerializer      $serializer
      */
-    public function __construct(ErrorMessageResolverContract $messageResolver, ErrorSerializerContract $serializer)
+    public function __construct(ErrorMessageResolverContract $messageResolver)
     {
         $this->messageResolver = $messageResolver;
-        $this->serializer = $serializer;
     }
 
     /**
      * Make an error array from the given error code and message.
      *
-     * @param  string|null $errorCode
-     * @param  string|null $message
-     * @param  array|null  $data
+     * @param  \Flugg\Responder\Contracts\ErrorSerializer $serializer
+     * @param  string|null                                $errorCode
+     * @param  string|null                                $message
+     * @param  array|null                                 $data
      * @return array
      */
-    public function make(string $errorCode = null, string $message = null, array $data = null): array
+    public function make(ErrorSerializer $serializer, string $errorCode = null, string $message = null, array $data = null): array
     {
         if (isset($errorCode) && ! isset($message)) {
             $message = $this->messageResolver->resolve($errorCode);
         }
 
-        return $this->serializer->format($errorCode, $message, $data);
+        return $serializer->format($errorCode, $message, $data);
     }
 }

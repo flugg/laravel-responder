@@ -49,7 +49,7 @@ class ErrorFactoryTest extends TestCase
 
         $this->messageResolver = Mockery::mock(ErrorMessageResolver::class);
         $this->serializer = Mockery::mock(ErrorSerializer::class);
-        $this->factory = new ErrorFactory($this->messageResolver, $this->serializer);
+        $this->factory = new ErrorFactory($this->messageResolver);
     }
 
     /**
@@ -59,7 +59,7 @@ class ErrorFactoryTest extends TestCase
     {
         $this->serializer->shouldReceive('format')->andReturn($error = ['bar' => 2]);
 
-        $result = $this->factory->make($code = 'test_error', $message = 'A test error has occured.', $data = ['foo' => 1]);
+        $result = $this->factory->make($this->serializer, $code = 'test_error', $message = 'A test error has occured.', $data = ['foo' => 1]);
 
         $this->assertEquals($error, $result);
         $this->serializer->shouldHaveReceived('format')->with($code, $message, $data)->once();
@@ -74,20 +74,20 @@ class ErrorFactoryTest extends TestCase
         $this->serializer->shouldReceive('format')->andReturn([]);
         $this->messageResolver->shouldReceive('resolve')->andReturn($message = 'A test error has occured.');
 
-        $this->factory->make($code = 'test_error');
+        $this->factory->make($this->serializer, $code = 'test_error');
 
         $this->serializer->shouldHaveReceived('format')->with($code, $message, null)->once();
         $this->messageResolver->shouldHaveReceived('resolve')->with($code)->once();
     }
 
     /**
-     * Assert that the [make] method allows skipping all parameters.
+     * Assert that the [make] method allows skipping all parameters except serializer.
      */
-    public function testMakeMethodAllowsNoParameters()
+    public function testMakeMethodAllowsPassingOnlySerializer()
     {
         $this->serializer->shouldReceive('format')->andReturn($error = ['foo' => 1]);
 
-        $result = $this->factory->make();
+        $result = $this->factory->make($this->serializer);
 
         $this->assertEquals($error, $result);
     }

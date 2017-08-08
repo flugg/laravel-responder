@@ -4,6 +4,7 @@ namespace Flugg\Responder\Tests\Unit;
 
 use Flugg\Responder\Contracts\TransformFactory;
 use Flugg\Responder\Exceptions\InvalidSerializerException;
+use Flugg\Responder\Exceptions\InvalidSuccessSerializerException;
 use Flugg\Responder\Pagination\CursorPaginator;
 use Flugg\Responder\Pagination\PaginatorFactory;
 use Flugg\Responder\Resources\ResourceFactory;
@@ -214,12 +215,12 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
-     * Assert that the [serializer] method throws [InvalidSerializerException] exception when
+     * Assert that the [serializer] method throws [InvalidSuccessSerializerException] exception when
      * given an invalid serializer.
      */
     public function testSerializerMethodThrowsExceptionWhenGivenInvalidSerializer()
     {
-        $this->expectException(InvalidSerializerException::class);
+        $this->expectException(InvalidSuccessSerializerException::class);
 
         $this->builder->serializer($serializer = stdClass::class)->transform();
     }

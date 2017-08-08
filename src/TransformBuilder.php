@@ -5,7 +5,7 @@ namespace Flugg\Responder;
 use Flugg\Responder\Contracts\Pagination\PaginatorFactory;
 use Flugg\Responder\Contracts\Resources\ResourceFactory;
 use Flugg\Responder\Contracts\TransformFactory;
-use Flugg\Responder\Exceptions\InvalidSerializerException;
+use Flugg\Responder\Exceptions\InvalidSuccessSerializerException;
 use Flugg\Responder\Pagination\CursorPaginator;
 use Flugg\Responder\Transformers\Transformer as BaseTransformer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -204,7 +204,7 @@ class TransformBuilder
      *
      * @param  \League\Fractal\Serializer\SerializerAbstract|string $serializer
      * @return $this
-     * @throws \Flugg\Responder\Exceptions\InvalidSerializerException
+     * @throws \Flugg\Responder\Exceptions\InvalidSuccessSerializerException
      */
     public function serializer($serializer)
     {
@@ -213,7 +213,7 @@ class TransformBuilder
         }
 
         if (! $serializer instanceof SerializerAbstract) {
-            throw new InvalidSerializerException;
+            throw new InvalidSuccessSerializerException;
         }
 
         $this->serializer = $serializer;

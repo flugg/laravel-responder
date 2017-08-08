@@ -3,7 +3,9 @@
 namespace Flugg\Responder\Http\Responses;
 
 use Flugg\Responder\Contracts\ErrorFactory;
+use Flugg\Responder\Contracts\ErrorSerializer;
 use Flugg\Responder\Contracts\ResponseFactory;
+use Flugg\Responder\Exceptions\InvalidErrorSerializerException;
 use InvalidArgumentException;
 
 /**
@@ -21,6 +23,13 @@ class ErrorResponseBuilder extends ResponseBuilder
      * @var \Flugg\Responder\Contracts\ErrorFactory
      */
     private $errorFactory;
+
+    /**
+     * A serializer for formatting error data.
+     *
+     * @var \Flugg\Responder\Contracts\ErrorSerializer
+     */
+    protected $serializer;
 
     /**
      * A code representing the error.
@@ -92,13 +101,35 @@ class ErrorResponseBuilder extends ResponseBuilder
     }
 
     /**
+     * Set the error serializer.
+     *
+     * @param  \Flugg\Responder\Contracts\ErrorSerializer|string $serializer
+     * @return $this
+     * @throws \Flugg\Responder\Exceptions\InvalidErrorSerializerException
+     */
+    public function serializer($serializer)
+    {
+        if (is_string($serializer)) {
+            $serializer = new $serializer;
+        }
+
+        if (! $serializer instanceof ErrorSerializer) {
+            throw new InvalidErrorSerializerException;
+        }
+
+        $this->serializer = $serializer;
+
+        return $this;
+    }
+
+    /**
      * Get the serialized response output.
      *
      * @return array
      */
     protected function getOutput(): array
     {
-        return $this->errorFactory->make($this->errorCode, $this->message, $this->data);
+        return $this->errorFactory->make($this->serializer, $this->errorCode, $this->message, $this->data);
     }
 
     /**

@@ -462,15 +462,24 @@ The technique of filtering the transformed data to only return what we need is c
 return responder()->success(Product::all())->only('id', 'name')->respond();
 ```
 
+When including relationships, you may also want to filter fields on related resources as well. This can be done by instead specifying an array where each key represents the resource keys for the resources being filtered
+
+```php
+return responder()->success(Product::all())->with('shipments')->only([
+    'products' => ['id', 'name'],
+    'shipments' => ['id']
+])->respond();
+```
+
 #### Filtering From Query String
 
-Relationships are loaded from a query string parameter if the `load_relations_parameter` configuration key is set to a string. By default, it's set to `with`, allowing you to automatically include relations from the query string:
+Fields will automatically be filtered if the `filter_fields_parameter` configuration key is set to a string. It defaults to `only`, allowing you to filter fields from the query string:
 
 ```
 GET /products?only=id,name
 ```
 
-When including relationships, you may optionally set the parameter to an array where each array key represents the resource keys for the resources being filtered:
+You may automatically filter related resources by setting the parameter to a key-based array:
 
 ```
 GET /products?with=shipments&only[products]=id,name&only[shipments]=id
@@ -481,7 +490,7 @@ GET /products?with=shipments&only[products]=id,name&only[shipments]=id
 You may want to attach additional meta data to your response. You can do this using the `meta` method:
 
 ```php
-return responder()->success(Product::all())->meta('count', Product::count())->respond();
+return responder()->success(Product::all())->meta(['count' => Product::count()])->respond();
 ```
 
 When using the default serializer, the meta data will simply be appended to the response array:
@@ -780,7 +789,7 @@ return [
 ];
 ```
 
-#### Register Messages On `ErrorMessageResolver`
+#### Register Messages Using `ErrorMessageResolver`
 
 Instead of implementing the `Transformable` contract for all models, an alternative approach is to bind the transformers using the `bind` method on the `TransformerManager` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
 
@@ -818,6 +827,18 @@ The error data will be appended to the response data. Assuming we're using the d
 ```
 
 ### Serializing Response Data
+
+Similarly to success responses, error responses will be serialized using the specified error serializer in the configuration file. This defaults to the package's own `Flugg\Responder\Serializers\ErrorSerializer`, but can of course be changed by using the `serializer` method:
+
+```php
+return responder()->error()->serializer(ExampleErrorSerializer::class)->respond();
+```
+
+```php
+return responder()->success()->serializer(new ExampleErrorSerializer())->respond();
+```
+
+You can create your own error serializer by implementing the `Flugg\Responder\Contracts\ErrorSerializer` contract.
 
 ## Handling Exceptions
 

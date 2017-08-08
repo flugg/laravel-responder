@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Tests\Unit\Http\Responses;
 
+use Flugg\Responder\Contracts\ErrorSerializer;
 use Flugg\Responder\ErrorFactory;
 use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
 use Flugg\Responder\Serializers\JsonSerializer;
@@ -35,6 +36,13 @@ class ErrorResponseBuilderTest extends TestCase
     protected $errorFactory;
 
     /**
+     * A mock of a [SerializerAbstract] class.
+     *
+     * @var \Mockery\MockInterface
+     */
+    protected $serializer;
+
+    /**
      * The [ErrorResponseBuilder] class being tested.
      *
      * @var \Flugg\Responder\Http\Responses\ErrorResponseBuilder
@@ -53,6 +61,7 @@ class ErrorResponseBuilderTest extends TestCase
         $this->responseFactory = $this->mockResponseFactory();
         $this->errorFactory = Mockery::mock(ErrorFactory::class);
         $this->responseBuilder = new ErrorResponseBuilder($this->responseFactory, $this->errorFactory);
+        $this->responseBuilder->serializer($this->serializer = Mockery::mock(ErrorSerializer::class));
     }
 
     /**
@@ -142,7 +151,7 @@ class ErrorResponseBuilderTest extends TestCase
 
         $this->responseBuilder->error($code = 'test_error', $message = 'A test error has occured.')->toArray();
 
-        $this->errorFactory->shouldHaveReceived('make')->with($code, $message, null)->once();
+        $this->errorFactory->shouldHaveReceived('make')->with($this->serializer, $code, $message, null)->once();
     }
 
     /**
@@ -154,6 +163,6 @@ class ErrorResponseBuilderTest extends TestCase
 
         $this->responseBuilder->data($data = ['foo' => 1])->toArray();
 
-        $this->errorFactory->shouldHaveReceived('make')->with(null, null, $data)->once();
+        $this->errorFactory->shouldHaveReceived('make')->with($this->serializer, null, null, $data)->once();
     }
 }

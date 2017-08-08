@@ -13,6 +13,7 @@ use Flugg\Responder\Contracts\ResponseFactory as ResponseFactoryContract;
 use Flugg\Responder\Contracts\Transformer as TransformerContract;
 use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
 use Flugg\Responder\Contracts\TransformFactory as TransformFactoryContract;
+use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
 use Flugg\Responder\Http\Responses\Factories\LaravelResponseFactory;
 use Flugg\Responder\Http\Responses\Factories\LumenResponseFactory;
 use Flugg\Responder\Pagination\PaginatorFactory;
@@ -135,6 +136,11 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->app->singleton(ErrorFactoryContract::class, function ($app) {
             return $app->make(ErrorFactory::class);
         });
+
+        $this->app->bind(ErrorResponseBuilder::class, function ($app) {
+            return (new ErrorResponseBuilder($app->make(ResponseFactoryContract::class), $app->make(ErrorFactoryContract::class)))
+                ->serializer($app->make(ErrorSerializerContract::class));
+        });
     }
 
     /**
@@ -185,7 +191,8 @@ class ResponderServiceProvider extends BaseServiceProvider
         });
 
         $this->app->bind(TransformBuilder::class, function ($app) {
-            return (new TransformBuilder($app->make(ResourceFactoryContract::class), $app->make(TransformFactoryContract::class), $app->make(PaginatorFactoryContract::class)))->serializer($app->make(SerializerAbstract::class))
+            return (new TransformBuilder($app->make(ResourceFactoryContract::class), $app->make(TransformFactoryContract::class), $app->make(PaginatorFactoryContract::class)))
+                ->serializer($app->make(SerializerAbstract::class))
                 ->with($app->make(Request::class)->input($app->config['responder.load_relations_parameter'], []))
                 ->only($app->make(Request::class)->input($app->config['responder.filter_fields_parameter'], []));
         });

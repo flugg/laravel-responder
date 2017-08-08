@@ -12,13 +12,13 @@ use RuntimeException;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class InvalidSerializerException extends RuntimeException
+class InvalidSuccessSerializerException extends RuntimeException
 {
     /**
      * Construct the exception class.
      */
     public function __construct()
     {
-        parent::__construct('Given serializer must be an instance of [' . SerializerAbstract::class . '].');
+        parent::__construct('Serializer must be an instance of [' . SerializerAbstract::class . '].');
     }
 }
