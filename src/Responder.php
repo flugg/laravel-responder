@@ -2,96 +2,67 @@
 
 namespace Flugg\Responder;
 
-use Flugg\Responder\ErrorResponse;
-use Flugg\Responder\Http\ErrorResponseBuilder;
-use Flugg\Responder\Http\SuccessResponseBuilder;
-use Flugg\Responder\SuccessResponse;
-use Illuminate\Http\JsonResponse;
+use Flugg\Responder\Contracts\Responder as ResponderContract;
+use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
+use Flugg\Responder\Http\Responses\SuccessResponseBuilder;
 
 /**
- * The responder service. This class is responsible for generating JSON API responses.
+ * A service class responsible for building responses.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class Responder
+class Responder implements ResponderContract
 {
     /**
-     * The response builder used to build success responses.
+     * A builder for building success responses.
      *
-     * @var \Flugg\Responder\Http\SuccessResponseBuilder
+     * @var \Flugg\Responder\Http\Responses\SuccessResponseBuilder
      */
-    protected $successResponse;
+    protected $successResponseBuilder;
 
     /**
-     * The response builder used to build error responses.
+     * A builder for building error responses.
      *
-     * @var \Flugg\Responder\Http\ErrorResponseBuilder
+     * @var \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */
-    protected $errorResponse;
+    protected $errorResponseBuilder;
 
     /**
-     * Constructor.
+     * Construct the service class.
      *
-     * @param \Flugg\Responder\Http\ErrorResponseBuilder   $errorResponse
-     * @param \Flugg\Responder\Http\SuccessResponseBuilder $successResponse
+     * @param \Flugg\Responder\Http\Responses\SuccessResponseBuilder $successResponseBuilder
+     * @param \Flugg\Responder\Http\Responses\ErrorResponseBuilder   $errorResponseBuilder
      */
-    public function __construct(SuccessResponseBuilder $successResponse, ErrorResponseBuilder $errorResponse)
+    public function __construct(SuccessResponseBuilder $successResponseBuilder, ErrorResponseBuilder $errorResponseBuilder)
     {
-        $this->successResponse = $successResponse;
-        $this->errorResponse = $errorResponse;
+        $this->successResponseBuilder = $successResponseBuilder;
+        $this->errorResponseBuilder = $errorResponseBuilder;
     }
 
     /**
-     * Generate an error JSON response.
+     * Build a successful response.
      *
-     * @param  mixed|null $errorCode
-     * @param  int|null    $statusCode
-     * @param  mixed       $message
-     * @return \Illuminate\Http\JsonResponse
+     * @param  mixed                                                          $data
+     * @param  callable|string|\Flugg\Responder\Transformers\Transformer|null $transformer
+     * @param  string|null                                                    $resourceKey
+     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder
      */
-    public function error($errorCode = null, int $statusCode = null, $message = null):JsonResponse
+    public function success($data = null, $transformer = null, string $resourceKey = null): SuccessResponseBuilder
     {
-        if ($exception = config("responder.exceptions.$errorCode")) {
-            if (class_exists($exception)) {
-                throw new $exception();
-            }
-        }
-
-        return $this->errorResponse->setError($errorCode, $message)->respond($statusCode);
+        return $this->successResponseBuilder->transform($data, $transformer, $resourceKey);
     }
 
     /**
-     * Generate a successful JSON response.
+     * Build an error response.
      *
-     * @param  mixed|null $data
-     * @param  int|null   $statusCode
-     * @param  array      $meta
-     * @return \Illuminate\Http\JsonResponse
+     * @param  string|null $errorCode
+     * @param  string|null $message
+     * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */
-    public function success($data = null, $statusCode = null, array $meta = []):JsonResponse
+    public function error(string $errorCode = null, string $message = null): ErrorResponseBuilder
     {
-        if (is_integer($data)) {
-            list($data, $statusCode, $meta) = [null, $data, is_array($statusCode) ? $statusCode : []];
-        }
-
-        if (is_array($statusCode)) {
-            list($statusCode, $meta) = [200, $statusCode];
-        }
-
-        return $this->successResponse->transform($data)->addMeta($meta)->respond($statusCode);
-    }
-
-    /**
-     * Transform the data and return a success response builder.
-     *
-     * @param  mixed|null           $data
-     * @param  callable|string|null $transformer
-     * @return \Flugg\Responder\Http\SuccessResponseBuilder
-     */
-    public function transform($data = null, $transformer = null):SuccessResponseBuilder
-    {
-        return $this->successResponse->transform($data, $transformer);
+        return $this->errorResponseBuilder->error($errorCode, $message);
     }
 }

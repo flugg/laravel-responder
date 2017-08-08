@@ -5,39 +5,40 @@ namespace Flugg\Responder\Exceptions\Http;
 use Illuminate\Contracts\Validation\Validator;
 
 /**
- * An exception replacing Laravel's \Illuminate\Validation\ValidationException.
+ * An exception thrown whan validation fails. This exception replaces Laravel's
+ * [\Illuminate\Validation\ValidationException].
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ValidationFailedException extends ApiException
+class ValidationFailedException extends HttpException
 {
     /**
-     * The HTTP status code.
+     * An HTTP status code.
      *
      * @var int
      */
-    protected $statusCode = 422;
+    protected $status = 422;
 
     /**
-     * The error code used for API responses.
+     * An error code.
      *
-     * @var string
+     * @var string|null
      */
     protected $errorCode = 'validation_failed';
 
     /**
-     * The validator instance.
+     * A validator for fetching validation messages.
      *
-     * @var Validator
+     * @var \Illuminate\Contracts\Validation\Validator
      */
     protected $validator;
 
     /**
-     * Create a new exception instance.
+     * Construct the exception class.
      *
-     * @param Validator $validator
+     * @param \Illuminate\Contracts\Validation\Validator $validator
      */
     public function __construct(Validator $validator)
     {
@@ -47,12 +48,12 @@ class ValidationFailedException extends ApiException
     }
 
     /**
-     * Get the error data.
+     * Retrieve the error data.
      *
      * @return array|null
      */
-    public function getData()
+    public function data()
     {
-        return ['fields' => $this->validator->getMessageBag()->toArray()];
+        return [$this->validator->getMessageBag()->toArray()];
     }
 }

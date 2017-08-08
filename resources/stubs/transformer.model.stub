@@ -1,0 +1,36 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyFullModelClass;
+use Flugg\Responder\Transformers\Transformer;
+
+class DummyClass extends Transformer
+{
+    /**
+     * List of available relations.
+     *
+     * @var string[]
+     */
+    protected $relations = ['*'];
+
+    /**
+     * List of autoloaded default relations.
+     *
+     * @var array
+     */
+    protected $load = [];
+
+    /**
+     * Transform the model.
+     *
+     * @param  \DummyFullModelClass $DummyModelVariable
+     * @return array
+     */
+    public function transform(DummyModelClass $DummyModelVariable)
+    {
+        return [
+            'id' => (int) $DummyModelVariable->id,
+        ];
+    }
+}

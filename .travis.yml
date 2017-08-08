@@ -1,11 +1,10 @@
-# Travis CI configuration
 language: php
 php:
-  - '7.0'
+  - 7.0
+  - 7.1
 before_script:
   - composer self-update
   - composer install --prefer-source --no-interaction
   - composer dump-autoload
-
 script:
   - vendor/bin/phpunit

@@ -2,13 +2,11 @@
 
 namespace Flugg\Responder\Tests\Unit;
 
-use Flugg\Responder\Http\SuccessResponseBuilder;
 use Flugg\Responder\Responder;
 use Flugg\Responder\Tests\TestCase;
-use Illuminate\Http\JsonResponse;
 
 /**
- * Collection of unit tests testing [\Flugg\Responder\Responder].
+ * Unit tests for the [Flugg\Responder\Responder] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -17,134 +15,63 @@ use Illuminate\Http\JsonResponse;
 class ResponderTest extends TestCase
 {
     /**
-     * Test that you can resolve an instance of [\Flugg\Responder\Responder] from the service
-     * container.
+     * A mock of a [SuccessResponseBuilder] class.
      *
-     * @test
+     * @var \Mockery\MockInterface
      */
-    public function youCanResolveResponderFromTheContainer()
-    {
-        // Act...
-        $manager = $this->app->make('responder');
+    protected $successResponseBuilder;
 
-        // Assert...
-        $this->assertInstanceOf(Responder::class, $manager);
+    /**
+     * A mock of an [ErrorResponseBuilder] class.
+     *
+     * @var \Mockery\MockInterface
+     */
+    protected $errorResponseBuilder;
+
+    /**
+     * The [Responder] service class being tested.
+     *
+     * @var \Flugg\Responder\Responder
+     */
+    protected $responder;
+
+    /**
+     * Setup the test environment.
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->successResponseBuilder = $this->mockSuccessResponseBuilder();
+        $this->errorResponseBuilder = $this->mockErrorResponseBuilder();
+        $this->responder = new Responder($this->successResponseBuilder, $this->errorResponseBuilder);
     }
 
     /**
-     *
-     *
-     * @test
+     * Assert that the parameters sent to the [success] method is forwarded to the success
+     * response builder.
      */
-    public function successMethodShouldReturnAJsonResponse()
+    public function testSuccessMethodShouldCallOnSuccessResponseBuilder()
     {
-        // Arrange...
-        $responder = $this->app->make('responder');
+        $result = $this->responder->success($data = ['foo' => 1], $transformer = $this->mockTransformer(), $resourceKey = 'foo');
 
-        // Act...
-        $response = $responder->success();
-
-        // Assert...
-        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame($this->successResponseBuilder, $result);
+        $this->successResponseBuilder->shouldHaveReceived('transform')->with($data, $transformer, $resourceKey)->once();
     }
 
     /**
-     *
-     *
-     * @test
+     * Assert that the parameters sent to the [error] method is forwarded to the error
+     * response builder.
      */
-    public function successMethodShouldCallOnTheSuccessResponseBuilder()
+    public function testErrorMethodShouldCallOnErrorResponseBuilder()
     {
-        // Arrange...
-        $responseBuilder = $this->mockSuccessBuilder();
-        $responder = $this->app->make('responder');
-        $data = $this->makeModel();
-        $meta = ['foo' => true];
+        $error = 'error_occured';
+        $message = 'An error has occured.';
+        $result = $this->responder->error($error, $message);
 
-        // Act...
-        $responder->success($data, 201, $meta);
-
-        // Assert...
-        $responseBuilder->shouldHaveReceived('transform')->with($data)->once();
-        $responseBuilder->shouldHaveReceived('addMeta')->with($meta)->once();
-        $responseBuilder->shouldHaveReceived('respond')->with(201)->once();
-    }
-
-    /**
-     *
-     *
-     * @test
-     */
-    public function successMethodShouldAllowSkippingStatusCodeParameter()
-    {
-        // Arrange...
-        $responseBuilder = $this->mockSuccessBuilder();
-        $responder = $this->app->make('responder');
-        $data = $this->makeModel();
-        $meta = ['foo' => true];
-
-        // Act...
-        $responder->success($data, $meta);
-
-        // Assert...
-        $responseBuilder->shouldHaveReceived('transform')->with($data)->once();
-        $responseBuilder->shouldHaveReceived('addMeta')->with($meta)->once();
-    }
-
-    /**
-     *
-     *
-     * @test
-     */
-    public function successMethodShouldAllowSkippingDataParameter()
-    {
-        // Arrange...
-        $responseBuilder = $this->mockSuccessBuilder();
-        $responder = $this->app->make('responder');
-        $meta = ['foo' => true];
-
-        // Act...
-        $responder->success(201, $meta);
-
-        // Assert...
-        $responseBuilder->shouldHaveReceived('addMeta')->with($meta)->once();
-        $responseBuilder->shouldHaveReceived('respond')->with(201)->once();
-    }
-
-    /**
-     *
-     *
-     * @test
-     */
-    public function transformMethodShouldReturnASuccessResponseBuilder()
-    {
-        // Arrange...
-        $responder = $this->app->make('responder');
-
-        // Act...
-        $response = $responder->transform();
-
-        // Assert...
-        $this->assertInstanceOf(SuccessResponseBuilder::class, $response);
-    }
-
-    /**
-     *
-     *
-     * @test
-     */
-    public function transformMethodShouldCallOnTheSuccessResponseBuilder()
-    {
-        // Arrange...
-        $responseBuilder = $this->mockSuccessBuilder();
-        $responder = $this->app->make('responder');
-        $data = $this->makeModel();
-        $transformer = function () { };
-
-        // Act...
-        $responder->transform($data, $transformer);
-
-        // Assert...
-        $responseBuilder->shouldHaveReceived('transform')->with($data, $transformer)->once();
+        $this->assertSame($this->errorResponseBuilder, $result);
+        $this->errorResponseBuilder->shouldHaveReceived('error')->with($error, $message)->once();
     }
 }

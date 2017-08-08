@@ -2,27 +2,25 @@
 
 namespace Flugg\Responder\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
- * An Artisan command for generating a new transformer class.
+ * An Artisan command class responsible for making transformer classes.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class MakeTransformer extends Command
+class MakeTransformer extends GeneratorCommand
 {
     /**
-     * The name and signature of the console command.
+     * The console command name.
      *
      * @var string
      */
-    protected $signature = 'make:transformer 
-                            {name : The name of the transformer class}
-                            {--pivot : Include a transformer method for pivot table data}
-                            {--model= : The namespace to the model being transformed}';
+    protected $name = 'make:transformer';
 
     /**
      * The console command description.
@@ -32,162 +30,120 @@ class MakeTransformer extends Command
     protected $description = 'Create a new transformer class';
 
     /**
-     * The file system instance.
+     * The type of class being generated.
      *
-     * @var Filesystem
+     * @var string
      */
-    protected $files;
+    protected $type = 'Transformer';
 
     /**
-     * Create a new command instance.
+     * Get the stub file for the generator.
      *
-     * @param  Filesystem $files
+     * @return string
      */
-    public function __construct(Filesystem $files)
+    protected function getStub()
     {
-        parent::__construct();
-
-        $this->files = $files;
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
-        $this->generateTransformer();
-    }
-
-    /**
-     * Generate the transformer class.
-     *
-     * @return void
-     */
-    protected function generateTransformer()
-    {
-        $name = (string) $this->argument('name');
-        $path = $this->laravel->basePath() . '/app/Transformers/' . $name . '.php';
-
-        if ($this->files->exists($path)) {
-            return $this->error($name . ' already exists!');
+        if ($this->option('plain')) {
+            return __DIR__ . '/../../resources/stubs/transformer.plain.stub';
         }
 
-        $this->makeDirectory($path);
-
-        $stubPath = $this->option('pivot') ? 'resources/stubs/transformer.pivot.stub' : 'resources/stubs/transformer.stub';
-        $stub = $this->files->get(__DIR__ . '/../../' . $stubPath);
-
-        $this->files->put($path, $this->makeTransformer($name, $stub));
-
-        $this->info('Transformer created successfully.');
+        return __DIR__ . '/../../resources/stubs/transformer.model.stub';
     }
 
     /**
-     * Build a transformers directory if one doesn't exist.
+     * Get the default namespace for the class.
      *
-     * @param  string $path
-     * @return void
+     * @param  string $rootNamespace
+     * @return string
      */
-    protected function makeDirectory(string $path)
+    protected function getDefaultNamespace($rootNamespace)
     {
-        if (! $this->files->isDirectory(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0777, true, true);
-        }
+        return $rootNamespace . '\Transformers';
     }
 
     /**
-     * Build the transformer class using the given name and stub.
+     * Build the class with the given name.
      *
      * @param  string $name
-     * @param  string $stub
      * @return string
      */
-    protected function makeTransformer(string $name, string $stub):string
+    protected function buildClass($name)
     {
-        $stub = $this->replaceNamespace($stub);
-        $stub = $this->replaceClass($stub, $name);
-        $stub = $this->replaceModel($stub, $name);
+        $replace = [];
 
-        return $stub;
-    }
-
-    /**
-     * Replace the namespace for the given stub.
-     *
-     * @param  string $stub
-     * @return string
-     */
-    protected function replaceNamespace(string $stub):string
-    {
-        if (method_exists($this->laravel, 'getNameSpace')) {
-            $namespace = $this->laravel->getNamespace() . 'Transformers';
-        } else {
-            $namespace = 'App\Transformers';
+        if (! $this->option('model') && ! $this->option('plain')) {
+            $this->input->setOption('model', $this->resolveModelFromClassName());
         }
 
-        $stub = str_replace('DummyNamespace', $namespace, $stub);
-
-        return $stub;
-    }
-
-    /**
-     * Replace the class name for the given stub.
-     *
-     * @param  string $stub
-     * @param  string $name
-     * @return string
-     */
-    protected function replaceClass(string $stub, string $name):string
-    {
-        $stub = str_replace('DummyClass', $name, $stub);
-
-        return $stub;
-    }
-
-    /**
-     * Replace the model for the given stub.
-     *
-     * @param  string $stub
-     * @param  string $name
-     * @return string
-     */
-    protected function replaceModel(string $stub, string $name):string
-    {
-        $model = $this->getModelNamespace($name);
-        $class = $this->getClassFromNamespace($model);
-
-        $stub = str_replace('DummyModelNamespace', $model, $stub);
-        $stub = str_replace('DummyModelClass', $class, $stub);
-        $stub = str_replace('DummyModelVariable', camel_case($class), $stub);
-
-        return $stub;
-    }
-
-    /**
-     * Get the full class path for the model.
-     *
-     * @param  string $name
-     * @return string
-     */
-    protected function getModelNamespace(string $name):string
-    {
         if ($this->option('model')) {
-            return $this->option('model');
+            $replace = $this->buildModelReplacements($replace);
         }
 
-        return 'App\\' . str_replace('Transformer', '', $name);
+        return str_replace(array_keys($replace), array_values($replace), parent::buildClass($name));
     }
 
     /**
-     * Get the full class path for the transformer.
+     * Resolve a model from the given class name.
      *
-     * @param  string $namespace
      * @return string
      */
-    protected function getClassFromNamespace(string $namespace):string
+    protected function resolveModelFromClassName()
     {
-        return last(explode('\\', $namespace));
+        return 'App\\' . str_replace('Transformer', '', array_last(explode('/', $this->getNameInput())));
+    }
+
+    /**
+     * Build the model replacement values.
+     *
+     * @param  array $replace
+     * @return array
+     */
+    protected function buildModelReplacements(array $replace)
+    {
+        if (! class_exists($modelClass = $this->parseModel($this->option('model')))) {
+            if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
+                $this->call('make:model', ['name' => $modelClass]);
+            }
+        }
+
+        return array_merge($replace, [
+            'DummyFullModelClass' => $modelClass,
+            'DummyModelClass' => class_basename($modelClass),
+            'DummyModelVariable' => lcfirst(class_basename($modelClass)),
+        ]);
+    }
+
+    /**
+     * Get the fully-qualified model class name.
+     *
+     * @param  string $model
+     * @return string
+     */
+    protected function parseModel($model)
+    {
+        if (preg_match('([^A-Za-z0-9_/\\\\])', $model)) {
+            throw new InvalidArgumentException('Model name contains invalid characters.');
+        }
+
+        $model = trim(str_replace('/', '\\', $model), '\\');
+
+        if (! Str::startsWith($model, $rootNamespace = $this->laravel->getNamespace())) {
+            $model = $rootNamespace . $model;
+        }
+
+        return $model;
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a model transformer.'],
+            ['plain', 'p', InputOption::VALUE_NONE, 'Generate a plain transformer.'],
+        ];
     }
 }

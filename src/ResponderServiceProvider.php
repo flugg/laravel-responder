@@ -3,9 +3,24 @@
 namespace Flugg\Responder;
 
 use Flugg\Responder\Console\MakeTransformer;
-use Flugg\Responder\Contracts\Manager as ManagerContract;
-use Flugg\Responder\Http\ErrorResponseBuilder;
-use Flugg\Responder\Http\SuccessResponseBuilder;
+use Flugg\Responder\Contracts\ErrorFactory as ErrorFactoryContract;
+use Flugg\Responder\Contracts\ErrorMessageResolver as ErrorMessageResolverContract;
+use Flugg\Responder\Contracts\ErrorSerializer as ErrorSerializerContract;
+use Flugg\Responder\Contracts\Pagination\PaginatorFactory as PaginatorFactoryContract;
+use Flugg\Responder\Contracts\Resources\ResourceFactory as ResourceFactoryContract;
+use Flugg\Responder\Contracts\Responder as ResponderContract;
+use Flugg\Responder\Contracts\ResponseFactory as ResponseFactoryContract;
+use Flugg\Responder\Contracts\Transformer as TransformerContract;
+use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
+use Flugg\Responder\Contracts\TransformFactory as TransformFactoryContract;
+use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
+use Flugg\Responder\Http\Responses\Factories\LaravelResponseFactory;
+use Flugg\Responder\Http\Responses\Factories\LumenResponseFactory;
+use Flugg\Responder\Pagination\PaginatorFactory;
+use Flugg\Responder\Resources\ResourceFactory;
+use Flugg\Responder\Transformers\Transformer as BaseTransformer;
+use Flugg\Responder\Transformers\TransformerResolver;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
@@ -14,7 +29,7 @@ use League\Fractal\Manager;
 use League\Fractal\Serializer\SerializerAbstract;
 
 /**
- * The Laravel Responder service provider. This is where the package is bootstrapped.
+ * A service provider class responsible for bootstrapping the parts of the Laravel package.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -23,41 +38,11 @@ use League\Fractal\Serializer\SerializerAbstract;
 class ResponderServiceProvider extends BaseServiceProvider
 {
     /**
-     * Keeps a quick reference to the Responder config.
-     *
-     * @var \Illuminate\Config\Repository
-     */
-    protected $config;
-
-    /**
      * Indicates if loading of the provider is deferred.
      *
      * @var bool
      */
     protected $defer = false;
-
-    /**
-     * Bootstrap the application events.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        if ($this->app instanceof Laravel && $this->app->runningInConsole()) {
-            $this->bootLaravelApplication();
-
-        } elseif ($this->app instanceof Lumen) {
-            $this->bootLumenApplication();
-        }
-
-        $this->mergeConfigFrom(__DIR__ . '/../resources/config/responder.php', 'responder');
-
-        $this->commands([
-            MakeTransformer::class
-        ]);
-
-        include __DIR__ . '/helpers.php';
-    }
 
     /**
      * Register the service provider.
@@ -66,87 +51,204 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     public function register()
     {
-        $this->registerFractal();
-        $this->registerResponseBuilders();
+        if ($this->app instanceof Laravel) {
+            $this->registerLaravelBindings();
+        } elseif ($this->app instanceof Lumen) {
+            $this->registerLumenBindings();
+        }
 
-        $this->app->bind(Responder::class, function ($app) {
-            return new Responder($app[SuccessResponseBuilder::class], $app[ErrorResponseBuilder::class]);
-        });
-
-        $this->registerAliases();
+        $this->registerSerializerBindings();
+        $this->registerErrorBindings();
+        $this->registerFractalBindings();
+        $this->registerResourceBindings();
+        $this->registerPaginationBindings();
+        $this->registerTransformationBindings();
+        $this->registerTransformerBindings();
+        $this->registerServiceBindings();
     }
 
     /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return ['responder', 'responder.success', 'responder.error', 'responder.manager', 'responder.serializer'];
-    }
-
-    /**
-     * Register Fractal serializer, manager and a factory to generate Fractal
-     * resource instances.
+     * Register Laravel bindings.
      *
      * @return void
      */
-    protected function registerFractal()
+    protected function registerLaravelBindings()
     {
+        $this->app->singleton(ResponseFactoryContract::class, function ($app) {
+            return $this->decorateResponseFactory($app->make(LaravelResponseFactory::class));
+        });
+    }
+
+    /**
+     * Register Lumen bindings.
+     *
+     * @return void
+     */
+    protected function registerLumenBindings()
+    {
+        $this->app->singleton(ResponseFactoryContract::class, function ($app) {
+            return $this->decorateResponseFactory($app->make(LumenResponseFactory::class));
+        });
+    }
+
+    /**
+     * Decorate response factories.
+     *
+     * @param  \Flugg\Responder\Contracts\ResponseFactory $factory
+     * @return void
+     */
+    protected function decorateResponseFactory(ResponseFactoryContract $factory)
+    {
+        foreach ($this->app->config['responder.decorators'] as $decorator) {
+            $factory = new $decorator($factory);
+        };
+
+        return $factory;
+    }
+
+    /**
+     * Register serializer bindings.
+     *
+     * @return void
+     */
+    protected function registerSerializerBindings()
+    {
+        $this->app->bind(ErrorSerializerContract::class, function ($app) {
+            return $app->make($app->config['responder.serializers.error']);
+        });
+
         $this->app->bind(SerializerAbstract::class, function ($app) {
-            $serializer = $app->config->get('responder.serializer');
-
-            return new $serializer;
-        });
-
-        $this->app->bind(Manager::class, function ($app) {
-            return (new Manager())->setSerializer($app[SerializerAbstract::class]);
-        });
-
-        $this->app->bind(ResourceFactory::class, function () {
-            return new ResourceFactory();
+            return $app->make($app->config['responder.serializers.success']);
         });
     }
 
     /**
-     * Register success and error response builders.
+     * Register error bindings.
      *
      * @return void
      */
-    protected function registerResponseBuilders()
+    protected function registerErrorBindings()
     {
-        $this->app->bind(SuccessResponseBuilder::class, function ($app) {
-            $builder = new SuccessResponseBuilder(response(), $app[ResourceFactory::class], $app[Manager::class]);
+        $this->app->singleton(ErrorMessageResolverContract::class, function ($app) {
+            return $app->make(ErrorMessageResolver::class);
+        });
 
-            if ($parameter = $app->config->get('responder.load_relations_from_parameter')) {
-                $builder->include($this->app[Request::class]->input($parameter, []));
-            }
-
-            $builder->setIncludeSuccessFlag($app->config->get('responder.include_success_flag'));
-            return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
+        $this->app->singleton(ErrorFactoryContract::class, function ($app) {
+            return $app->make(ErrorFactory::class);
         });
 
         $this->app->bind(ErrorResponseBuilder::class, function ($app) {
-            $builder = new ErrorResponseBuilder(response(), $app['translator']);
-
-            $builder->setIncludeSuccessFlag($app->config->get('responder.include_success_flag'));
-            return $builder->setIncludeStatusCode($app->config->get('responder.include_status_code'));
+            return (new ErrorResponseBuilder($app->make(ResponseFactoryContract::class), $app->make(ErrorFactoryContract::class)))
+                ->serializer($app->make(ErrorSerializerContract::class));
         });
     }
 
     /**
-     * Set aliases for the provided services.
+     * Register Fractal bindings.
      *
      * @return void
      */
-    protected function registerAliases()
+    protected function registerFractalBindings()
     {
-        $this->app->alias(Responder::class, 'responder');
-        $this->app->alias(SuccessResponseBuilder::class, 'responder.success');
-        $this->app->alias(ErrorResponseBuilder::class, 'responder.error');
-        $this->app->alias(Manager::class, 'responder.manager');
-        $this->app->alias(Manager::class, 'responder.serializer');
+        $this->app->bind(Manager::class, function ($app) {
+            return (new Manager)->setRecursionLimit($app->config['responder.recursion_limit']);
+        });
+    }
+
+    /**
+     * Register pagination bindings.
+     *
+     * @return void
+     */
+    protected function registerResourceBindings()
+    {
+        $this->app->singleton(ResourceFactoryContract::class, function ($app) {
+            return $app->make(ResourceFactory::class);
+        });
+    }
+
+    /**
+     * Register pagination bindings.
+     *
+     * @return void
+     */
+    protected function registerPaginationBindings()
+    {
+        $this->app->singleton(PaginatorFactoryContract::class, function ($app) {
+            return new PaginatorFactory($app->make(Request::class)->query());
+        });
+    }
+
+    /**
+     * Register transformation bindings.
+     *
+     * @return void
+     */
+    protected function registerTransformationBindings()
+    {
+        $this->app->singleton(TransformFactoryContract::class, function ($app) {
+            return $app->make(FractalTransformFactory::class);
+        });
+
+        $this->app->bind(TransformBuilder::class, function ($app) {
+            return (new TransformBuilder($app->make(ResourceFactoryContract::class), $app->make(TransformFactoryContract::class), $app->make(PaginatorFactoryContract::class)))
+                ->serializer($app->make(SerializerAbstract::class))
+                ->with($app->make(Request::class)->input($app->config['responder.load_relations_parameter'], []))
+                ->only($app->make(Request::class)->input($app->config['responder.filter_fields_parameter'], []));
+        });
+
+        $this->app->singleton(TransformerResolverContract::class, function ($app) {
+            return $app->make(TransformerResolver::class);
+        });
+    }
+
+    /**
+     * Register transformer bindings.
+     *
+     * @return void
+     */
+    protected function registerTransformerBindings()
+    {
+        $this->app->singleton(TransformerResolverContract::class, function ($app) {
+            return $app->make(TransformerResolver::class);
+        });
+
+        BaseTransformer::containerResolver(function () {
+            return $this->app->make(Container::class);
+        });
+    }
+
+    /**
+     * Register service bindings.
+     *
+     * @return void
+     */
+    protected function registerServiceBindings()
+    {
+        $this->app->singleton(ResponderContract::class, function ($app) {
+            return $app->make(Responder::class);
+        });
+
+        $this->app->singleton(TransformerContract::class, function ($app) {
+            return $app->make(Transformer::class);
+        });
+    }
+
+    /**
+     * Bootstrap the application events.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        if ($this->app instanceof Laravel) {
+            $this->bootLaravelApplication();
+        } elseif ($this->app instanceof Lumen) {
+            $this->bootLumenApplication();
+        }
+
+        $this->mergeConfigFrom(__DIR__ . '/../config/responder.php', 'responder');
+        $this->commands(MakeTransformer::class);
     }
 
     /**
@@ -156,13 +258,14 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function bootLaravelApplication()
     {
-        $this->publishes([
-            __DIR__ . '/../resources/config/responder.php' => config_path('responder.php')
-        ], 'config');
-
-        $this->publishes([
-            __DIR__ . '/../resources/lang/en/errors.php' => base_path('resources/lang/en/errors.php')
-        ], 'lang');
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/responder.php' => config_path('responder.php'),
+            ], 'config');
+            $this->publishes([
+                __DIR__ . '/../resources/lang/en/errors.php' => base_path('resources/lang/en/errors.php'),
+            ], 'lang');
+        }
     }
 
     /**

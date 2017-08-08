@@ -2,110 +2,50 @@
 
 namespace Flugg\Responder;
 
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use League\Fractal\Resource\ResourceAbstract;
-use League\Fractal\Scope;
-use League\Fractal\TransformerAbstract;
+use Flugg\Responder\Contracts\Transformer as TransformerContract;
+use Flugg\Responder\Serializers\NullSerializer;
 
 /**
- * An abstract base transformer. Your transformers should extend this class, and this
- * class itself extends Fractal's transformer.
+ * A service class responsible for transforming data without serializing.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-abstract class Transformer extends TransformerAbstract
+class Transformer implements TransformerContract
 {
     /**
-     * A list of all available relations.
+     * A builder used to build transformed arrays.
      *
-     * @var array
+     * @var \Flugg\Responder\TransformBuilder
      */
-    protected $relations = ['*'];
+    protected $transformBuilder;
 
     /**
-     * Get relations set on the transformer.
+     * Construct the service class.
      *
+     * @param \Flugg\Responder\TransformBuilder $transformBuilder
+     */
+    public function __construct(TransformBuilder $transformBuilder)
+    {
+        $this->transformBuilder = $transformBuilder;
+    }
+
+    /**
+     * Transform the data without serializing with the given transformer and relations.
+     *
+     * @param  mixed                                                          $data
+     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
+     * @param  string[]                                                       $with
+     * @param  string[]                                                       $without
      * @return array
      */
-    public function getRelations():array
+    public function transform($data = null, $transformer = null, array $with = [], array $without = []): array
     {
-        $relations = array_unique(array_merge($this->getAvailableIncludes(), $this->relations));
-
-        return array_filter($relations, function($relation) {
-            return $relation !== '*';
-        });
-    }
-
-    /**
-     * Set relations on the transformer.
-     *
-     * @param  array|string $relations
-     * @return self
-     */
-    public function setRelations($relations)
-    {
-        $this->setAvailableIncludes(array_unique(array_merge($this->availableIncludes, (array) $relations)));
-
-        return $this;
-    }
-
-    /**
-     * Check if the transformer has whitelisted all relations.
-     *
-     * @return bool
-     */
-    public function allRelationsAllowed():bool
-    {
-        return $this->relations == ['*'];
-    }
-
-    /**
-     * Call method for retrieving a relation. This method overrides Fractal's own
-     * [callIncludeMethod] method to load relations directly from your models.
-     *
-     * @param  Scope  $scope
-     * @param  string $includeName
-     * @param  mixed  $data
-     * @return \League\Fractal\Resource\ResourceInterface|bool
-     * @throws \Exception
-     */
-    protected function callIncludeMethod(Scope $scope, $includeName, $data)
-    {
-        if ($includeName === 'pivot') {
-            return $this->includePivot($data->$includeName);
-        }
-
-        $params = $scope->getManager()->getIncludeParams($scope->getIdentifier($includeName));
-
-        if (method_exists($this, $includeName)) {
-            $include = call_user_func([$this, $includeName], $data, $params);
-
-            if ($include instanceof ResourceAbstract) {
-                return $include;
-            }
-
-            return app(Responder::class)->transform($include)->getResource();
-        } else {
-            return app(Responder::class)->transform($data->$includeName)->getResource();
-        }
-    }
-
-    /**
-     * Include pivot table data to the response.
-     *
-     * @param  Pivot $pivot
-     * @return \League\Fractal\Resource\ResourceInterface|bool
-     */
-    protected function includePivot(Pivot $pivot)
-    {
-        if (! method_exists($this, 'transformPivot')) {
-            return false;
-        }
-
-        return app(Responder::class)->transform($pivot, function ($pivot) {
-            return $this->transformPivot($pivot);
-        })->getResource();
+        return $this->transformBuilder->resource($data, $transformer)
+            ->with($with)
+            ->without($without)
+            ->serializer(new NullSerializer)
+            ->transform();
     }
 }

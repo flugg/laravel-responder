@@ -1,10 +1,2 @@
-/.idea
 /vendor
 composer.lock
-.DS_STORE
-.*.swo
-.*.swp
-.swo
-.swp
-*.sublime-project
-*.sublime-workspace

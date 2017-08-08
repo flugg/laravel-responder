@@ -1,7 +1,5 @@
-# Scrutinizer CI configuration
 filter:
     excluded_paths: [tests/*]
-
 checks:
     php:
         code_rating: true
@@ -19,60 +17,17 @@ checks:
         fix_identation_4spaces: true
         fix_doc_comments: true
         uppercase_constants: true
-        simplify_boolean_return: true
-        return_doc_comments: true
-        parameter_doc_comments: true
         classes_in_camel_caps: true
-        variable_existence: true
         verify_property_names: false
-        use_self_instead_of_fqcn: true
         properties_in_camelcaps: true
-        phpunit_assertions: true
         parameters_in_camelcaps: true
-        optional_parameters_at_the_end: true
-        no_new_line_at_end_of_file: true
-        encourage_single_quotes: true
-        avoid_multiple_statements_on_same_line: true
-
-coding_style:
-    php:
-        spaces:
-            before_parentheses:
-                closure_definition: true
-            around_operators:
-                concatenation: true
-                negation: true
-            within:
-                brackets: true
-                function_call: true
-                function_declaration: true
-                if: true
-                for: true
-                while: true
-                switch: true
-                catch: true
-        braces:
-            classes_functions:
-                class: new-line
-                function: new-line
-                closure: end-of-line
-            if:
-                opening: end-of-line
-            for:
-                opening: end-of-line
-            while:
-                opening: end-of-line
-            do_while:
-                opening: end-of-line
-            switch:
-                opening: end-of-line
-            try:
-                opening: end-of-line
-        upper_lower_casing:
-            keywords:
-                general: lower
-            constants:
-                true_false_null: lower
 build:
     environment:
-        php: 7.0.6
+        php: 7.1.0
+    tests:
+        override:
+            -
+                command: 'vendor/bin/phpunit --coverage-clover=coverage'
+                coverage:
+                    file: 'coverage'
+                    format: 'clover'

@@ -3,25 +3,25 @@
 namespace Flugg\Responder\Exceptions\Http;
 
 /**
- * An exception replacing Laravel's Illuminate\Database\Eloquent\RelationNotFoundException.
+ * An exception thrown whan a relation is not found.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class RelationNotFoundException extends ApiException
+class RelationNotFoundException extends HttpException
 {
     /**
-     * The HTTP status code.
+     * An HTTP status code.
      *
      * @var int
      */
-    protected $statusCode = 422;
+    protected $status = 422;
 
     /**
-     * The error code used for API responses.
+     * An error code.
      *
-     * @var string
+     * @var string|null
      */
     protected $errorCode = 'relation_not_found';
 }

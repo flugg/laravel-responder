@@ -1,15 +1,14 @@
 {
     "name": "flugger/laravel-responder",
-    "description": "A Laravel package for APIs, wrapping the Fractal library behind an elegant Laravel API.",
+    "description": "A Fractal Laravel package for building API responses, giving you the power of Fractal and the elegancy of Laravel.",
     "keywords": [
         "laravel",
         "lumen",
-        "responder",
-        "api",
-        "json",
-        "response",
         "fractal",
-        "transformer"
+        "transformer",
+        "api",
+        "response",
+        "responder"
     ],
     "homepage": "https://github.com/flugger/laravel-responder",
     "license": "MIT",
@@ -21,25 +20,43 @@
     ],
     "require": {
         "php": "^7.0",
-        "illuminate/support": "5.1.* || 5.2.* || 5.3.* || 5.4.*",
-        "league/fractal": ">=0.14.0"
+        "illuminate/contracts": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.*",
+        "illuminate/support": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.*",
+        "league/fractal": "^0.16.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.4",
-        "illuminate/database": "5.1.* || 5.2.* || 5.3.*",
+        "illuminate/database": "5.4.*",
         "orchestra/testbench": "~3.0",
         "mockery/mockery": "^0.9.5",
         "fzaninotto/faker": "^1.6",
-        "doctrine/dbal": "^2.5"
+        "doctrine/dbal": "^2.5",
+        "phpunit/phpunit": "^6.1"
     },
     "autoload": {
         "psr-4": {
             "Flugg\\Responder\\": "src"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
             "Flugg\\Responder\\Tests\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Flugg\\Responder\\ResponderServiceProvider"
+            ],
+            "aliases": {
+                "Responder": "Flugg\\Responder\\Facades\\Responder",
+                "Transformer": "Flugg\\Responder\\Facades\\Transformer"
+            }
         }
     }
 }

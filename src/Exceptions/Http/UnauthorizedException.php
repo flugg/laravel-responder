@@ -3,25 +3,26 @@
 namespace Flugg\Responder\Exceptions\Http;
 
 /**
- * An exception replacing Laravel's \Illuminate\Auth\Access\AuthorizationException.
+ * An exception thrown whan a user is unauthorized. This exception replaces Laravel's
+ * [\Illuminate\Auth\Access\AuthorizationException].
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class UnauthorizedException extends ApiException
+class UnauthorizedException extends HttpException
 {
     /**
-     * The HTTP status code.
+     * An HTTP status code.
      *
      * @var int
      */
-    protected $statusCode = 403;
+    protected $status = 403;
 
     /**
-     * The error code used for API responses.
+     * An error code.
      *
-     * @var string
+     * @var string|null
      */
     protected $errorCode = 'unauthorized';
 }

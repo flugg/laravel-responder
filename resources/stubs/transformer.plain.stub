@@ -1,0 +1,35 @@
+<?php
+
+namespace DummyNamespace;
+
+use Flugg\Responder\Transformers\Transformer;
+
+class DummyClass extends Transformer
+{
+    /**
+     * List of available relations.
+     *
+     * @var string[]
+     */
+    protected $relations = [];
+
+    /**
+     * List of autoloaded default relations.
+     *
+     * @var array
+     */
+    protected $load = [];
+
+    /**
+     * Transform the data.
+     *
+     * @param  mixed $data
+     * @return array
+     */
+    public function transform($data)
+    {
+        return [
+            //
+        ];
+    }
+}
