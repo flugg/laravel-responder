@@ -19,6 +19,6 @@ class InvalidTransformerException extends RuntimeException
      */
     public function __construct()
     {
-        parent::__construct('Given transformer must be a callable or an instance of [' . Transformer::class . '].');
+        parent::__construct('Transformer must be a callable or an instance of [' . Transformer::class . '].');
     }
 }

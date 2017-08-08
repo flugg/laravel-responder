@@ -81,10 +81,10 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Add additional data to the error.
      *
-     * @param  array $data
+     * @param  array|null $data
      * @return $this
      */
-    public function data(array $data)
+    public function data(array $data = null)
     {
         $this->data = array_merge((array) $this->data, $data);
 

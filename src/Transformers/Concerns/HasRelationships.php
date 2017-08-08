@@ -37,13 +37,33 @@ trait HasRelationships
      */
     public function defaultRelations(): array
     {
-        $this->load = Collection::make($this->load)->mapWithKeys(function ($transformer, $relation) {
-            return is_numeric($relation) ? [$transformer => null] : [$relation => $transformer];
-        })->all();
+        $this->load = $this->normalizeRelations($this->load);
 
         $relations = $this->addEagerLoadConstraints(array_keys($this->load));
 
         return array_merge($relations, $this->getNestedDefaultRelations());
+    }
+
+    /**
+     * Normalize relations to force a key value structure.
+     *
+     * @param  array $relations
+     * @return array
+     */
+    protected function normalizeRelations(array $relations): array
+    {
+        $normalized = [];
+
+        foreach ($relations as $relation => $transformer) {
+            if (is_numeric($relation)) {
+                $relation = $transformer;
+                $transformer = null;
+            }
+
+            $normalized[$relation] = $transformer;
+        }
+
+        return $normalized;
     }
 
     /**
@@ -81,7 +101,7 @@ trait HasRelationships
         })->flatMap(function ($transformer, $relation) {
             return array_map(function ($nestedRelation) use ($relation) {
                 return "$relation.$nestedRelation";
-            }, $this->resolveTransformer($transformer)->getDefaultRelations());
+            }, $this->resolveTransformer($transformer)->defaultRelations());
         })->all();
     }
 

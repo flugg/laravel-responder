@@ -24,7 +24,7 @@ class SuccessFlagDecorator extends ResponseDecorator
     public function make(array $data, int $status, array $headers = []): JsonResponse
     {
         return $this->factory->make(array_merge([
-            'success' => $status >= 100 || $status < 400,
+            'success' => $status >= 100 && $status < 400,
         ], $data), $status, $headers);
     }
 }

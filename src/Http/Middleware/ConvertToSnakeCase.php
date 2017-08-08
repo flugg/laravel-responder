@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace Flugg\Responder\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 
@@ -32,10 +32,12 @@ class ConvertToSnakeCase extends TransformsRequest
      */
     protected function cleanArray(array $data)
     {
-        return collect($data)->mapWithKeys(function ($value, $key) {
-            $key = in_array($key, $this->except) ? $key : snake_case($key);
+        $parameters = [];
 
-            return [$key => $value];
-        })->all();
+        foreach ($data as $key => $value) {
+            $parameters[in_array($key, $this->except) ? $key : snake_case($key)] = $value;
+        }
+
+        return $parameters;
     }
 }

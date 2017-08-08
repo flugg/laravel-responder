@@ -12,6 +12,7 @@ Version `2.0.0` has been a complete rewrite of the package and brings a lot new 
 * Removed `Flugg\Responder\Traits\ConvertsParameter`, use new `ConvertToSnakeCase` middleware instead
 * Removed `Flugg\Responder\Traits\ThrowsApiErrors`, manually override form requests to replicate
 * Changed `Flugg\Responder\Exceptions\Http\ApiException` to `Flugg\Responder\Exceptions\Http\HttpException` 
+* Renamed `$statusCode` property of the `HttpException` exceptions to `$status`
 * Removed `Flugg\Responder\Exceptions\Http\ResourceNotFoundException`, handler now points to `PageNotFoundException`
 * Renamed `Flugg\Responder\Serializers\ApiSerializer` to `Flugg\Responder\Serializers\SuccessSerializer`
 * Renamed `successResponse` method of the `MakesResponses` trait to `success`
