@@ -37,9 +37,9 @@ abstract class HttpException extends BaseHttpException
     /**
      * Additional error data.
      *
-     * @var array|null
+     * @var array
      */
-    protected $data = null;
+    protected $data = [];
 
     /**
      * Attached headers.
