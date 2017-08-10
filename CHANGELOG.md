@@ -1,4 +1,17 @@
-# 2.0.0 (2017-08-01)
+# 2.0.2 (2017-08-11)
+
+### Bug Fixes
+
+* Fix null data being converted to arrays for error responses
+
+# 2.0.1 (2017-08-11)
+
+### Bug Fixes
+
+* Convert empty string messages in HttpException to null
+* Remove `data` field from error response to make it behave as stated in the documentation
+
+# 2.0.0 (2017-08-10)
 
 Version `2.0.0` has been a complete rewrite of the package and brings a lot new stuff to the table, including this very new changelog. The documentation has also been revamped and explains all the new features in greater details. If you're upgrading from an earlier version, make sure to remove your `config/responder.php` file and rerun `php artisan vendor:publish --provider="Flugg\Responder\ResponderServiceProvider"` to publish the new configuration file. 
 
