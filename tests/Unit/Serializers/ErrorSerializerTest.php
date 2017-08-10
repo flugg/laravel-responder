@@ -44,7 +44,7 @@ class ErrorSerializerTest extends TestCase
             'error' => [
                 'code' => $code,
                 'message' => $message,
-                'data' => $data,
+                'foo' => 1,
             ],
         ], $formattedData);
     }

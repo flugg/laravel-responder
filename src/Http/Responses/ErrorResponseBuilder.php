@@ -95,7 +95,7 @@ class ErrorResponseBuilder extends ResponseBuilder
      */
     public function data(array $data = null)
     {
-        $this->data = array_merge((array) $this->data, $data);
+        $this->data = array_merge((array) $this->data, (array) $data);
 
         return $this;
     }
