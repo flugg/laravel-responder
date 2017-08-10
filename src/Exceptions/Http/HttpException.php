@@ -37,9 +37,9 @@ abstract class HttpException extends BaseHttpException
     /**
      * Additional error data.
      *
-     * @var array
+     * @var array|null
      */
-    protected $data = [];
+    protected $data = null;
 
     /**
      * Attached headers.
@@ -86,7 +86,7 @@ abstract class HttpException extends BaseHttpException
      */
     public function message()
     {
-        return $this->message;
+        return $this->message ?: null;
     }
 
     /**

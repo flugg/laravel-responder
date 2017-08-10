@@ -71,6 +71,10 @@ To get started, install the package through Composer:
 composer require flugger/laravel-responder
 ```
 
+***
+_*Notice:* A recent change to the Laravel installer locks new projects to Laravel 5.6. If you get an error about non-matching PHP version, make sure your composer.json doesn't contain a `platform` field._
+***
+
 ## Laravel
 
 #### Register Service Provider
