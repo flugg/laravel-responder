@@ -1,5 +1,5 @@
 {
-    "name": "flugger/laravel-responder",
+    "name": "pegziq/laravel-responder",
     "description": "A Laravel Fractal package for building API responses, giving you the power of Fractal and the elegancy of Laravel.",
     "keywords": [
         "laravel",
