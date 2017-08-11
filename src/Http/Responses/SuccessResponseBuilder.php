@@ -77,7 +77,7 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     public function __call($name, $arguments)
     {
-        if (in_array($name, ['meta', 'with', 'without', 'serializer', 'paginator', 'cursor'])) {
+        if (in_array($name, ['meta', 'with', 'without', 'serializer', 'paginator', 'cursor', 'only'])) {
             $this->transformBuilder->$name(...$arguments);
 
             return $this;
