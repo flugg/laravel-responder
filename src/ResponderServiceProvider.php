@@ -8,6 +8,7 @@ use Flugg\Responder\Contracts\ErrorMessageResolver as ErrorMessageResolverContra
 use Flugg\Responder\Contracts\ErrorSerializer as ErrorSerializerContract;
 use Flugg\Responder\Contracts\Pagination\PaginatorFactory as PaginatorFactoryContract;
 use Flugg\Responder\Contracts\Resources\ResourceFactory as ResourceFactoryContract;
+use Flugg\Responder\Contracts\Resources\ResourceKeyResolver as ResourceKeyResolverContract;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Contracts\ResponseFactory as ResponseFactoryContract;
 use Flugg\Responder\Contracts\Transformer as TransformerContract;
@@ -18,6 +19,7 @@ use Flugg\Responder\Http\Responses\Factories\LaravelResponseFactory;
 use Flugg\Responder\Http\Responses\Factories\LumenResponseFactory;
 use Flugg\Responder\Pagination\PaginatorFactory;
 use Flugg\Responder\Resources\ResourceFactory;
+use Flugg\Responder\Resources\ResourceKeyResolver;
 use Flugg\Responder\Transformers\Transformer as BaseTransformer;
 use Flugg\Responder\Transformers\TransformerResolver;
 use Illuminate\Contracts\Container\Container;
@@ -162,6 +164,10 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerResourceBindings()
     {
+        $this->app->singleton(ResourceKeyResolverContract::class, function ($app) {
+            return $app->make(ResourceKeyResolver::class);
+        });
+
         $this->app->singleton(ResourceFactoryContract::class, function ($app) {
             return $app->make(ResourceFactory::class);
         });

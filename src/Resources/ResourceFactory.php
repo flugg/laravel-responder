@@ -3,6 +3,7 @@
 namespace Flugg\Responder\Resources;
 
 use Flugg\Responder\Contracts\Resources\ResourceFactory as ResourceFactoryContract;
+use Flugg\Responder\Contracts\Resources\ResourceKeyResolver;
 use Flugg\Responder\Contracts\Transformers\TransformerResolver;
 use Illuminate\Support\Arr;
 use League\Fractal\Resource\Collection as CollectionResource;
@@ -35,15 +36,24 @@ class ResourceFactory implements ResourceFactoryContract
     protected $transformerResolver;
 
     /**
+     * A resolver class, used to resolve resource keys.
+     *
+     * @var \Flugg\Responder\Contracts\Resources\ResourceKeyResolver
+     */
+    protected $resourceKeyResolver;
+
+    /**
      * Construct the factory class.
      *
      * @param \Flugg\Responder\Resources\DataNormalizer                   $normalizer
      * @param \Flugg\Responder\Contracts\Transformers\TransformerResolver $transformerResolver
+     * @param \Flugg\Responder\Contracts\Resources\ResourceKeyResolver    $resourceKeyResolver
      */
-    public function __construct(DataNormalizer $normalizer, TransformerResolver $transformerResolver)
+    public function __construct(DataNormalizer $normalizer, TransformerResolver $transformerResolver, ResourceKeyResolver $resourceKeyResolver)
     {
         $this->normalizer = $normalizer;
         $this->transformerResolver = $transformerResolver;
+        $this->resourceKeyResolver = $resourceKeyResolver;
     }
 
     /**
@@ -57,12 +67,14 @@ class ResourceFactory implements ResourceFactoryContract
     public function make($data = null, $transformer = null, string $resourceKey = null): ResourceInterface
     {
         if ($data instanceof ResourceInterface) {
-            return $data->setTransformer($this->resolveTransformer($data->getData(), $transformer ?: $data->getTransformer()));
+            return $data->setTransformer($this->resolveTransformer($data->getData(), $transformer ?: $data->getTransformer()))
+                ->setResourceKey($this->resolveResourceKey($data->getData(), $resourceKey ?: $data->getResourceKey()));
         } elseif (is_null($data = $this->normalizer->normalize($data))) {
-            return $this->instatiateResource($data);
+            return $this->instatiateResource($data, null, $resourceKey);
         }
 
         $transformer = $this->resolveTransformer($data, $transformer);
+        $resourceKey = $this->resolveResourceKey($data, $resourceKey);
 
         return $this->instatiateResource($data, $transformer, $resourceKey);
     }
@@ -84,6 +96,18 @@ class ResourceFactory implements ResourceFactoryContract
     }
 
     /**
+     * Resolve a resource key.
+     *
+     * @param  mixed       $data
+     * @param  string|null $resourceKey
+     * @return null|string
+     */
+    protected function resolveResourceKey($data, string $resourceKey = null)
+    {
+        return isset($resourceKey) ? $resourceKey : $this->resourceKeyResolver->resolve($data);
+    }
+
+    /**
      * Instatiate a new resource instance.
      *
      * @param  mixed                                                   $data
@@ -94,7 +118,7 @@ class ResourceFactory implements ResourceFactoryContract
     protected function instatiateResource($data, $transformer = null, string $resourceKey = null): ResourceInterface
     {
         if (is_null($data)) {
-            return new NullResource;
+            return new NullResource(null, null, $resourceKey);
         } elseif ($this->shouldCreateCollection($data)) {
             return new CollectionResource($data, $transformer, $resourceKey);
         }

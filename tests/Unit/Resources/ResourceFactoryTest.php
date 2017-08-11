@@ -5,6 +5,7 @@ namespace Flugg\Responder\Tests\Unit\Resources;
 use Flugg\Responder\Pagination\CursorFactory;
 use Flugg\Responder\Resources\DataNormalizer;
 use Flugg\Responder\Resources\ResourceFactory;
+use Flugg\Responder\Resources\ResourceKeyResolver;
 use Flugg\Responder\Tests\TestCase;
 use Flugg\Responder\Transformers\TransformerManager;
 use Flugg\Responder\Transformers\TransformerResolver;
@@ -38,6 +39,13 @@ class ResourceFactoryTest extends TestCase
     protected $transformerResolver;
 
     /**
+     * A mock of a [ResourceKeyResolver] class.
+     *
+     * @var \Mockery\MockInterface
+     */
+    protected $resourceKeyResolver;
+
+    /**
      * The [ResourceFactory] class being tested.
      *
      * @var \Flugg\Responder\Resources\ResourceFactory
@@ -55,7 +63,8 @@ class ResourceFactoryTest extends TestCase
 
         $this->normalizer = Mockery::mock(DataNormalizer::class);
         $this->transformerResolver = Mockery::mock(TransformerResolver::class);
-        $this->factory = new ResourceFactory($this->normalizer, $this->transformerResolver);
+        $this->resourceKeyResolver = Mockery::mock(ResourceKeyResolver::class);
+        $this->factory = new ResourceFactory($this->normalizer, $this->transformerResolver, $this->resourceKeyResolver);
     }
 
     /**
@@ -68,7 +77,7 @@ class ResourceFactoryTest extends TestCase
         $resource = $this->factory->make();
 
         $this->assertInstanceOf(NullResource::class, $resource);
-        $this->normalizer->shouldHaveReceived('normalize')->with(null);
+        $this->normalizer->shouldHaveReceived('normalize')->with(null)->once();
     }
 
     /**
@@ -131,11 +140,13 @@ class ResourceFactoryTest extends TestCase
     public function testMakeMethodResolvesTransformerWhenNotGivenOne()
     {
         $this->transformerResolver->shouldReceive('resolveFromData')->andReturn($transformer = $this->mockTransformer());
+        $this->resourceKeyResolver->shouldReceive('resolve')->andReturn($resourceKey = 'foo');
         $this->normalizer->shouldReceive('normalize')->andReturn($data = Mockery::mock(Model::class));
 
         $this->factory->make($data);
 
         $this->transformerResolver->shouldHaveReceived('resolveFromData')->with($data)->once();
+        $this->resourceKeyResolver->shouldHaveReceived('resolve')->with($data)->once();
     }
 
     /**
@@ -144,11 +155,13 @@ class ResourceFactoryTest extends TestCase
     public function testMakeMethodShouldAllowResources()
     {
         $this->transformerResolver->shouldReceive('resolveFromData')->andReturn($transformer = $this->mockTransformer());
+        $this->resourceKeyResolver->shouldReceive('resolve')->andReturn($resourceKey = 'foo');
 
         $resource = $this->factory->make(new Item($data = Mockery::mock(Model::class)));
 
         $this->assertInstanceOf(Item::class, $resource);
         $this->assertSame($transformer, $resource->getTransformer());
         $this->transformerResolver->shouldHaveReceived('resolveFromData')->with($data)->once();
+        $this->resourceKeyResolver->shouldHaveReceived('resolve')->with($data)->once();
     }
 }
