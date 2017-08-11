@@ -1,3 +1,9 @@
+# 2.0.3 (2017-08-11)
+
+### Bug Fixes
+
+* Add missing `only` method to `SuccessResponseBuilder`
+
 # 2.0.2 (2017-08-11)
 
 ### Bug Fixes
