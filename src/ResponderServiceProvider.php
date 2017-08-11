@@ -197,9 +197,6 @@ class ResponderServiceProvider extends BaseServiceProvider
                 ->only($app->make(Request::class)->input($app->config['responder.filter_fields_parameter'], []));
         });
 
-        $this->app->singleton(TransformerResolverContract::class, function ($app) {
-            return $app->make(TransformerResolver::class);
-        });
     }
 
     /**
