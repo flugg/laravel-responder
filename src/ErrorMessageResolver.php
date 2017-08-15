@@ -3,7 +3,7 @@
 namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\ErrorMessageResolver as ErrorMessageResolverContract;
-use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Translation\Translator;
 
 /**
  * A resolver class responsible for resolving messages from error codes.
@@ -17,7 +17,7 @@ class ErrorMessageResolver implements ErrorMessageResolverContract
     /**
      * A serivce for resolving messages from language files.
      *
-     * @var \Illuminate\Contracts\Translation\Translator
+     * @var \Illuminate\Translation\Translator
      */
     protected $translator;
 
@@ -31,7 +31,7 @@ class ErrorMessageResolver implements ErrorMessageResolverContract
     /**
      * Construct the resolver class.
      *
-     * @param \Illuminate\Contracts\Translation\Translator $translator
+     * @param \Illuminate\Translation\Translator $translator
      */
     public function __construct(Translator $translator)
     {
