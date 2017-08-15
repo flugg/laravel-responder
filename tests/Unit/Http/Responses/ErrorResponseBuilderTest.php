@@ -4,6 +4,7 @@ namespace Flugg\Responder\Tests\Unit\Http\Responses;
 
 use Flugg\Responder\Contracts\ErrorSerializer;
 use Flugg\Responder\ErrorFactory;
+use Flugg\Responder\Exceptions\InvalidErrorSerializerException;
 use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
 use Flugg\Responder\Serializers\JsonSerializer;
 use Flugg\Responder\Tests\TestCase;
@@ -11,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Mockery;
+use stdClass;
 
 /**
  * Unit tests for the [Flugg\Responder\Http\Responses\ErrorResponseBuilder] class.
@@ -149,20 +151,55 @@ class ErrorResponseBuilderTest extends TestCase
     {
         $this->errorFactory->shouldReceive('make')->andReturn([]);
 
-        $this->responseBuilder->error($code = 'test_error', $message = 'A test error has occured.')->toArray();
+        $this->responseBuilder->error($code = 'test_error', $message = 'A test error has occured.')->respond();
 
         $this->errorFactory->shouldHaveReceived('make')->with($this->serializer, $code, $message, null)->once();
     }
 
     /**
-     * Assert that the [data] method adds error data that is sent to the [ErrorFactory]
+     * Assert that the [data] method adds error data that is sent to the [ErrorFactory].
      */
     public function testDataMethodSetsErrorData()
     {
         $this->errorFactory->shouldReceive('make')->andReturn([]);
 
-        $this->responseBuilder->data($data = ['foo' => 1])->toArray();
+        $this->responseBuilder->data($data = ['foo' => 1])->respond();
 
         $this->errorFactory->shouldHaveReceived('make')->with($this->serializer, null, null, $data)->once();
+    }
+
+    /**
+     * Assert that the [serializer] method sets the serializer that is sent to the [ErrorFactory].
+     */
+    public function testSerializerMethodSetsErrorSerializer()
+    {
+        $this->errorFactory->shouldReceive('make')->andReturn([]);
+
+        $this->responseBuilder->serializer($serializer = Mockery::mock(ErrorSerializer::class))->respond();
+
+        $this->errorFactory->shouldHaveReceived('make')->with($serializer, null, null, null)->once();
+    }
+
+    /**
+     * Assert that the [serializer] method allows class name strings.
+     */
+    public function testSerializerMethodAllowsClassNameStrings()
+    {
+        $this->errorFactory->shouldReceive('make')->andReturn([]);
+
+        $this->responseBuilder->serializer($serializer = get_class(Mockery::mock(ErrorSerializer::class)))->respond();
+
+        $this->errorFactory->shouldHaveReceived('make')->with($serializer, null, null, null)->once();
+    }
+
+    /**
+     * Assert that the [serializer] method throws [InvalidErrorSerializerException] exception when
+     * given an invalid serializer.
+     */
+    public function testSerializerMethodThrowsExceptionWhenGivenInvalidSerializer()
+    {
+        $this->expectException(InvalidErrorSerializerException::class);
+
+        $this->responseBuilder->serializer($serializer = stdClass::class);
     }
 }

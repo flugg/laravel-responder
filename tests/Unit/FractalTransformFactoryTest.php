@@ -7,6 +7,7 @@ use Flugg\Responder\Tests\TestCase;
 use League\Fractal\Resource\NullResource;
 use League\Fractal\Scope;
 use League\Fractal\Serializer\SerializerAbstract;
+use LogicException;
 use Mockery;
 
 /**
@@ -65,5 +66,60 @@ class FractalTransformFactoryTest extends TestCase
         $this->manager->shouldHaveReceived('parseExcludes')->with($without)->once();
         $this->manager->shouldHaveReceived('parseFieldsets')->with($fieldsets)->once();
         $this->manager->shouldHaveReceived('createData')->with($resource)->once();
+    }
+
+    /**
+     * Assert that the [make] method throws a [LogicException] when fieldsets are requested, but
+     * the resource doesn't have a resource key.
+     */
+    public function testMakeMethodShouldThrowExceptionIfResourceKeyIsNotSetAndFieldsetsAreRequested()
+    {
+        $this->manager->shouldReceive('createData')->andReturn($scope = Mockery::mock(Scope::class));
+        $scope->shouldReceive('toArray')->andReturn($data = ['foo' => 1]);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Filtering fields using sparse fieldsets require resource key to be set.');
+
+        $this->factory->make($resource = new NullResource, $serializer = Mockery::mock(SerializerAbstract::class), [
+            'fieldsets' => $fieldsets = ['foo'],
+        ]);
+    }
+
+    /**
+     * Assert that the [make] method parses fieldsets
+     */
+    public function testMakeMethodShouldParseFieldsets()
+    {
+        $this->manager->shouldReceive('createData')->andReturn($scope = Mockery::mock(Scope::class));
+        $scope->shouldReceive('toArray')->andReturn($data = ['foo' => 1]);
+
+        $this->factory->make($resource = new NullResource(null, null, 'foo'), $serializer = Mockery::mock(SerializerAbstract::class), [
+            'fieldsets' => $fieldsets = ['id', 'name'],
+        ]);
+
+        $this->manager->shouldHaveReceived('parseFieldsets')->with([
+            'foo' => 'id,name',
+        ])->once();
+    }
+
+    /**
+     * Assert that the [make] method parses fieldsets
+     */
+    public function testMakeMethodShouldParseFieldsetsWithNested()
+    {
+        $this->manager->shouldReceive('createData')->andReturn($scope = Mockery::mock(Scope::class));
+        $scope->shouldReceive('toArray')->andReturn($data = ['foo' => 1]);
+
+        $this->factory->make($resource = new NullResource(null, null, 'foo'), $serializer = Mockery::mock(SerializerAbstract::class), [
+            'includes' => $with = ['bar.baz'],
+            'fieldsets' => $fieldsets = [
+                'foo' => ['id', 'name'],
+                'bar' => ['id'],
+            ],
+        ]);
+
+        $this->manager->shouldHaveReceived('parseFieldsets')->with([
+            'foo' => 'id,name,bar',
+            'bar' => 'id,baz',
+        ])->once();
     }
 }

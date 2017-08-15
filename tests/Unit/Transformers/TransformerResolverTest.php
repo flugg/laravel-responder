@@ -121,6 +121,21 @@ class TransformerResolverTest extends TestCase
     }
 
     /**
+     * Assert that the [resolveFromData] method resolves an element implementing the [Transformable] contract
+     * to resolve a transformer from, from a list of items.
+     */
+    public function testResolveFromDataMethodShouldResolveTransformableFromCollection()
+    {
+        $model = Mockery::mock(Transformable::class);
+        $model->shouldReceive('transformer')->andReturn($transformer = $this->mockTransformer());
+
+        $result = $this->resolver->resolveFromData([$model]);
+
+        $this->assertSame($transformer, $result);
+        $model->shouldHaveReceived('transformer')->once();
+    }
+
+    /**
      * Assert that the [resolveFromData] method resolves an automatic closure transformer if no other
      * can be resolved.
      */

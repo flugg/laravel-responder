@@ -44,6 +44,18 @@ class ErrorMessageResolverTest extends TestCase
     }
 
     /**
+     * Assert that the [resolve] method resolves error message from cache if binding is registered.
+     */
+    public function testResolveMethodShouldResolveMessageFromCacheIfSet()
+    {
+        $this->messageResolver->register($errorCode = 'test_error', $message = 'A test error occured.');
+
+        $result = $this->messageResolver->resolve($errorCode);
+
+        $this->assertEquals($message, $result);
+    }
+
+    /**
      * Assert that the [resolve] method uses the translator to resolve a message.
      */
     public function testResolveMethodShouldResolveMessageFromTranslator()

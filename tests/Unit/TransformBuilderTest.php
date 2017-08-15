@@ -222,7 +222,7 @@ class TransformBuilderTest extends TestCase
     {
         $this->expectException(InvalidSuccessSerializerException::class);
 
-        $this->builder->serializer($serializer = stdClass::class)->transform();
+        $this->builder->serializer($serializer = stdClass::class);
     }
 
     /**

@@ -100,10 +100,13 @@ class FractalTransformFactory implements TransformFactory
                 $key = $resourceKey;
             }
 
-            $fieldsets[$key] = $this->parseFieldset($key, (array) $fields, $includes);
+            $fields = $this->parseFieldset($key, (array) $fields, $includes);
+            $fieldsets[$key] = array_unique(array_merge($fieldsets[$key] ?? [], $fields));
         }
 
-        return $fieldsets;
+        return array_map(function ($fields) {
+            return implode(',', $fields);
+        }, $fieldsets);
     }
 
     /**
@@ -112,15 +115,15 @@ class FractalTransformFactory implements TransformFactory
      * @param  string $key
      * @param  array  $fields
      * @param  array  $includes
-     * @return string
+     * @return array
      */
-    protected function parseFieldset(string $key, array $fields, array $includes): string
+    protected function parseFieldset(string $key, array $fields, array $includes): array
     {
         $childIncludes = array_reduce($includes, function ($segments, $include) use ($key) {
             return array_merge($segments, $this->resolveChildIncludes($key, $include));
         }, []);
 
-        return implode(',', array_merge($fields, array_unique($childIncludes)));
+        return array_merge($fields, array_unique($childIncludes));
     }
 
     /**
