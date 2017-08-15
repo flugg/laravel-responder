@@ -372,6 +372,22 @@ return responder()->success(Product::all())->respond();
 _As you might have noticed, unlike Fractal, you don't need to worry about creating resource objects like `Item` and `Collection`. The package will make one for you based on the data type, however, you may wrap your data in a resource to override this._
 ***
 
+### Setting Resource Key
+
+If the data you send into the response is a model or contains a list of models, a resource key will implicitly be resolved from the model's table name. You can overwrite this by adding a `getResourceKey` method to your model:
+
+```php
+public function getResourceKey(): string {
+    return 'products';
+}
+```
+
+You can also explicitly set a resource key on a response by sending a third argument to the ´success` method:
+
+```php
+return responder()->success(Product::all(), ProductTransformer::class, 'products')->respond();
+```
+
 ### Paginating Response Data
 
 Sending a paginator to the `success` method will set pagination meta data and transform the data automatically, as well as append any query string parameters to the paginator links.
