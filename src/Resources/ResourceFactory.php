@@ -28,7 +28,7 @@ class ResourceFactory implements ResourceFactoryContract
     protected $normalizer;
 
     /**
-     * A manager class, used to manage transformers.
+     * A resolver class, used to resolve resource keys.
      *
      * @var \Flugg\Responder\Contracts\Transformers\TransformerResolver
      */

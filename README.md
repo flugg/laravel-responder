@@ -24,9 +24,9 @@ _Version 2.0 has been released with some changes and tons of new features. If yo
 - [Usage](#usage)
     - [Creating Responses](#creating-responses)
     - [Creating Success Responses](#creating-success-responses)
-    - [Creating Error Responses](#creating-error-responses)
     - [Creating Transformers](#creating-transformers)
     - [Transforming Data](#creating-transformers)
+    - [Creating Error Responses](#creating-error-responses)
     - [Handling Exceptions](#handling-exceptions)
     - [Testing Responses](#testing-responses)
 - [Contributing](#contributing)
@@ -175,7 +175,7 @@ Optionally, you may use the `Responder` facade to create responses:
 return Responder::success();
 ```
 ```php
-return Responder->error();
+return Responder::error();
 ```
 
 #### Option 4: Use `MakesApiResponses` Trait

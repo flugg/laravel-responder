@@ -60,10 +60,10 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->registerSerializerBindings();
         $this->registerErrorBindings();
         $this->registerFractalBindings();
+        $this->registerTransformerBindings();
         $this->registerResourceBindings();
         $this->registerPaginationBindings();
         $this->registerTransformationBindings();
-        $this->registerTransformerBindings();
         $this->registerServiceBindings();
     }
 
@@ -156,6 +156,22 @@ class ResponderServiceProvider extends BaseServiceProvider
     }
 
     /**
+     * Register transformer bindings.
+     *
+     * @return void
+     */
+    protected function registerTransformerBindings()
+    {
+        $this->app->singleton(TransformerResolverContract::class, function ($app) {
+            return $app->make(TransformerResolver::class);
+        });
+
+        BaseTransformer::containerResolver(function () {
+            return $this->app->make(Container::class);
+        });
+    }
+
+    /**
      * Register pagination bindings.
      *
      * @return void
@@ -195,23 +211,6 @@ class ResponderServiceProvider extends BaseServiceProvider
                 ->serializer($app->make(SerializerAbstract::class))
                 ->with($app->make(Request::class)->input($app->config['responder.load_relations_parameter'], []))
                 ->only($app->make(Request::class)->input($app->config['responder.filter_fields_parameter'], []));
-        });
-
-    }
-
-    /**
-     * Register transformer bindings.
-     *
-     * @return void
-     */
-    protected function registerTransformerBindings()
-    {
-        $this->app->singleton(TransformerResolverContract::class, function ($app) {
-            return $app->make(TransformerResolver::class);
-        });
-
-        BaseTransformer::containerResolver(function () {
-            return $this->app->make(Container::class);
         });
     }
 
