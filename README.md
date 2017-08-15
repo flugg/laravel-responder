@@ -18,7 +18,7 @@ _Version 2.0 has been released with some changes and tons of new features. If yo
 
 # Table of Contents
 
-- [Introduction](#philosophy)
+- [Introduction](#introduction)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
