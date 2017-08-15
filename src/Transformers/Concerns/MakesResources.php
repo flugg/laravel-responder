@@ -6,6 +6,7 @@ use Flugg\Responder\Contracts\Resources\ResourceFactory;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Resource\ResourceInterface;
+use LogicException;
 
 /**
  * A trait to be used by a transformer to make related resources.
