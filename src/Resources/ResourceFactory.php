@@ -67,8 +67,7 @@ class ResourceFactory implements ResourceFactoryContract
     public function make($data = null, $transformer = null, string $resourceKey = null): ResourceInterface
     {
         if ($data instanceof ResourceInterface) {
-            return $data->setTransformer($this->resolveTransformer($data->getData(), $transformer ?: $data->getTransformer()))
-                ->setResourceKey($this->resolveResourceKey($data->getData(), $resourceKey ?: $data->getResourceKey()));
+            return $this->makeFromResource($data, $transformer, $resourceKey);
         } elseif (is_null($data = $this->normalizer->normalize($data))) {
             return $this->instatiateResource($data, null, $resourceKey);
         }
@@ -80,31 +79,19 @@ class ResourceFactory implements ResourceFactoryContract
     }
 
     /**
-     * Resolve a transformer.
+     * Make resource from the given resource.
      *
-     * @param  mixed                                                          $data
+     * @param \League\Fractal\Resource\ResourceInterface                      $resource
      * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
-     * @return \Flugg\Responder\Transformers\Transformer|callable
+     * @param  string|null                                                    $resourceKey
+     * @return \League\Fractal\Resource\ResourceInterface
      */
-    protected function resolveTransformer($data, $transformer)
+    public function makeFromResource(ResourceInterface $resource, $transformer = null, string $resourceKey = null): ResourceInterface
     {
-        if (isset($transformer)) {
-            return $this->transformerResolver->resolve($transformer);
-        }
+        $transformer = $this->resolveTransformer($resource->getData(), $transformer ?: $resource->getTransformer());
+        $resourceKey = $this->resolveResourceKey($resource->getData(), $resourceKey ?: $resource->getResourceKey());
 
-        return $this->transformerResolver->resolveFromData($data);
-    }
-
-    /**
-     * Resolve a resource key.
-     *
-     * @param  mixed       $data
-     * @param  string|null $resourceKey
-     * @return null|string
-     */
-    protected function resolveResourceKey($data, string $resourceKey = null)
-    {
-        return isset($resourceKey) ? $resourceKey : $this->resourceKeyResolver->resolve($data);
+        return $resource->setTransformer($transformer)->setResourceKey($resourceKey);
     }
 
     /**
@@ -139,5 +126,33 @@ class ResourceFactory implements ResourceFactoryContract
         }
 
         return $data instanceof Traversable;
+    }
+
+    /**
+     * Resolve a transformer.
+     *
+     * @param  mixed                                                          $data
+     * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
+     * @return \Flugg\Responder\Transformers\Transformer|callable
+     */
+    protected function resolveTransformer($data, $transformer)
+    {
+        if (isset($transformer)) {
+            return $this->transformerResolver->resolve($transformer);
+        }
+
+        return $this->transformerResolver->resolveFromData($data);
+    }
+
+    /**
+     * Resolve a resource key.
+     *
+     * @param  mixed       $data
+     * @param  string|null $resourceKey
+     * @return null|string
+     */
+    protected function resolveResourceKey($data, string $resourceKey = null)
+    {
+        return isset($resourceKey) ? $resourceKey : $this->resourceKeyResolver->resolve($data);
     }
 }
