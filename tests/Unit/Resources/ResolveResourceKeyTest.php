@@ -90,12 +90,16 @@ class ResolveResourceKeyTest extends TestCase
      */
     public function testResolveMethodShouldResolveResourceKeyFromGetResourceKeyIfMethodExists()
     {
-        $model = new class extends Model {
-            public function getResourceKey() { return 'foo'; }
-        };
-
-        $result = $this->resolver->resolve($model);
+        $result = $this->resolver->resolve($model = new ModelWithResourceKey);
 
         $this->assertEquals('foo', $result);
+    }
+}
+
+class ModelWithResourceKey extends Model
+{
+    public function getResourceKey()
+    {
+        return 'foo';
     }
 }

@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Resources;
 
 use Flugg\Responder\Contracts\Resources\ResourceFactory as ResourceFactoryContract;
-use Flugg\Responder\Contracts\Resources\ResourceKeyResolver;
+use Flugg\Responder\Contracts\Resources\ResourceKeyResolver as ResourceKeyResolverContract;
 use Flugg\Responder\Contracts\Transformers\TransformerResolver;
 use Illuminate\Support\Arr;
 use League\Fractal\Resource\Collection as CollectionResource;
@@ -49,7 +49,7 @@ class ResourceFactory implements ResourceFactoryContract
      * @param \Flugg\Responder\Contracts\Transformers\TransformerResolver $transformerResolver
      * @param \Flugg\Responder\Contracts\Resources\ResourceKeyResolver    $resourceKeyResolver
      */
-    public function __construct(DataNormalizer $normalizer, TransformerResolver $transformerResolver, ResourceKeyResolver $resourceKeyResolver)
+    public function __construct(DataNormalizer $normalizer, TransformerResolver $transformerResolver, ResourceKeyResolverContract $resourceKeyResolver)
     {
         $this->normalizer = $normalizer;
         $this->transformerResolver = $transformerResolver;
