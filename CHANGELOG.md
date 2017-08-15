@@ -1,3 +1,9 @@
+# 2.0.4 (2017-08-15)
+
+### Bug Fixes
+
+* Change `Translator` contract with implementation to widen Laravel support
+
 # 2.0.3 (2017-08-11)
 
 ### Bug Fixes
@@ -14,7 +20,7 @@
 
 ### Bug Fixes
 
-* Convert empty string messages in HttpException to null
+* Convert empty string messages in `HttpException` to null
 * Remove `data` field from error response to make it behave as stated in the documentation
 
 # 2.0.0 (2017-08-10)
