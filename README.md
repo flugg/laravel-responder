@@ -351,11 +351,11 @@ _You're not limited to returning a class name string, you can return a transform
 Instead of implementing the `Transformable` contract for all models, an alternative approach is to bind the transformers using the `bind` method on the `TransformerResolver` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
 
 ```php
-use Flugg\Responder\Transformers\TransformerResolver;
+use Flugg\Responder\Contracts\Transformers\TransformerResolver;
 
 public function boot()
 {
-    $this->app->make(TransformerResolver)->bind([
+    $this->app->make(TransformerResolver::class)->bind([
         \App\Product::class => \App\Transformers\ProductTransformer::class,
         \App\Shipment::class => \App\Transformers\ShipmentTransformer::class,
     ]);
