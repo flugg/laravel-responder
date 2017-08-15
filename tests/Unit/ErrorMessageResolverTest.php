@@ -4,7 +4,7 @@ namespace Flugg\Responder\Tests\Unit;
 
 use Flugg\Responder\ErrorMessageResolver;
 use Flugg\Responder\Tests\TestCase;
-use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Translation\Translator;
 use Mockery;
 
 /**
