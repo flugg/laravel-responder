@@ -1,3 +1,9 @@
+# 2.0.6 (2017-08-16)
+
+### Bug Fixes
+
+* Explode query string relations on comma to support multiple relations
+
 # 2.0.5 (2017-08-16)
 
 ### Features
