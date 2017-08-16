@@ -1,3 +1,14 @@
+# 2.0.5 (2017-08-16)
+
+### Features
+
+* Automatic resolving of resource key if the data contains models
+
+### Bug Fixes
+
+* Add missing `LogicException` import to base `Transformer`
+* Add missing `fields` key to error data of `ValidationFailedException`
+
 # 2.0.4 (2017-08-15)
 
 ### Bug Fixes
