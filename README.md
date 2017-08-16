@@ -743,7 +743,7 @@ public function __construct(Transformer $transformer)
 Model attributes are traditionally specified in snake case, however, you might prefer to use camel case in your response data. A transformer makes for a perfect location to convert the attributes, like the `soldOut` field in the example below:
 
 ```php
-return responder()->transform(Product::all(), function ($product) {
+return responder()->success(Product::all(), function ($product) {
     return ['soldOut' => (bool) $product->sold_out];    
 })->respond();
 ```
