@@ -140,8 +140,7 @@ class ResponderServiceProvider extends BaseServiceProvider
         });
 
         $this->app->bind(ErrorResponseBuilder::class, function ($app) {
-            return (new ErrorResponseBuilder($app->make(ResponseFactoryContract::class), $app->make(ErrorFactoryContract::class)))
-                ->serializer($app->make(ErrorSerializerContract::class));
+            return (new ErrorResponseBuilder($app->make(ResponseFactoryContract::class), $app->make(ErrorFactoryContract::class)))->serializer($app->make(ErrorSerializerContract::class));
         });
     }
 
@@ -213,10 +212,14 @@ class ResponderServiceProvider extends BaseServiceProvider
         });
 
         $this->app->bind(TransformBuilder::class, function ($app) {
+            $request = $this->app->make(Request::class);
+            $relations = $request->input($this->app->config['responder.load_relations_parameter'], []);
+            $fieldsets = $request->input($app->config['responder.filter_fields_parameter'], []);
+
             return (new TransformBuilder($app->make(ResourceFactoryContract::class), $app->make(TransformFactoryContract::class), $app->make(PaginatorFactoryContract::class)))
                 ->serializer($app->make(SerializerAbstract::class))
-                ->with(explode(',', $app->make(Request::class)->input($app->config['responder.load_relations_parameter'], '')))
-                ->only($app->make(Request::class)->input($app->config['responder.filter_fields_parameter'], []));
+                ->with(is_string($relations) ? explode(',', $relations) : $relations)
+                ->only($fieldsets);
         });
     }
 
