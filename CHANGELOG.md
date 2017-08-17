@@ -1,3 +1,9 @@
+# 2.0.8 (2017-08-17)
+
+### Bug Fixes
+
+* Fix a query string relation parsing bug
+
 # 2.0.7 (2017-08-17)
 
 ### Bug Fixes
