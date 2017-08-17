@@ -215,7 +215,7 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->app->bind(TransformBuilder::class, function ($app) {
             return (new TransformBuilder($app->make(ResourceFactoryContract::class), $app->make(TransformFactoryContract::class), $app->make(PaginatorFactoryContract::class)))
                 ->serializer($app->make(SerializerAbstract::class))
-                ->with(explode(',', $app->make(Request::class)->input($app->config['responder.load_relations_parameter'], [])))
+                ->with(explode(',', $app->make(Request::class)->input($app->config['responder.load_relations_parameter'], '')))
                 ->only($app->make(Request::class)->input($app->config['responder.filter_fields_parameter'], []));
         });
     }
