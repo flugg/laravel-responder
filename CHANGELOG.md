@@ -2,7 +2,7 @@
 
 ### Bug Fixes
 
-* Fix explode default value for query string relations.
+* Fix explode default value for query string relations
 
 # 2.0.6 (2017-08-16)
 
