@@ -1,3 +1,9 @@
+# 2.0.7 (2017-08-17)
+
+### Bug Fixes
+
+* Fix explode default value for query string relations
+
 # 2.0.6 (2017-08-16)
 
 ### Bug Fixes
