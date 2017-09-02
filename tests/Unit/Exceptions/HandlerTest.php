@@ -65,8 +65,10 @@ class HandlerTest extends TestCase
     {
         parent::setUp();
 
-        $this->container = Mockery::mock(Container::class);
         $this->request = Mockery::mock(Request::class);
+        $this->request->shouldReceive('wantsJson')->andReturn(true);
+
+        $this->container = Mockery::mock(Container::class);
         $this->handler = new Handler($this->container);
         $this->app->instance(Container::class, $this->container);
     }
