@@ -1,3 +1,9 @@
+# 2.0.9 (2017-09-02)
+
+### Bug Fixes
+
+* Add JSON check to exception handler 
+
 # 2.0.8 (2017-08-17)
 
 ### Bug Fixes

@@ -26,10 +26,12 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        $this->convertDefaultException($exception);
+        if ($request->wantsJson()) {
+            $this->convertDefaultException($exception);
 
-        if ($exception instanceof HttpException) {
-            return $this->renderResponse($exception);
+            if ($exception instanceof HttpException) {
+                return $this->renderResponse($exception);
+            }
         }
 
         return parent::render($request, $exception);

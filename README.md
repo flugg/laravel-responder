@@ -902,6 +902,18 @@ public function render($request, Exception $exception)
 }
 ```
 
+If you only want to return JSON error responses on requests actually asking for JSON, you may wrap the code above in a `wantsJson` check as seen below:
+
+```php
+if ($request->wantsJson()) {
+    $this->convertDefaultException($exception);
+
+    if ($exception instanceof HttpException) {
+        return $this->renderResponse($exception);
+    }
+}
+```
+
 ### Converting Exceptions
 
 Once you've implemented one of the above options, the package will convert some of Laravel's exceptions to an exception extending `Flugg\Responder\Exceptions\Http\HttpException`. It will then convert these to an error response. The table below shows which Laravel exceptions are converted and what they are converted to. All the exceptions on the right is under the `Flugg\Responder\Exceptions\Http` namespace and extends `Flugg\Responder\Exceptions\Http\HttpException`. All exceptions extending the `HttpException` class will be automatically converted to an error response. 
