@@ -26,6 +26,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
+use Illuminate\Translation\Translator;
 use Laravel\Lumen\Application as Lumen;
 use League\Fractal\Manager;
 use League\Fractal\Serializer\SerializerAbstract;
@@ -90,6 +91,10 @@ class ResponderServiceProvider extends BaseServiceProvider
     {
         $this->app->singleton(ResponseFactoryContract::class, function ($app) {
             return $this->decorateResponseFactory($app->make(LumenResponseFactory::class));
+        });
+
+        $this->app->bind(Translator::class, function ($app) {
+            return $app['translator'];
         });
     }
 
