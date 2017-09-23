@@ -1,3 +1,15 @@
+# 2.0.11 (2017-09-23)
+
+### Bug Fixes
+
+* Change `Responder` and `Transformer` from singletons to regular bindings
+
+# 2.0.10 (2017-09-17)
+
+### Bug Fixes
+
+* Rebind incompatible translator implementation with Lumen
+
 # 2.0.9 (2017-09-02)
 
 ### Bug Fixes
