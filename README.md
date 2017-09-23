@@ -71,10 +71,6 @@ To get started, install the package through Composer:
 composer require flugger/laravel-responder
 ```
 
-***
-_*Notice:* A recent change to the Laravel installer locks new projects to PHP 5.6. If you get an error about non-matching PHP version, make sure your composer.json doesn't contain a `platform` field._
-***
-
 ## Laravel
 
 #### Register Service Provider
@@ -710,10 +706,10 @@ transform(Product::all());
 Unlike the `success` method, this wont serialize the data. However, it will resolve a transformer from the model if a binding is set, and you can overwrite the transformer by setting a second parameter. You can also specify a list of included relations as a third argument:
 
 ```php
-transform(Product::all(), new ProductTransformer, ['comments']);
+transform(Product::all(), new ProductTransformer, ['shipments']);
 ```
 
-In addition, if you want to blacklist any of the default loaded relations, you can fill the fourth parameter:
+Additionally, if you want to blacklist any of the default loaded relations, you can fill the fourth parameter:
 
 ```php
 transform(Product::all(), new ProductTransformer, ['shipments'], ['orders']);
@@ -721,26 +717,26 @@ transform(Product::all(), new ProductTransformer, ['shipments'], ['orders']);
 
 #### Option 2: The `Transformer` Facade
 
-Instead of using the `transform` helper function, you can use the `Transformer` facade to do the same thing:
+Instead of using the `transform` helper function, you can also use the `Transformer` facade to achieve the same thing:
 
 ```php
-Transformer::transform(Product::all(), new ProductTransformer, ['comments'], ['user']);
+Transformer::transform(Product::all(), new ProductTransformer, ['shipments']);
 ```
 
 #### Option 3: The `Transformer` Service
 
-Both the helper method and facade uses the `Flugg\Responder\Transformer` service class to apply the transformation. You can use the service yourself by injecting the service:
+Both the helper method and facade uses the `Flugg\Responder\Transformer` service class to apply the transformation. You can use the service yourself by using dependency injeciton:
 
 ```php
 public function __construct(Transformer $transformer)
 {
-    $transformer->transform(Product::all(), new ProductTransformer, ['comments'], ['user']);
+    $transformer->transform(Product::all(), new ProductTransformer, ['shipments']);
 }
 ```
 
 ### Transforming To Camel Case
 
-Model attributes are traditionally specified in snake case, however, you might prefer to use camel case in your response data. A transformer makes for a perfect location to convert the attributes, like the `soldOut` field in the example below:
+Model attributes are traditionally specified in snake case, however, you might prefer to use camel case for the response fields. A transformer makes for a perfect location to convert the fields, as seen from the `soldOut` field in the example below:
 
 ```php
 return responder()->success(Product::all(), function ($product) {
@@ -750,7 +746,7 @@ return responder()->success(Product::all(), function ($product) {
 
 #### Transforming Requests To Snake Case
 
-After responding with camel case, you probably want to let people send in request data using camel case parameters as well. The package provides a `Flugg\Responder\Http\Middleware\ConvertToSnakeCase` middleware you may append to the `$middleware` array in `app/Http/Kernel.php` to convert all request parameters to snake case automatically:
+After responding with camel case, you probably want to let people send in request data using camel cased parameters as well. The package provides a `Flugg\Responder\Http\Middleware\ConvertToSnakeCase` middleware you may append to the `$middleware` array in `app/Http/Kernel.php` to convert all parameters to snake case automatically:
 
 ```php
 protected $middleware = [
@@ -771,7 +767,7 @@ Whenever a consumer of your API does something unexpected, you can return an err
 return responder()->error()->respond();
 ```
 
-The error response has knowledge about an error code, a corresponding error message, and optionally some error data. If using the default configuration, the above code would output the following JSON:
+The error response has knowledge about an error code, a corresponding error message and optionally some error data. With the default configuration, the above code would output the following JSON:
 
 ```json
 {
@@ -793,10 +789,10 @@ return responder()->error('sold_out_error')->respond();
 ```
 
 ***
-_You can also use integers as error codes._
+_You may optionally use integers for error codes._
 ***
 
-Additionally, you may set the second parameter to an error message describing the error:
+In addition, you may set the second parameter to an error message describing the error:
 
 ```php
 return responder()->error('sold_out_error', 'The requested product is sold out.')->respond();
@@ -804,7 +800,7 @@ return responder()->error('sold_out_error', 'The requested product is sold out.'
 
 #### Set Messages In Language Files
 
-Alternatively, you can set the error messages in a language file, allowing for returning messages in different languages for different consumers. The configuration file has an `error_message_files` key defining a list of language files with error messages. By default, it is set to `['errors']`, meaning it will look for an `errors.php` file inside `resources/lang/en`. You can use these files to map error codes to corresponding error messages:
+You can set the error messages in a language file, which allows for returning messages in different languages. The configuration file has an `error_message_files` key defining a list of language files with error messages. By default, it is set to `['errors']`, meaning it will look for an `errors.php` file inside `resources/lang/en`. You can use these files to map error codes to corresponding error messages:
 
 ```php
 return [
@@ -814,7 +810,7 @@ return [
 
 #### Register Messages Using `ErrorMessageResolver`
 
-Instead of implementing the `Transformable` contract for all models, an alternative approach is to bind the transformers using the `bind` method on the `TransformerManager` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
+Instead of using language files, you may alternatively set error messages directly on the `ErrorMessageResolver` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
 
 ```php
 use Flugg\Responder\ErrorMessageResolver;
