@@ -235,11 +235,11 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerServiceBindings()
     {
-        $this->app->singleton(ResponderContract::class, function ($app) {
+        $this->app->bind(ResponderContract::class, function ($app) {
             return $app->make(Responder::class);
         });
 
-        $this->app->singleton(TransformerContract::class, function ($app) {
+        $this->app->bind(TransformerContract::class, function ($app) {
             return $app->make(Transformer::class);
         });
     }
