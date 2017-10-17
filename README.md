@@ -974,21 +974,21 @@ use Flugg\Responder\Exceptions\Http\HttpException;
 class SoldOutException extends HttpException
 {
     /**
-     * An HTTP status code.
+     * The HTTP status code.
      *
      * @var int
      */
     protected $status = 400;
 
     /**
-     * An error code.
+     * The error code.
      *
      * @var string|null
      */
-    protected $code = 'sold_out_error';
+    protected $errorCode = 'sold_out_error';
 
     /**
-     * An error message.
+     * The error message.
      *
      * @var string|null
      */
