@@ -75,11 +75,11 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Set the error code and message.
      *
-     * @param  string|null $errorCode
+     * @param  mixed|null $errorCode
      * @param  string|null $message
      * @return $this
      */
-    public function error(string $errorCode = null, string $message = null)
+    public function error($errorCode = null, string $message = null)
     {
         $this->errorCode = $errorCode;
         $this->message = $message;
