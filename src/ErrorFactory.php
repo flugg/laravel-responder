@@ -5,7 +5,6 @@ namespace Flugg\Responder;
 use Flugg\Responder\Contracts\ErrorFactory as ErrorFactoryContract;
 use Flugg\Responder\Contracts\ErrorMessageResolver as ErrorMessageResolverContract;
 use Flugg\Responder\Contracts\ErrorSerializer;
-use Flugg\Responder\Contracts\ErrorSerializer as ErrorSerializerContract;
 
 /**
  * A factory class responsible for creating error arrays.
@@ -37,12 +36,12 @@ class ErrorFactory implements ErrorFactoryContract
      * Make an error array from the given error code and message.
      *
      * @param  \Flugg\Responder\Contracts\ErrorSerializer $serializer
-     * @param  string|null                                $errorCode
+     * @param  mixed|null                                 $errorCode
      * @param  string|null                                $message
      * @param  array|null                                 $data
      * @return array
      */
-    public function make(ErrorSerializer $serializer, string $errorCode = null, string $message = null, array $data = null): array
+    public function make(ErrorSerializer $serializer, $errorCode = null, string $message = null, array $data = null): array
     {
         if (isset($errorCode) && ! isset($message)) {
             $message = $this->messageResolver->resolve($errorCode);

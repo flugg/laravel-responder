@@ -14,8 +14,8 @@ interface ErrorMessageResolver
     /**
      * Resolve a message from the given error code.
      *
-     * @param  string $errorCode
+     * @param  mixed $errorCode
      * @return string|null
      */
-    public function resolve(string $errorCode);
+    public function resolve($errorCode);
 }

@@ -27,9 +27,9 @@ interface Responder
     /**
      * Build an error response.
      *
-     * @param  string|null $errorCode
+     * @param  mixed|null $errorCode
      * @param  string|null $message
      * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */
-    public function error(string $errorCode = null, string $message = null): ErrorResponseBuilder;
+    public function error($errorCode = null, string $message = null): ErrorResponseBuilder;
 }
