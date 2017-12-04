@@ -6,7 +6,7 @@ use Flugg\Responder\Http\Responses\Decorators\SuccessFlagDecorator;
 use Flugg\Responder\Tests\TestCase;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\SuccessResponseBuilder] class.
+ * Unit tests for the [Flugg\Responder\Http\Decorators\SuccessFlagDecorator] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -22,7 +22,7 @@ class SuccessFlagDecoratorTest extends TestCase
     protected $responseFactory;
 
     /**
-     * The [StatusCodeResponseDecorator] class being tested.
+     * The [SuccessFlagDecorator] class being tested.
      *
      * @var \Flugg\Responder\Http\Responses\Decorators\SuccessFlagDecorator
      */
@@ -43,7 +43,7 @@ class SuccessFlagDecoratorTest extends TestCase
 
     /**
      * Assert that the [make] method decorates the response data with information about
-     * wether or not the response was successful.
+     * whether or not the response was successful.
      */
     public function testMakeMethodShouldAppendSuccessFlagFieldToResponseData()
     {

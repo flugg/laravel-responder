@@ -6,7 +6,7 @@ use Flugg\Responder\Http\Responses\Decorators\StatusCodeDecorator;
 use Flugg\Responder\Tests\TestCase;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\SuccessResponseBuilder] class.
+ * Unit tests for the [Flugg\Responder\Http\Decorators\StatusCodeDecorator] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -22,7 +22,7 @@ class StatusCodeDecoratorTest extends TestCase
     protected $responseFactory;
 
     /**
-     * The [StatusCodeResponseDecorator] class being tested.
+     * The [StatusCodeDecorator] class being tested.
      *
      * @var \Flugg\Responder\Http\Responses\Decorators\StatusCodeDecorator
      */
