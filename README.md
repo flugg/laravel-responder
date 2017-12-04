@@ -250,10 +250,13 @@ return responder()->success()->decorator(ExampleDecorator::class)->respond();
 return responder()->error()->decorator(ExampleDecorator::class)->respond();
 ```
 
-The package also ships with a `PrettyPrintDecorator` decorator, disabled by default, which will beautify JSON output. You can add this to the decorator list as
- ```php
- `\Flugg\Responder\Http\Responses\Decorators\PrettyPrintDecorator::class,`
- ```
+***
+The package also ships with a `PrettyPrintDecorator` decorator which will beautify the JSON output. This is disabled by default, but can be added to the decorator list:
+
+```php
+\Flugg\Responder\Http\Responses\Decorators\PrettyPrintDecorator::class,
+```
+***
 
 ## Creating Success Responses
 
