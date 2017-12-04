@@ -336,7 +336,7 @@ class TransformBuilderTest extends TestCase
         //  if it's the same closure reference but no closure are alike, even when they are defined identically.
         // Here we just check that 'bar' element contains a closure.
         $model->shouldHaveReceived('load')->with(Mockery::on(function (array $relations) {
-            return ($relations == 'foo') && ($relations['bar'] instanceof \Closure);
+            return ($relations[0] == 'foo') && ($relations['bar'] instanceof \Closure);
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo:first(aa|bb)', 'bar:second(cc|dd)'],
