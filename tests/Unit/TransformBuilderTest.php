@@ -316,6 +316,30 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
+     * Assert that the [transform] method extracts default relationships from transformer and
+     * automatically eager loads all relationships.
+     */
+    public function testTransformMethodExtractsAndEagerLoadsRelationsWhenThereAreRelationParameters()
+    {
+        $this->transformFactory->shouldReceive('make')->andReturn([]);
+        $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
+        $model->shouldReceive('load')->andReturnSelf();
+        $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
+        $transformer->shouldReceive('defaultRelations')->andReturn([]);
+
+        $this->builder->resource()->with($relations = ['foo:first(aa|bb)','bar:second(cc|dd)'])->transform();
+
+        // Model should receive the relations names without parameters,
+        //  while the transformFactory should receive also parameters to let Fractal use them
+        $model->shouldHaveReceived('load')->with(['foo','bar'])->once();
+        $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
+            'includes' => $relations,
+            'excludes' => [],
+            'fieldsets' => [],
+        ])->once();
+    }
+
+    /**
      * Assert that the [only] method sets the filtered fields that are sent to the
      * [TransformFactory].
      */
