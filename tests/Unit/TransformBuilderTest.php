@@ -327,13 +327,19 @@ class TransformBuilderTest extends TestCase
         $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
         $transformer->shouldReceive('defaultRelations')->andReturn([]);
 
-        $this->builder->resource()->with($relations = ['foo:first(aa|bb)','bar:second(cc|dd)'])->transform();
+        $this->builder->resource()->with(['foo:first(aa|bb)', 'bar:second(cc|dd)' => function() {}])->transform();
 
         // Model should receive the relations names without parameters,
         //  while the transformFactory should receive also parameters to let Fractal use them
-        $model->shouldHaveReceived('load')->with(['foo','bar'])->once();
+        // We must use the Mockery::on() method because with() method will try to do a strict match
+        //  for the closure resulting in a failure, because it will check
+        //  if it's the same closure reference but no closure are alike, even when they are defined identically.
+        // Here we just check that 'bar' element contains a closure.
+        $model->shouldHaveReceived('load')->with(Mockery::on(function (array $relations) {
+            return ($relations == 'foo') && ($relations['bar'] instanceof \Closure);
+        }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
-            'includes' => $relations,
+            'includes' => ['foo:first(aa|bb)', 'bar:second(cc|dd)'],
             'excludes' => [],
             'fieldsets' => [],
         ])->once();
