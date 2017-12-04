@@ -251,7 +251,7 @@ return responder()->error()->decorator(ExampleDecorator::class)->respond();
 ```
 
 ***
-The package also ships with a `PrettyPrintDecorator` decorator which will beautify the JSON output. This is disabled by default, but can be added to the decorator list:
+_The package also ships with a `PrettyPrintDecorator` decorator which will beautify the JSON output. This is disabled by default, but can be added to the decorator list:_
 
 ```php
 \Flugg\Responder\Http\Responses\Decorators\PrettyPrintDecorator::class,
