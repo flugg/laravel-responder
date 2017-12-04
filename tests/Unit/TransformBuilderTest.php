@@ -317,7 +317,7 @@ class TransformBuilderTest extends TestCase
 
     /**
      * Assert that the [transform] method extracts default relationships from transformer and
-     * automatically eager loads all relationships.
+     * automatically eager loads all relationships even when the relation name contains include parameters.
      */
     public function testTransformMethodExtractsAndEagerLoadsRelationsWhenThereAreRelationParameters()
     {
