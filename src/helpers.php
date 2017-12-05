@@ -25,9 +25,9 @@ if (! function_exists('transform')) {
      * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
      * @param  string[]                                                       $with
      * @param  string[]                                                       $without
-     * @return array
+     * @return array|null
      */
-    function transform($data = null, $transformer = null, array $with = [], array $without = []): array
+    function transform($data = null, $transformer = null, array $with = [], array $without = []): ?array
     {
         return app(Transformer::class)->transform($data, $transformer, $with, $without);
     }

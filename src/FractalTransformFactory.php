@@ -40,9 +40,9 @@ class FractalTransformFactory implements TransformFactory
      * @param  \League\Fractal\Resource\ResourceInterface    $resource
      * @param  \League\Fractal\Serializer\SerializerAbstract $serializer
      * @param  array                                         $options
-     * @return array
+     * @return array|null
      */
-    public function make(ResourceInterface $resource, SerializerAbstract $serializer, array $options = []): array
+    public function make(ResourceInterface $resource, SerializerAbstract $serializer, array $options = []): ?array
     {
         $options = $this->parseOptions($options, $resource);
 

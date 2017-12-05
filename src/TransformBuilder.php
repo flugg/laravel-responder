@@ -224,9 +224,9 @@ class TransformBuilder
     /**
      * Transform and serialize the data and return the transformed array.
      *
-     * @return array
+     * @return array|null
      */
-    public function transform(): array
+    public function transform(): ?array
     {
         $this->prepareRelations($this->resource->getData(), $this->resource->getTransformer());
 
