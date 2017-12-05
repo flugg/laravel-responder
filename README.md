@@ -641,6 +641,10 @@ return $this->resource($product->shipments, new ShipmentTransformer);
 _You should be careful with executing any new database calls inside the include methods as you might end up with an unexpected amount of hits to the database._
 ***
 
+#### Using parameters
+
+Parameters management is totally delegated to the underlying Fractal library (see it's [documentation](https://fractal.thephpleague.com/transformers/#include-parameters)) except from the fact that parameters are provided directly as an array instead of a `\League\Fractal\ParamBag`.
+
 #### Setting Available Relationships
 
 The `$relations` property specifies a list of relations available to be included. When you generate a transformer, the `$relations` property will be equal to a wildcard, allowing all relations on the transformer:

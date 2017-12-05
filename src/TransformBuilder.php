@@ -251,7 +251,7 @@ class TransformBuilder
         }
 
         if ($data instanceof Model || $data instanceof Collection) {
-            $data->load($this->with);
+            $data->load($this->relationsWithoutParameters());
         }
 
         $this->with = $this->stripEagerLoadConstraints($this->with);
@@ -286,5 +286,28 @@ class TransformBuilder
         return collect($relations)->map(function ($value, $key) {
             return is_numeric($key) ? $value : $key;
         })->values()->all();
+    }
+
+    /**
+     * Remove parameters from relations that must be loaded.
+     *
+     * @return array
+     */
+    protected function relationsWithoutParameters(): array
+    {
+        $cleanedRelations = [];
+        foreach ($this->with as $key => $value) {
+            // If the key is numeric, value is the relation name:
+            //  we remove parameters from the value and return the relation name
+            // Otherwise the key is the relation name and the value is a custom scope:
+            //  we remove parameters from the key and return the relation with the value untouched
+            if(is_numeric($key)) {
+                $cleanedRelations[$key] = explode(':', $value)[0];
+            } else {
+                $cleanedRelations[explode(':', $key)[0]] = $value;
+            }
+        }
+
+        return $cleanedRelations;
     }
 }
