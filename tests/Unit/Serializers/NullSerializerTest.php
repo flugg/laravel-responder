@@ -57,13 +57,13 @@ class NullSerializerTest extends TestCase
     }
 
     /**
-     * Assert that the [null] method returns an empty array.
+     * Assert that the [null] method returns null.
      */
-    public function testNullMethodShouldReturnAnEmptyArray()
+    public function testNullMethodShouldReturnNull()
     {
         $result = $this->serializer->null();
 
-        $this->assertEquals([], $result);
+        $this->assertEquals(null, $result);
     }
 
     /**

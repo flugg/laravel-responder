@@ -45,7 +45,7 @@ class NullSerializer extends SuccessSerializer
      */
     public function null()
     {
-        return [];
+        return null;
     }
 
     /**
