@@ -571,7 +571,7 @@ class ProductTransformer extends Transformer
      *
      * @var string[]
      */
-    protected $relations = ['*'];
+    protected $relations = [];
 
     /**
      * A list of autoloaded default relations.
@@ -647,7 +647,7 @@ Parameters management is totally delegated to the underlying Fractal library (se
 
 #### Setting Available Relationships
 
-The `$relations` property specifies a list of relations available to be included. When you generate a transformer, the `$relations` property will be equal to a wildcard, allowing all relations on the transformer:
+The `$relations` property specifies a list of relations available to be included. When you generate a transformer, the `$relations` property will be equal to an empty array (which is also the default value when it's not defined), but you can change it to a wildcard allowing the access to all relations on the transformer:
 
 ```php
 protected $relations = ['*'];
