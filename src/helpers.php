@@ -27,7 +27,7 @@ if (! function_exists('transform')) {
      * @param  string[]                                                       $without
      * @return array|null
      */
-    function transform($data = null, $transformer = null, array $with = [], array $without = []): ?array
+    function transform($data = null, $transformer = null, array $with = [], array $without = [])
     {
         return app(Transformer::class)->transform($data, $transformer, $with, $without);
     }

@@ -40,7 +40,7 @@ class Transformer implements TransformerContract
      * @param  string[]                                                       $without
      * @return array|null
      */
-    public function transform($data = null, $transformer = null, array $with = [], array $without = []): ?array
+    public function transform($data = null, $transformer = null, array $with = [], array $without = [])
     {
         return $this->transformBuilder->resource($data, $transformer)
             ->with($with)

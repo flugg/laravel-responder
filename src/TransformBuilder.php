@@ -226,7 +226,7 @@ class TransformBuilder
      *
      * @return array|null
      */
-    public function transform(): ?array
+    public function transform()
     {
         $this->prepareRelations($this->resource->getData(), $this->resource->getTransformer());
 

@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^7.1",
+        "php": "^7.0",
         "illuminate/contracts": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.*",
         "illuminate/support": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.*",
         "league/fractal": "^0.16.0"

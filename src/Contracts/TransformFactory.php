@@ -22,5 +22,5 @@ interface TransformFactory
      * @param  array                                         $options
      * @return array|null
      */
-    public function make(ResourceInterface $resource, SerializerAbstract $serializer, array $options = []): ?array;
+    public function make(ResourceInterface $resource, SerializerAbstract $serializer, array $options = []);
 }

@@ -20,5 +20,5 @@ interface Transformer
      * @param  string[]                                                       $without
      * @return array|null
      */
-    public function transform($data = null, $transformer = null, array $with = [], array $without = []): ?array;
+    public function transform($data = null, $transformer = null, array $with = [], array $without = []);
 }
