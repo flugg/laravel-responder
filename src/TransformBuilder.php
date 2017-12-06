@@ -251,7 +251,7 @@ class TransformBuilder
         }
 
         if ($data instanceof Model || $data instanceof Collection) {
-            $data->load($this->relationsWithoutParameters());
+            $data->load($this->prepareEagerLoadableRelations($this->with, $transformer));
         }
 
         $this->with = $this->stripEagerLoadConstraints($this->with);
@@ -289,22 +289,32 @@ class TransformBuilder
     }
 
     /**
-     * Remove parameters from relations that must be loaded.
+     * Remove parameters from relations that must be eager loaded and
+     * filter out the relations which have an includeXxx method.
      *
+     * @param array                                                             $relations
+     * @param \Flugg\Responder\Transformers\Transformer|callable|string|null    $transformer
      * @return array
      */
-    protected function relationsWithoutParameters(): array
+    protected function prepareEagerLoadableRelations(array $relations, $transformer): array
     {
         $cleanedRelations = [];
-        foreach ($this->with as $key => $value) {
-            // If the key is numeric, value is the relation name:
-            //  we remove parameters from the value and return the relation name
+        foreach ($relations as $key => $value) {
+            // Strip out parameters from relation name
+            $relationName = explode(':', is_numeric($key) ? $value : $key)[0];
+            // Ignores all relation which have a includeXxx method
+            // method_exists does not care if the $transformer is actually an object or not
+            if (method_exists($transformer, 'include' . ucfirst($relationName))) {
+                continue;
+            }
+
+            // If the key is numeric, value is the relation name: return it
             // Otherwise the key is the relation name and the value is a custom scope:
-            //  we remove parameters from the key and return the relation with the value untouched
+            //  return the relation with the value untouched
             if(is_numeric($key)) {
-                $cleanedRelations[$key] = explode(':', $value)[0];
+                $cleanedRelations[$key] = $relationName;
             } else {
-                $cleanedRelations[explode(':', $key)[0]] = $value;
+                $cleanedRelations[$relationName] = $value;
             }
         }
 
