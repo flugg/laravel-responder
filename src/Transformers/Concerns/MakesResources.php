@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Transformers\Concerns;
 
+use Countable;
 use Flugg\Responder\Contracts\Resources\ResourceFactory;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Model;
@@ -72,7 +73,7 @@ trait MakesResources
     {
         $data = $this->resolveRelation($model, $identifier);
 
-        if (! count($data)) {
+        if (! is_array($data) && ! $data instanceof Countable) {
             return $this->resource($data, null, $identifier);
         } elseif (key_exists($identifier, $this->resources)) {
             return $this->resources[$identifier]->setData($data);
