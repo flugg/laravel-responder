@@ -130,16 +130,6 @@ class SuccessSerializerTest extends TestCase
     }
 
     /**
-     * Assert that the [sideloadIncludes] method returns true.
-     */
-    public function testSideloadIncludesMethodShouldReturnTrue()
-    {
-        $result = $this->serializer->sideloadIncludes();
-
-        $this->assertTrue($result);
-    }
-
-    /**
      * Assert that the [mergeIncludes] method merges relations and strips away extra data fields.
      */
     public function testMergeIncludesMethodShouldMergeRelationsAndStripDataFields()
@@ -147,15 +137,5 @@ class SuccessSerializerTest extends TestCase
         $result = $this->serializer->mergeIncludes($data = ['foo' => 1], $relations = ['bar' => ['data' => 2]]);
 
         $this->assertEquals(['foo' => 1, 'bar' => 2], $result);
-    }
-
-    /**
-     * Assert that the [includedData] method returns an empty array.
-     */
-    public function testIncludedDataMethodShouldReturnAnEmptyArray()
-    {
-        $result = $this->serializer->includedData($resource = new Item, ['foo' => 1]);
-
-        $this->assertEquals([], $result);
     }
 }
