@@ -251,11 +251,20 @@ return responder()->error()->decorator(ExampleDecorator::class)->respond();
 ```
 
 ***
-_The package also ships with a `PrettyPrintDecorator` decorator which will beautify the JSON output. This is disabled by default, but can be added to the decorator list:_
+
+The package also ships with some situational decorators disabled by default, but which can be added to the decorator list: 
+- `PrettyPrintDecorator` decorator will beautify the JSON output;
 
 ```php
 \Flugg\Responder\Http\Responses\Decorators\PrettyPrintDecorator::class,
 ```
+
+- `EscapeHtmlDecorator` decorator, based on the "sanitize input, escape output" concept, will escape HTML entities in all strings returned by your API. You can securely store input data "as is" (even malicious HTML tags) being sure that it will be outputted as un-harmful strings. Note that, using this decorator, printing data as text will result in the wrong representation and you **must** print it as HTML to retrieve the original value.
+
+```php
+\Flugg\Responder\Http\Responses\Decorators\EscapeHtmlDecorator::class,
+```
+
 ***
 
 ## Creating Success Responses
