@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Support;
+namespace Flugg\Responder\Http\Responses\Decorators;
 
-use Flugg\Responder\Http\Responses\Decorators\ResponseDecorator;
 use Illuminate\Http\JsonResponse;
 
 /**
