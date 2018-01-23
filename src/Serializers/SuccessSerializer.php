@@ -102,16 +102,6 @@ class SuccessSerializer extends ArraySerializer
     }
 
     /**
-     * Indicates if includes should be side-loaded.
-     *
-     * @return bool
-     */
-    public function sideloadIncludes()
-    {
-        return true;
-    }
-
-    /**
      * Merge includes into data.
      *
      * @param  array $transformedData
@@ -125,17 +115,5 @@ class SuccessSerializer extends ArraySerializer
         }
 
         return array_merge($transformedData, $includedData);
-    }
-
-    /**
-     * Format the included data.
-     *
-     * @param  \League\Fractal\Resource\ResourceInterface $resource
-     * @param  array                                      $data
-     * @return array
-     */
-    public function includedData(ResourceInterface $resource, array $data)
-    {
-        return [];
     }
 }

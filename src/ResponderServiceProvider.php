@@ -212,7 +212,7 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerTransformationBindings()
     {
-        $this->app->singleton(TransformFactoryContract::class, function ($app) {
+        $this->app->bind(TransformFactoryContract::class, function ($app) {
             return $app->make(FractalTransformFactory::class);
         });
 

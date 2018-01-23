@@ -44,7 +44,7 @@ class TransformerTest extends TestCase
      */
     public function testGetAvailableIncludesMethodReturnsRelations()
     {
-        $transformer = new TransformerWithoutWildard;
+        $transformer = new TransformerWithoutWildcard;
 
         $includes = $transformer->getAvailableIncludes();
 
@@ -56,7 +56,7 @@ class TransformerTest extends TestCase
      */
     public function testGetAvailableIncludesMethodReturnsResolvedRelationsOnWildcard()
     {
-        $transformer = new TransformerWithWildard;
+        $transformer = new TransformerWithWildcard;
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('getParentScopes')->andReturn([]);
         $scope->shouldReceive('getManager')->andReturn($manager = Mockery::mock(Manager::class));
@@ -133,7 +133,7 @@ class TransformerTest extends TestCase
      */
     public function testProcessIncludedResourcesMethodThrowsExceptionWhenNoRelationCanBeResolved()
     {
-        $transformer = new TransformerWithoutWildard;
+        $transformer = new TransformerWithoutWildcard;
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('getParentScopes')->andReturn([]);
         $scope->shouldReceive('isRequested')->andReturn(true);
@@ -145,7 +145,7 @@ class TransformerTest extends TestCase
         $manager->shouldReceive('getRequestedIncludes')->andReturn([]);
         $manager->shouldReceive('getIncludeParams')->andReturn(new ParamBag([]));
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Relation [foo] not found in [' . TransformerWithoutWildard::class . '].');
+        $this->expectExceptionMessage('Relation [foo] not found in [' . TransformerWithoutWildcard::class . '].');
 
         $result = $transformer->processIncludedResources($scope, $data = []);
 
@@ -153,19 +153,19 @@ class TransformerTest extends TestCase
     }
 }
 
-class TransformerWithoutWildard extends Transformer
+class TransformerWithoutWildcard extends Transformer
 {
     protected $relations = ['foo', 'bar'];
 }
 
-class TransformerWithWildard extends Transformer
+class TransformerWithWildcard extends Transformer
 {
     protected $relations = ['*'];
 }
 
 class TransformerWithDefaultRelations extends Transformer
 {
-    protected $load = ['foo', 'bar' => TransformerWithoutWildard::class];
+    protected $load = ['foo', 'bar' => TransformerWithoutWildcard::class];
 }
 
 class TransformerWithRelationMethod extends Transformer

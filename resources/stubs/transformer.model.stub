@@ -12,7 +12,7 @@ class DummyClass extends Transformer
      *
      * @var string[]
      */
-    protected $relations = ['*'];
+    protected $relations = [];
 
     /**
      * List of autoloaded default relations.

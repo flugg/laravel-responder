@@ -250,6 +250,23 @@ return responder()->success()->decorator(ExampleDecorator::class)->respond();
 return responder()->error()->decorator(ExampleDecorator::class)->respond();
 ```
 
+***
+
+The package also ships with some situational decorators disabled by default, but which can be added to the decorator list: 
+- `PrettyPrintDecorator` decorator will beautify the JSON output;
+
+```php
+\Flugg\Responder\Http\Responses\Decorators\PrettyPrintDecorator::class,
+```
+
+- `EscapeHtmlDecorator` decorator, based on the "sanitize input, escape output" concept, will escape HTML entities in all strings returned by your API. You can securely store input data "as is" (even malicious HTML tags) being sure that it will be outputted as un-harmful strings. Note that, using this decorator, printing data as text will result in the wrong representation and you **must** print it as HTML to retrieve the original value.
+
+```php
+\Flugg\Responder\Http\Responses\Decorators\EscapeHtmlDecorator::class,
+```
+
+***
+
 ## Creating Success Responses
 
 As briefly demonstrated above, success responses are created using the `success` method:
@@ -563,7 +580,7 @@ class ProductTransformer extends Transformer
      *
      * @var string[]
      */
-    protected $relations = ['*'];
+    protected $relations = [];
 
     /**
      * A list of autoloaded default relations.
@@ -633,9 +650,13 @@ return $this->resource($product->shipments, new ShipmentTransformer);
 _You should be careful with executing any new database calls inside the include methods as you might end up with an unexpected amount of hits to the database._
 ***
 
+#### Using parameters
+
+Parameters management is totally delegated to the underlying Fractal library (see it's [documentation](https://fractal.thephpleague.com/transformers/#include-parameters)) except from the fact that parameters are provided directly as an array instead of a `\League\Fractal\ParamBag`.
+
 #### Setting Available Relationships
 
-The `$relations` property specifies a list of relations available to be included. When you generate a transformer, the `$relations` property will be equal to a wildcard, allowing all relations on the transformer:
+The `$relations` property specifies a list of relations available to be included. When you generate a transformer, the `$relations` property will be equal to an empty array (which is also the default value when it's not defined), but you can change it to a wildcard allowing the access to all relations on the transformer:
 
 ```php
 protected $relations = ['*'];

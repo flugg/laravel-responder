@@ -5,29 +5,30 @@ namespace Flugg\Responder\Http\Responses\Decorators;
 use Illuminate\Http\JsonResponse;
 
 /**
- * A decorator class for generating JSON using the JSON_PRETTY_PRINT option.
+ * A decorator class for escaping HTML entities in strings on the response.
  *
  * @package flugger/laravel-responder
- * @author  Alexander Tømmerås <flugged@gmail.com>
+ * @author  Paolo Caleffi <p.caleffi@dreamonkey.com>
  * @license The MIT License
  */
-class PrettyPrintDecorator extends ResponseDecorator
+class EscapeHtmlDecorator extends ResponseDecorator
 {
     /**
      * Generate a JSON response.
      *
      * @param  array $data
-     * @param  int   $status
+     * @param  int $status
      * @param  array $headers
      * @return \Illuminate\Http\JsonResponse
      */
     public function make(array $data, int $status, array $headers = []): JsonResponse
     {
-        $response = $this->factory->make($data, $status, $headers);
+        array_walk_recursive($data, function (&$value) {
+            if(is_string($value)) {
+                $value = e($value);
+            }
+        });
 
-        $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
-
-        return $response;
+        return $this->factory->make($data, $status, $headers);
     }
-}
 }

@@ -224,9 +224,9 @@ class TransformBuilder
     /**
      * Transform and serialize the data and return the transformed array.
      *
-     * @return array
+     * @return array|null
      */
-    public function transform(): array
+    public function transform()
     {
         $this->prepareRelations($this->resource->getData(), $this->resource->getTransformer());
 
@@ -251,7 +251,7 @@ class TransformBuilder
         }
 
         if ($data instanceof Model || $data instanceof Collection) {
-            $data->load($this->with);
+            $data->load($this->prepareEagerLoadableRelations($this->with, $transformer));
         }
 
         $this->with = $this->stripEagerLoadConstraints($this->with);
@@ -286,5 +286,38 @@ class TransformBuilder
         return collect($relations)->map(function ($value, $key) {
             return is_numeric($key) ? $value : $key;
         })->values()->all();
+    }
+
+    /**
+     * Remove parameters from relations that must be eager loaded and
+     * filter out the relations which have an includeXxx method.
+     *
+     * @param array                                                             $relations
+     * @param \Flugg\Responder\Transformers\Transformer|callable|string|null    $transformer
+     * @return array
+     */
+    protected function prepareEagerLoadableRelations(array $relations, $transformer): array
+    {
+        $cleanedRelations = [];
+        foreach ($relations as $key => $value) {
+            // Strip out parameters from relation name
+            $relationName = explode(':', is_numeric($key) ? $value : $key)[0];
+            // Ignores all relation which have a includeXxx method
+            // method_exists does not care if the $transformer is actually an object or not
+            if (method_exists($transformer, 'include' . ucfirst($relationName))) {
+                continue;
+            }
+
+            // If the key is numeric, value is the relation name: return it
+            // Otherwise the key is the relation name and the value is a custom scope:
+            //  return the relation with the value untouched
+            if(is_numeric($key)) {
+                $cleanedRelations[$key] = $relationName;
+            } else {
+                $cleanedRelations[$relationName] = $value;
+            }
+        }
+
+        return $cleanedRelations;
     }
 }

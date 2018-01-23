@@ -316,6 +316,57 @@ class TransformBuilderTest extends TestCase
     }
 
     /**
+     * Assert that the [transform] method extracts default relationships from transformer and
+     * automatically eager loads all relationships even when the relation name contains include parameters.
+     */
+    public function testTransformMethodExtractsAndEagerLoadsRelationsWhenThereAreRelationParameters()
+    {
+        $this->transformFactory->shouldReceive('make')->andReturn([]);
+        $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
+        $model->shouldReceive('load')->andReturnSelf();
+        $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
+        $transformer->shouldReceive('defaultRelations')->andReturn([]);
+
+        $this->builder->resource()->with(['foo:first(aa|bb)', 'bar:second(cc|dd)' => function() {}])->transform();
+
+        // Model should receive the relations names without parameters,
+        //  while the transformFactory should receive also parameters to let Fractal use them
+        // We must use the Mockery::on() method because with() method will try to do a strict match
+        //  for the closure resulting in a failure, because it will check
+        //  if it's the same closure reference but no closure are alike, even when they are defined identically.
+        // Here we just check that 'bar' element contains a closure.
+        $model->shouldHaveReceived('load')->with(Mockery::on(function (array $relations) {
+            return ($relations[0] == 'foo') && ($relations['bar'] instanceof \Closure);
+        }))->once();
+        $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
+            'includes' => ['foo:first(aa|bb)', 'bar:second(cc|dd)'],
+            'excludes' => [],
+            'fieldsets' => [],
+        ])->once();
+    }
+
+    /**
+     * Assert that the [transform] method do not eager load relations for which is present an include method.
+     */
+    public function testTransformMethodDoNotEagerLoadsRelationsForWhichAnIncludeMethodExists()
+    {
+        $this->transformFactory->shouldReceive('make')->andReturn([]);
+        $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
+        $model->shouldReceive('load')->andReturnSelf();
+        // It's not possible to easily mock method_exists with mockery so we must rely on a stub
+        $this->resource->shouldReceive('getTransformer')->andReturn(new TransformerWithIncludeMethods());
+
+        $this->builder->resource()->with($relations = ['foo', 'bar'])->transform();
+
+        $model->shouldHaveReceived('load')->with(['foo'])->once();
+        $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
+            'includes' => ['foo', 'bar', 'baz'],
+            'excludes' => [],
+            'fieldsets' => [],
+        ])->once();
+    }
+
+    /**
      * Assert that the [only] method sets the filtered fields that are sent to the
      * [TransformFactory].
      */
@@ -347,5 +398,19 @@ class TransformBuilderTest extends TestCase
             'excludes' => [],
             'fieldsets' => ['foo', 'bar', 'baz'],
         ])->once();
+    }
+}
+
+class TransformerWithIncludeMethods extends Transformer {
+    protected $relations = ['foo', 'bar'];
+
+    protected $load = ['baz'];
+
+    public function includeBar() {
+        //
+    }
+
+    public function includeBaz() {
+        //
     }
 }

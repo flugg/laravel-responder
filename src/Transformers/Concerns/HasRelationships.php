@@ -21,7 +21,7 @@ trait HasRelationships
      *
      * @var string[]
      */
-    protected $relations = ['*'];
+    protected $relations = [];
 
     /**
      * A list of autoloaded default relations.
