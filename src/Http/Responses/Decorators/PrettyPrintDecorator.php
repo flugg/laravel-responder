@@ -30,4 +30,3 @@ class PrettyPrintDecorator extends ResponseDecorator
         return $response;
     }
 }
-}

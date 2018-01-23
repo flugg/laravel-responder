@@ -272,7 +272,8 @@ class TransformBuilder
         $this->with(Collection::make($transformer->defaultRelations())
             ->filter(function ($constrain, $relation) use ($relations) {
                 return ! in_array(is_numeric($relation) ? $constrain : $relation, $relations);
-            })->all());
+            })
+            ->all());
     }
 
     /**
@@ -289,29 +290,24 @@ class TransformBuilder
     }
 
     /**
-     * Remove parameters from relations that must be eager loaded and
-     * filter out the relations which have an includeXxx method.
+     * Remove parameters from relations that must be eager loaded and filter
+     * out the relations which have an includeXxx method.
      *
-     * @param array                                                             $relations
-     * @param \Flugg\Responder\Transformers\Transformer|callable|string|null    $transformer
+     * @param array                                                          $relations
+     * @param \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
      * @return array
      */
     protected function prepareEagerLoadableRelations(array $relations, $transformer): array
     {
         $cleanedRelations = [];
+
         foreach ($relations as $key => $value) {
-            // Strip out parameters from relation name
             $relationName = explode(':', is_numeric($key) ? $value : $key)[0];
-            // Ignores all relation which have a includeXxx method
-            // method_exists does not care if the $transformer is actually an object or not
             if (method_exists($transformer, 'include' . ucfirst($relationName))) {
                 continue;
             }
 
-            // If the key is numeric, value is the relation name: return it
-            // Otherwise the key is the relation name and the value is a custom scope:
-            //  return the relation with the value untouched
-            if(is_numeric($key)) {
+            if (is_numeric($key)) {
                 $cleanedRelations[$key] = $relationName;
             } else {
                 $cleanedRelations[$relationName] = $value;
