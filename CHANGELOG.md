@@ -163,7 +163,7 @@ Version `2.0.0` has been a complete rewrite of the package and brings a lot new 
 * Added a shortcut `-m` to the `--model` modifier of the `make:transformer` command
 * Added a `--plain` (and `-p`) option to `make:transformer` to make plain transformers
 * Added possibility to bind transformers to models using the `TransformerResolver` class
-* Added possibility to bind error messages to error codes using tne `ErrorMessageResolver` class
+* Added possibility to bind error messages to error codes using the `ErrorMessageResolver` class
 * Decoupled Fractal from the package by introducing a `TransformFactory` adapter
 * Changed `success` to transform using an item resource if passed a has-one relation
 * Added a `resource` method to the base `Transformer` for creating related resources
