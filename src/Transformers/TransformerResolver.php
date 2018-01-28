@@ -6,7 +6,6 @@ use Flugg\Responder\Contracts\Transformable;
 use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
 use Flugg\Responder\Exceptions\InvalidTransformerException;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Support\Arrayable;
 use Traversable;
 
 /**
@@ -19,13 +18,6 @@ use Traversable;
 class TransformerResolver implements TransformerResolverContract
 {
     /**
-     * A container used to resolve transformers.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    protected $container;
-
-    /**
      * Transformable to transformer mappings.
      *
      * @var array
@@ -33,13 +25,29 @@ class TransformerResolver implements TransformerResolverContract
     protected $bindings = [];
 
     /**
+     * A container used to resolve transformers.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
+     * A fallback transformer to return when no transformer can be resolved.
+     *
+     * @var \Flugg\Responder\Transformers\Transformer|string|callable
+     */
+    protected $fallback;
+
+    /**
      * Construct the resolver class.
      *
-     * @param \Illuminate\Contracts\Container\Container $container
+     * @param \Illuminate\Contracts\Container\Container                 $container
+     * @param \Flugg\Responder\Transformers\Transformer|string|callable $fallback
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container, $fallback)
     {
         $this->container = $container;
+        $this->fallback = $fallback;
     }
 
     /**
@@ -84,27 +92,9 @@ class TransformerResolver implements TransformerResolverContract
      */
     public function resolveFromData($data)
     {
-        $transformable = $this->resolveTransformable($data);
-        $transformer = $this->resolveTransformer($transformable);
+        $transformer = $this->resolveTransformer($this->resolveTransformableItem($data));
 
         return $this->resolve($transformer);
-    }
-
-    /**
-     * Resolve a transformable from the given data.
-     *
-     * @param  mixed $data
-     * @return mixed
-     */
-    protected function resolveTransformable($data)
-    {
-        if (is_array($data) || $data instanceof Traversable) {
-            foreach ($data as $item) {
-                return $item;
-            }
-        }
-
-        return $data;
     }
 
     /**
@@ -123,18 +113,23 @@ class TransformerResolver implements TransformerResolverContract
             return $transformable->transformer();
         }
 
-        return $this->resolveFallbackTransformer();
+        return $this->resolve($this->fallback);
     }
 
     /**
-     * Resolve a fallback closure transformer just returning the data directly.
+     * Resolve a transformable item from the given data.
      *
-     * @return callable
+     * @param  mixed $data
+     * @return mixed
      */
-    protected function resolveFallbackTransformer()
+    protected function resolveTransformableItem($data)
     {
-        return function ($data) {
-            return $data instanceof Arrayable ? $data->toArray() : $data;
-        };
+        if (is_array($data) || $data instanceof Traversable) {
+            foreach ($data as $item) {
+                return $item;
+            }
+        }
+
+        return $data;
     }
 }

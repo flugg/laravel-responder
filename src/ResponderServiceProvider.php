@@ -170,7 +170,7 @@ class ResponderServiceProvider extends BaseServiceProvider
     protected function registerTransformerBindings()
     {
         $this->app->singleton(TransformerResolverContract::class, function ($app) {
-            return $app->make(TransformerResolver::class);
+            return new TransformerResolver($app, $app->config['responder.fallback_transformer']);
         });
 
         BaseTransformer::containerResolver(function () {
@@ -222,8 +222,7 @@ class ResponderServiceProvider extends BaseServiceProvider
             $relations = $request->input($this->app->config['responder.load_relations_parameter'], []);
             $fieldsets = $request->input($app->config['responder.filter_fields_parameter'], []);
 
-            return (new TransformBuilder($app->make(ResourceFactoryContract::class), $app->make(TransformFactoryContract::class), $app->make(PaginatorFactoryContract::class)))
-                ->serializer($app->make(SerializerAbstract::class))
+            return (new TransformBuilder($app->make(ResourceFactoryContract::class), $app->make(TransformFactoryContract::class), $app->make(PaginatorFactoryContract::class)))->serializer($app->make(SerializerAbstract::class))
                 ->with(is_string($relations) ? explode(',', $relations) : $relations)
                 ->only($fieldsets);
         });

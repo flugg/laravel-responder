@@ -36,6 +36,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Fallback Transformer
+    |--------------------------------------------------------------------------
+    |
+    | When transforming data without specifying a transformer we'll instead
+    | use a fallback transformer specified below. The [ArrayTransformer]
+    | transformer will simply convert the data to an array untouched.
+    |
+    */
+
+    'fallback_transformer' => \Flugg\Responder\Transformers\ArrayTransformer::class,
+
+    /*
+    |--------------------------------------------------------------------------
     | Autoload Relationships With Query String
     |--------------------------------------------------------------------------
     |

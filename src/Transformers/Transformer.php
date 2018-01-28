@@ -3,6 +3,7 @@
 namespace Flugg\Responder\Transformers;
 
 use Closure;
+use Flugg\Responder\Contracts\Transformers\TransformerResolver;
 use Flugg\Responder\Transformers\Concerns\HasRelationships;
 use Flugg\Responder\Transformers\Concerns\MakesResources;
 use Flugg\Responder\Transformers\Concerns\OverridesFractal;

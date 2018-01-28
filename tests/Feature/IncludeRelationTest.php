@@ -23,9 +23,35 @@ class IncludeRelationTest extends TestCase
      */
     public function testIncludeRelations()
     {
-        $response = responder()->success($this->product)->with('shipments')->respond();
+        $response = responder()->success($this->product, ProductTransformer::class)->with('shipments')->respond();
 
         $this->assertEquals($this->responseData(array_merge($this->product->toArray(), [
+            'shipments' => [$this->shipment->toArray()],
+        ])), $response->getData(true));
+    }
+
+    /**
+     * Assert that it for safety reasons wont include relations if no transformer is provided.
+     */
+    public function testItWontIncludeRelationsWithoutATransformerSpecified()
+    {
+        $response = responder()->success($this->product)->with('shipments')->respond();
+
+        $this->assertEquals($this->responseData($this->product->toArray()), $response->getData(true));
+    }
+
+    /**
+     * Assert that you cannot include relationships not specified in the $relations property
+     * of a transformer class when given a dedicated transformer.
+     */
+    public function testItOnlyIncludesWhitelistedRelations()
+    {
+        $response = responder()
+            ->success($this->product, ProductWithShipmentsWhitelistedTransformer::class)
+            ->with('shipments', 'orders.customer', 'invalid')
+            ->respond();
+
+        $this->assertEquals($this->responseData(array_merge($this->product->fresh()->toArray(), [
             'shipments' => [$this->shipment->toArray()],
         ])), $response->getData(true));
     }
@@ -37,7 +63,7 @@ class IncludeRelationTest extends TestCase
     {
         $shipment = $this->product->shipments()->create(['created_at' => Carbon::tomorrow()]);
 
-        $response = responder()->success($this->product)->with([
+        $response = responder()->success($this->product, ProductTransformer::class)->with([
             'shipments' => function ($query) {
                 $query->where('created_at', '>', Carbon::now());
             },
@@ -53,7 +79,10 @@ class IncludeRelationTest extends TestCase
      */
     public function testIncludeNestedRelations()
     {
-        $response = responder()->success($this->product)->with('shipments', 'orders.customer')->respond();
+        $response = responder()
+            ->success($this->product, ProductTransformer::class)
+            ->with('shipments', 'orders.customer')
+            ->respond();
 
         $this->assertEquals($this->responseData(array_merge($this->product->toArray(), [
             'shipments' => [$this->shipment->toArray()],
@@ -75,7 +104,7 @@ class IncludeRelationTest extends TestCase
         $request->shouldReceive('input')->with('only', [])->andReturn([]);
         $request->shouldReceive('query')->andReturn([]);
 
-        $response = responder()->success($this->product)->respond();
+        $response = responder()->success($this->product, ProductTransformer::class)->respond();
 
         $this->assertEquals($this->responseData(array_merge($this->product->toArray(), [
             'shipments' => [$this->shipment->toArray()],
@@ -84,22 +113,6 @@ class IncludeRelationTest extends TestCase
                     'customer' => $this->customer->toArray(),
                 ]),
             ],
-        ])), $response->getData(true));
-    }
-
-    /**
-     * Assert that you cannot include relationships not specified in the $relations property
-     * of a transformer class when given a dedicated transformer.
-     */
-    public function testItOnlyIncludesWhitelistedRelations()
-    {
-        $response = responder()
-            ->success($this->product, ProductWithShipmentsWhitelistedTransformer::class)
-            ->with('shipments', 'orders.customer', 'invalid')
-            ->respond();
-
-        $this->assertEquals($this->responseData(array_merge($this->product->fresh()->toArray(), [
-            'shipments' => [$this->shipment->toArray()],
         ])), $response->getData(true));
     }
 

@@ -73,7 +73,7 @@ class ResourceKeyResolver implements ResourceKeyResolverContract
     }
 
     /**
-     * Resolve a transformable from the given data.
+     * Resolve a transformable item from the given data.
      *
      * @param  mixed $data
      * @return mixed

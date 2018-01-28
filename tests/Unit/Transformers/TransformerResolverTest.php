@@ -29,6 +29,13 @@ class TransformerResolverTest extends TestCase
     protected $container;
 
     /**
+     * A mock of a [Transformer] class.
+     *
+     * @var \Mockery\MockInterface
+     */
+    protected $fallbackTransformer;
+
+    /**
      * The [TransformerResolver] class being tested.
      *
      * @var \Flugg\Responder\Transformers\TransformerResolver
@@ -45,7 +52,8 @@ class TransformerResolverTest extends TestCase
         parent::setUp();
 
         $this->container = Mockery::mock(Container::class);
-        $this->resolver = new TransformerResolver($this->container);
+        $this->fallbackTransformer = $this->mockTransformer();
+        $this->resolver = new TransformerResolver($this->container, get_class($this->fallbackTransformer));
     }
 
     /**
@@ -139,15 +147,13 @@ class TransformerResolverTest extends TestCase
      * Assert that the [resolveFromData] method resolves an automatic closure transformer if no other
      * can be resolved.
      */
-    public function testResolveFromDataMethodShouldResolveAClosureTransformerAsFallback()
+    public function testResolveFromDataMethodShouldResolveAFallbackTransformer()
     {
-        $model = Mockery::mock(Arrayable::class);
-        $model->shouldReceive('toArray')->andReturn($data = ['foo']);
+        $model = Mockery::mock(Model::class);
+        $this->container->shouldReceive('make')->andReturn($this->fallbackTransformer);
 
         $result = $this->resolver->resolveFromData($model);
 
-        $this->assertTrue(is_callable($result));
-        $this->assertSame($data, $result($model));
-        $this->assertSame($data, $result($data));
+        $this->assertSame($this->fallbackTransformer, $result);
     }
 }
