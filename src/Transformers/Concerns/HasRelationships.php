@@ -103,7 +103,7 @@ trait HasRelationships
      */
     protected function getQueryConstraint(string $relation)
     {
-        if (! method_exists($this, $method = 'load' . ucfirst($relation))) {
+        if (! method_exists($this, $method = 'load' . ucfirst(camel_case($relation)))) {
             return null;
         }
 
@@ -127,7 +127,7 @@ trait HasRelationships
 
         $relation = $model->$identifier;
 
-        if (method_exists($this, $method = 'filter' . ucfirst($identifier))) {
+        if (method_exists($this, $method = 'filter' . ucfirst(camel_case($identifier)))) {
             return $this->$method($relation);
         }
 
