@@ -1,6 +1,6 @@
 # 3.0.0 (2018-01-28)
 
-Version `3.0.0` contains mostly bug fixes, but also quite a lot of new features and changes. The entire relationship logic has been rewritten to improve performance, security and stability among other improvements. There has also been big focus on improving test coverage for this release and we're now right below 90% coverage.
+Version `3.0.0` contains many bug fixes, but also quite a lot of new features and changes. The entire relationship logic has been rewritten to improve performance, security and stability among other improvements. There has also been big focus on improving test coverage for this release and we're now right below 90% coverage.
 
 ### Breaking Changes
 
