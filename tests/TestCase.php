@@ -9,6 +9,8 @@ use Flugg\Responder\Resources\ResourceBuilder;
 use Flugg\Responder\ResponderServiceProvider;
 use Flugg\Responder\TransformBuilder;
 use Flugg\Responder\Transformers\Transformer;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\JsonResponse;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -29,6 +31,51 @@ abstract class TestCase extends BaseTestCase
     use MockeryPHPUnitIntegration;
 
     /**
+     * A dummy product model.
+     *
+     * @var \Flugg\Responder\Tests\Product
+     */
+    protected $product;
+
+    /**
+     * A dummy shipment model.
+     *
+     * @var \Flugg\Responder\Tests\Product
+     */
+    protected $shipment;
+
+    /**
+     * A dummy customer model.
+     *
+     * @var \Flugg\Responder\Tests\Product
+     */
+    protected $customer;
+
+    /**
+     * A dummy order model.
+     *
+     * @var \Flugg\Responder\Tests\Product
+     */
+    protected $order;
+
+    /**
+     * Setup the test environment.
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->runTestMigrations();
+
+        $this->product = Product::create()->fresh();
+        $this->shipment = Shipment::create(['product_id' => $this->product->id])->fresh();
+        $this->customer = Customer::create()->fresh();
+        $this->order = Order::create(['product_id' => $this->product->id, 'customer_id' => $this->customer->id]);
+    }
+
+    /**
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application $app
@@ -44,6 +91,49 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Run migrations for tables used for testing purposes.
+     *
+     * @return void
+     */
+    private function runTestMigrations()
+    {
+        $schema = $this->app['db']->connection()->getSchemaBuilder();
+
+        if (! $schema->hasTable('products')) {
+            $schema->create('products', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('name')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('shipments')) {
+            $schema->create('shipments', function (Blueprint $table) {
+                $table->increments('id');
+                $table->unsignedInteger('product_id');
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('orders')) {
+            $schema->create('orders', function (Blueprint $table) {
+                $table->increments('id');
+                $table->unsignedInteger('product_id');
+                $table->unsignedInteger('customer_id');
+                $table->timestamps();
+            });
+        }
+
+        if (! $schema->hasTable('customers')) {
+            $schema->create('customers', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('name')->nullable();
+                $table->timestamps();
+            });
+        }
+    }
+
+    /**
      * Get package service providers.
      *
      * @param \Illuminate\Foundation\Application $app
@@ -54,6 +144,23 @@ abstract class TestCase extends BaseTestCase
         return [
             ResponderServiceProvider::class,
         ];
+    }
+
+    /**
+     * Merge given data with the skeleton of a serialization using the default [SuccessSerializer].
+     *
+     * @param  null  $data
+     * @param  array $meta
+     * @param  int   $status
+     * @return array
+     */
+    protected function responseData($data = null, $meta = [], $status = 200): array
+    {
+        return array_merge([
+            'status' => $status,
+            'success' => true,
+            'data' => $data,
+        ], $meta);
     }
 
     /**
@@ -170,5 +277,107 @@ abstract class TestCase extends BaseTestCase
         $resource->shouldReceive('setPaginator')->andReturnSelf()->byDefault();
 
         return $resource;
+    }
+}
+
+class Product extends Model
+{
+    protected $guarded = [];
+    protected $table = 'products';
+
+    public function shipments()
+    {
+        return $this->hasMany(Shipment::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+}
+
+class Shipment extends Model
+{
+    protected $guarded = [];
+    protected $table = 'shipments';
+    protected $casts = [
+        'product_id' => 'int',
+    ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+}
+
+class Order extends Model
+{
+    protected $guarded = [];
+    protected $table = 'orders';
+    protected $casts = [
+        'product_id' => 'int',
+        'customer_id' => 'int',
+    ];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+}
+
+class Customer extends Model
+{
+    protected $guarded = [];
+    protected $table = 'customers';
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+}
+
+class ProductTransformer extends Transformer
+{
+    protected $relations = [
+        'shipments' => ShipmentTransformer::class,
+        'orders' => OrderTransformer::class,
+    ];
+
+    public function transform(Product $product)
+    {
+        return $product->fresh()->toArray();
+    }
+}
+
+class ShipmentTransformer extends Transformer
+{
+    public function transform(Shipment $shipment)
+    {
+        return $shipment->fresh()->toArray();
+    }
+}
+
+class OrderTransformer extends Transformer
+{
+    protected $relations = [
+        'customer' => CustomerTransformer::class,
+    ];
+
+    public function transform(Order $order)
+    {
+        return $order->fresh()->toArray();
+    }
+}
+
+class CustomerTransformer extends Transformer
+{
+    public function transform(Customer $customer)
+    {
+        return $customer->fresh()->toArray();
     }
 }
