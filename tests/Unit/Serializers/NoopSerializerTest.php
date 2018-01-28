@@ -2,25 +2,25 @@
 
 namespace Flugg\Responder\Tests\Unit\Serializers;
 
-use Flugg\Responder\Serializers\NullSerializer;
+use Flugg\Responder\Serializers\NoopSerializer;
 use Flugg\Responder\Tests\TestCase;
 use League\Fractal\Pagination\CursorInterface;
 use League\Fractal\Pagination\PaginatorInterface;
 use Mockery;
 
 /**
- * Unit tests for the [Flugg\Responder\Serializers\NullSerializer] class.
+ * Unit tests for the [Flugg\Responder\Serializers\NoopSerializer] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class NullSerializerTest extends TestCase
+class NoopSerializerTest extends TestCase
 {
     /**
-     * The [NullSerializer] class being tested.
+     * The [NoopSerializer] class being tested.
      *
-     * @var \Flugg\Responder\Serializers\NullSerializer
+     * @var \Flugg\Responder\Serializers\NoopSerializer
      */
     protected $serializer;
 
@@ -33,7 +33,7 @@ class NullSerializerTest extends TestCase
     {
         parent::setUp();
 
-        $this->serializer = new NullSerializer;
+        $this->serializer = new NoopSerializer;
     }
 
     /**

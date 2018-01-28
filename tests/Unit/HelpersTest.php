@@ -3,8 +3,9 @@
 namespace Flugg\Responder\Tests\Unit;
 
 use Flugg\Responder\Contracts\Responder;
-use Flugg\Responder\Contracts\Transformer;
+use Flugg\Responder\Contracts\SimpleTransformer;
 use Flugg\Responder\Tests\TestCase;
+use Flugg\Responder\TransformBuilder;
 use Mockery;
 
 /**
@@ -24,7 +25,7 @@ class HelpersTest extends TestCase
     protected $responder;
 
     /**
-     * A mock of a [Transformer] service class.
+     * A mock of a [SimpleTransformer] service class.
      *
      * @var \Mockery\MockInterface
      */
@@ -42,8 +43,8 @@ class HelpersTest extends TestCase
         $this->responder = Mockery::mock(Responder::class);
         $this->app->instance(Responder::class, $this->responder);
 
-        $this->transformer = Mockery::mock(Transformer::class);
-        $this->app->instance(Transformer::class, $this->transformer);
+        $this->transformer = Mockery::mock(SimpleTransformer::class);
+        $this->app->instance(SimpleTransformer::class, $this->transformer);
     }
 
     /**
@@ -61,13 +62,13 @@ class HelpersTest extends TestCase
      * Assert that the [transform] function should use the transformer service to transform
      * the data.
      */
-    public function testTransformFunctionShouldTransformData()
+    public function testTransformationFunctionShouldTransformUsingSimpleTransformerService()
     {
-        $this->transformer->shouldReceive('transform')->andReturn($transformedData = ['bar' => 2]);
+        $this->transformer->shouldReceive('make')->andReturn($transformBuilder = $this->mockTransformBuilder());
 
-        $result = transform($data = ['foo' => 1], $transformer = $this->mockTransformer(), $with = ['foo'], $without = ['bar']);
+        $result = transformation($data = ['foo' => 1], $transformer = $this->mockTransformer());
 
-        $this->assertEquals($transformedData, $result);
-        $this->transformer->shouldHaveReceived('transform')->with($data, $transformer, $with, $without);
+        $this->assertSame($transformBuilder, $result);
+        $this->transformer->shouldHaveReceived('make')->with($data, $transformer);
     }
 }

@@ -2,18 +2,19 @@
 
 namespace Flugg\Responder\Tests\Unit;
 
-use Flugg\Responder\Serializers\NullSerializer;
+use Flugg\Responder\Serializers\NoopSerializer;
+use Flugg\Responder\SimpleTransformer;
 use Flugg\Responder\Tests\TestCase;
 use Flugg\Responder\Transformer;
 
 /**
- * Unit tests for the [Flugg\Responder\Transformer] class.
+ * Unit tests for the [Flugg\Responder\SimpleTransformer] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformerTest extends TestCase
+class SimpleTransformerTest extends TestCase
 {
     /**
      * A mock of a [TransformBuilder] class.
@@ -23,7 +24,7 @@ class TransformerTest extends TestCase
     protected $transformBuilder;
 
     /**
-     * The [Transformer] service class being tested.
+     * The [SimpleTransformer] service class being tested.
      *
      * @var \Flugg\Responder\Transformer
      */
@@ -39,7 +40,7 @@ class TransformerTest extends TestCase
         parent::setUp();
 
         $this->transformBuilder = $this->mockTransformBuilder();
-        $this->transformer = new Transformer($this->transformBuilder);
+        $this->transformer = new SimpleTransformer($this->transformBuilder);
     }
 
     /**
@@ -48,14 +49,10 @@ class TransformerTest extends TestCase
      */
     public function testTransformMethodShouldCallOnTransformBuilder()
     {
-        $transformer = $transformer = $this->mockTransformer();
-        $this->transformBuilder->shouldReceive('transform')->andReturn($data = ['foo' => 1]);
+        $transformation = $this->transformer->make($data = ['foo' => 1], $transformer = $this->mockTransformer());
 
-        $transformation = $this->transformer->transform($data, $transformer, $relations = ['foo', 'bar']);
-
-        $this->assertEquals($data, $transformation);
+        $this->assertSame($this->transformBuilder, $transformation);
         $this->transformBuilder->shouldHaveReceived('resource')->with($data, $transformer)->once();
-        $this->transformBuilder->shouldHaveReceived('serializer')->with(NullSerializer::class)->once();
-        $this->transformBuilder->shouldHaveReceived('with')->with($relations)->once();
+        $this->transformBuilder->shouldHaveReceived('serializer')->with(NoopSerializer::class)->once();
     }
 }
