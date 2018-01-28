@@ -1,3 +1,37 @@
+# 2.0.14 (2018-01-23)
+
+### Features
+
+* Added support for Laravel 5.6
+
+### Bug Fixes
+
+* Removed extra end bracket in `PrettyPrintDecorator`
+
+# 2.0.13 (2018-01-23)
+
+### Features
+
+* Added support for PHP 7.2
+* Added two new optional decorators: `PrettyPrintDecorator` and `EscapeHtmlDecorator`
+
+### Security Fixes
+
+* New transformers now has an empty array as whitelisted relations instead of a wildcard
+
+### Bug Fixes
+
+* Parameters are stripped away from relations before eager loading
+* Changed `TransformFactory` from singleton to a normal binding
+* `NullSerializer` now returns `null` instead of an empty array on null resources
+* Relations that have an "include" method in a transformer is no longer eager loaded
+
+# 2.0.12 (2017-10-17)
+
+### Bug Fixes
+
+* Remove `string` typehint for `$errorCode`
+
 # 2.0.11 (2017-09-23)
 
 ### Bug Fixes
@@ -129,7 +163,7 @@ Version `2.0.0` has been a complete rewrite of the package and brings a lot new 
 * Added a shortcut `-m` to the `--model` modifier of the `make:transformer` command
 * Added a `--plain` (and `-p`) option to `make:transformer` to make plain transformers
 * Added possibility to bind transformers to models using the `TransformerResolver` class
-* Added possibility to bind error messages to error codes using tne `ErrorMessageResolver` class
+* Added possibility to bind error messages to error codes using the `ErrorMessageResolver` class
 * Decoupled Fractal from the package by introducing a `TransformFactory` adapter
 * Changed `success` to transform using an item resource if passed a has-one relation
 * Added a `resource` method to the base `Transformer` for creating related resources
