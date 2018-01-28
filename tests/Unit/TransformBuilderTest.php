@@ -303,11 +303,14 @@ class TransformBuilderTest extends TestCase
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
         $model->shouldReceive('load')->andReturnSelf();
         $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
-        $transformer->shouldReceive('defaultRelations')->andReturn($default = ['baz']);
+        $transformer->shouldReceive('whitelistedRelations')->andReturn(['foo' => null, 'bar' => null]);
+        $transformer->shouldReceive('defaultRelations')->andReturn(['baz' => null]);
 
         $this->builder->resource()->with($relations = ['foo' => function () { }, 'bar'])->transform();
 
-        $model->shouldHaveReceived('load')->with(array_merge($relations, $default))->once();
+        $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+            return array_has($argument, ['foo', 'bar', 'baz']);
+        }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo', 'bar', 'baz'],
             'excludes' => [],
@@ -317,20 +320,22 @@ class TransformBuilderTest extends TestCase
 
     /**
      * Assert that the [transform] method extracts default relationships from transformer and
-     * automatically eager loads all relationships even when the relation name contains include parameters.
+     * automatically eager loads all relationships even when the relation name contains
+     * inclusion parameters separated with a colon.
      */
-    public function testTransformMethodExtractsAndEagerLoadsRelationsWhenThereAreRelationParameters()
+    public function testTransformMethodExtractsAndEagerLoadsRelationsWithParameters()
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
         $model->shouldReceive('load')->andReturnSelf();
         $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
+        $transformer->shouldReceive('whitelistedRelations')->andReturn(['foo' => null, 'bar' => null]);
         $transformer->shouldReceive('defaultRelations')->andReturn([]);
 
-        $this->builder->resource()->with(['foo:first(aa|bb)', 'bar:second(cc|dd)' => function () { }])->transform();
+        $this->builder->resource()->with(['foo:first(aa|bb)', 'bar:second(cc|dd)'])->transform();
 
-        $model->shouldHaveReceived('load')->with(Mockery::on(function (array $relations) {
-            return ($relations[0] == 'foo') && ($relations['bar'] instanceof \Closure);
+        $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+            return array_has($argument, ['foo', 'bar']);
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo:first(aa|bb)', 'bar:second(cc|dd)'],
@@ -342,25 +347,26 @@ class TransformBuilderTest extends TestCase
     /**
      * Assert that the [transform] method doesn't eager load relations not present in the $relations list.
      */
-    /*public function testTransformMethodDoesntEagerLoadNonListedRelations()
+    public function testTransformMethodDoesntEagerLoadNonListedRelations()
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
         $model->shouldReceive('load')->andReturnSelf();
-        $this->resource->shouldReceive('getTransformer')->andReturn($transformer = new class extends Transformer
-        {
-            protected $relations = ['foo'];
-        });
+        $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
+        $transformer->shouldReceive('whitelistedRelations')->andReturn(['foo' => null]);
+        $transformer->shouldReceive('defaultRelations')->andReturn([]);
 
         $this->builder->resource()->with(['foo', 'bar'])->transform();
 
-        $model->shouldHaveReceived('load')->with(['foo'])->once();
+        $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+            return array_has($argument, 'foo') && count($argument) === 1;
+        }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo'],
             'excludes' => [],
             'fieldsets' => [],
         ])->once();
-    }*/
+    }
 
     /**
      * Assert that the [transform] method doesn't eager load relations which has an include method.
@@ -370,18 +376,18 @@ class TransformBuilderTest extends TestCase
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
         $model->shouldReceive('load')->andReturnSelf();
-        $this->resource->shouldReceive('getTransformer')->andReturn(new class extends Transformer
-        {
-            protected $relations = ['foo', 'bar'];
-            protected $load = ['baz'];
-
-            public function includeBar() { }
-            public function includeBaz() { }
-        });
+        $transformer = Mockery::mock(TransformerWithIncludeMethods::class);
+        $this->resource->shouldReceive('getTransformer')->andReturn($transformer);
+        $transformer->shouldReceive([
+            'whitelistedRelations' => ['foo' => null, 'bar' => null],
+            'defaultRelations' => ['baz' => null],
+        ]);
 
         $this->builder->resource()->with($relations = ['foo', 'bar'])->transform();
 
-        $model->shouldHaveReceived('load')->with(['foo'])->once();
+        $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+            return array_has($argument, 'foo') && count($argument) === 1;
+        }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo', 'bar', 'baz'],
             'excludes' => [],
@@ -422,4 +428,11 @@ class TransformBuilderTest extends TestCase
             'fieldsets' => ['foo', 'bar', 'baz'],
         ])->once();
     }
+}
+
+class TransformerWithIncludeMethods extends Transformer
+{
+    public function includeBar() { }
+
+    public function includeBaz() { }
 }

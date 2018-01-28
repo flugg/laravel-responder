@@ -12,7 +12,6 @@ use Flugg\Responder\Exceptions\Http\ResourceNotFoundException;
 use Flugg\Responder\Exceptions\Http\UnauthenticatedException;
 use Flugg\Responder\Exceptions\Http\UnauthorizedException;
 use Flugg\Responder\Exceptions\Http\ValidationFailedException;
-use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
 use Flugg\Responder\Tests\TestCase;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;

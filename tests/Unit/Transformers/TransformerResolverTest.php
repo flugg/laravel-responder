@@ -76,7 +76,7 @@ class TransformerResolverTest extends TestCase
      */
     public function testResolveMethodShouldReturnTransformerIfClosure()
     {
-        $result = $this->resolver->resolve($transformer = function () {});
+        $result = $this->resolver->resolve($transformer = function () { });
 
         $this->assertSame($transformer, $result);
     }

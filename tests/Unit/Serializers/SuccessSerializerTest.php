@@ -6,7 +6,6 @@ use Flugg\Responder\Serializers\SuccessSerializer;
 use Flugg\Responder\Tests\TestCase;
 use League\Fractal\Pagination\CursorInterface;
 use League\Fractal\Pagination\PaginatorInterface;
-use League\Fractal\Resource\Item;
 use Mockery;
 
 /**
