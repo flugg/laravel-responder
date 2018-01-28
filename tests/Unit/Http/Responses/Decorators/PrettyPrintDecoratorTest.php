@@ -22,7 +22,7 @@ class PrettyPrintDecoratorTest extends TestCase
     protected $responseFactory;
 
     /**
-     * The [StatusCodeResponseDecorator] class being tested.
+     * The [PrettyPrintDecorator] class being tested.
      *
      * @var \Flugg\Responder\Http\Responses\Decorators\PrettyPrintDecorator
      */
@@ -42,7 +42,8 @@ class PrettyPrintDecoratorTest extends TestCase
     }
 
     /**
-     * Assert that the [make] method decorates the response data setting the pretty print JSON option.
+     * Assert that the [make] method decorates the response data setting the pretty print
+     * JSON option.
      */
     public function testMakeMethodShouldPrettyPrintResponseData()
     {

@@ -3,6 +3,7 @@
 namespace Flugg\Responder\Tests\Feature;
 
 use Carbon\Carbon;
+use Flugg\Responder\Tests\OrderTransformer;
 use Flugg\Responder\Tests\Product;
 use Flugg\Responder\Tests\ProductTransformer;
 use Flugg\Responder\Tests\TestCase;
@@ -59,7 +60,7 @@ class IncludeRelationTest extends TestCase
     /**
      * Assert that you can include associated resources including a query constraint.
      */
-    public function testIncludeRelationsWithQueryConstrains()
+    public function testIncludeRelationsWithQueryConstraints()
     {
         $shipment = $this->product->shipments()->create(['created_at' => Carbon::tomorrow()]);
 
@@ -126,6 +127,11 @@ class IncludeRelationTest extends TestCase
 
         $this->assertEquals($this->responseData(array_merge($this->product->toArray(), [
             'shipments' => [$this->shipment->toArray()],
+            'orders' => [
+                array_merge($this->order->toArray(), [
+                    'customer' => $this->customer->toArray(),
+                ]),
+            ],
         ])), $response->getData(true));
     }
 
@@ -136,10 +142,12 @@ class IncludeRelationTest extends TestCase
     {
         $response = responder()
             ->success($this->product, ProductWithShipmentsAutoloadedTransformer::class)
-            ->without('shipments')
+            ->without('shipments', 'orders.customer')
             ->respond();
 
-        $this->assertEquals($this->responseData(array_merge($this->product->toArray())), $response->getData(true));
+        $this->assertEquals($this->responseData(array_merge($this->product->toArray(), [
+            'orders' => [$this->order->toArray()],
+        ])), $response->getData(true));
     }
 
     /**
@@ -180,6 +188,42 @@ class IncludeRelationTest extends TestCase
             'orders' => [$this->order->toArray()],
         ])), $response->getData(true));
     }
+
+    /**
+     * Assert that it loads relations with query constraints from a "load" method
+     * on the transformer if it's defined.
+     */
+    public function testIncludeRelationsWithQueryConstraintsFromLoadMethod()
+    {
+        $shipment = $this->product->shipments()->create(['created_at' => Carbon::tomorrow()]);
+
+        $response = responder()
+            ->success($this->product, ProductWithLoadMethodTransformer::class)
+            ->with('shipments')
+            ->respond();
+
+        $this->assertEquals($this->responseData(array_merge($this->product->toArray(), [
+            'shipments' => [$shipment->toArray()],
+        ])), $response->getData(true));
+    }
+
+    /**
+     * Assert that you can filter relations after they've been loaded with a "filter"
+     * method on the transformer.
+     */
+    public function testFilterRelationsWithFilterMethod()
+    {
+        $shipment = $this->product->shipments()->create(['created_at' => Carbon::tomorrow()]);
+
+        $response = responder()
+            ->success($this->product, ProductWithFilterMethodTransformer::class)
+            ->with('shipments')
+            ->respond();
+
+        $this->assertEquals($this->responseData(array_merge($this->product->toArray(), [
+            'shipments' => [$shipment->toArray()],
+        ])), $response->getData(true));
+    }
 }
 
 class ProductWithShipmentsWhitelistedTransformer extends ProductTransformer
@@ -189,7 +233,12 @@ class ProductWithShipmentsWhitelistedTransformer extends ProductTransformer
 
 class ProductWithShipmentsAutoloadedTransformer extends ProductTransformer
 {
-    protected $load = ['shipments'];
+    protected $load = ['shipments', 'orders' => OrderWithCustomerAutoloadedTransformer::class];
+}
+
+class OrderWithCustomerAutoloadedTransformer extends OrderTransformer
+{
+    protected $load = ['customer'];
 }
 
 class ProductWithIncludeMethodTransformer extends ProductTransformer
@@ -199,5 +248,27 @@ class ProductWithIncludeMethodTransformer extends ProductTransformer
     public function includeShipments(Product $product)
     {
         return $product->shipments;
+    }
+}
+
+class ProductWithLoadMethodTransformer extends ProductTransformer
+{
+    protected $relations = ['shipments', 'orders'];
+
+    public function loadShipments($query)
+    {
+        return $query->where('created_at', '>', Carbon::now());
+    }
+}
+
+class ProductWithFilterMethodTransformer extends ProductTransformer
+{
+    protected $relations = ['shipments', 'orders'];
+
+    public function filterShipments($shipments)
+    {
+        return $shipments->filter(function ($shipment) {
+            return $shipment->created_at > Carbon::now();
+        });
     }
 }

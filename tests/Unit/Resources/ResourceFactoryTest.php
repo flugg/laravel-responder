@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use League\Fractal\Resource\NullResource;
+use League\Fractal\Resource\Primitive;
 use Mockery;
 
 /**
@@ -121,7 +122,25 @@ class ResourceFactoryTest extends TestCase
     }
 
     /**
-     * Assert that the [make] method makes a [Item] resource when given an array.
+     * Assert that the [make] method makes a [Primitive] resource when given a scalar.
+     */
+    public function testMakeMethodShouldMakePrimitiveResourcesWhenGivenAScalar()
+    {
+        $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
+        $this->normalizer->shouldReceive('normalize')->andReturn($data = 'foo');
+
+        $resource = $this->factory->make($data, $transformer, $resourceKey = 'bar');
+
+        $this->assertInstanceOf(Primitive::class, $resource);
+        $this->assertEquals($data, $resource->getData());
+        $this->assertSame($transformer, $resource->getTransformer());
+        $this->assertEquals($resourceKey, $resource->getResourceKey());
+        $this->normalizer->shouldHaveReceived('normalize')->with($data)->once();
+        $this->transformerResolver->shouldHaveReceived('resolve')->with($transformer)->once();
+    }
+
+    /**
+     * Assert that the [make] method makes a [Item] resource when given an array with scalars.
      */
     public function testMakeMethodShouldMakeItemResourcesWhenGivenArraysWithScalars()
     {
