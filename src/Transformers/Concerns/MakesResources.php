@@ -57,7 +57,7 @@ trait MakesResources
     {
         $transformer = $this->getRelatedTransformerName($identifier);
 
-        if (method_exists($this, $method = 'include' . ucfirst($identifier))) {
+        if (method_exists($this, $method = 'include' . ucfirst(camel_case($identifier)))) {
             $resource = $this->resource($this->$method($data, collect($parameters)), $transformer, $identifier);
         } elseif ($data instanceof Model) {
             $resource = $this->includeResourceFromModel($data, $identifier, $transformer);

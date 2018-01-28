@@ -121,6 +121,10 @@ trait HasRelationships
      */
     protected function resolveRelation(Model $model, string $identifier)
     {
+        if (str_contains($identifier, '_')) {
+            $identifier = camel_case($identifier);
+        }
+
         $relation = $model->$identifier;
 
         if (method_exists($this, $method = 'filter' . ucfirst($identifier))) {

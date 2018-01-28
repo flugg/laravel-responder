@@ -168,6 +168,25 @@ class IncludeRelationTest extends TestCase
     }
 
     /**
+     * Assert that it converts snake cased relations to camel case before loading them
+     * from the model.
+     */
+    public function testItConvertsSnakeCasedRelationsToCamelCase()
+    {
+        $product = Mockery::mock($this->product);
+        $product->shouldReceive('load')->andReturnSelf();
+
+        responder()
+            ->success($product, ProductWithSnakeCasedRelationsTransformer::class)
+            ->with('whitelisted_shipments', 'default_orders')
+            ->respond();
+
+        $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+            return array_has($argument, ['whitelistedShipments', 'defaultOrders']) && count($argument) === 2;
+        }))->once();
+    }
+
+    /**
      * Assert that it loads relations from an "include" method on the transformer if it's
      * defined.
      */
@@ -239,6 +258,12 @@ class ProductWithShipmentsAutoloadedTransformer extends ProductTransformer
 class OrderWithCustomerAutoloadedTransformer extends OrderTransformer
 {
     protected $load = ['customer'];
+}
+
+class ProductWithSnakeCasedRelationsTransformer extends ProductTransformer
+{
+    protected $relations = ['whitelisted_shipments'];
+    protected $load = ['default_orders'];
 }
 
 class ProductWithIncludeMethodTransformer extends ProductTransformer

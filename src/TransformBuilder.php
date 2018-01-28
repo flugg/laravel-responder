@@ -330,6 +330,10 @@ class TransformBuilder
         $relations = collect(array_keys($requested))->reduce(function ($eagerLoads, $relation) use ($requested, $transformer) {
             $identifier = $this->stripParametersFromRelation($relation);
 
+            if (str_contains($identifier, '_')) {
+                $identifier = camel_case($identifier);
+            }
+
             if (method_exists($transformer, 'include' . ucfirst($identifier))) {
                 return $eagerLoads;
             }

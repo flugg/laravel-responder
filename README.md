@@ -15,7 +15,7 @@ Laravel Responder is a package for building API responses, integrating [Fractal]
 ***
 ### **2018 Update: Version 3.0.0 Released! 🎉**
 
-_3.0.0 has been released with tons of bug fixes, many new features and some breaking changes. Make sure to check out the [changelog](CHANGELOG.md) to get an overview of everything fresh. The [Creating Transformers](#creating-transformers) and [Transforming Data](#transforming-data) sections of the documentation has also been rewritten for clarity and to account for the new changes._
+_3.0.0 has been released with many bug fixes, tons of new features and some breaking changes. Make sure to check out the [changelog](CHANGELOG.md) to get an overview of everything fresh. The [Creating Transformers](#creating-transformers) and [Transforming Data](#transforming-data) sections of the documentation has also been rewritten for clarity and to account for the new changes._
 ***
 
 # Table of Contents
