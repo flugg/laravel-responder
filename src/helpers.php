@@ -1,7 +1,8 @@
 <?php
 
 use Flugg\Responder\Contracts\Responder;
-use Flugg\Responder\Contracts\Transformer;
+use Flugg\Responder\Contracts\SimpleTransformer;
+use Flugg\Responder\TransformBuilder;
 
 if (! function_exists('responder')) {
 
@@ -16,19 +17,17 @@ if (! function_exists('responder')) {
     }
 }
 
-if (! function_exists('transform')) {
+if (! function_exists('transformation')) {
 
     /**
      * A helper method to transform data without serializing.
      *
      * @param  mixed                                                          $data
      * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
-     * @param  string[]                                                       $with
-     * @param  string[]                                                       $without
-     * @return array|null
+     * @return \Flugg\Responder\TransformBuilder
      */
-    function transform($data = null, $transformer = null, array $with = [], array $without = [])
+    function transformation($data = null, $transformer = null): TransformBuilder
     {
-        return app(Transformer::class)->transform($data, $transformer, $with, $without);
+        return app(SimpleTransformer::class)->make($data, $transformer);
     }
 }

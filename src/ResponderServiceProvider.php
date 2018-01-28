@@ -10,8 +10,9 @@ use Flugg\Responder\Contracts\Pagination\PaginatorFactory as PaginatorFactoryCon
 use Flugg\Responder\Contracts\Resources\ResourceFactory as ResourceFactoryContract;
 use Flugg\Responder\Contracts\Resources\ResourceKeyResolver as ResourceKeyResolverContract;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
+use Flugg\Responder\Contracts\ResponseFactory;
 use Flugg\Responder\Contracts\ResponseFactory as ResponseFactoryContract;
-use Flugg\Responder\Contracts\Transformer as TransformerContract;
+use Flugg\Responder\Contracts\SimpleTransformer as SimpleTransformerContract;
 use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
 use Flugg\Responder\Contracts\TransformFactory as TransformFactoryContract;
 use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
@@ -102,9 +103,9 @@ class ResponderServiceProvider extends BaseServiceProvider
      * Decorate response factories.
      *
      * @param  \Flugg\Responder\Contracts\ResponseFactory $factory
-     * @return void
+     * @return \Flugg\Responder\Contracts\ResponseFactory
      */
-    protected function decorateResponseFactory(ResponseFactoryContract $factory)
+    protected function decorateResponseFactory(ResponseFactoryContract $factory): ResponseFactory
     {
         foreach ($this->app->config['responder.decorators'] as $decorator) {
             $factory = new $decorator($factory);
@@ -200,7 +201,7 @@ class ResponderServiceProvider extends BaseServiceProvider
      */
     protected function registerPaginationBindings()
     {
-        $this->app->singleton(PaginatorFactoryContract::class, function ($app) {
+        $this->app->bind(PaginatorFactoryContract::class, function ($app) {
             return new PaginatorFactory($app->make(Request::class)->query());
         });
     }
@@ -239,8 +240,8 @@ class ResponderServiceProvider extends BaseServiceProvider
             return $app->make(Responder::class);
         });
 
-        $this->app->bind(TransformerContract::class, function ($app) {
-            return $app->make(Transformer::class);
+        $this->app->bind(SimpleTransformerContract::class, function ($app) {
+            return $app->make(SimpleTransformer::class);
         });
     }
 
