@@ -41,7 +41,7 @@ class ErrorMessageResolver implements ErrorMessageResolverContract
     /**
      * Register a message mapped to an error code.
      *
-     * @param  mixed $errorCode
+     * @param  mixed  $errorCode
      * @param  string $message
      * @return void
      */

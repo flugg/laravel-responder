@@ -89,7 +89,7 @@ class SuccessResponseBuilder extends ResponseBuilder
     /**
      * Get the serialized response output.
      *
-     * @return array
+     * @return mixed
      */
     protected function getOutput(): array
     {

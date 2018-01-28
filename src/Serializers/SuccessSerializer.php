@@ -4,7 +4,6 @@ namespace Flugg\Responder\Serializers;
 
 use League\Fractal\Pagination\CursorInterface;
 use League\Fractal\Pagination\PaginatorInterface;
-use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Serializer\ArraySerializer;
 
 /**

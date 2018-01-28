@@ -24,7 +24,7 @@ interface ResourceKeyResolver
      * Resolve a resource key from the given data.
      *
      * @param  mixed $data
-     * @return string|null
+     * @return string
      */
     public function resolve($data);
 }

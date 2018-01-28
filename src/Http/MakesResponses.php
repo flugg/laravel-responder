@@ -31,7 +31,7 @@ trait MakesResponses
     /**
      * Build an error response.
      *
-     * @param  mixed|null $errorCode
+     * @param  mixed|null  $errorCode
      * @param  string|null $message
      * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */

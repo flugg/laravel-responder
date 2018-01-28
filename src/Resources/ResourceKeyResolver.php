@@ -40,11 +40,11 @@ class ResourceKeyResolver implements ResourceKeyResolverContract
      * Resolve a resource key from the given data.
      *
      * @param  mixed $data
-     * @return string|null
+     * @return string
      */
     public function resolve($data)
     {
-        $transformable = $this->resolveTransformable($data);
+        $transformable = $this->resolveTransformableItem($data);
 
         if (is_object($transformable) && key_exists(get_class($transformable), $this->bindings)) {
             return $this->bindings[get_class($transformable)];
@@ -54,24 +54,7 @@ class ResourceKeyResolver implements ResourceKeyResolverContract
             return $this->resolveFromModel($transformable);
         }
 
-        return null;
-    }
-
-    /**
-     * Resolve a transformable from the given data.
-     *
-     * @param  mixed $data
-     * @return mixed
-     */
-    protected function resolveTransformable($data)
-    {
-        if (is_array($data) || $data instanceof Traversable) {
-            foreach ($data as $item) {
-                return $item;
-            }
-        }
-
-        return $data;
+        return 'data';
     }
 
     /**
@@ -80,12 +63,29 @@ class ResourceKeyResolver implements ResourceKeyResolverContract
      * @param  \Illuminate\Database\Eloquent\Model $model
      * @return string
      */
-    protected function resolveFromModel(Model $model)
+    public function resolveFromModel(Model $model)
     {
         if (method_exists($model, 'getResourceKey')) {
             return $model->getResourceKey();
         }
 
         return $model->getTable();
+    }
+
+    /**
+     * Resolve a transformable from the given data.
+     *
+     * @param  mixed $data
+     * @return mixed
+     */
+    protected function resolveTransformableItem($data)
+    {
+        if (is_array($data) || $data instanceof Traversable) {
+            foreach ($data as $item) {
+                return $item;
+            }
+        }
+
+        return $data;
     }
 }

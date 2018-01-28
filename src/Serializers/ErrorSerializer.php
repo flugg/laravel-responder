@@ -16,7 +16,7 @@ class ErrorSerializer implements ErrorSerializerContract
     /**
      * Format the error data.
      *
-     * @param  mixed|null $errorCode
+     * @param  mixed|null  $errorCode
      * @param  string|null $message
      * @param  array|null  $data
      * @return array

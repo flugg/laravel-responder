@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use League\Fractal\Resource\Collection as CollectionResource;
 use League\Fractal\Resource\Item as ItemResource;
 use League\Fractal\Resource\NullResource;
+use League\Fractal\Resource\Primitive;
 use League\Fractal\Resource\ResourceInterface;
 use Traversable;
 
@@ -81,7 +82,7 @@ class ResourceFactory implements ResourceFactoryContract
     /**
      * Make resource from the given resource.
      *
-     * @param \League\Fractal\Resource\ResourceInterface                      $resource
+     * @param  \League\Fractal\Resource\ResourceInterface                     $resource
      * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
      * @param  string|null                                                    $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
@@ -108,6 +109,8 @@ class ResourceFactory implements ResourceFactoryContract
             return new NullResource(null, null, $resourceKey);
         } elseif ($this->shouldCreateCollection($data)) {
             return new CollectionResource($data, $transformer, $resourceKey);
+        } elseif (is_scalar($data)) {
+            return new Primitive($data, $transformer, $resourceKey);
         }
 
         return new ItemResource($data, $transformer, $resourceKey);
@@ -122,7 +125,7 @@ class ResourceFactory implements ResourceFactoryContract
     protected function shouldCreateCollection($data): bool
     {
         if (is_array($data)) {
-            return ! is_scalar(Arr::first($data));
+            return ! Arr::isAssoc($data) && ! is_scalar(Arr::first($data));
         }
 
         return $data instanceof Traversable;

@@ -125,7 +125,7 @@ class CursorPaginator
      */
     public function set($data): CursorPaginator
     {
-        $this->items = $data instanceof Collection ? $data : Collection::make($data);;
+        $this->items = $data instanceof Collection ? $data : collect($data);
 
         return $this;
     }

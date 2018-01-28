@@ -5,13 +5,11 @@ namespace Flugg\Responder\Http\Middleware;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 
 /**
- * A middleware class responsible for converting parameter keys to snake case.
+ * A middleware class responsible for converting incoming parameter keys to snake case.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
- *
- * @see \Flugg\Responder\Responder
  */
 class ConvertToSnakeCase extends TransformsRequest
 {
