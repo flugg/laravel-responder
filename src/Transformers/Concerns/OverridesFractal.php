@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder\Transformers\Concerns;
 
-use Illuminate\Support\Collection;
 use League\Fractal\Resource\ResourceInterface;
 use League\Fractal\Scope;
 
@@ -26,9 +25,7 @@ trait OverridesFractal
             return $this->resolveScopedIncludes($this->getCurrentScope());
         }
 
-        return array_filter($this->relations, function ($relation) {
-            return $relation != '*';
-        });
+        return array_keys($this->normalizeRelations($this->relations));
     }
 
     /**
@@ -38,9 +35,9 @@ trait OverridesFractal
      */
     public function getDefaultIncludes()
     {
-        return Collection::make($this->load)->map(function ($transformer, $relation) {
-            return is_numeric($relation) ? $transformer : $relation;
-        })->values()->all();
+        $requested = $this->getCurrentScope()->getManager()->getRequestedIncludes();
+
+        return array_intersect(array_keys($this->normalizeRelations($this->load)), $requested);
     }
 
     /**
@@ -53,7 +50,7 @@ trait OverridesFractal
      */
     protected function callIncludeMethod(Scope $scope, $identifier, $data)
     {
-        $parameters = $this->resolveScopedParameters($scope, $identifier);
+        $parameters = iterator_to_array($scope->getManager()->getIncludeParams($scope->getIdentifier($identifier)));
 
         return $this->includeResource($identifier, $data, $parameters);
     }
@@ -69,23 +66,11 @@ trait OverridesFractal
         $level = count($scope->getParentScopes());
         $includes = $scope->getManager()->getRequestedIncludes();
 
-        return Collection::make($includes)->map(function ($include) {
+        return collect($includes)->map(function ($include) {
             return explode('.', $include);
         })->filter(function ($include) use ($level) {
             return count($include) > $level;
         })->pluck($level)->unique()->all();
-    }
-
-    /**
-     * Resolve scoped parameters for the given scope.
-     *
-     * @param  \League\Fractal\Scope $scope
-     * @param  string                $identifier
-     * @return array
-     */
-    protected function resolveScopedParameters(Scope $scope, string $identifier): array
-    {
-        return iterator_to_array($scope->getManager()->getIncludeParams($scope->getIdentifier($identifier)));
     }
 
     /**
@@ -94,6 +79,14 @@ trait OverridesFractal
      * @return \League\Fractal\Scope
      */
     public abstract function getCurrentScope();
+
+    /**
+     * Normalize relations to force a key value structure.
+     *
+     * @param  array $relations
+     * @return array
+     */
+    protected abstract function normalizeRelations(array $relations): array;
 
     /**
      * Include a related resource.

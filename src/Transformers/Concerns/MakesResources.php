@@ -28,13 +28,17 @@ trait MakesResources
     /**
      * Make a resource.
      *
-     * @param  null                                                           $data
+     * @param  mixed                                                          $data
      * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
      * @param  string|null                                                    $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
      */
     protected function resource($data = null, $transformer = null, string $resourceKey = null): ResourceInterface
     {
+        if ($data instanceof ResourceInterface) {
+            return $data;
+        }
+
         $resourceFactory = $this->resolveContainer()->make(ResourceFactory::class);
 
         return $resourceFactory->make($data, $transformer, $resourceKey);
@@ -51,10 +55,12 @@ trait MakesResources
      */
     protected function includeResource(string $identifier, $data, array $parameters): ResourceInterface
     {
+        $transformer = $this->getRelatedTransformerName($identifier);
+
         if (method_exists($this, $method = 'include' . ucfirst($identifier))) {
-            $resource = $this->$method($data, $parameters);
+            $resource = $this->resource($this->$method($data, $parameters), $transformer, $identifier);
         } elseif ($data instanceof Model) {
-            $resource = $this->includeResourceFromModel($data, $identifier);
+            $resource = $this->includeResourceFromModel($data, $identifier, $transformer);
         } else {
             throw new LogicException('Relation [' . $identifier . '] not found in [' . get_class($this) . '].');
         }
@@ -63,23 +69,35 @@ trait MakesResources
     }
 
     /**
-     * Include a related resource from a model.
+     * Include a related resource from a model and cache the resource type for following calls.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string                              $identifier
+     * @param  \Illuminate\Database\Eloquent\Model                            $model
+     * @param  string                                                         $identifier
+     * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    protected function includeResourceFromModel(Model $model, string $identifier): ResourceInterface
+    protected function includeResourceFromModel(Model $model, string $identifier, $transformer = null): ResourceInterface
     {
         $data = $this->resolveRelation($model, $identifier);
 
-        if (! is_array($data) && ! $data instanceof Countable) {
-            return $this->resource($data, null, $identifier);
+        if (! $this->shouldCacheResource($data)) {
+            return $this->resource($data, $transformer, $identifier);
         } elseif (key_exists($identifier, $this->resources)) {
             return $this->resources[$identifier]->setData($data);
         }
 
-        return $this->resources[$identifier] = $this->resource($data, null, $identifier);
+        return $this->resources[$identifier] = $this->resource($data, $transformer, $identifier);
+    }
+
+    /**
+     * Indicates if the resource should be cached.
+     *
+     * @param  mixed $data
+     * @return bool
+     */
+    protected function shouldCacheResource($data): bool
+    {
+        return is_array($data) || $data instanceof Countable ? count($data) > 0 : is_null($data);
     }
 
     /**
@@ -97,4 +115,12 @@ trait MakesResources
      * @return mixed
      */
     protected abstract function resolveRelation(Model $model, string $identifier);
+
+    /**
+     * Get a related transformer class mapped to a relation identifier.
+     *
+     * @param  string $identifier
+     * @return string
+     */
+    protected abstract function getRelatedTransformerName(string $identifier);
 }

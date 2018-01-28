@@ -2,10 +2,7 @@
 
 namespace Flugg\Responder\Transformers\Concerns;
 
-use Flugg\Responder\Contracts\Transformers\TransformerResolver;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 /**
  * A trait to be used by a transformer to handle relations
@@ -31,17 +28,54 @@ trait HasRelationships
     protected $load = [];
 
     /**
-     * Get a list of default relations with eager load constraints.
+     * Get a list of whitelisted relations, including nested relations.
+     *
+     * @return array
+     */
+    public function whitelistedRelations(): array
+    {
+        $nestedRelations = $this->getNestedRelations($this->relations, function ($transformer) {
+            return $transformer->whitelistedRelations();
+        });
+
+        return array_merge($this->normalizeRelations($this->relations), $nestedRelations);
+    }
+
+    /**
+     * Get a list of default relations, including nested relations.
      *
      * @return array
      */
     public function defaultRelations(): array
     {
-        $this->load = $this->normalizeRelations($this->load);
+        $nestedRelations = $this->getNestedRelations($this->load, function ($transformer) {
+            return $transformer->defaultRelations();
+        });
 
-        $relations = $this->addEagerLoadConstraints(array_keys($this->load));
+        return array_merge($this->normalizeRelations($this->load), $nestedRelations);
+    }
 
-        return array_merge($relations, $this->getNestedDefaultRelations());
+    /**
+     * Extract a list of nested relations from the transformers provided in the
+     * list of relations.
+     *
+     * @param  array    $relations
+     * @param  callable $nestedCallback
+     * @return array
+     */
+    protected function getNestedRelations(array $relations, callable $nestedCallback): array
+    {
+        return collect($relations)->filter(function ($transformer, $relation) {
+            return ! is_numeric($relation) && ! is_null($transformer);
+        })->map(function ($transformer) {
+            return $this->resolveTransformer($transformer);
+        })->flatMap(function ($transformer, $relation) use ($nestedCallback) {
+            return collect($nestedRelations = $nestedCallback($transformer))
+                ->keys()
+                ->reduce(function ($value, $nestedRelation) use ($relation, $nestedRelations) {
+                    return array_merge($value, ["$relation.$nestedRelation" => $nestedRelations[$nestedRelation]]);
+                }, []);
+        })->all();
     }
 
     /**
@@ -52,57 +86,30 @@ trait HasRelationships
      */
     protected function normalizeRelations(array $relations): array
     {
-        $normalized = [];
-
-        foreach ($relations as $relation => $transformer) {
+        return collect(array_keys($relations))->reduce(function ($normalized, $relation) use ($relations) {
             if (is_numeric($relation)) {
-                $relation = $transformer;
-                $transformer = null;
+                $relation = $relations[$relation];
             }
 
-            $normalized[$relation] = $transformer;
-        }
-
-        return $normalized;
+            return array_merge($normalized, [$relation => $this->getQueryConstraint($relation)]);
+        }, []);
     }
 
     /**
-     * Add eager load constraints to a list of relations.
+     * Normalize relations to force a key value structure.
      *
-     * @param  array $relations
-     * @return array
+     * @param  string $relation
+     * @return \Closure|null
      */
-    protected function addEagerLoadConstraints(array $relations): array
+    protected function getQueryConstraint(string $relation)
     {
-        $eagerLoads = [];
-
-        foreach ($relations as $relation) {
-            if (method_exists($this, $method = 'load' . ucfirst($relation))) {
-                $eagerLoads[$relation] = function ($query) use ($method) {
-                    return $this->$method($query);
-                };
-            } else {
-                $eagerLoads[] = $relation;
-            }
+        if (! method_exists($this, $method = 'load' . ucfirst($relation))) {
+            return null;
         }
 
-        return $eagerLoads;
-    }
-
-    /**
-     * Get a list of nested default relationships with eager load constraints.
-     *
-     * @return array
-     */
-    protected function getNestedDefaultRelations(): array
-    {
-        return Collection::make($this->load)->filter(function ($transformer) {
-            return ! is_null($transformer);
-        })->flatMap(function ($transformer, $relation) {
-            return array_map(function ($nestedRelation) use ($relation) {
-                return "$relation.$nestedRelation";
-            }, $this->resolveTransformer($transformer)->defaultRelations());
-        })->all();
+        return function ($query) use ($method) {
+            return $this->$method($query);
+        };
     }
 
     /**
@@ -114,30 +121,33 @@ trait HasRelationships
      */
     protected function resolveRelation(Model $model, string $identifier)
     {
+        $relation = $model->$identifier;
+
         if (method_exists($this, $method = 'filter' . ucfirst($identifier))) {
-            return $this->$method($model->$identifier);
+            return $this->$method($relation);
         }
 
-        return $model->$identifier;
+        return $relation;
     }
 
     /**
-     * Resolve a related transformer from a class name string.
+     * Get a related transformer class mapped to a relation identifier.
+     *
+     * @param  string $identifier
+     * @return string|null
+     */
+    protected function getRelatedTransformerName(string $identifier)
+    {
+        $relations = array_merge($this->relations, $this->load);
+
+        return array_has($relations, $identifier) ? $relations[$identifier] : null;
+    }
+
+    /**
+     * Resolve a transformer from a class name string.
      *
      * @param  string $transformer
      * @return mixed
      */
-    protected function resolveTransformer(string $transformer)
-    {
-        $resolver = $this->resolveContainer()->make(TransformerResolver::class);
-
-        return $resolver->resolve($transformer);
-    }
-
-    /**
-     * Resolve a container using the resolver callback.
-     *
-     * @return \Illuminate\Contracts\Container\Container
-     */
-    protected abstract function resolveContainer(): Container;
+    protected abstract function resolveTransformer(string $transformer);
 }

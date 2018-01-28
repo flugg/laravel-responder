@@ -49,4 +49,17 @@ abstract class Transformer extends TransformerAbstract
     {
         return call_user_func(static::$containerResolver);
     }
+
+    /**
+     * Resolve a transformer from a class name string.
+     *
+     * @param  string $transformer
+     * @return mixed
+     */
+    protected function resolveTransformer(string $transformer)
+    {
+        $transformerResolver = $this->resolveContainer()->make(TransformerResolver::class);
+
+        return $transformerResolver->resolve($transformer);
+    }
 }

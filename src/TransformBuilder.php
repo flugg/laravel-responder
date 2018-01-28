@@ -168,7 +168,16 @@ class TransformBuilder
      */
     public function with($relations)
     {
-        $this->with = array_merge($this->with, is_array($relations) ? $relations : func_get_args());
+        $relations = is_array($relations) ? $relations : func_get_args();
+
+        foreach ($relations as $relation => $constraint) {
+            if (is_numeric($relation)) {
+                $relation = $constraint;
+                $constraint = null;
+            }
+
+            $this->with = array_merge($this->with, [$relation => $constraint]);
+        }
 
         return $this;
     }
@@ -247,73 +256,87 @@ class TransformBuilder
     protected function prepareRelations($data, $transformer)
     {
         if ($transformer instanceof BaseTransformer) {
-            $this->includeTransformerRelations($transformer);
+            $whitelisted = $transformer->whitelistedRelations();
+            $default = $transformer->defaultRelations();
+            $relations = $this->addMissingQueryConstraints($this->with, $whitelisted);
+            $this->with = $this->removeForbiddenRelations(array_merge($relations, $default), array_merge($whitelisted, $default));
         }
 
         if ($data instanceof Model || $data instanceof Collection) {
-            $data->load($this->prepareEagerLoadableRelations($this->with, $transformer));
+            $this->eagerLoadRelations($data, $this->with, $transformer);
         }
 
-        $this->with = $this->stripEagerLoadConstraints($this->with);
+        $this->with = array_keys($this->with);
     }
 
     /**
-     * Include default relationships and add eager load constraints from transformer.
+     * Add query constraints defined as "load" methods in the transformers to the list of
+     * requested relations.
      *
-     * @param  \Flugg\Responder\Transformers\Transformer $transformer
-     * @return void
+     * @param  array $requested
+     * @param  array $whitelisted
+     * @return array
      */
-    protected function includeTransformerRelations(BaseTransformer $transformer)
+    protected function addMissingQueryConstraints(array $requested, array $whitelisted): array
     {
-        $relations = array_filter(array_keys($this->with), function ($relation) {
-            return ! is_numeric($relation);
-        });
+        return collect(array_keys($requested))->reduce(function ($relations, $relation) use ($requested, $whitelisted) {
+            $constraint = $requested[$relation];
 
-        $this->with(Collection::make($transformer->defaultRelations())
-            ->filter(function ($constrain, $relation) use ($relations) {
-                return ! in_array(is_numeric($relation) ? $constrain : $relation, $relations);
-            })
-            ->all());
+            return array_merge($relations, [$relation => $constraint ? $constraint : $whitelisted[$relation] ?? null]);
+        }, []);
     }
 
     /**
-     * Remove eager load constraint functions from the given relations.
+     * Filter out relations that are not whitelisted in the transformer or relations that
+     * have been explicitly excluded using the [without] method.
      *
      * @param  array $relations
+     * @param  array $whitelisted
      * @return array
      */
-    protected function stripEagerLoadConstraints(array $relations): array
+    protected function removeForbiddenRelations(array $relations, array $whitelisted): array
     {
-        return collect($relations)->map(function ($value, $key) {
-            return is_numeric($key) ? $value : $key;
-        })->values()->all();
+        return array_filter($relations, function ($relation) use ($whitelisted) {
+            $relation = $this->stripParametersFromRelation($relation);
+
+            return key_exists($relation, $whitelisted) && ! in_array($relation, $this->without);
+        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
-     * Remove parameters from relations that must be eager loaded and filter
-     * out the relations which have an includeXxx method.
+     * Strip parameter suffix from the relation string by only taking what is in front of
+     * the colon.
      *
-     * @param array                                                          $relations
-     * @param \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
-     * @return array
+     * @param  string $relation
+     * @return string
      */
-    protected function prepareEagerLoadableRelations(array $relations, $transformer): array
+    protected function stripParametersFromRelation(string $relation): string
     {
-        $cleanedRelations = [];
+        return explode(':', $relation)[0];
+    }
 
-        foreach ($relations as $key => $value) {
-            $relationName = explode(':', is_numeric($key) ? $value : $key)[0];
-            if (method_exists($transformer, 'include' . ucfirst($relationName))) {
-                continue;
+    /**
+     * Eager load all requested relations except the ones defined as an "include" method
+     * in the transformers. We also strip away any parameters from the relation name
+     * and normalize relations by swapping "null" constraints to empty closures.
+     *
+     * @param  mixed                                                          $data
+     * @param  array                                                          $requested
+     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
+     * @return void
+     */
+    protected function eagerLoadRelations($data, array $requested, $transformer)
+    {
+        $relations = collect(array_keys($requested))->reduce(function ($eagerLoads, $relation) use ($requested, $transformer) {
+            $identifier = $this->stripParametersFromRelation($relation);
+
+            if (method_exists($transformer, 'include' . ucfirst($identifier))) {
+                return $eagerLoads;
             }
 
-            if (is_numeric($key)) {
-                $cleanedRelations[$key] = $relationName;
-            } else {
-                $cleanedRelations[$relationName] = $value;
-            }
-        }
+            return array_merge($eagerLoads, [$identifier => $requested[$relation] ?: function () { }]);
+        }, []);
 
-        return $cleanedRelations;
+        $data->load($relations);
     }
 }
