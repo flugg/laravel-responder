@@ -12,10 +12,6 @@
 
 Laravel Responder is a package for building API responses, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can transform your data using transformers, create and serialize success- and error responses, handle exceptions and assist you with testing your responses.
 
-***
-_Version 2.0 has been released with some changes and tons of new features. If you're migrating from an earlier version, make sure you read the [changelog](CHANGELOG.md)._
-***
-
 # Table of Contents
 
 - [Introduction](#introduction)
@@ -25,10 +21,9 @@ _Version 2.0 has been released with some changes and tons of new features. If yo
     - [Creating Responses](#creating-responses)
     - [Creating Success Responses](#creating-success-responses)
     - [Creating Transformers](#creating-transformers)
-    - [Transforming Data](#creating-transformers)
+    - [Transforming Data](#transforming-data)
     - [Creating Error Responses](#creating-error-responses)
     - [Handling Exceptions](#handling-exceptions)
-    - [Testing Responses](#testing-responses)
 - [Contributing](#contributing)
 - [Donating](#contributing)
 - [License](#license)
