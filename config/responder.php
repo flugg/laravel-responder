@@ -49,7 +49,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Autoload Relationships With Query String
+    | Load Relationships With Query String Parameter
     |--------------------------------------------------------------------------
     |
     | The package can automatically load relationships from the query string
@@ -62,7 +62,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Filter Fields With Query String
+    | Filter Fields With Query String Parameter
     |--------------------------------------------------------------------------
     |
     | The package can automatically filter the fields of transformed data
@@ -85,5 +85,18 @@ return [
     */
 
     'recursion_limit' => 5,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Error Message Translation Files
+    |--------------------------------------------------------------------------
+    |
+    | You can declare error messages in a language file, which allows for
+    | returning messages in different languages. The array below lists
+    | the language files that will be searched in to find messages.
+    |
+    */
+
+    'error_message_files' => ['errors'],
 
 ];

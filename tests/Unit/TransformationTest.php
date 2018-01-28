@@ -3,18 +3,18 @@
 namespace Flugg\Responder\Tests\Unit;
 
 use Flugg\Responder\Serializers\NoopSerializer;
-use Flugg\Responder\SimpleTransformer;
 use Flugg\Responder\Tests\TestCase;
+use Flugg\Responder\Transformation;
 use Flugg\Responder\Transformer;
 
 /**
- * Unit tests for the [Flugg\Responder\SimpleTransformer] class.
+ * Unit tests for the [Flugg\Responder\Transformation] class.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class SimpleTransformerTest extends TestCase
+class TransformationTest extends TestCase
 {
     /**
      * A mock of a [TransformBuilder] class.
@@ -24,11 +24,11 @@ class SimpleTransformerTest extends TestCase
     protected $transformBuilder;
 
     /**
-     * The [SimpleTransformer] service class being tested.
+     * The [Transformation] class being tested.
      *
      * @var \Flugg\Responder\Transformer
      */
-    protected $transformer;
+    protected $transformation;
 
     /**
      * Setup the test environment.
@@ -40,7 +40,7 @@ class SimpleTransformerTest extends TestCase
         parent::setUp();
 
         $this->transformBuilder = $this->mockTransformBuilder();
-        $this->transformer = new SimpleTransformer($this->transformBuilder);
+        $this->transformation = new Transformation($this->transformBuilder);
     }
 
     /**
@@ -49,10 +49,11 @@ class SimpleTransformerTest extends TestCase
      */
     public function testTransformMethodShouldCallOnTransformBuilder()
     {
-        $transformation = $this->transformer->make($data = ['foo' => 1], $transformer = $this->mockTransformer());
+        $transformer = $transformer = $this->mockTransformer();
+        $transformation = $this->transformation->make($data = ['foo' => 1], $transformer, $resourceKey = 'foo');
 
         $this->assertSame($this->transformBuilder, $transformation);
-        $this->transformBuilder->shouldHaveReceived('resource')->with($data, $transformer)->once();
+        $this->transformBuilder->shouldHaveReceived('resource')->with($data, $transformer, $resourceKey)->once();
         $this->transformBuilder->shouldHaveReceived('serializer')->with(NoopSerializer::class)->once();
     }
 }

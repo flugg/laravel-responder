@@ -1,7 +1,7 @@
 <?php
 
 use Flugg\Responder\Contracts\Responder;
-use Flugg\Responder\Contracts\SimpleTransformer;
+use Flugg\Responder\Transformation;
 use Flugg\Responder\TransformBuilder;
 
 if (! function_exists('responder')) {
@@ -28,6 +28,6 @@ if (! function_exists('transformation')) {
      */
     function transformation($data = null, $transformer = null): TransformBuilder
     {
-        return app(SimpleTransformer::class)->make($data, $transformer);
+        return app(Transformation::class)->make($data, $transformer);
     }
 }

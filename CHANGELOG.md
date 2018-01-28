@@ -1,3 +1,33 @@
+# 3.0.0 (2018-01-28)
+
+Version `3.0.0` contains mostly bug fixes, but also quite a lot of new features and changes. The entire relationship logic has been rewritten to improve performance, security and stability among other improvements. There has also been big focus on improving test coverage for this release and we're now right below 90% coverage.
+
+### Breaking Changes
+
+* Fractal requirement changed to `0.17.0`
+* Whitelisted relationships now required a transformer mapping in order for eager loading to take effect
+* Relationships will now only be eager loaded if you have specified a transformer with whitelisted relationships
+* The `transform` method has been renamed to `transformation` and it now returns a `TransformBuilder` instead of an array
+* The `Flugg\Responder\Transformer` service has been renamed to `Transformation`
+* The `Transformer` facade has been renamed to `Transformation`
+* `NullSerializer` has been renamed to `NoopSerializer`
+
+### Features
+
+* New integration test suite
+* Added support for primitive resources when including relations
+* Added a `fallback_transformer` configuration option to change the fallback transformer
+* Added a `error_message_files` configuration option to change translation files to load error messages from
+* Support for specifying query constraints for relationships as "load" methods in transformers
+* You no longer need to use the `resource` method inside "include" methods in transformers, you can just return the data directly
+
+### Bug Fixes
+
+* It will now only eager load relationships that are whitelisted
+* You can now call multiple transformers in sequence without problems
+* Associative arrays will now be treated as an item rather than a collection
+* A default resource key of `data` is now set, allowing to use the `only` method even when data is empty
+
 # 2.0.14 (2018-01-23)
 
 ### Features

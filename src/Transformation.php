@@ -5,13 +5,13 @@ namespace Flugg\Responder;
 use Flugg\Responder\Serializers\NoopSerializer;
 
 /**
- * A service class responsible for just transforming data, without the serializing.
+ * A class responsible for obtaining a transformation to transform data without serializing.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class SimpleTransformer
+class Transformation
 {
     /**
      * A builder used to build transformed arrays.
@@ -31,14 +31,15 @@ class SimpleTransformer
     }
 
     /**
-     * Transform the data without serializing, using the given transformer.
+     * Make a new transformation to transform data without serializing.
      *
      * @param  mixed                                                          $data
      * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
+     * @param  string|null                                                    $resourceKey
      * @return \Flugg\Responder\TransformBuilder
      */
-    public function make($data = null, $transformer = null): TransformBuilder
+    public function make($data = null, $transformer = null, string $resourceKey = null): TransformBuilder
     {
-        return $this->transformBuilder->resource($data, $transformer)->serializer(new NoopSerializer);
+        return $this->transformBuilder->resource($data, $transformer, $resourceKey)->serializer(new NoopSerializer);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Facades;
 
-use Flugg\Responder\Contracts\Transformer as TransformerContract;
+use Flugg\Responder\Transformation as TransformationService;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \Flugg\Responder\Transformer
  */
-class Transformer extends Facade
+class Transformation extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -23,6 +23,6 @@ class Transformer extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return TransformerContract::class;
+        return TransformationService::class;
     }
 }

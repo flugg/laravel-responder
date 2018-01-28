@@ -12,6 +12,12 @@
 
 Laravel Responder is a package for building API responses, integrating [Fractal](https://github.com/thephpleague/fractal) into Laravel and Lumen. It can transform your data using transformers, create and serialize success- and error responses, handle exceptions and assist you with testing your responses.
 
+***
+### **2018 Update: Version 3.0.0 Released! 🎉**
+
+_3.0.0 has been released with tons of bug fixes, many new features and some breaking changes. Make sure to check out the [changelog](CHANGELOG.md) to get an overview of everything fresh. The [Creating Transformers](#creating-transformers) and [Transforming Data](#transforming-data) sections of the documentation has also been rewritten for clarity and to account for the new changes._
+***
+
 # Table of Contents
 
 - [Introduction](#introduction)
@@ -82,11 +88,11 @@ _The package supports auto-discovery, so if you use Laravel 5.5 or later you may
 
 #### Register Facades _(optional)_
 
-If you like facades, you may also append the `Responder` and `Transformer` facades to the `aliases` key:
+If you like facades, you may also append the `Responder` and `Transformation` facades to the `aliases` key:
 
 ```php
 'Responder' => Flugg\Responder\Facades\Responder::class,
-'Transformer' => Flugg\Responder\Facades\Transformer::class,
+'Transformation' => Flugg\Responder\Facades\Transformation::class,
 ```
 
 #### Publish Package Assets _(optional)_
@@ -115,7 +121,7 @@ You may also add the following lines to `app/bootstrap.php` to register the faca
 
 ```php
 class_alias(Flugg\Responder\Facades\Responder::class, 'Responder');
-class_alias(Flugg\Responder\Facades\Transformer::class, 'Transformer');
+class_alias(Flugg\Responder\Facades\Transformation::class, 'Transformation');
 ```
 
 #### Publish Package Assets _(optional)_
@@ -254,7 +260,7 @@ The package also ships with some situational decorators disabled by default, but
 \Flugg\Responder\Http\Responses\Decorators\PrettyPrintDecorator::class,
 ```
 
-- `EscapeHtmlDecorator` decorator, based on the "sanitize input, escape output" concept, will escape HTML entities in all strings returned by your API. You can securely store input data "as is" (even malicious HTML tags) being sure that it will be outputted as un-harmful strings. Note that, using this decorator, printing data as text will result in the wrong representation and you **must** print it as HTML to retrieve the original value.
+- `EscapeHtmlDecorator` decorator, based on the "sanitize input, escape output" concept, will escape HTML entities in all strings returned by your API. You can securely store input data "as is" (even malicious HTML tags) being sure that it will be outputted as un-harmful strings. Note that, using this decorator, printing data as text will result in the wrong representation and you must print it as HTML to retrieve the original value.
 
 ```php
 \Flugg\Responder\Http\Responses\Decorators\EscapeHtmlDecorator::class,
@@ -552,7 +558,7 @@ Above we're using Fractal's `JsonApiSerializer` class. Fractal also ships with a
 
 ## Creating Transformers
 
-A dedicated transformer class gives you a convenient location to transform data and allows you to use the same transformer multiple times. It also allows you to include and transform relationships. You can create a transformer using the `make:transformer` Artisan command:
+A dedicated transformer class gives you a convenient location to transform data and allows you to reuse the transformer at multiple places. It also allows you to include and transform relationships. You can create a transformer using the `make:transformer` Artisan command:
 
 ```shell
 php artisan make:transformer ProductTransformer
@@ -599,7 +605,7 @@ class ProductTransformer extends Transformer
 }
 ```
 
-It will automatically resolve a model name from the name provided. For instance, in the example above, the package will extract `Product` from `ProductTransformer` and assume the models live directly in the `app` folder (as per Laravel's convention). If you store them somewhere else, you can use the `--model` (or `-m`) option to override it: 
+It will automatically resolve a model name from the name provided. For instance, the package will extract `Product` from `ProductTransformer` and assume the models live directly in the `app` folder (as per Laravel's convention). If you store them somewhere else, you can use the `--model` (or `-m`) option to override it: 
 
 ```shell
 php artisan make:transformer ProductTransformer --model="App\Models\Product"
@@ -615,61 +621,44 @@ php artisan make:transformer ProductTransformer --plain
 
 This will remove the typehint from the `transform` method and add less boilerplate code.
 
-### Including Relationships
+### Setting Relationships
 
-All transformers generated through the `make:transformer` command will include a `$relations` and `$load` property, which are the equivalent to Fractal's `$availableIncludes` and `$defaultIncludes`. Fractal also requires you to to create methods in your transformer for all included relation. While this package also allows you to create such methods, it doesn't require it if you're transforming models. 
-
-For instance, if you're including a `shipments` relation in a `ProductTransformer`, the package will assume you have a `shipments` relationship method in your `Product` model and automatically fetch the relation. You can overwrite this by creating an `includeShipments` method in `ProductTransformer`, just like you would with Fractal:
+The `$relations` and `$load` properties in the transformer are the equivalent to Fractal's own `$availableIncludes` and `$defaultIncludes`. In addition to the slight name change, the package uses the `$relations` and `$load` properties to map out all available relationships for eager loading, so in contrast to Fractal, you should map the relationship to their corresponding transformer:
 
 ```php
-/**
- * Include related shipments.
- *
- * @param  \App\Product $product
- * @param  array|null   $parameters
- * @return \League\Fractal\ResourceInterface
- */
-public function includeShipments(Product $product, array $parameters = null)
-{
-    return $this->resource($product->shipments);
-}
-```
-
-The `resource` method used above replaces Fractal's `item` and `collection` methods in the Transformer for creating a resource. It will automatically figure out wether it should be an item or collection resource based on the data. It will also resolve a transformer from the `Shipment` model, if a transformer binding is set, just like the `success` method. In fact, it accepts the exact same arguments as the `success` method:
-
-```php
-return $this->resource($product->shipments, new ShipmentTransformer);
+protected $relations = [
+    'shipments' => ShipmentTransformer::class,
+];
 ```
 
 ***
-_You should be careful with executing any new database calls inside the include methods as you might end up with an unexpected amount of hits to the database._
+_You can choose to skip the mapping and just pass the strings like with Fractal, but that means the package wont be able to eager load relationships automatically._
 ***
 
-#### Using parameters
+#### Setting Whitelisted Relationships
 
-Parameters management is totally delegated to the underlying Fractal library (see it's [documentation](https://fractal.thephpleague.com/transformers/#include-parameters)) except from the fact that parameters are provided directly as an array instead of a `\League\Fractal\ParamBag`.
-
-#### Setting Available Relationships
-
-The `$relations` property specifies a list of relations available to be included. When you generate a transformer, the `$relations` property will be equal to an empty array (which is also the default value when it's not defined), but you can change it to a wildcard allowing the access to all relations on the transformer:
+The `$relations` property specifies a list of relations available to be included. You can set it to a wildcard allowing the access to all relations on the transformer:
 
 ```php
 protected $relations = ['*'];
 ```
 
-If you only want to whitelist certain relations, you can instead set a list of relations you want to make available:
+If you want to whitelist certain relations, you can set a list of relations mapped to their corresponding transformers:
 
 ```php
-protected $relations = ['shipments', 'orders'];
+protected $relations = [
+    'shipments' => ShipmentTransformer::class,
+    'orders' => OrderTransformer::class,
+];
 ```
 
 ***
-_**Security warning:** Since the transformer doesn't know what relations exists on a model unless you specify it in `$relations`, you're technically allowing calls to any method on your model when using a wildcard. You should therefore consider always specifying a whitelist._
+_**Security warning:** Since the transformer doesn't know what relations exists on a model unless you specify it in `$relations` or `$load`, you're technically allowing calls to any method on your model when using a wildcard. You should therefore consider always specifying a whitelist._
 ***
 
-#### Setting Default Relationships
+#### Setting Autoloaded Relationships
 
-The `$load` property specifies a list of relations to be autoloaded every time you transform data with the transformer. By mapping a transformer to the relation the package will also be able to automatically eager load all default relations, including nested ones:
+The `$load` property specifies a list of relations to be autoloaded every time you transform data with the transformer:
 
 ```php
 protected $load = [
@@ -678,14 +667,67 @@ protected $load = [
 ];
 ```
 
-If you're transforming non-model data or don't care about the eager loading, you can skip the transformer mapping and just specify a list of relations:
+***
+_You don't have to add relations to both `$relations` and `$load`, all relations in `$load` will be available by nature._
+***
+
+### Including Relationships
+
+While Fractal requires you to to create a method in your transformer for every included relation, this package lets you skip this when transforming models, as it will automatically fetch relationships from the model. You may of course override this functionality by creating an "include" method:
 
 ```php
-protected $load = ['shipments', 'orders'];
+/**
+ * Include related shipments.
+ *
+ * @param  \App\Product $product
+ * @return mixed
+ */
+public function includeShipments(Product $product)
+{
+    return $product->shipments;
+}
+```
+
+Unlike Fractal you can just return the data directly without wrapping it in an `item` or `collection` method.
+
+***
+_You should be careful with executing database calls inside the include methods as you might end up with an unexpected amount of hits to the database._
+***
+
+#### Using Include Parameters
+
+Fractal can parse query string parameters which can be used when including relations. For more information about how to format the parameters see Fractal's [documentation on parameters](https://fractal.thephpleague.com/transformers/#include-parameters). You may access the parameters by adding a second parameter to the "include" method:
+
+```php
+public function includeShipments(Product $product, Collection $parameters)
+{
+    return $product->shipments->take($parameters->get('limit'));
+}
 ```
 
 ***
-_You don't have to add relations to both `$relations` and `$load`, all relations in `$load` will be available by nature._
+_To be as decoupled from Fractal as possible the parameters (which are normally accessed using `League\Fractal\ParamBag`) are accessed as Laravel collections instead._
+***
+
+#### Adding Query Constraints
+
+Just as you can specify a query constraint when including a relationship with the `with` method, you can also add query constraints as a "load" method on the transformer. This will automatically be applied when extracting relationships for eager loading.
+
+```php
+/**
+ * Load shipments with constraints.
+ *
+ * @param  \Illuminate\Database\Eloquent\Builder $query
+ * @return \Illuminate\Database\Eloquent\Builder
+ */
+public function loadShipments($query)
+{
+    return $query->whereNull('shipped_at');
+}
+```
+
+***
+_Note: You cannot mix "include" and "load" methods because the package doesn't eager load relationships included with an "include" method._
 ***
 
 ### Filtering Relationships
@@ -709,45 +751,78 @@ public function filterShipments($shipments)
 
 ## Transforming Data
 
-We've already looked at how to transform data when creating success responses, however, you may want to transform data in other places than your controllers. An example of when you would want to transform data is in your broadcasted events. You're exposing data using websockets instead of HTTP, but you still want to receive the same transformed data in your frontend. 
+We've looked at how to transform response data of success responses, however, there may be other places than your controllers where you want to transform data. An example is broadcasted events where you're exposing data using websockets instead of HTTP. You just want to return the transformed data, not an entire response. 
 
-#### Option 1: The `transform` Helper
-
-You can use the `transform` helper function to transform data without creating a response:
+It's possible to simply transform data by newing up the transformer and calling `transform`:
 
 ```php
-transform(Product::all());
+return (new ProductTransformer)->transform(Product::first());
 ```
 
-Unlike the `success` method, this wont serialize the data. However, it will resolve a transformer from the model if a binding is set, and you can overwrite the transformer by setting a second parameter. You can also specify a list of included relations as a third argument:
+However, this approach might become a bit messy when building transformations with relationships:
 
 ```php
-transform(Product::all(), new ProductTransformer, ['shipments']);
+return array_merge((new ProductTransformer)->transform($product = Product::first()), [
+    'shipments' => $product->shipments->map(function ($shipment) {
+        return (new ShipmentTransformer)->transform($shipment);
+    })
+]);
 ```
 
-Additionally, if you want to blacklist any of the default loaded relations, you can fill the fourth parameter:
+Yuck! Imagine that with multiple nested relationships. Let's explore a simpler way to handle this.
+
+### Builiding Transformations
+
+The `SuccessResponseBuilder` actually delegates all of the transformation work to a dedicated `Flugg\Responder\TransformBuilder` class. We can use this class ourself to transform data. For instance, if the product and shipment transformers were bound to the models, we could replicate the code above we in the following way:
 
 ```php
-transform(Product::all(), new ProductTransformer, ['shipments'], ['orders']);
-```
-
-#### Option 2: The `Transformer` Facade
-
-Instead of using the `transform` helper function, you can also use the `Transformer` facade to achieve the same thing:
-
-```php
-Transformer::transform(Product::all(), new ProductTransformer, ['shipments']);
-```
-
-#### Option 3: The `Transformer` Service
-
-Both the helper method and facade uses the `Flugg\Responder\Transformer` service class to apply the transformation. You can use the service yourself by using dependency injeciton:
-
-```php
-public function __construct(Transformer $transformer)
+public function index(TransformBuilder $transformation)
 {
-    $transformer->transform(Product::all(), new ProductTransformer, ['shipments']);
+    return $transformation->resource(Product::all())->with('shipments')->transform();
 }
+```
+
+Instead of using the `success` method on the `Responder` service, we use the `resouce` method on the `TransformBuilder` with the same method signature. We also use `transform` to execute the transformation instead of `respond` as we did when creating responses. In addition to the `with` method, you also have access to the other transformation methods like `without`, `only`, `meta` and `serializer`.
+
+***
+_Using `toArray` on the `Responder` service is almost the same as the code above, however, it will also include response decorators which might not be desired._
+***
+
+### Transforming Without Serializing
+
+When using the `TransformBuilder` to transform data it will still serialize the data using the configured serializer. Fractal requires the use of a serializer to transform data, but sometimes we're just interested in the raw transformed data. The package ships with a `Flugg\Responder\Serializers\NoopSerializer` to solve this, a no-op serializer which leaves the transformed data untouched:
+
+```php
+return $transformation->resource(Product::all())->serializer(NoopSerializer::class)->transform();
+```
+
+If you think this is looking messy, don't worry, there's a quicker way. In fact, you will probably never even need to utilize the `NoopSerializer` or `TransformBuilder` manually, but it helps to know how it works. The `Flugg\Responder\Transformation` is a class which can be used for quickly transforming data without serializing.
+
+#### Option 1: The `Transformation` Service
+
+The `Transformation` class utilizes the `TransformBuilder` class to build a transformation using the `NoopSerializer`. You can inject the `Transformation` class and call `make` to obtain an instance of `TransformBuilder` which gives you access to all of the chainable methods including `with`, like below:
+
+```php
+public function __construct(Transformation $transformation)
+{
+    $transformation->make(Product::all())->with('shipments')->transform();
+}
+```
+
+#### Option 2: The `transformation` Helper
+
+You can use the `transformation` helper function to transform data without serializing:
+
+```php
+transformation(Product::all())->with('shipments')->transform();
+```
+
+#### Option 3: The `Transformation` Facade
+
+You can also use the `Transformation` facade to achieve the same thing:
+
+```php
+Transformation::make(Product::all())->with('shipments')->transform();
 ```
 
 ### Transforming To Camel Case
@@ -760,9 +835,9 @@ return responder()->success(Product::all(), function ($product) {
 })->respond();
 ```
 
-#### Transforming Requests To Snake Case
+#### Transforming Request Parameters
 
-After responding with camel case, you probably want to let people send in request data using camel cased parameters as well. The package provides a `Flugg\Responder\Http\Middleware\ConvertToSnakeCase` middleware you may append to the `$middleware` array in `app/Http/Kernel.php` to convert all parameters to snake case automatically:
+After responding with camel case, you probably want to let people send in request data using camel cased parameters as well. The package provides a `Flugg\Responder\Http\Middleware\ConvertToSnakeCase` middleware you can append to the `$middleware` array in `app/Http/Kernel.php` to convert all parameters to snake case automatically:
 
 ```php
 protected $middleware = [

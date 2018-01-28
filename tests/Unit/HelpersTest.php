@@ -3,9 +3,8 @@
 namespace Flugg\Responder\Tests\Unit;
 
 use Flugg\Responder\Contracts\Responder;
-use Flugg\Responder\Contracts\SimpleTransformer;
 use Flugg\Responder\Tests\TestCase;
-use Flugg\Responder\TransformBuilder;
+use Flugg\Responder\Transformation;
 use Mockery;
 
 /**
@@ -25,11 +24,11 @@ class HelpersTest extends TestCase
     protected $responder;
 
     /**
-     * A mock of a [SimpleTransformer] service class.
+     * A mock of a [Transformation] class.
      *
      * @var \Mockery\MockInterface
      */
-    protected $transformer;
+    protected $transformation;
 
     /**
      * Setup the test environment.
@@ -43,8 +42,8 @@ class HelpersTest extends TestCase
         $this->responder = Mockery::mock(Responder::class);
         $this->app->instance(Responder::class, $this->responder);
 
-        $this->transformer = Mockery::mock(SimpleTransformer::class);
-        $this->app->instance(SimpleTransformer::class, $this->transformer);
+        $this->transformation = Mockery::mock(Transformation::class);
+        $this->app->instance(Transformation::class, $this->transformation);
     }
 
     /**
@@ -62,13 +61,13 @@ class HelpersTest extends TestCase
      * Assert that the [transform] function should use the transformer service to transform
      * the data.
      */
-    public function testTransformationFunctionShouldTransformUsingSimpleTransformerService()
+    public function testTransformationFunctionShouldTransformUsingTransformationClass()
     {
-        $this->transformer->shouldReceive('make')->andReturn($transformBuilder = $this->mockTransformBuilder());
+        $this->transformation->shouldReceive('make')->andReturn($transformBuilder = $this->mockTransformBuilder());
 
         $result = transformation($data = ['foo' => 1], $transformer = $this->mockTransformer());
 
         $this->assertSame($transformBuilder, $result);
-        $this->transformer->shouldHaveReceived('make')->with($data, $transformer);
+        $this->transformation->shouldHaveReceived('make')->with($data, $transformer);
     }
 }

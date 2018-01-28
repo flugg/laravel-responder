@@ -238,10 +238,6 @@ class ResponderServiceProvider extends BaseServiceProvider
         $this->app->bind(ResponderContract::class, function ($app) {
             return $app->make(Responder::class);
         });
-
-        $this->app->bind(SimpleTransformerContract::class, function ($app) {
-            return $app->make(SimpleTransformer::class);
-        });
     }
 
     /**

@@ -8,7 +8,7 @@ use League\Fractal\Pagination\PaginatorInterface;
 /**
  * A no-op serializer class responsible for returning the given data back untouched.
  * Only the raw transformed data is shown, this means meta data wont be visible.
- * The package uses this serializer for the [SimpleTransformer] and it's
+ * The package uses this serializer for the [Transformation] class and it's
  * practically an internal serializer, but feel free to use it elsewhere.
  *
  * @package flugger/laravel-responder
