@@ -66,7 +66,6 @@ class HandlerTest extends TestCase
 
         $this->request = Mockery::mock(Request::class);
         $this->request->shouldReceive('wantsJson')->andReturn(true);
-        $this->request->shouldReceive('expectsJson')->andReturn(true);
 
         $this->container = Mockery::mock(Container::class);
         $this->handler = new Handler($this->container);
@@ -160,6 +159,8 @@ class HandlerTest extends TestCase
      */
     public function testItShouldNotConvertNonHttpExceptions()
     {
+        $this->request->shouldReceive('expectsJson')->andReturn(false);
+
         $result = $this->handler->render($this->request, $exception = new Exception);
 
         $this->assertInstanceOf(Response::class, $result);
