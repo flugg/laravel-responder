@@ -55,7 +55,7 @@ trait MakesResources
      */
     protected function includeResource(string $identifier, $data, array $parameters): ResourceInterface
     {
-        $transformer = $this->getRelatedTransformerName($identifier);
+        $transformer = $this->mappedTransformerClass($identifier);
 
         if (method_exists($this, $method = 'include' . ucfirst(camel_case($identifier)))) {
             $resource = $this->resource($this->$method($data, collect($parameters)), $transformer, $identifier);
@@ -122,5 +122,5 @@ trait MakesResources
      * @param  string $identifier
      * @return string
      */
-    protected abstract function getRelatedTransformerName(string $identifier);
+    protected abstract function mappedTransformerClass(string $identifier);
 }

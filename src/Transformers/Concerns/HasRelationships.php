@@ -28,82 +28,180 @@ trait HasRelationships
     protected $load = [];
 
     /**
-     * Get a list of whitelisted relations, including nested relations.
+     * Get a list of whitelisted relations that are requested, including nested relations.
+     *
+     * @param  array $requested
+     * @return array
+     */
+    public function relations(array $requested = []): array
+    {
+        $requested = $this->normalizeRelations($requested);
+        $relations = $this->applyQueryConstraints($this->extractRelations($requested));
+        $nestedRelations = $this->nestedRelations($requested, $relations, 'relations');
+
+        return array_merge($relations, $nestedRelations);
+    }
+
+    /**
+     * Get a list of default relations including nested relations.
+     *
+     * @param  array $requested
+     * @return array
+     */
+    public function defaultRelations(array $requested = []): array
+    {
+        $requested = $this->normalizeRelations($requested);
+        $relations = $this->applyQueryConstraints($this->normalizeRelations($this->load));
+        $nestedRelations = $this->nestedRelations($relations, array_merge($relations, $requested), 'defaultRelations');
+
+        return array_merge($relations, $nestedRelations);
+    }
+
+    /**
+     * Get a list of available relations from the transformer with a normalized structure.
      *
      * @return array
      */
-    public function whitelistedRelations(): array
+    protected function availableRelations(): array
     {
-        $nestedRelations = $this->getNestedRelations($this->relations, function ($transformer) {
-            return $transformer->whitelistedRelations();
+        return $this->normalizeRelations(array_merge($this->relations, $this->load));
+    }
+
+    /**
+     * Get nested relations from transformers resolved from the $available parameter that
+     * also occur in the $requested parameter.
+     *
+     * @param  array  $requested
+     * @param  array  $available
+     * @param  string $method
+     * @return array
+     */
+    protected function nestedRelations(array $requested, array $available, string $method): array
+    {
+        $transformers = $this->mappedTransformers($available);
+
+        return collect(array_keys($transformers))->reduce(function ($nestedRelations, $relation) use ($requested, $method, $transformers) {
+            $transformer = $transformers[$relation];
+            $children = $this->extractChildRelations($requested, $relation);
+            $childRelations = $this->wrapChildRelations($transformer->$method($children), $relation);
+
+            return array_merge($nestedRelations, $childRelations);
+        }, []);
+    }
+
+    /**
+     * Extract available root relations from the given list of relations.
+     *
+     * @param  array $relations
+     * @return array
+     */
+    protected function extractRelations(array $relations): array
+    {
+        $available = $this->availableRelations();
+
+        return array_filter($this->mapRelations($relations, function ($relation, $constraint) {
+            $identifier = explode('.', $relation)[0];
+            $constraint = $identifier === $relation ? $constraint : null;
+
+            return [$identifier => $constraint ?: $this->resolveQueryConstraint($identifier)];
+        }), function ($relation) use ($available) {
+            return array_has($available, explode(':', $relation)[0]);
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * Extract all nested relations under a given identifier.
+     *
+     * @param  array  $relations
+     * @param  string $identifier
+     * @return array
+     */
+    protected function extractChildRelations(array $relations, string $identifier): array
+    {
+        return array_reduce(array_keys($relations), function ($nested, $relation) use ($relations, $identifier) {
+            if (! starts_with($relation, "$identifier.")) {
+                return $nested;
+            }
+
+            $nestedIdentifier = explode('.', $relation);
+            array_shift($nestedIdentifier);
+
+            return array_merge($nested, [implode('.', $nestedIdentifier) => $relations[$relation]]);
+        }, []);
+    }
+
+    /**
+     * Wrap the identifier of each relation of the given list of nested relations with
+     * the parent relation identifier using dot notation.
+     *
+     * @param  array  $nestedRelations
+     * @param  string $relation
+     * @return array
+     */
+    protected function wrapChildRelations(array $nestedRelations, string $relation): array
+    {
+        return $this->mapRelations($nestedRelations, function ($nestedRelation, $constraint) use ($relation) {
+            return ["$relation.$nestedRelation" => $constraint];
         });
-
-        return array_merge($this->normalizeRelations($this->relations), $nestedRelations);
     }
 
     /**
-     * Get a list of default relations, including nested relations.
-     *
-     * @return array
-     */
-    public function defaultRelations(): array
-    {
-        $nestedRelations = $this->getNestedRelations($this->load, function ($transformer) {
-            return $transformer->defaultRelations();
-        });
-
-        return array_merge($this->normalizeRelations($this->load), $nestedRelations);
-    }
-
-    /**
-     * Extract a list of nested relations from the transformers provided in the
-     * list of relations.
-     *
-     * @param  array    $relations
-     * @param  callable $nestedCallback
-     * @return array
-     */
-    protected function getNestedRelations(array $relations, callable $nestedCallback): array
-    {
-        return collect($relations)->filter(function ($transformer, $relation) {
-            return ! is_numeric($relation) && ! is_null($transformer);
-        })->map(function ($transformer) {
-            return $this->resolveTransformer($transformer);
-        })->flatMap(function ($transformer, $relation) use ($nestedCallback) {
-            return collect($nestedRelations = $nestedCallback($transformer))
-                ->keys()
-                ->reduce(function ($value, $nestedRelation) use ($relation, $nestedRelations) {
-                    return array_merge($value, ["$relation.$nestedRelation" => $nestedRelations[$nestedRelation]]);
-                }, []);
-        })->all();
-    }
-
-    /**
-     * Normalize relations to force a key value structure.
+     * Normalize relations to force an [identifier => constraint/transformer] structure.
      *
      * @param  array $relations
      * @return array
      */
     protected function normalizeRelations(array $relations): array
     {
-        return collect(array_keys($relations))->reduce(function ($normalized, $relation) use ($relations) {
+        return array_reduce(array_keys($relations), function ($normalized, $relation) use ($relations) {
             if (is_numeric($relation)) {
-                $relation = $relations[$relation];
+                return array_merge($normalized, [$relations[$relation] => null]);
             }
 
-            return array_merge($normalized, [$relation => $this->getQueryConstraint($relation)]);
+            return array_merge($normalized, [$relation => $relations[$relation]]);
         }, []);
     }
 
     /**
-     * Normalize relations to force a key value structure.
+     * Map over a list of relations with the [identifier => constraint/transformer] structure.
      *
-     * @param  string $relation
+     * @param  array    $relations
+     * @param  callable $callback
+     * @return array
+     */
+    protected function mapRelations(array $relations, callable $callback): array
+    {
+        $mapped = [];
+
+        foreach ($relations as $identifier => $value) {
+            $mapped = array_merge($mapped, $callback($identifier, $value));
+        }
+
+        return $mapped;
+    }
+
+    /**
+     * Applies any query constraints defined in the transformer to the list of relaations.
+     *
+     * @param  array $relations
+     * @return array
+     */
+    protected function applyQueryConstraints(array $relations): array
+    {
+        return $this->mapRelations($relations, function ($relation, $constraint) {
+            return [$relation => is_callable($constraint) ? $constraint : $this->resolveQueryConstraint($relation)];
+        });
+    }
+
+    /**
+     * Resolve a query constraint for a given relation identifier.
+     *
+     * @param  string $identifier
      * @return \Closure|null
      */
-    protected function getQueryConstraint(string $relation)
+    protected function resolveQueryConstraint(string $identifier)
     {
-        if (! method_exists($this, $method = 'load' . ucfirst(camel_case($relation)))) {
+        if (! method_exists($this, $method = 'load' . ucfirst(camel_case($identifier)))) {
             return null;
         }
 
@@ -113,7 +211,7 @@ trait HasRelationships
     }
 
     /**
-     * Resolve a relationship from a model instance.
+     * Resolve a relation from a model instance and an identifier.
      *
      * @param  \Illuminate\Database\Eloquent\Model $model
      * @param  string                              $identifier
@@ -121,17 +219,29 @@ trait HasRelationships
      */
     protected function resolveRelation(Model $model, string $identifier)
     {
-        if (str_contains($identifier, '_')) {
-            $identifier = camel_case($identifier);
-        }
-
+        $identifier = camel_case($identifier);
         $relation = $model->$identifier;
 
-        if (method_exists($this, $method = 'filter' . ucfirst(camel_case($identifier)))) {
+        if (method_exists($this, $method = 'filter' . ucfirst($identifier))) {
             return $this->$method($relation);
         }
 
         return $relation;
+    }
+
+    /**
+     * Resolve a list of transformers from a list of relations mapped to transformers.
+     *
+     * @param  array $relations
+     * @return array
+     */
+    protected function mappedTransformers(array $relations): array
+    {
+        return collect($this->availableRelations())->filter(function ($transformer) {
+            return ! is_null($transformer);
+        })->map(function ($transformer) {
+            return $this->resolveTransformer($transformer);
+        })->intersectKey($relations)->all();
     }
 
     /**
@@ -140,11 +250,9 @@ trait HasRelationships
      * @param  string $identifier
      * @return string|null
      */
-    protected function getRelatedTransformerName(string $identifier)
+    protected function mappedTransformerClass(string $identifier)
     {
-        $relations = array_merge($this->relations, $this->load);
-
-        return array_has($relations, $identifier) ? $relations[$identifier] : null;
+        return $this->availableRelations()[$identifier] ?? null;
     }
 
     /**

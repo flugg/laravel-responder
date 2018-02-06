@@ -7,7 +7,7 @@ use Flugg\Responder\Contracts\Resources\ResourceFactory;
 use Flugg\Responder\Contracts\TransformFactory;
 use Flugg\Responder\Exceptions\InvalidSuccessSerializerException;
 use Flugg\Responder\Pagination\CursorPaginator;
-use Flugg\Responder\Transformers\Transformer as BaseTransformer;
+use Flugg\Responder\Transformers\Transformer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -255,11 +255,10 @@ class TransformBuilder
      */
     protected function prepareRelations($data, $transformer)
     {
-        if ($transformer instanceof BaseTransformer) {
-            $whitelisted = $transformer->whitelistedRelations();
-            $default = $transformer->defaultRelations();
-            $relations = $this->addMissingQueryConstraints($this->with, $whitelisted);
-            $this->with = $this->removeForbiddenRelations(array_merge($relations, $default), array_merge($whitelisted, $default));
+        if ($transformer instanceof Transformer) {
+            $relations = $transformer->relations($this->with);
+            $defaultRelations = $this->removeExcludedRelations($transformer->defaultRelations($this->with));
+            $this->with = array_merge($relations, $defaultRelations);
         }
 
         if ($data instanceof Model || $data instanceof Collection) {
@@ -270,36 +269,15 @@ class TransformBuilder
     }
 
     /**
-     * Add query constraints defined as "load" methods in the transformers to the list of
-     * requested relations.
-     *
-     * @param  array $requested
-     * @param  array $whitelisted
-     * @return array
-     */
-    protected function addMissingQueryConstraints(array $requested, array $whitelisted): array
-    {
-        return collect(array_keys($requested))->reduce(function ($relations, $relation) use ($requested, $whitelisted) {
-            $constraint = $requested[$relation];
-
-            return array_merge($relations, [$relation => $constraint ? $constraint : $whitelisted[$relation] ?? null]);
-        }, []);
-    }
-
-    /**
-     * Filter out relations that are not whitelisted in the transformer or relations that
-     * have been explicitly excluded using the [without] method.
+     * Filter out relations that have been explicitly excluded using the [without] method.
      *
      * @param  array $relations
-     * @param  array $whitelisted
      * @return array
      */
-    protected function removeForbiddenRelations(array $relations, array $whitelisted): array
+    protected function removeExcludedRelations(array $relations): array
     {
-        return array_filter($relations, function ($relation) use ($whitelisted) {
-            $relation = $this->stripParametersFromRelation($relation);
-
-            return key_exists($relation, $whitelisted) && ! in_array($relation, $this->without);
+        return array_filter($relations, function ($relation) {
+            return ! in_array($this->stripParametersFromRelation($relation), $this->without);
         }, ARRAY_FILTER_USE_KEY);
     }
 
@@ -328,11 +306,7 @@ class TransformBuilder
     protected function eagerLoadRelations($data, array $requested, $transformer)
     {
         $relations = collect(array_keys($requested))->reduce(function ($eagerLoads, $relation) use ($requested, $transformer) {
-            $identifier = $this->stripParametersFromRelation($relation);
-
-            if (str_contains($identifier, '_')) {
-                $identifier = camel_case($identifier);
-            }
+            $identifier = camel_case($this->stripParametersFromRelation($relation));
 
             if (method_exists($transformer, 'include' . ucfirst($identifier))) {
                 return $eagerLoads;

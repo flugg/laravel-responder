@@ -21,7 +21,7 @@ class TransformResponseDataTest extends TestCase
     /**
      * Assert that you can transform the response data using a basic closure transformer.
      */
-    public function testTransformResponseDataUsingClosure()
+    public function testTransformDataUsingClosure()
     {
         $response = responder()->success($product = Product::create(['name' => 'foo']), function ($product) {
             return [

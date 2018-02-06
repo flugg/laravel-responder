@@ -8,6 +8,7 @@ use Flugg\Responder\Tests\Product;
 use Flugg\Responder\Tests\ProductTransformer;
 use Flugg\Responder\Tests\TestCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Mockery;
 
 /**
@@ -58,6 +59,26 @@ class IncludeRelationTest extends TestCase
     }
 
     /**
+     * Assert that it doesn't end up with a circular dependency when extracting whitelisted
+     * relationships from the transformers.
+     */
+    public function testIncludeCircularRelations()
+    {
+        $response = responder()
+            ->success($this->product, ProductWithOrdersWhitelistedTransformer::class)
+            ->with('orders.product')
+            ->respond();
+
+        $this->assertEquals($this->responseData(array_merge($this->product->fresh()->toArray(), [
+            'orders' => [
+                array_merge($this->order->toArray(), [
+                    'product' => $this->product->fresh()->toArray(),
+                ]),
+            ],
+        ])), $response->getData(true));
+    }
+
+    /**
      * Assert that you can include associated resources including a query constraint.
      */
     public function testIncludeRelationsWithQueryConstraints()
@@ -96,6 +117,25 @@ class IncludeRelationTest extends TestCase
     }
 
     /**
+     * Assert that when you include a nested relation with a query string constraint, that's
+     * not applied for the parent relation.
+     */
+    public function testIncludeNestedRelationsWithQueryConstraints()
+    {
+        $product = Mockery::mock($this->product);
+
+        responder()->success($product, ProductTransformer::class)->with([
+            'orders.customer' => function ($query) {
+                $query->where('name', 'foo');
+            },
+        ])->respond();
+
+        $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+            return array_has($argument, 'orders') && is_callable($argument['orders']) && count($argument) === 2;
+        }))->once();
+    }
+
+    /**
      * Assert that you can include associated resources using the configured query string parameter.
      */
     public function testIncludeRelationsWithQueryStringParameter()
@@ -127,6 +167,26 @@ class IncludeRelationTest extends TestCase
 
         $this->assertEquals($this->responseData(array_merge($this->product->toArray(), [
             'shipments' => [$this->shipment->toArray()],
+            'orders' => [
+                array_merge($this->order->toArray(), [
+                    'customer' => $this->customer->toArray(),
+                ]),
+            ],
+        ])), $response->getData(true));
+    }
+
+    /**
+     * Assert that it automatically includes relationships declared in the $load property
+     * of a transformer class resolved from a nested transformer.
+     */
+    public function testIncludeRelationsByDefaultFromNestedTransformer()
+    {
+        $response = responder()
+            ->success($this->product, ProductWithOrdersWhitelistedAndCustomerAutoloadedTransformer::class)
+            ->with('orders')
+            ->respond();
+
+        $this->assertEquals($this->responseData(array_merge($this->product->toArray(), [
             'orders' => [
                 array_merge($this->order->toArray(), [
                     'customer' => $this->customer->toArray(),
@@ -209,6 +269,22 @@ class IncludeRelationTest extends TestCase
     }
 
     /**
+     * Assert that it loads relations from an "include" method on the transformer if it's
+     * defined.
+     */
+    public function testItSendsParametersToTheIncludeMethod()
+    {
+        $response = responder()
+            ->success($this->product, ProductWithIncludeMethodAndParametersTransformer::class)
+            ->with('shipments:product(foo|bar)')
+            ->respond();
+
+        $this->assertEquals($this->responseData(array_merge($this->product->fresh()->toArray(), [
+            'shipments' => ['foo', 'bar'],
+        ])), $response->getData(true));
+    }
+
+    /**
      * Assert that it loads relations with query constraints from a "load" method
      * on the transformer if it's defined.
      */
@@ -250,9 +326,24 @@ class ProductWithShipmentsWhitelistedTransformer extends ProductTransformer
     protected $relations = ['shipments'];
 }
 
+class ProductWithOrdersWhitelistedTransformer extends ProductTransformer
+{
+    protected $relations = ['orders' => OrderWithProductWhitelistedTransformer::class];
+}
+
+class ProductWithOrdersWhitelistedAndCustomerAutoloadedTransformer extends ProductTransformer
+{
+    protected $relations = ['orders' => OrderWithCustomerAutoloadedTransformer::class];
+}
+
 class ProductWithShipmentsAutoloadedTransformer extends ProductTransformer
 {
     protected $load = ['shipments', 'orders' => OrderWithCustomerAutoloadedTransformer::class];
+}
+
+class OrderWithProductWhitelistedTransformer extends OrderTransformer
+{
+    protected $relations = ['product' => ProductWithOrdersWhitelistedTransformer::class];
 }
 
 class OrderWithCustomerAutoloadedTransformer extends OrderTransformer
@@ -273,6 +364,16 @@ class ProductWithIncludeMethodTransformer extends ProductTransformer
     public function includeShipments(Product $product)
     {
         return $product->shipments;
+    }
+}
+
+class ProductWithIncludeMethodAndParametersTransformer extends ProductTransformer
+{
+    protected $relations = ['shipments', 'orders'];
+
+    public function includeShipments(Product $product, Collection $parameters)
+    {
+        return $parameters->get('product');
     }
 }
 
