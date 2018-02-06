@@ -1,3 +1,21 @@
+# 3.0.2 (2018-02-06)
+
+### Bug Fixes
+
+* Change Collection's `intersectKey` with `array_key_intersect` in transformer as the method isn't available in all Laravel versions
+
+# 3.0.1 (2018-02-06)
+
+### Features
+
+* When requesting non-whitelisted nested relations, it now returns any relation up to the one that's not whitelisted
+* It will now automatically camel case relations before loading them from the model allowing for snake cased relations in transformers
+
+### Bug Fixes
+
+* Fix bug concerning circular relationship mappings
+* It will now correctly look for default relations in requested relations that are nested
+
 # 3.0.0 (2018-01-28)
 
 Version `3.0.0` contains many bug fixes, but also quite a lot of new features and changes. The entire relationship logic has been rewritten to improve performance, security and stability among other improvements. There has also been big focus on improving test coverage for this release and we're now right below 90% coverage.
