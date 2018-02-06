@@ -35,9 +35,7 @@ trait OverridesFractal
      */
     public function getDefaultIncludes()
     {
-        $requested = $this->getCurrentScope()->getManager()->getRequestedIncludes();
-
-        return array_intersect(array_keys($this->normalizeRelations($this->load)), $requested);
+        return array_keys($this->normalizeRelations($this->load));
     }
 
     /**

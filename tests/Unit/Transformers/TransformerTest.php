@@ -84,24 +84,6 @@ class TransformerTest extends TestCase
     }
 
     /**
-     * Assert that the [getDefaultIncludes] method only returns relations that are part of
-     * the requested relations. The default includes should be part of them, unless they
-     * have been explicitly excluded.
-     */
-    public function testGetDefaultIncludesMethodOnlyReturnsNonExcludedRelations()
-    {
-        $transformer = new TransformerWithDefaultRelations;
-        $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
-        $scope->shouldReceive('getParentScopes')->andReturn([]);
-        $scope->shouldReceive('getManager')->andReturn($manager = Mockery::mock(Manager::class));
-        $manager->shouldReceive('getRequestedIncludes')->andReturn(['foo']);
-
-        $result = $transformer->getDefaultIncludes();
-
-        $this->assertEquals(['foo'], $result);
-    }
-
-    /**
      * Assert that the [processIncludedResources] method makes a resource from include method
      * if one exists.
      */

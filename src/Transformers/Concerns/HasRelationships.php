@@ -237,11 +237,13 @@ trait HasRelationships
      */
     protected function mappedTransformers(array $relations): array
     {
-        return collect($this->availableRelations())->filter(function ($transformer) {
+        $transformers = collect($this->availableRelations())->filter(function ($transformer) {
             return ! is_null($transformer);
         })->map(function ($transformer) {
             return $this->resolveTransformer($transformer);
-        })->intersectKey($relations)->all();
+        })->all();
+
+        return array_intersect_key($transformers, $relations);
     }
 
     /**
