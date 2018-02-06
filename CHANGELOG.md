@@ -1,14 +1,15 @@
 # 3.0.0 (2018-01-28)
 
-Version `3.0.0` contains mostly bug fixes, but also quite a lot of new features and changes. The entire relationship logic has been rewritten to improve performance, security and stability among other improvements. There has also been big focus on improving test coverage for this release and we're now right below 90% coverage.
+Version `3.0.0` contains many bug fixes, but also quite a lot of new features and changes. The entire relationship logic has been rewritten to improve performance, security and stability among other improvements. There has also been big focus on improving test coverage for this release and we're now right below 90% coverage.
 
 ### Breaking Changes
 
 * Fractal requirement changed to `0.17.0`
-* Whitelisted relationships now required a transformer mapping in order for eager loading to take effect
+* Whitelisted relationships now requires a transformer mapping in order for eager loading to take effect
 * Relationships will now only be eager loaded if you have specified a transformer with whitelisted relationships
-* The `transform` method has been renamed to `transformation` and it now returns a `TransformBuilder` instead of an array
+* The `transform` method of `Transformer` service and `Transformer` facade has been renamed to `make` and now returns a `TransformBuilder`
 * The `Flugg\Responder\Transformer` service has been renamed to `Transformation`
+* The `transform` helper function has been renamed to `transformation`
 * The `Transformer` facade has been renamed to `Transformation`
 * `NullSerializer` has been renamed to `NoopSerializer`
 
