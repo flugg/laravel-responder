@@ -83,7 +83,7 @@ Flugg\Responder\ResponderServiceProvider::class,
 ```
 
 ***
-_The package supports auto-discovery, so if you use Laravel 5.5 or later you may skip registering the service provider and facades and instead run `php artisan package:discover`._
+_The package supports auto-discovery, so if you use Laravel 5.5 or later you may skip registering the service provider and facades as they will be registered automatically._
 ***
 
 #### Register Facades _(optional)_
