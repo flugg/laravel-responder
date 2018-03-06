@@ -771,7 +771,7 @@ return array_merge((new ProductTransformer)->transform($product = Product::first
 
 Yuck! Imagine that with multiple nested relationships. Let's explore a simpler way to handle this.
 
-### Builiding Transformations
+### Building Transformations
 
 The `SuccessResponseBuilder` actually delegates all of the transformation work to a dedicated `Flugg\Responder\TransformBuilder` class. We can use this class ourself to transform data. For instance, if the product and shipment transformers were bound to the models, we could replicate the code above in the following way:
 
