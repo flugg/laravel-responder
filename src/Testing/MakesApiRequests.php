@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Traits;
+namespace Flugg\Responder\Testing;
 
 use Flugg\Responder\Responder;
 use Illuminate\Http\JsonResponse;
