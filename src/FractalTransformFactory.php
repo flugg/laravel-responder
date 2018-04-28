@@ -101,7 +101,7 @@ class FractalTransformFactory implements TransformFactory
             }
 
             $fields = $this->parseFieldset($key, (array) $fields, $includes);
-            $fieldsets[$key] = array_unique($fields);
+            $fieldsets[$key] = array_unique(array_merge(key_exists($key, $fieldsets) ? (array) $fieldsets[$key] : [], $fields));
         }
 
         return array_map(function ($fields) {
