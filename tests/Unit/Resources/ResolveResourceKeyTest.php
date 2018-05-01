@@ -36,14 +36,14 @@ class ResolveResourceKeyTest extends TestCase
     }
 
     /**
-     * Assert that the [resolve] method resolves 'data' as resource key if it can't resolve
+     * Assert that the [resolve] method resolves null as resource key if it can't resolve
      * a resource key from the given data.
      */
     public function testResolveMethodShouldResolveDefaultResourceKeyIfNoneIsFound()
     {
         $result = $this->resolver->resolve($data = []);
 
-        $this->assertEquals('data', $result);
+        $this->assertEquals(null, $result);
     }
 
     /**
