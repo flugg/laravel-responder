@@ -40,7 +40,7 @@ class ResourceKeyResolver implements ResourceKeyResolverContract
      * Resolve a resource key from the given data.
      *
      * @param  mixed $data
-     * @return string
+     * @return string|null
      */
     public function resolve($data)
     {
@@ -54,7 +54,7 @@ class ResourceKeyResolver implements ResourceKeyResolverContract
             return $this->resolveFromModel($transformable);
         }
 
-        return 'data';
+        return null;
     }
 
     /**
