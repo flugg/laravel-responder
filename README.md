@@ -175,7 +175,7 @@ return Responder::success();
 return Responder::error();
 ```
 
-#### Option 4: Use `MakesApiResponses` Trait
+#### Option 4: Use `MakesResponses` Trait
 
 Lastly, the package provides a `Flugg\Responder\Http\MakesResponses` trait you can use in your controllers:
 
