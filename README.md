@@ -416,13 +416,14 @@ Assuming there are no products and the default configuration is used, the JSON o
 {
     "success": true,
     "status": 200,
-    "data": null,
+    "data": [],
     "pagination": {
         "total": 0,
         "count": 0,
         "perPage": 15,
         "currentPage": 1,
-        "totalPages": 1
+        "totalPages": 1,
+        "links": []
     }
 }
 ```
