@@ -383,7 +383,7 @@ return responder()->success(Product::all())->respond();
 ```
 
 ***
-_As you might have noticed, unlike Fractal, you don't need to worry about creating resource objects like `Item` and `Collection`. The package will make one for you based on the data type, however, you may wrap your data in a resource to override this._
+_As you might have noticed, unlike Fractal, you don't need to worry about creating resource objects like `Item` and `Collection`. The package will make one for you based on the data type, however, you may wrap your data in a resource object to override this._
 ***
 
 ### Setting Resource Key
