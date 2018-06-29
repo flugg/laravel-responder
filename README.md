@@ -638,13 +638,7 @@ _You can choose to skip the mapping and just pass the strings like with Fractal,
 
 #### Setting Whitelisted Relationships
 
-The `$relations` property specifies a list of relations available to be included. You can set it to a wildcard allowing the access to all relations on the transformer:
-
-```php
-protected $relations = ['*'];
-```
-
-If you want to whitelist certain relations, you can set a list of relations mapped to their corresponding transformers:
+The `$relations` property specifies a list of relations available to be included. You can set a list of relations mapped to their corresponding transformers:
 
 ```php
 protected $relations = [
@@ -652,10 +646,6 @@ protected $relations = [
     'orders' => OrderTransformer::class,
 ];
 ```
-
-***
-_**Security warning:** Since the transformer doesn't know what relations exists on a model unless you specify it in `$relations` or `$load`, you're technically allowing calls to any method on your model when using a wildcard. You should therefore consider always specifying a whitelist._
-***
 
 #### Setting Autoloaded Relationships
 
