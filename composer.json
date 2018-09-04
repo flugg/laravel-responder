@@ -20,12 +20,12 @@
     ],
     "require": {
         "php": "^7.0",
-        "illuminate/contracts": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.*",
-        "illuminate/support": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.*",
+        "illuminate/contracts": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.* || 5.7.*",
+        "illuminate/support": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.* || 5.7.*",
         "league/fractal": "^0.17.0"
     },
     "require-dev": {
-        "illuminate/database": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.*",
+        "illuminate/database": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.* || 5.7.*",
         "orchestra/testbench": "~3.0",
         "mockery/mockery": "^0.9.5 || ^1.0",
         "fzaninotto/faker": "^1.6",
