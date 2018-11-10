@@ -85,6 +85,6 @@ trait ConvertsExceptions
         return app(Responder::class)
             ->error($exception->errorCode(), $exception->message())
             ->data($exception->data())
-            ->respond($exception->statusCode());
+            ->respond($exception->statusCode(), $exception->getHeaders());
     }
 }
