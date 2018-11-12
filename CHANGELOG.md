@@ -1,3 +1,15 @@
+# 3.0.4 (2018-09-05)
+
+### Bug Fixes
+
+* Add missing header call in `ConvertsExceptions`
+
+# 3.0.3 (2018-09-05)
+
+### Features
+
+* Add Laravel 5.7 support
+
 # 3.0.2 (2018-02-06)
 
 ### Bug Fixes
