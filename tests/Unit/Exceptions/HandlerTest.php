@@ -8,7 +8,6 @@ use Flugg\Responder\Exceptions\Handler;
 use Flugg\Responder\Exceptions\Http\HttpException;
 use Flugg\Responder\Exceptions\Http\PageNotFoundException;
 use Flugg\Responder\Exceptions\Http\RelationNotFoundException;
-use Flugg\Responder\Exceptions\Http\ResourceNotFoundException;
 use Flugg\Responder\Exceptions\Http\UnauthenticatedException;
 use Flugg\Responder\Exceptions\Http\UnauthorizedException;
 use Flugg\Responder\Exceptions\Http\ValidationFailedException;
@@ -142,6 +141,7 @@ class HandlerTest extends TestCase
         $exception->shouldReceive('message')->andReturn($message = 'A test error has occured.');
         $exception->shouldReceive('data')->andReturn($data = ['foo' => 1]);
         $exception->shouldReceive('statusCode')->andReturn($status = 404);
+        $exception->shouldReceive('getHeaders')->andReturn($headers = ['x-foo' => 123]);
         $this->app->instance(Responder::class, $responder = Mockery::mock(Responder::class));
         $responder->shouldReceive('error')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
         $responseBuilder->shouldReceive('respond')->andReturn($response = new JsonResponse);
@@ -151,7 +151,7 @@ class HandlerTest extends TestCase
         $this->assertSame($response, $result);
         $responder->shouldHaveReceived('error')->with($errorCode, $message)->once();
         $responseBuilder->shouldHaveReceived('data')->with($data)->once();
-        $responseBuilder->shouldHaveReceived('respond')->with($status)->once();
+        $responseBuilder->shouldHaveReceived('respond')->with($status, $headers)->once();
     }
 
     /**
