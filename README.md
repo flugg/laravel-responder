@@ -767,7 +767,7 @@ public function index(TransformBuilder $transformation)
 }
 ```
 
-Instead of using the `success` method on the `Responder` service, we use the `resouce` method on the `TransformBuilder` with the same method signature. We also use `transform` to execute the transformation instead of `respond` as we did when creating responses. In addition to the `with` method, you also have access to the other transformation methods like `without`, `only`, `meta` and `serializer`.
+Instead of using the `success` method on the `Responder` service, we use the `resource` method on the `TransformBuilder` with the same method signature. We also use `transform` to execute the transformation instead of `respond` as we did when creating responses. In addition to the `with` method, you also have access to the other transformation methods like `without`, `only`, `meta` and `serializer`.
 
 ***
 _Using `toArray` on the `Responder` service is almost the same as the code above, however, it will also include response decorators which might not be desired._
