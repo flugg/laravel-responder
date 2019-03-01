@@ -1,3 +1,9 @@
+# 3.0.5 (2019-03-01)
+
+### Features
+
+* Add Laravel 5.8 support
+
 # 3.0.4 (2018-09-05)
 
 ### Bug Fixes
