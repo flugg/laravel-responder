@@ -3,6 +3,8 @@
 namespace Flugg\Responder\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -88,7 +90,7 @@ class MakeTransformer extends GeneratorCommand
      */
     protected function resolveModelFromClassName()
     {
-        return 'App\\' . str_replace('Transformer', '', array_last(explode('/', $this->getNameInput())));
+        return 'App\\' . str_replace('Transformer', '', Arr::last(explode('/', $this->getNameInput())));
     }
 
     /**
@@ -126,7 +128,7 @@ class MakeTransformer extends GeneratorCommand
 
         $model = trim(str_replace('/', '\\', $model), '\\');
 
-        if (! starts_with($model, $rootNamespace = $this->laravel->getNamespace())) {
+        if (! Str::startsWith($model, $rootNamespace = $this->laravel->getNamespace())) {
             $model = $rootNamespace . $model;
         }
 

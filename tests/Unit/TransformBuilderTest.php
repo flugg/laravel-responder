@@ -14,6 +14,7 @@ use Flugg\Responder\TransformBuilder;
 use Flugg\Responder\Transformers\Transformer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use League\Fractal\Pagination\Cursor;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Serializer\JsonApiSerializer;
@@ -309,7 +310,7 @@ class TransformBuilderTest extends TestCase
         $this->builder->resource()->with($relations = ['foo' => function () { }, 'bar'])->transform();
 
         $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
-            return array_has($argument, ['foo', 'bar', 'baz']);
+            return Arr::has($argument, ['foo', 'bar', 'baz']);
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo', 'bar', 'baz'],
@@ -335,7 +336,7 @@ class TransformBuilderTest extends TestCase
         $this->builder->resource()->with(['foo:first(aa|bb)', 'bar:second(cc|dd)'])->transform();
 
         $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
-            return array_has($argument, ['foo', 'bar']);
+            return Arr::has($argument, ['foo', 'bar']);
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo:first(aa|bb)', 'bar:second(cc|dd)'],
@@ -359,7 +360,7 @@ class TransformBuilderTest extends TestCase
         $this->builder->resource()->with(['foo', 'bar'])->transform();
 
         $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
-            return array_has($argument, 'foo') && count($argument) === 1;
+            return Arr::has($argument, 'foo') && count($argument) === 1;
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo'],
@@ -386,7 +387,7 @@ class TransformBuilderTest extends TestCase
         $this->builder->resource()->with($relations = ['foo', 'bar'])->transform();
 
         $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
-            return array_has($argument, 'foo') && count($argument) === 1;
+            return Arr::has($argument, 'foo') && count($argument) === 1;
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
             'includes' => ['foo', 'bar', 'baz'],

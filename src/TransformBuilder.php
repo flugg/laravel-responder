@@ -11,6 +11,7 @@ use Flugg\Responder\Transformers\Transformer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use League\Fractal\Pagination\Cursor;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection as CollectionResource;
@@ -306,7 +307,7 @@ class TransformBuilder
     protected function eagerLoadRelations($data, array $requested, $transformer)
     {
         $relations = collect(array_keys($requested))->reduce(function ($eagerLoads, $relation) use ($requested, $transformer) {
-            $identifier = camel_case($this->stripParametersFromRelation($relation));
+            $identifier = Str::camel($this->stripParametersFromRelation($relation));
 
             if (method_exists($transformer, 'include' . ucfirst($identifier))) {
                 return $eagerLoads;
