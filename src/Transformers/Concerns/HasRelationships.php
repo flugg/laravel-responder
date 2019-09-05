@@ -4,6 +4,7 @@ namespace Flugg\Responder\Transformers\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * A trait to be used by a transformer to handle relations
@@ -120,7 +121,7 @@ trait HasRelationships
     protected function extractChildRelations(array $relations, string $identifier): array
     {
         return array_reduce(array_keys($relations), function ($nested, $relation) use ($relations, $identifier) {
-            if (! starts_with($relation, "$identifier.")) {
+            if (! Str::startsWith($relation, "$identifier.")) {
                 return $nested;
             }
 
@@ -202,7 +203,7 @@ trait HasRelationships
      */
     protected function resolveQueryConstraint(string $identifier)
     {
-        if (! method_exists($this, $method = 'load' . ucfirst(camel_case($identifier)))) {
+        if (! method_exists($this, $method = 'load' . ucfirst(Str::camel($identifier)))) {
             return null;
         }
 
@@ -220,7 +221,7 @@ trait HasRelationships
      */
     protected function resolveRelation(Model $model, string $identifier)
     {
-        $identifier = camel_case($identifier);
+        $identifier = Str::camel($identifier);
         $relation = $model->$identifier;
 
         if (method_exists($this, $method = 'filter' . ucfirst($identifier))) {

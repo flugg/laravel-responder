@@ -6,6 +6,7 @@ use Countable;
 use Flugg\Responder\Contracts\Resources\ResourceFactory;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use League\Fractal\Resource\ResourceInterface;
 use LogicException;
 
@@ -57,7 +58,7 @@ trait MakesResources
     {
         $transformer = $this->mappedTransformerClass($identifier);
 
-        if (method_exists($this, $method = 'include' . ucfirst(camel_case($identifier)))) {
+        if (method_exists($this, $method = 'include' . ucfirst(Str::camel($identifier)))) {
             $resource = $this->resource($this->$method($data, collect($parameters)), $transformer, $identifier);
         } elseif ($data instanceof Model) {
             $resource = $this->includeResourceFromModel($data, $identifier, $transformer);
