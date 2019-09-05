@@ -3,6 +3,7 @@
 namespace Flugg\Responder\Transformers\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 /**
  * A trait to be used by a transformer to handle relations
@@ -105,7 +106,7 @@ trait HasRelationships
 
             return [$identifier => $constraint ?: $this->resolveQueryConstraint($identifier)];
         }), function ($relation) use ($available) {
-            return array_has($available, explode(':', $relation)[0]);
+            return Arr::has($available, explode(':', $relation)[0]);
         }, ARRAY_FILTER_USE_KEY);
     }
 

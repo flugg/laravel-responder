@@ -8,6 +8,7 @@ use Flugg\Responder\Tests\Product;
 use Flugg\Responder\Tests\ProductTransformer;
 use Flugg\Responder\Tests\TestCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Mockery;
 
@@ -131,7 +132,7 @@ class IncludeRelationTest extends TestCase
         ])->respond();
 
         $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
-            return array_has($argument, 'orders') && is_callable($argument['orders']) && count($argument) === 2;
+            return Arr::has($argument, 'orders') && is_callable($argument['orders']) && count($argument) === 2;
         }))->once();
     }
 
@@ -223,7 +224,7 @@ class IncludeRelationTest extends TestCase
             ->respond();
 
         $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
-            return array_has($argument, 'shipments') && count($argument) === 1;
+            return Arr::has($argument, 'shipments') && count($argument) === 1;
         }))->once();
     }
 
@@ -242,7 +243,7 @@ class IncludeRelationTest extends TestCase
             ->respond();
 
         $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
-            return array_has($argument, ['whitelistedShipments', 'defaultOrders']) && count($argument) === 2;
+            return Arr::has($argument, ['whitelistedShipments', 'defaultOrders']) && count($argument) === 2;
         }))->once();
     }
 
@@ -260,7 +261,7 @@ class IncludeRelationTest extends TestCase
             ->respond();
 
         $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
-            return array_has($argument, 'orders') && count($argument) === 1;
+            return Arr::has($argument, 'orders') && count($argument) === 1;
         }))->once();
         $this->assertEquals($this->responseData(array_merge($this->product->fresh()->toArray(), [
             'shipments' => [$this->shipment->toArray()],
