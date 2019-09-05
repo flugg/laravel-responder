@@ -65,7 +65,7 @@ class ErrorMessageResolver implements ErrorMessageResolverContract
         }
 
         if ($this->translator->has($errorCode = "errors.$errorCode")) {
-            return $this->translator->trans($errorCode);
+            return $this->translator->get($errorCode);
         }
 
         return null;

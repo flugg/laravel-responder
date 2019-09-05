@@ -61,13 +61,13 @@ class ErrorMessageResolverTest extends TestCase
     public function testResolveMethodShouldResolveMessageFromTranslator()
     {
         $this->translator->shouldReceive('has')->andReturn(true);
-        $this->translator->shouldReceive('trans')->andReturn($message = 'A test error has occured.');
+        $this->translator->shouldReceive('get')->andReturn($message = 'A test error has occured.');
 
         $result = $this->messageResolver->resolve($code = 'test_error');
 
         $this->assertEquals($message, $result);
         $this->translator->shouldHaveReceived('has')->with("errors.$code")->once();
-        $this->translator->shouldHaveReceived('trans')->with("errors.$code")->once();
+        $this->translator->shouldHaveReceived('get')->with("errors.$code")->once();
     }
 
     /**
