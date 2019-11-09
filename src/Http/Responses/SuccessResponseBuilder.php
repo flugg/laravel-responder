@@ -11,7 +11,7 @@ use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Serializer\SerializerAbstract;
 
 /**
- * A builder class for building error responses.
+ * A builder class for building success responses.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
