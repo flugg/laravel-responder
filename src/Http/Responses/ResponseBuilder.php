@@ -59,7 +59,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
     }
 
     /**
-     * Respond with a successful response.
+     * Respond with an HTTP response.
      *
      * @param  int|null $status
      * @param  array    $headers
