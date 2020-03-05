@@ -8,6 +8,7 @@ use Flugg\Responder\Serializers\SuccessSerializer;
 use Flugg\Responder\Tests\Product;
 use Flugg\Responder\Tests\TestCase;
 use Flugg\Responder\Transformers\Transformer;
+use Illuminate\Testing\Constraints\ArraySubset;
 
 /**
  * Feature tests asserting that you can transform response data of success responses.
@@ -109,7 +110,9 @@ class TransformResponseDataTest extends TestCase
     {
         $response = responder()->success($this->product)->serializer(ResourceKeySerializer::class)->respond();
 
-        $this->assertArraySubset(['products' => $this->product->toArray()], $response->getData(true));
+        $this->assertTrue((
+            new ArraySubset(['products' => $this->product->toArray()]))->evaluate($response->getData(true), '', true)
+        );
     }
 
     /**
@@ -122,7 +125,10 @@ class TransformResponseDataTest extends TestCase
             ->serializer(ResourceKeySerializer::class)
             ->respond();
 
-        $this->assertArraySubset(['foo' => $this->product->toArray()], $response->getData(true));
+
+        $this->assertTrue(
+            (new ArraySubset(['foo' => $this->product->toArray()]))->evaluate($response->getData(true), '', true)
+        );
     }
 
     /**
@@ -135,7 +141,10 @@ class TransformResponseDataTest extends TestCase
             ->serializer(ResourceKeySerializer::class)
             ->respond();
 
-        $this->assertArraySubset(['foo' => $product->toArray()], $response->getData(true));
+
+        $this->assertTrue(
+            (new ArraySubset(['foo' => $product->toArray()]))->evaluate($response->getData(true), '', true)
+        );
     }
 }
 

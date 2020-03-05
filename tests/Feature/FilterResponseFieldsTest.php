@@ -12,6 +12,7 @@ use Flugg\Responder\Tests\ProductWithTransformerClass;
 use Flugg\Responder\Tests\ProductWithTransformerClassName;
 use Flugg\Responder\Tests\TestCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Mockery;
 
 /**
@@ -30,7 +31,7 @@ class FilterResponseFieldsTest extends TestCase
     {
         $response = responder()->success($this->product)->only('name')->respond();
 
-        $this->assertEquals($this->responseData(array_only($this->product->toArray(), ['name'])), $response->getData(true));
+        $this->assertEquals($this->responseData(Arr::only($this->product->toArray(), ['name'])), $response->getData(true));
     }
 
     /**
@@ -43,8 +44,8 @@ class FilterResponseFieldsTest extends TestCase
                 'shipments' => ['id'],
             ])->respond();
 
-        $this->assertEquals($this->responseData(array_merge(array_only($this->product->toArray(), ['name']), [
-            'shipments' => [array_only($this->shipment->toArray(), ['id'])],
+        $this->assertEquals($this->responseData(array_merge(Arr::only($this->product->toArray(), ['name']), [
+            'shipments' => [Arr::only($this->shipment->toArray(), ['id'])],
         ])), $response->getData(true));
     }
 
@@ -63,11 +64,11 @@ class FilterResponseFieldsTest extends TestCase
             ])
             ->respond();
 
-        $this->assertEquals($this->responseData(array_merge(array_only($this->product->toArray(), ['name']), [
-            'shipments' => [array_only($this->shipment->toArray(), ['id'])],
+        $this->assertEquals($this->responseData(array_merge(Arr::only($this->product->toArray(), ['name']), [
+            'shipments' => [Arr::only($this->shipment->toArray(), ['id'])],
             'orders' => [
                 array_merge($this->order->toArray(), [
-                    'customer' => array_only($this->customer->toArray(), ['name']),
+                    'customer' => Arr::only($this->customer->toArray(), ['name']),
                 ]),
             ],
         ])), $response->getData(true));
@@ -92,11 +93,11 @@ class FilterResponseFieldsTest extends TestCase
             ->with('shipments', 'orders.customer')
             ->respond();
 
-        $this->assertEquals($this->responseData(array_merge(array_only($this->product->toArray(), ['name']), [
-            'shipments' => [array_only($this->shipment->toArray(), ['id'])],
+        $this->assertEquals($this->responseData(array_merge(Arr::only($this->product->toArray(), ['name']), [
+            'shipments' => [Arr::only($this->shipment->toArray(), ['id'])],
             'orders' => [
                 array_merge($this->order->toArray(), [
-                    'customer' => array_only($this->customer->toArray(), ['name']),
+                    'customer' => Arr::only($this->customer->toArray(), ['name']),
                 ]),
             ],
         ])), $response->getData(true));
