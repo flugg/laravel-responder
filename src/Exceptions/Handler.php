@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder\Exceptions;
 
-use Exception;
 use Flugg\Responder\Exceptions\Http\HttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
@@ -22,7 +21,7 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \Exception               $exception
+     * @param  \Throwable               $exception
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function render($request, Throwable $exception)
