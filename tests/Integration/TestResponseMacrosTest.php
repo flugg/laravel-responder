@@ -3,11 +3,11 @@
 namespace Flugg\Responder\Tests\Unit\Facades;
 
 use Flugg\Responder\Tests\IntegrationTestCase;
-use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Testing\TestResponse;
 use Mockery\MockInterface;
 
 /**
- * Integration tests for testing [Illuminate\Foundation\Testing\TestResponse] macros.
+ * Integration tests for testing [Illuminate\Testing\TestResponse] macros.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

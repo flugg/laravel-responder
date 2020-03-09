@@ -19,7 +19,7 @@ use Flugg\Responder\Testing\AssertSuccessMacro;
 use Flugg\Responder\Testing\AssertValidationErrorsMacro;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Application as Laravel;
-use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Testing\TestResponse;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Lumen\Application as Lumen;
 
