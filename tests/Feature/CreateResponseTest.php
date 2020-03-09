@@ -102,8 +102,8 @@ class CreateResponseTest extends TestCase
         $success = responder()->success()->toArray();
         $error = responder()->error()->toArray();
 
-        $this->assertInternalType('array', $success);
-        $this->assertInternalType('array', $error);
+        $this->assertIsArray($success);
+        $this->assertIsArray($error);
     }
 
     /**
@@ -126,7 +126,7 @@ class CreateResponseTest extends TestCase
         $success = responder()->success()->toJson();
         $error = responder()->error()->toJson();
 
-        $this->assertInternalType('string', $success);
-        $this->assertInternalType('string', $error);
+        $this->assertIsString($success);
+        $this->assertIsString($error);
     }
 }

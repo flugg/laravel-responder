@@ -26,14 +26,15 @@ class ConvertToSnakeCase extends TransformsRequest
      * Clean the data in the given array.
      *
      * @param  array $data
+     * @param  string $keyPrefix
      * @return array
      */
-    protected function cleanArray(array $data)
+    protected function cleanArray(array $data, $keyPrefix = '')
     {
         $parameters = [];
 
         foreach ($data as $key => $value) {
-            $parameters[in_array($key, $this->except) ? $key : snake_case($key)] = $value;
+            $parameters[in_array($keyPrefix.$key, $this->except) ? $keyPrefix.$key : snake_case($keyPrefix.$key)] = $value;
         }
 
         return $parameters;
