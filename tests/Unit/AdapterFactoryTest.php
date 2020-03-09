@@ -18,44 +18,34 @@ use Flugg\Responder\Tests\UnitTestCase;
 class AdapterFactoryTest extends UnitTestCase
 {
     /**
-     * The service class being tested.
+     * The factory class being tested.
      *
      * @var AdapterFactory
      */
     protected $factory;
 
     /**
-     * Setup the test environment.
-     *
-     * @return void
+     * Assert that [makePaginator] returns null when no mapping exists.
      */
-    public function setUp(): void
+    public function testMakePaginatorMethodReturnsNull()
     {
-        parent::setUp();
-
         $this->factory = new AdapterFactory();
-    }
 
-    /**
-     * Assert that you get null back when calling the [makePaginator] method when no adapter is set.
-     */
-    public function testMakePaginatorMethodReturnsNullIfNoAdapterIsFound()
-    {
         $adapter = $this->factory->makePaginator('foo');
 
         $this->assertNull($adapter);
     }
 
     /**
-     * Assert that you get null back when calling the [makePaginator] method when no adapter is set.
+     * Assert that [makePaginator] returns an adapter instance when a mapping exists.
      */
     public function testMakePaginatorMethodReturnsAdapter()
     {
         $paginator = mock();
         $paginatorAdapter = mock(Paginator::class);
-        $this->factory::$adapters = [
+        $this->factory = new AdapterFactory([
             Paginator::class => [get_class($paginator) => get_class($paginatorAdapter)],
-        ];
+        ]);
 
         $adapter = $this->factory->makePaginator($paginator);
 
@@ -63,25 +53,27 @@ class AdapterFactoryTest extends UnitTestCase
     }
 
     /**
-     * Assert that you get null back when calling the [makeCursorPaginator] method when no adapter is set.
+     * Assert that [makeCursorPaginator] returns null when no mapping exists.
      */
-    public function testMakeCursorPaginatorMethodReturnsNullIfNoAdapterIsFound()
+    public function testMakeCursorPaginatorMethodReturnsNull()
     {
+        $this->factory = new AdapterFactory();
+
         $adapter = $this->factory->makeCursorPaginator('foo');
 
         $this->assertNull($adapter);
     }
 
     /**
-     * Assert that you get null back when calling the [makeCursorPaginator] method when no adapter is set.
+     * Assert that [makeCursorPaginator] returns an adapter instance when a mapping exists.
      */
     public function testMakeCursorPaginatorMethodReturnsAdapter()
     {
         $cursorPaginator = mock();
         $cursorPaginatorAdapter = mock(CursorPaginator::class);
-        $this->factory::$adapters = [
+        $this->factory = new AdapterFactory([
             CursorPaginator::class => [get_class($cursorPaginator) => get_class($cursorPaginatorAdapter)],
-        ];
+        ]);
 
         $adapter = $this->factory->makeCursorPaginator($cursorPaginator);
 
@@ -89,25 +81,27 @@ class AdapterFactoryTest extends UnitTestCase
     }
 
     /**
-     * Assert that you get null back when calling the [makeValidator] method when no adapter is set.
+     * Assert that [makeValidator] returns null when no mapping exists.
      */
-    public function testMakeValidatorMethodReturnsNullIfNoAdapterIsFound()
+    public function testMakeValidatorMethodReturnsNull()
     {
+        $this->factory = new AdapterFactory();
+
         $adapter = $this->factory->makeValidator('foo');
 
         $this->assertNull($adapter);
     }
 
     /**
-     * Assert that you get null back when calling the [makeValidator] method when no adapter is set.
+     * Assert that [makeValidator] returns an adapter instance when a mapping exists.
      */
     public function testMakeValidatorMethodReturnsAdapter()
     {
         $validator = mock();
         $validatorAdapter = mock(Validator::class);
-        $this->factory::$adapters = [
+        $this->factory = new AdapterFactory([
             Validator::class => [get_class($validator) => get_class($validatorAdapter)],
-        ];
+        ]);
 
         $adapter = $this->factory->makeValidator($validator);
 

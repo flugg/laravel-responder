@@ -19,7 +19,7 @@ interface Validator
     public function failed(): array;
 
     /**
-     * Get a list of fields mapped to a list of the failed rules.
+     * Get a list of fields mapped to a list of failed rules.
      *
      * @return array
      */

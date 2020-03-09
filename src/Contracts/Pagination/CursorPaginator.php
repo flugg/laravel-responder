@@ -12,28 +12,28 @@ namespace Flugg\Responder\Contracts\Pagination;
 interface CursorPaginator
 {
     /**
-     * Get the current page.
+     * Get the current cursor.
      *
-     * @return int
+     * @return mixed
      */
-    public function current(): int;
+    public function current();
 
     /**
-     * Get the last page.
+     * Get the previous cursor.
      *
-     * @return int
+     * @return mixed
      */
-    public function previous(): int;
+    public function previous();
 
     /**
-     * Get the total number of items.
+     * Get the next cursor.
      *
-     * @return int
+     * @return mixed
      */
-    public function next(): int;
+    public function next();
 
     /**
-     * Get the current number of items.
+     * Get the current count of items.
      *
      * @return int
      */

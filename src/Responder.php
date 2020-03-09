@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
- * A service class responsible for building responses.
+ * A service class for building success- and error responses.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -21,23 +21,23 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 class Responder implements ResponderContract
 {
     /**
-     * A builder for building success responses.
+     * A builder class for building success responses.
      *
      * @var SuccessResponseBuilder
      */
     protected $successResponseBuilder;
 
     /**
-     * A builder for building error responses.
+     * A builder class for building error responses.
      *
      * @var ErrorResponseBuilder
      */
     protected $errorResponseBuilder;
 
     /**
-     * Constructs the class.
+     * Create a new responder instance.
      *
-     * @param SuccessResponseBuilder $successResponseBuilder¨
+     * @param SuccessResponseBuilder $successResponseBuilder
      * @param ErrorResponseBuilder $errorResponseBuilder
      */
     public function __construct(SuccessResponseBuilder $successResponseBuilder, ErrorResponseBuilder $errorResponseBuilder)
@@ -60,12 +60,12 @@ class Responder implements ResponderContract
     /**
      * Build an error response.
      *
-     * @param Exception|int|string|null $errorCode
-     * @param Exception|string|null $message
+     * @param int|string|Exception|null $code
+     * @param string|Exception|null $message
      * @return ErrorResponseBuilder
      */
-    public function error($errorCode = null, $message = null): ErrorResponseBuilder
+    public function error($code = null, $message = null): ErrorResponseBuilder
     {
-        return $this->errorResponseBuilder->error($errorCode, $message);
+        return $this->errorResponseBuilder->error($code, $message);
     }
 }

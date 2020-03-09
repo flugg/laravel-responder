@@ -21,10 +21,20 @@ class AdapterFactory implements AdapterFactoryContract
      *
      * @var array
      */
-    public static $adapters = [];
+    protected $adapters = [];
 
     /**
-     * Make a paginator using an adapter if it exists.
+     * Create a new adapter factory instance.
+     *
+     * @param array $adapters
+     */
+    public function __construct(array $adapters = [])
+    {
+        $this->adapters = $adapters;
+    }
+
+    /**
+     * Make a paginator adapter if a mapping exists.
      *
      * @param mixed $instance
      * @return Paginator|null
@@ -35,7 +45,7 @@ class AdapterFactory implements AdapterFactoryContract
     }
 
     /**
-     * Make a cursor paginator using an adapter if it exists.
+     * Make a cursor paginator adapter if a mapping exists.
      *
      * @param mixed $instance
      * @return CursorPaginator|null
@@ -46,7 +56,7 @@ class AdapterFactory implements AdapterFactoryContract
     }
 
     /**
-     * Make a validator using an adapter if it exists.
+     * Make a validator adapter if a mapping exists.
      *
      * @param mixed $instance
      * @return Validator|null
@@ -57,15 +67,15 @@ class AdapterFactory implements AdapterFactoryContract
     }
 
     /**
-     * Make an adapter if it exists.
+     * Make an adapter if a mapping exists.
      *
      * @param string $type
      * @param mixed $instance
-     * @return mixed|void
+     * @return object|void
      */
     protected function make(string $type, $instance)
     {
-        foreach ((self::$adapters[$type] ?? []) as $class => $adapter) {
+        foreach (($this->adapters[$type] ?? []) as $class => $adapter) {
             if ($instance instanceof $class) {
                 return new $adapter($instance);
             }

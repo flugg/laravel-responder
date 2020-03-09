@@ -6,7 +6,7 @@ use Flugg\Responder\Contracts\Http\ErrorMessageResolver as ErrorMessageResolverC
 use Illuminate\Contracts\Translation\Translator;
 
 /**
- * A resolver class for resolving error messages from error codes.
+ * A class for resolving error messages from error codes.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -15,21 +15,21 @@ use Illuminate\Contracts\Translation\Translator;
 class ErrorMessageResolver implements ErrorMessageResolverContract
 {
     /**
-     * A translation service for resolving messages from language files.
+     * A translation service for resolving error messages from language files.
      *
      * @var Translator
      */
     protected $translator;
 
     /**
-     * A list of registered messages mapped to error codes.
+     * A list of registered error messages mapped to error codes.
      *
      * @var array
      */
     protected $messages = [];
 
     /**
-     * Construct the class.
+     * Create a new error message resolver class.
      *
      * @param Translator $translator
      */
@@ -41,30 +41,30 @@ class ErrorMessageResolver implements ErrorMessageResolverContract
     /**
      * Register error messages mapped to error codes.
      *
-     * @param array|int|string $errorCode
+     * @param int|string|array $code
      * @param string|null $message
      * @return void
      */
-    public function register($errorCode, string $message = null): void
+    public function register($code, string $message = null): void
     {
-        $this->messages = array_merge($this->messages, is_array($errorCode) ? $errorCode : [
-            $errorCode => $message,
+        $this->messages = array_merge($this->messages, is_array($code) ? $code : [
+            $code => $message,
         ]);
     }
 
     /**
-     * Resolve a message from the given error code.
+     * Resolve an error message from an error code.
      *
-     * @param int|string $errorCode
+     * @param int|string $code
      * @return string|null
      */
-    public function resolve($errorCode): ?string
+    public function resolve($code): ?string
     {
-        if (key_exists($errorCode, $this->messages)) {
-            return $this->messages[$errorCode];
+        if (key_exists($code, $this->messages)) {
+            return $this->messages[$code];
         }
 
-        if ($translation = $this->translator->get($errorCode = "errors.$errorCode")) {
+        if ($translation = $this->translator->get($code = "errors.$code")) {
             return $translation;
         }
 

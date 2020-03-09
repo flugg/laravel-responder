@@ -17,7 +17,7 @@ interface Paginator
      * @return int
      */
     public function currentPage(): int;
-    
+
     /**
      * Get the last page.
      *
@@ -26,28 +26,28 @@ interface Paginator
     public function lastPage(): int;
 
     /**
-     * Get the total number of items.
+     * Get the total count of items.
      *
      * @return int
      */
     public function total(): int;
-    
+
     /**
-     * Get the current number of items.
+     * Get the current count of items.
      *
      * @return int
      */
     public function count(): int;
 
     /**
-     * Get the number per page.
+     * Get the count of items per page.
      *
      * @return int
      */
     public function perPage(): int;
-    
+
     /**
-     * Get the url for the given page.
+     * Get the URL for the given page.
      *
      * @param int $page
      * @return string

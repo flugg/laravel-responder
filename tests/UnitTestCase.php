@@ -7,7 +7,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 
 /**
- * A base test case responsible for bootstrapping the testing environment for the unit suite.
+ * A base test case for bootstrapping the testing environment for the unit suite.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

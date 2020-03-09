@@ -11,13 +11,13 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * An exception handler responsible for converting exceptions to JSON errors.
+ * A trait for converting exceptions to JSON responses in exception handler classes.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-trait HandlesJsonErrors
+trait ConvertsExceptions
 {
     /**
      * Prepare a JSON response for the given exception.
@@ -30,10 +30,6 @@ trait HandlesJsonErrors
     {
         if ($this->shouldConvertException($exception)) {
             return app(Responder::class)->error($exception)->respond();
-        }
-
-        if (!config('app.debug') && $error = config('responder.fallback_error')) {
-            return app(Responder::class)->error($error['code'])->respond($error['status']);
         }
 
         return parent::prepareJsonResponse($request, $exception);
@@ -79,6 +75,12 @@ trait HandlesJsonErrors
      */
     protected function shouldConvertException(Exception $exception): bool
     {
-        return key_exists(get_class($exception), config('responder.exceptions'));
+        foreach (config('responder.exceptions') as $class => $error) {
+            if ($exception instanceof $class) {
+                return !(config('app.debug') && $error['status'] >= 500);
+            }
+        }
+
+        return false;
     }
 }

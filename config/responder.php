@@ -7,14 +7,15 @@ use Flugg\Responder\Pagination\IlluminatePaginatorAdapter;
 use Flugg\Responder\Validation\IlluminateValidatorAdapter;
 
 return [
+
     /*
     |--------------------------------------------------------------------------
     | Response Formatter
     |--------------------------------------------------------------------------
     |
-    | Response decorators are used to decorate both your success- and error
-    | responses. A decorator can be disabled by removing it from the list
-    | below. You may additionally add your own decorators to the list.
+    | The response formatter is used to format the structure of the response
+    | data of both success- and error responses. You may override this on
+    | a per-response basis or set to null to simply disable formatting.
     |
     */
 
@@ -26,8 +27,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Response decorators are used to decorate both your success- and error
-    | responses. A decorator can be disabled by removing it from the list
-    | below. You may additionally add your own decorators to the list.
+    | responses. These are typically used for adding headers or altering
+    | the response data and are executed after the response formatter.
     |
     */
 
@@ -41,9 +42,9 @@ return [
     | Adapters
     |--------------------------------------------------------------------------
     |
-    | Response decorators are used to decorate both your success- and error
-    | responses. A decorator can be disabled by removing it from the list
-    | below. You may additionally add your own decorators to the list.
+    | The Laravel Responder package uses adapter classes for pagination and
+    | validation, allowing you to use other implementations. The package
+    | doesn't include an adapter for cursor pagination out of the box.
     |
     */
 
@@ -61,12 +62,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Converted Exceptions
+    | Exceptions
     |--------------------------------------------------------------------------
     |
-    | Response decorators are used to decorate both your success- and error
-    | responses. A decorator can be disabled by removing it from the list
-    | below. You may additionally add your own decorators to the list.
+    | A map of exceptions that will be converted to JSON error responses when
+    | the exception handler uses the [ConvertsExceptions] trait. Responses
+    | with a status code of 5xx are ignored if debug mode is turned on.
     |
     */
 
@@ -95,26 +96,10 @@ return [
             'code' => 'validation_failed',
             'status' => 422,
         ],
-        '**' => [
+        \Exception::class => [
             'code' => 'server_error',
             'status' => 500,
         ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Fallback Error
-    |--------------------------------------------------------------------------
-    |
-    | Response decorators are used to decorate both your success- and error
-    | responses. A decorator can be disabled by removing it from the list
-    | below. You may additionally add your own decorators to the list.
-    |
-    */
-
-    'fallback_error' => [
-        'code' => 'server_error',
-        'status' => 500,
     ],
 
     /*

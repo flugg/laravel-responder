@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Http\Decorators;
 
-use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 
 /**

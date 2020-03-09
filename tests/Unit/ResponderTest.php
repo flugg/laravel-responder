@@ -27,7 +27,7 @@ class ResponderTest extends UnitTestCase
     /**
      * A mock of an error response builder.
      *
-     * @var ErrorResponseBuilder|MockInterface
+     * @var MockInterface|ErrorResponseBuilder
      */
     protected $errorResponseBuilder;
 
@@ -52,7 +52,7 @@ class ResponderTest extends UnitTestCase
     }
 
     /**
-     * Assert that the parameters sent to the [success] method is forwarded to the success response builder.
+     * Assert that the parameters sent to [success] is forwarded to the success response builder.
      */
     public function testSuccessMethodShouldCallOnSuccessResponseBuilder()
     {
@@ -64,7 +64,7 @@ class ResponderTest extends UnitTestCase
     }
 
     /**
-     * Assert that the parameters sent to the [error] method is forwarded to the error response builder.
+     * Assert that the parameters sent to [error] is forwarded to the error response builder.
      */
     public function testErrorMethodShouldCallOnErrorResponseBuilder()
     {

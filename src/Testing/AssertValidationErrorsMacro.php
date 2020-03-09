@@ -9,7 +9,7 @@ use Illuminate\Validation\ValidationRuleParser;
 use Illuminate\Validation\Validator;
 
 /**
- * A mixin class extending TestResponse providing an [assertValidationErrors] method.
+ * A mixin class extending the TestResponse class with an [assertValidationErrors] method.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

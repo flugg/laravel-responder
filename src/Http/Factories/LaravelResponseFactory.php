@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Http\Factories;
 
-use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
 use Illuminate\Contracts\Routing\ResponseFactory as IlluminateResponseFactory;
 use Illuminate\Http\JsonResponse;
 

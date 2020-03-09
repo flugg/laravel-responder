@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Http\Builders;
 
-use Flugg\Responder\Contracts\Http\SuccessResponseBuilder as SuccessResponseBuilderContract;
+use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder as SuccessResponseBuilderContract;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidDataException;

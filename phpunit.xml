@@ -21,4 +21,7 @@
             <directory suffix=".php">./src</directory>
         </whitelist>
     </filter>
+    <logging>
+        <log type="coverage-html" target="cov" />
+    </logging>
 </phpunit>

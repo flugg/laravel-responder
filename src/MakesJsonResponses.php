@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
- * A trait to be used to easily make success- and error responses.
+ * A trait for building success- and error responses.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -34,12 +34,12 @@ trait MakesJsonResponses
     /**
      * Build an error response.
      *
-     * @param Exception|int|string|null $errorCode
-     * @param Exception|string|null $message
+     * @param int|string|Exception|null $code
+     * @param string|Exception|null $message
      * @return ErrorResponseBuilder
      */
-    public function error($errorCode = null, $message = null): ErrorResponseBuilder
+    public function error($code = null, $message = null): ErrorResponseBuilder
     {
-        return app(Responder::class)->error($errorCode, $message);
+        return app(Responder::class)->error($code, $message);
     }
 }

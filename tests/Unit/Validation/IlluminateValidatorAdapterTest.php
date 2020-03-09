@@ -45,7 +45,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
     }
 
     /**
-     * Assert that you can get a list of fields that failed validation from the validator.
+     * Assert that [failed] returns a list of fields that failed validation.
      */
     public function testFailedMethodReturnsListOfFailedFields()
     {
@@ -58,7 +58,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
     }
 
     /**
-     * Assert that you can get a list of fields mapped to a list of failed validation rules that failed.
+     * Assert that [errors] returns a map of fields mapped to a list of failed rules.
      */
     public function testErrorsMethodReturnsMapOfFailedRules()
     {
@@ -74,7 +74,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
     }
 
     /**
-     * Assert that you can get a list of fields mapped to a list of validation messages.
+     * Assert that [messages] returns a list of fields and rules mapped to corresponding messages.
      */
     public function testMessagesMethodReturnsMapOfValidationMessages()
     {

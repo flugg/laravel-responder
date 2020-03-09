@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Contracts\Http;
+namespace Flugg\Responder\Contracts\Http\Builders;
 
 use Exception;
 use Flugg\Responder\Exceptions\MissingAdapterException;

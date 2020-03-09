@@ -16,7 +16,7 @@ use Flugg\Responder\Contracts\Validation\Validator;
 interface AdapterFactory
 {
     /**
-     * Make a paginator using an adapter if it exists.
+     * Make a paginator adapter if a mapping exists.
      *
      * @param mixed $instance
      * @return Paginator|null
@@ -24,7 +24,7 @@ interface AdapterFactory
     public function makePaginator($instance): ?Paginator;
 
     /**
-     * Make a cursor paginator using an adapter if it exists.
+     * Make a cursor paginator adapter if a mapping exists.
      *
      * @param mixed $instance
      * @return CursorPaginator|null
@@ -32,7 +32,7 @@ interface AdapterFactory
     public function makeCursorPaginator($instance): ?CursorPaginator;
 
     /**
-     * Make a validator using an adapter if it exists.
+     * Make a validator adapter if a mapping exists.
      *
      * @param mixed $instance
      * @return Validator|null

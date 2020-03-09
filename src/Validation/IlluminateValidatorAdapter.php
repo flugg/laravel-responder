@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
- * A paginator adapter class for Laravel's validator.
+ * A paginator adapter class for Illuminate validators.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -17,14 +17,14 @@ use Illuminate\Support\Str;
 class IlluminateValidatorAdapter implements Validator
 {
     /**
-     * The validator instance.
+     * The Illuminate validator instance.
      *
      * @var IlluminateValidator
      */
     protected $validator;
 
     /**
-     * Construct the class.
+     * Create a new Illuminate validator adapter instance.
      *
      * @param IlluminateValidator $validator
      */
@@ -44,7 +44,7 @@ class IlluminateValidatorAdapter implements Validator
     }
 
     /**
-     * Get a list of fields mapped to a list of the failed rules.
+     * Get a list of fields mapped to a list of failed rules.
      *
      * @return array
      */

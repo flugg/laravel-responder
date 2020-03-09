@@ -1,42 +1,58 @@
 {
-  "name": "flugger/laravel-responder",
-  "description": "A Laravel package for building API responses.",
-  "keywords": ["laravel", "lumen", "api", "response"],
-  "homepage": "https://github.com/flugger/laravel-responder",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Alexander Tømmerås",
-      "email": "flugged@gmail.com"
-    }
-  ],
-  "require": {
-    "php": "^7.2.5",
-    "illuminate/contracts": "^7.0",
-    "illuminate/testing": "^7.0",
-    "illuminate/validation": "^7.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "Flugg\\Responder\\": "src"
+    "name": "flugger/laravel-responder",
+    "description": "A Laravel package for building API responses.",
+    "keywords": [
+        "laravel",
+        "lumen",
+        "api",
+        "response"
+    ],
+    "homepage": "https://github.com/flugger/laravel-responder",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexander Tømmerås",
+            "email": "flugged@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5",
+        "illuminate/contracts": "^7.0",
+        "illuminate/database": "^7.0",
+        "illuminate/support": "^7.0",
+        "illuminate/testing": "^7.0",
+        "illuminate/validation": "^7.0"
     },
-    "files": [
-      "src/helpers.php"
-    ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Flugg\\Responder\\Tests\\": "tests"
+    "require-dev": {
+        "fzaninotto/faker": "^1.0",
+        "mockery/mockery": "^1.0",
+        "orchestra/testbench": "^5.0",
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Flugg\\Responder\\": "src"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Flugg\\Responder\\Tests\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Flugg\\Responder\\ResponderServiceProvider"
+            ],
+            "aliases": {
+                "Responder": "Flugg\\Responder\\Facades\\Responder"
+            }
+        }
     }
-  },
-  "config": {
-    "sort-packages": true
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Flugg\\Responder\\ResponderServiceProvider"
-      ]
-    }
-  }
 }

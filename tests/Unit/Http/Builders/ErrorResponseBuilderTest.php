@@ -4,7 +4,7 @@ namespace Flugg\Responder\Tests\Unit\Http\Responses;
 
 use Flugg\Responder\Contracts\AdapterFactory;
 use Flugg\Responder\Contracts\Http\ErrorMessageResolver;
-use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
 use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Tests\UnitTestCase;

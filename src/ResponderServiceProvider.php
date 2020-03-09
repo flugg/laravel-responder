@@ -3,11 +3,11 @@
 namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\AdapterFactory as AdapterFactoryContract;
-use Flugg\Responder\Contracts\Http\ErrorMessageResolver as ErrorMessageResolverContract;
-use Flugg\Responder\Contracts\Http\ErrorResponseBuilder as ErrorResponseBuilderContract;
-use Flugg\Responder\Contracts\Http\ResponseFactory;
-use Flugg\Responder\Contracts\Http\ResponseFormatter;
-use Flugg\Responder\Contracts\Http\SuccessResponseBuilder as SuccessResponseBuilderContract;
+use Flugg\Responder\Contracts\Http\Builders\ErrorMessageResolver as ErrorMessageResolverContract;
+use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder as ErrorResponseBuilderContract;
+use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
+use Flugg\Responder\Contracts\Http\Formatters\ResponseFormatter;
+use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder as SuccessResponseBuilderContract;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
@@ -76,9 +76,7 @@ class ResponderServiceProvider extends ServiceProvider
     protected function registerAdapterFactory(): void
     {
         $this->app->singleton(AdapterFactoryContract::class, function () {
-            return tap($this->app->make(AdapterFactory::class), function ($factory) {
-                $factory::$adapters = config('responder.adapters');
-            });
+            return new AdapterFactory(config('responder.adapters'));
         });
     }
 

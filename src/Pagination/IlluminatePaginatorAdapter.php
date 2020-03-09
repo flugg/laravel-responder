@@ -6,7 +6,7 @@ use Flugg\Responder\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
- * A paginator adapter class for Laravel's paginator.
+ * A paginator adapter class for Illuminate paginators.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -15,14 +15,14 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 class IlluminatePaginatorAdapter implements Paginator
 {
     /**
-     * The paginator instance.
+     * The Illuminate paginator instance.
      *
      * @var LengthAwarePaginator
      */
     protected $paginator;
 
     /**
-     * Construct the class.
+     * Create a new Illuminate paginator adapter instance.
      *
      * @param LengthAwarePaginator $paginator
      */
@@ -52,7 +52,7 @@ class IlluminatePaginatorAdapter implements Paginator
     }
 
     /**
-     * Get the total number of items.
+     * Get the total count of items.
      *
      * @return int
      */
@@ -62,7 +62,7 @@ class IlluminatePaginatorAdapter implements Paginator
     }
 
     /**
-     * Get the current number of items.
+     * Get the current count of items.
      *
      * @return int
      */
@@ -72,7 +72,7 @@ class IlluminatePaginatorAdapter implements Paginator
     }
 
     /**
-     * Get the number per page.
+     * Get the count of items per page.
      *
      * @return int
      */
@@ -82,7 +82,7 @@ class IlluminatePaginatorAdapter implements Paginator
     }
 
     /**
-     * Get the url for the given page.
+     * Get the URL for the given page.
      *
      * @param int $page
      * @return string

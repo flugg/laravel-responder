@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Tests\Unit\Http\Responses;
 
-use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
 use Flugg\Responder\Http\Decorators\EscapeHtmlDecorator;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Http\JsonResponse;
