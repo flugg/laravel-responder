@@ -23,7 +23,7 @@ checks:
         parameters_in_camelcaps: true
 build:
     environment:
-        php: 7.3.0
+        php: 7.2.5
     tests:
         override:
             -
