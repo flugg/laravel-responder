@@ -1,22 +1,24 @@
 <?php
 
-return [
+use Flugg\Responder\Contracts\Pagination\CursorPaginator;
+use Flugg\Responder\Contracts\Pagination\Paginator;
+use Flugg\Responder\Contracts\Validation\Validator;
+use Flugg\Responder\Pagination\IlluminatePaginatorAdapter;
+use Flugg\Responder\Validation\IlluminateValidatorAdapter;
 
+return [
     /*
     |--------------------------------------------------------------------------
-    | Serializer Class Paths
+    | Response Formatter
     |--------------------------------------------------------------------------
     |
-    | The full class path to the serializer classes you want to use for both
-    | success- and error responses. The success serializer must implement
-    | Fractal's serializer. You can override these for every response.
+    | Response decorators are used to decorate both your success- and error
+    | responses. A decorator can be disabled by removing it from the list
+    | below. You may additionally add your own decorators to the list.
     |
     */
 
-    'serializers' => [
-        'success' => Flugg\Responder\Serializers\SuccessSerializer::class,
-        'error' => \Flugg\Responder\Serializers\ErrorSerializer::class,
-    ],
+    'formatter' => \Flugg\Responder\Http\Formatters\SimpleFormatter::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -30,73 +32,109 @@ return [
     */
 
     'decorators' => [
-        \Flugg\Responder\Http\Responses\Decorators\StatusCodeDecorator::class,
-        \Flugg\Responder\Http\Responses\Decorators\SuccessFlagDecorator::class,
+        // \Flugg\Responder\Http\Decorators\PrettyPrintDecorator::class,
+        // \Flugg\Responder\Http\Decorators\EscapeHtmlDecorator::class,
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Fallback Transformer
+    | Adapters
     |--------------------------------------------------------------------------
     |
-    | When transforming data without specifying a transformer we'll instead
-    | use a fallback transformer specified below. The [ArrayTransformer]
-    | transformer will simply convert the data to an array untouched.
+    | Response decorators are used to decorate both your success- and error
+    | responses. A decorator can be disabled by removing it from the list
+    | below. You may additionally add your own decorators to the list.
     |
     */
 
-    'fallback_transformer' => \Flugg\Responder\Transformers\ArrayTransformer::class,
+    'adapters' => [
+        Paginator::class => [
+            Illuminate\Contracts\Pagination\LengthAwarePaginator::class => IlluminatePaginatorAdapter::class,
+        ],
+        CursorPaginator::class => [
+            //
+        ],
+        Validator::class => [
+            \Illuminate\Contracts\Validation\Validator::class => IlluminateValidatorAdapter::class,
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
-    | Load Relationships With Query String Parameter
+    | Converted Exceptions
     |--------------------------------------------------------------------------
     |
-    | The package can automatically load relationships from the query string
-    | and will look for a query string parameter with the name configured
-    | below. You can set the value to null to disable the autoloading.
+    | Response decorators are used to decorate both your success- and error
+    | responses. A decorator can be disabled by removing it from the list
+    | below. You may additionally add your own decorators to the list.
     |
     */
 
-    'load_relations_parameter' => 'with',
+    'exceptions' => [
+        \Illuminate\Auth\AuthenticationException::class => [
+            'code' => 'unauthenticated',
+            'status' => 401,
+        ],
+        \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException::class => [
+            'code' => 'unauthorized',
+            'status' => 403,
+        ],
+        \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class => [
+            'code' => 'page_not_found',
+            'status' => 404,
+        ],
+        \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException::class => [
+            'code' => 'method_not_allowed',
+            'status' => 405,
+        ],
+        \Illuminate\Database\Eloquent\RelationNotFoundException::class => [
+            'code' => 'relation_not_found',
+            'status' => 422,
+        ],
+        \Illuminate\Validation\ValidationException::class => [
+            'code' => 'validation_failed',
+            'status' => 422,
+        ],
+        '**' => [
+            'code' => 'server_error',
+            'status' => 500,
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
-    | Filter Fields With Query String Parameter
+    | Fallback Error
     |--------------------------------------------------------------------------
     |
-    | The package can automatically filter the fields of transformed data
-    | from a query string parameter configured below. The technique is
-    | also known as sparse fieldsets. Set it to null to disable it.
+    | Response decorators are used to decorate both your success- and error
+    | responses. A decorator can be disabled by removing it from the list
+    | below. You may additionally add your own decorators to the list.
     |
     */
 
-    'filter_fields_parameter' => 'only',
+    'fallback_error' => [
+        'code' => 'server_error',
+        'status' => 500,
+    ],
 
     /*
     |--------------------------------------------------------------------------
-    | Recursion Limit
+    | Error Messages
     |--------------------------------------------------------------------------
     |
-    | When transforming data, you may be including relations recursively.
-    | By setting the value below, you can limit the amount of times it
-    | should include relationships recursively. Five might be good.
+    | Response decorators are used to decorate both your success- and error
+    | responses. A decorator can be disabled by removing it from the list
+    | below. You may additionally add your own decorators to the list.
     |
     */
 
-    'recursion_limit' => 5,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Error Message Translation Files
-    |--------------------------------------------------------------------------
-    |
-    | You can declare error messages in a language file, which allows for
-    | returning messages in different languages. The array below lists
-    | the language files that will be searched in to find messages.
-    |
-    */
-
-    'error_message_files' => ['errors'],
-
+    'error_messages' => [
+        'unauthenticated' => 'You are not authenticated',
+        'unauthorized' => 'You are not authorized',
+        'page_not_found' => 'The requested page was not found',
+        'method_not_allowed' => 'The method is not allowed for this request',
+        'relation_not_found' => 'The requested relation was not found',
+        'validation_failed' => 'The given data was invalid',
+        'server_error' => 'Something went wrong',
+    ],
 ];

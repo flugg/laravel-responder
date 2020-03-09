@@ -2,36 +2,39 @@
 
 namespace Flugg\Responder\Tests\Unit;
 
+use Flugg\Responder\Contracts\Http\ErrorResponseBuilder;
+use Flugg\Responder\Contracts\Http\SuccessResponseBuilder;
 use Flugg\Responder\Responder;
-use Flugg\Responder\Tests\TestCase;
+use Flugg\Responder\Tests\UnitTestCase;
+use Mockery\MockInterface;
 
 /**
  * Unit tests for the [Flugg\Responder\Responder] class.
  *
  * @package flugger/laravel-responder
- * @author  Alexander Tømmerås <flugged@gmail.com>
+ * @author Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ResponderTest extends TestCase
+class ResponderTest extends UnitTestCase
 {
     /**
-     * A mock of a [SuccessResponseBuilder] class.
+     * A mock of a success response builder.
      *
-     * @var \Mockery\MockInterface
+     * @var MockInterface|SuccessResponseBuilder
      */
     protected $successResponseBuilder;
 
     /**
-     * A mock of an [ErrorResponseBuilder] class.
+     * A mock of an error response builder.
      *
-     * @var \Mockery\MockInterface
+     * @var ErrorResponseBuilder|MockInterface
      */
     protected $errorResponseBuilder;
 
     /**
-     * The [Responder] service class being tested.
+     * The service class being tested.
      *
-     * @var \Flugg\Responder\Responder
+     * @var Responder
      */
     protected $responder;
 
@@ -40,38 +43,35 @@ class ResponderTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
-
-        $this->successResponseBuilder = $this->mockSuccessResponseBuilder();
-        $this->errorResponseBuilder = $this->mockErrorResponseBuilder();
+        $this->successResponseBuilder = mock(SuccessResponseBuilder::class);
+        $this->errorResponseBuilder = mock(ErrorResponseBuilder::class);
         $this->responder = new Responder($this->successResponseBuilder, $this->errorResponseBuilder);
     }
 
     /**
-     * Assert that the parameters sent to the [success] method is forwarded to the success
-     * response builder.
+     * Assert that the parameters sent to the [success] method is forwarded to the success response builder.
      */
     public function testSuccessMethodShouldCallOnSuccessResponseBuilder()
     {
-        $result = $this->responder->success($data = ['foo' => 1], $transformer = $this->mockTransformer(), $resourceKey = 'foo');
+        $this->successResponseBuilder->allows('data')->andReturnSelf();
+        $result = $this->responder->success($data = ['foo' => 1]);
 
         $this->assertSame($this->successResponseBuilder, $result);
-        $this->successResponseBuilder->shouldHaveReceived('transform')->with($data, $transformer, $resourceKey)->once();
+        $this->successResponseBuilder->shouldHaveReceived('data')->with($data);
     }
 
     /**
-     * Assert that the parameters sent to the [error] method is forwarded to the error
-     * response builder.
+     * Assert that the parameters sent to the [error] method is forwarded to the error response builder.
      */
     public function testErrorMethodShouldCallOnErrorResponseBuilder()
     {
-        $error = 'error_occured';
-        $message = 'An error has occured.';
-        $result = $this->responder->error($error, $message);
+        $this->errorResponseBuilder->allows('error')->andReturnSelf();
+        $result = $this->responder->error($error = 'error_occured', $message = 'An error has occured.');
 
         $this->assertSame($this->errorResponseBuilder, $result);
-        $this->errorResponseBuilder->shouldHaveReceived('error')->with($error, $message)->once();
+        $this->errorResponseBuilder->shouldHaveReceived('error')->with($error, $message);
     }
 }

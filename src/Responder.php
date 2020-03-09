@@ -2,15 +2,20 @@
 
 namespace Flugg\Responder;
 
+use Exception;
+use Flugg\Responder\Contracts\Http\ErrorResponseBuilder;
+use Flugg\Responder\Contracts\Http\SuccessResponseBuilder;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
-use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
-use Flugg\Responder\Http\Responses\SuccessResponseBuilder;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
  * A service class responsible for building responses.
  *
  * @package flugger/laravel-responder
- * @author  Alexander Tømmerås <flugged@gmail.com>
+ * @author Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
 class Responder implements ResponderContract
@@ -18,22 +23,22 @@ class Responder implements ResponderContract
     /**
      * A builder for building success responses.
      *
-     * @var \Flugg\Responder\Http\Responses\SuccessResponseBuilder
+     * @var SuccessResponseBuilder
      */
     protected $successResponseBuilder;
 
     /**
      * A builder for building error responses.
      *
-     * @var \Flugg\Responder\Http\Responses\ErrorResponseBuilder
+     * @var ErrorResponseBuilder
      */
     protected $errorResponseBuilder;
 
     /**
-     * Construct the service class.
+     * Constructs the class.
      *
-     * @param \Flugg\Responder\Http\Responses\SuccessResponseBuilder $successResponseBuilder
-     * @param \Flugg\Responder\Http\Responses\ErrorResponseBuilder   $errorResponseBuilder
+     * @param SuccessResponseBuilder $successResponseBuilder¨
+     * @param ErrorResponseBuilder $errorResponseBuilder
      */
     public function __construct(SuccessResponseBuilder $successResponseBuilder, ErrorResponseBuilder $errorResponseBuilder)
     {
@@ -42,26 +47,24 @@ class Responder implements ResponderContract
     }
 
     /**
-     * Build a successful response.
+     * Build a success response.
      *
-     * @param  mixed                                                          $data
-     * @param  callable|string|\Flugg\Responder\Transformers\Transformer|null $transformer
-     * @param  string|null                                                    $resourceKey
-     * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder
+     * @param array|Arrayable|Builder|QueryBuilder|Relation $data
+     * @return SuccessResponseBuilder
      */
-    public function success($data = null, $transformer = null, string $resourceKey = null): SuccessResponseBuilder
+    public function success($data = null): SuccessResponseBuilder
     {
-        return $this->successResponseBuilder->transform($data, $transformer, $resourceKey);
+        return $this->successResponseBuilder->data($data);
     }
 
     /**
      * Build an error response.
      *
-     * @param  mixed|null  $errorCode
-     * @param  string|null $message
-     * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
+     * @param Exception|int|string|null $errorCode
+     * @param Exception|string|null $message
+     * @return ErrorResponseBuilder
      */
-    public function error($errorCode = null, string $message = null): ErrorResponseBuilder
+    public function error($errorCode = null, $message = null): ErrorResponseBuilder
     {
         return $this->errorResponseBuilder->error($errorCode, $message);
     }

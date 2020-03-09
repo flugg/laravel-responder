@@ -1,62 +1,46 @@
 {
-    "name": "flugger/laravel-responder",
-    "description": "A Laravel Fractal package for building API responses, giving you the power of Fractal and the elegancy of Laravel.",
-    "keywords": [
-        "laravel",
-        "lumen",
-        "fractal",
-        "transformer",
-        "api",
-        "response",
-        "responder"
-    ],
-    "homepage": "https://github.com/flugger/laravel-responder",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Alexander Tømmerås",
-            "email": "flugged@gmail.com"
-        }
-    ],
-    "require": {
-        "php": "^7.0",
-        "illuminate/contracts": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0.0",
-        "illuminate/support": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0.0",
-        "league/fractal": "^0.17.0"
-    },
-    "require-dev": {
-        "illuminate/database": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.* || 5.6.* || 5.7.* || 5.8.* || ^6.0.0",
-        "orchestra/testbench": "~3.0",
-        "mockery/mockery": "^0.9.5 || ^1.0",
-        "fzaninotto/faker": "^1.6",
-        "doctrine/dbal": "^2.5",
-        "phpunit/phpunit": "^6.1"
-    },
-    "autoload": {
-        "psr-4": {
-            "Flugg\\Responder\\": "src"
-        },
-        "files": [
-            "src/helpers.php"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Flugg\\Responder\\Tests\\": "tests"
-        }
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Flugg\\Responder\\ResponderServiceProvider"
-            ],
-            "aliases": {
-                "Responder": "Flugg\\Responder\\Facades\\Responder",
-                "Transformer": "Flugg\\Responder\\Facades\\Transformer"
-            }
-        }
+  "name": "flugger/laravel-responder",
+  "description": "A Laravel package for building API responses.",
+  "keywords": ["laravel", "lumen", "api", "response"],
+  "homepage": "https://github.com/flugger/laravel-responder",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alexander Tømmerås",
+      "email": "flugged@gmail.com"
     }
+  ],
+  "require": {
+    "php": "^7.1",
+    "laravel/framework": "^6.0"
+  },
+  "require-dev": {
+    "fzaninotto/faker": "^1.0",
+    "mockery/mockery": "^1.0",
+    "orchestra/testbench": "^4.0",
+    "phpunit/phpunit": "^8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Flugg\\Responder\\": "src"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Flugg\\Responder\\Tests\\": "tests"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Flugg\\Responder\\ResponderServiceProvider"
+      ]
+    }
+  }
 }
