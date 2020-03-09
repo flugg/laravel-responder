@@ -1,3 +1,10 @@
+
+# 3.1.0 (2020-03-09)
+
+### Features
+
+* Add Laravel 7.0 support
+
 # 3.0.6 (2019-08-28)
 
 ### Features
