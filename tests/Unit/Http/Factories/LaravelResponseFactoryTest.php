@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit\Http\Responses;
+namespace Flugg\Responder\Tests\Unit\Http\Factories;
 
 use Flugg\Responder\Http\Factories\LaravelResponseFactory;
 use Flugg\Responder\Tests\UnitTestCase;
@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Mockery\MockInterface;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Factories\LaravelResponseFactory] class.
+ * Unit tests for the [Flugg\Responder\Contracts\Http\LaravelResponseFactory] class.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

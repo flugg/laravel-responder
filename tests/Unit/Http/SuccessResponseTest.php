@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit;
+namespace Flugg\Responder\Tests\Unit\Http;
 
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
 use Flugg\Responder\Http\SuccessResponse;

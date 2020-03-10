@@ -1,9 +1,9 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit\Http\Responses;
+namespace Flugg\Responder\Tests\Unit\Http\Builders;
 
 use Flugg\Responder\Contracts\AdapterFactory;
-use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
+use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Tests\UnitTestCase;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Contracts\Http\Factories;
+namespace Flugg\Responder\Contracts\Http;
 
 use Illuminate\Http\JsonResponse;
 

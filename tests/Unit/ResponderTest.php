@@ -2,8 +2,8 @@
 
 namespace Flugg\Responder\Tests\Unit;
 
-use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder;
-use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder;
+use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
+use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Responder;
 use Flugg\Responder\Tests\UnitTestCase;
 use Mockery\MockInterface;

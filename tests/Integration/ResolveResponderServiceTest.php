@@ -1,9 +1,9 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit\Facades;
+namespace Flugg\Responder\Tests\Integration;
 
-use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder;
-use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder;
+use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
+use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Facades\Responder as ResponderFacade;
 use Flugg\Responder\MakesJsonResponses;
@@ -37,14 +37,14 @@ class ResolveResponderServiceTest extends IntegrationTestCase
     /**
      * A mock of an error response builder.
      *
-     * @var ErrorResponseBuilder|MockInterface
+     * @var MockInterface|ErrorResponseBuilder
      */
     protected $errorResponseBuilder;
 
     /**
-     * A mock of a [\Flugg\Responder\MakesJsonResponses] trait.
+     * A mock of a trait for making JSON responses.
      *
-     * @var MakesJsonResponses|MockInterface
+     * @var MockInterface|MakesJsonResponses
      */
     protected $trait;
 

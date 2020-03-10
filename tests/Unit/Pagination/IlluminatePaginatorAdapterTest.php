@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit;
+namespace Flugg\Responder\Tests\Unit\Pagination;
 
 use Flugg\Responder\Pagination\IlluminatePaginatorAdapter;
 use Flugg\Responder\Tests\UnitTestCase;

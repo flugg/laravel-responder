@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit;
+namespace Flugg\Responder\Tests\Unit\Formatters;
 
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;

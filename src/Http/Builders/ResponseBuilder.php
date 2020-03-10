@@ -3,9 +3,8 @@
 namespace Flugg\Responder\Http\Builders;
 
 use Flugg\Responder\Contracts\AdapterFactory;
-use Flugg\Responder\Contracts\Http\Builders\ResponseBuilder as ResponseBuilderContract;
-use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
-use Flugg\Responder\Contracts\Http\Formatters\ResponseFormatter;
+use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
 use Flugg\Responder\Http\Response;
 use Illuminate\Contracts\Support\Arrayable;
@@ -23,7 +22,7 @@ use JsonSerializable;
  * @author Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-abstract class ResponseBuilder implements ResponseBuilderContract, Responsable, Arrayable, Jsonable, JsonSerializable
+abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, JsonSerializable
 {
     /**
      * A factory for making JSON responses.

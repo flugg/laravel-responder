@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder\Http\Builders;
 
-use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder as SuccessResponseBuilderContract;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidDataException;
@@ -21,7 +20,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @author Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class SuccessResponseBuilder extends ResponseBuilder implements SuccessResponseBuilderContract
+class SuccessResponseBuilder extends ResponseBuilder
 {
     /**
      * A response object.

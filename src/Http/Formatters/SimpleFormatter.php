@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Http\Formatters;
 
-use Flugg\Responder\Contracts\Http\Formatters\ResponseFormatter;
+use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Contracts\Validation\Validator;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit;
+namespace Flugg\Responder\Tests\Unit\Validation;
 
 use Flugg\Responder\Tests\UnitTestCase;
 use Flugg\Responder\Validation\IlluminateValidatorAdapter;

@@ -4,14 +4,12 @@ namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\AdapterFactory as AdapterFactoryContract;
 use Flugg\Responder\Contracts\ErrorMessageRegistry as ErrorMessageRegistryContract;
-use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder as ErrorResponseBuilderContract;
-use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
-use Flugg\Responder\Contracts\Http\Formatters\ResponseFormatter;
-use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder as SuccessResponseBuilderContract;
+use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
+use Flugg\Responder\ErrorMessageRegistry;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
-use Flugg\Responder\ErrorMessageRegistry;
 use Flugg\Responder\Http\Factories\LaravelResponseFactory;
 use Flugg\Responder\Http\Factories\LumenResponseFactory;
 use Flugg\Responder\Testing\AssertErrorMacro;
@@ -19,12 +17,12 @@ use Flugg\Responder\Testing\AssertSuccessMacro;
 use Flugg\Responder\Testing\AssertValidationErrorsMacro;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Application as Laravel;
-use Illuminate\Testing\TestResponse;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Testing\TestResponse;
 use Laravel\Lumen\Application as Lumen;
 
 /**
- * A service provider class responsible for bootstrapping the package.
+ * A service provider bootstrapping the Laravel Responder package.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -44,7 +42,6 @@ class ResponderServiceProvider extends ServiceProvider
         $this->registerAdapterFactory();
         $this->registerErrorMessageRegistry();
         $this->registerResponseFormatter();
-        $this->registerResponseBuilders();
         $this->registerResponderService();
         $this->registerTestingMacros();
     }
@@ -104,21 +101,13 @@ class ResponderServiceProvider extends ServiceProvider
         $this->app->singleton(ResponseFormatter::class, function () {
             return $this->app->make(config('responder.formatter'));
         });
-    }
 
-    /**
-     * Register response builder bindings with default formatter set.
-     *
-     * @return void
-     */
-    protected function registerResponseBuilders(): void
-    {
-        $this->app->bind(SuccessResponseBuilderContract::class, function () {
-            return $this->app->make(SuccessResponseBuilder::class)->formatter($this->app->make(ResponseFormatter::class));
+        $this->app->extend(SuccessResponseBuilder::class, function ($responseBuilder) {
+            return $responseBuilder->formatter($this->app->make(ResponseFormatter::class));
         });
 
-        $this->app->bind(ErrorResponseBuilderContract::class, function () {
-            return $this->app->make(ErrorResponseBuilder::class)->formatter($this->app->make(ResponseFormatter::class));
+        $this->app->extend(ErrorResponseBuilder::class, function ($responseBuilder) {
+            return $responseBuilder->formatter($this->app->make(ResponseFormatter::class));
         });
     }
 

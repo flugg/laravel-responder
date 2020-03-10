@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit\Facades;
+namespace Flugg\Responder\Tests\Integration;
 
 use Flugg\Responder\Tests\IntegrationTestCase;
 use Illuminate\Testing\TestResponse;

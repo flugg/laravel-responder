@@ -2,7 +2,7 @@
 
 namespace Flugg\Responder\Http\Factories;
 
-use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
+use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Laravel\Lumen\Http\ResponseFactory as BaseLumenResponseFactory;
 

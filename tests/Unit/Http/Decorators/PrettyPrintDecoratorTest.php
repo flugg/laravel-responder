@@ -1,8 +1,8 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit\Http\Responses;
+namespace Flugg\Responder\Tests\Unit\Http\Decorators;
 
-use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
+use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Flugg\Responder\Http\Decorators\PrettyPrintDecorator;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Http\JsonResponse;

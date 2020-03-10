@@ -5,8 +5,7 @@ namespace Flugg\Responder\Http\Builders;
 use Exception;
 use Flugg\Responder\Contracts\AdapterFactory;
 use Flugg\Responder\Contracts\ErrorMessageRegistry;
-use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder as ErrorResponseBuilderContract;
-use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
+use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Flugg\Responder\Contracts\Validation\Validator;
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
 use Flugg\Responder\Exceptions\MissingAdapterException;
@@ -20,7 +19,7 @@ use Illuminate\Support\Str;
  * @author Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ErrorResponseBuilder extends ResponseBuilder implements ErrorResponseBuilderContract
+class ErrorResponseBuilder extends ResponseBuilder
 {
     /**
      * A response object.

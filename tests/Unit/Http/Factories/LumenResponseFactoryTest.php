@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit\Http\Responses;
+namespace Flugg\Responder\Tests\Unit\Http\Factories;
 
 use Flugg\Responder\Http\Factories\LumenResponseFactory;
 use Flugg\Responder\Tests\UnitTestCase;

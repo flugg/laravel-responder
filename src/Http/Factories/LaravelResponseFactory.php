@@ -2,8 +2,8 @@
 
 namespace Flugg\Responder\Http\Factories;
 
-use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
-use Illuminate\Contracts\Routing\ResponseFactory as IlluminateResponseFactory;
+use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Illuminate\Contracts\Routing\ResponseFactory as BaseLaravelResponseFactory;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -18,16 +18,16 @@ class LaravelResponseFactory implements ResponseFactory
     /**
      * The Laravel factory for making responses.
      *
-     * @var IlluminateResponseFactory
+     * @var BaseLaravelResponseFactory
      */
     protected $factory;
 
     /**
      * Create a new Laravel response factory instance.
      *
-     * @param IlluminateResponseFactory $factory
+     * @param BaseLaravelResponseFactory $factory
      */
-    public function __construct(IlluminateResponseFactory $factory)
+    public function __construct(BaseLaravelResponseFactory $factory)
     {
         $this->factory = $factory;
     }
