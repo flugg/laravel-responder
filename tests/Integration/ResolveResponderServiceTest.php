@@ -2,8 +2,8 @@
 
 namespace Flugg\Responder\Tests\Unit\Facades;
 
-use Flugg\Responder\Contracts\Http\ErrorResponseBuilder;
-use Flugg\Responder\Contracts\Http\SuccessResponseBuilder;
+use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder;
+use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Facades\Responder as ResponderFacade;
 use Flugg\Responder\MakesJsonResponses;

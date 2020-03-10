@@ -35,7 +35,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
     }
 
     /**
-     * Assert that you can call the [assertSuccess] method on a test response to assert a valid success response.
+     * Assert that you can call [assertSuccess] on a test response to assert a valid success response.
      */
     public function testMacroAssertsASuccessResponse(): void
     {
@@ -51,7 +51,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
     }
 
     /**
-     * Assert that you can call the [assertError] method on a test response to assert a valid error response.
+     * Assert that you can call [assertError] on a test response to assert a valid error response.
      */
     public function testMacroAssertsAnErrorResponse(): void
     {
@@ -70,7 +70,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
     }
 
     /**
-     * Assert that you can call the [assertValidationErrors] method on a test response to assert a valid error response
+     * Assert that you can call [assertValidationErrors] on a test response to assert a valid error response
      * including validation errors.
      */
     public function testMacroAssertsAValidationErrorResponse(): void

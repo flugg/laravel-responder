@@ -23,7 +23,7 @@ class LumenResponseFactory implements ResponseFactory
     protected $factory;
 
     /**
-     * Constructs the class.
+     * Create a new Lumen response factory instance.
      *
      * @param BaseLumenResponseFactory $factory
      */

@@ -22,7 +22,7 @@ abstract class ResponseDecorator implements ResponseFactory
     protected $factory;
 
     /**
-     * Construct the class.
+     * Create a new response decorator instance.
      *
      * @param ResponseFactory $factory
      */

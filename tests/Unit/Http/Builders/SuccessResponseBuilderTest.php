@@ -28,7 +28,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
     /**
      * A mock of an adapter factory.
      *
-     * @var AdapterFactory|MockInterface
+     * @var MockInterface|AdapterFactory
      */
     protected $adapterFactory;
 

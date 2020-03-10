@@ -54,7 +54,7 @@ abstract class ResponseBuilder implements ResponseBuilderContract, Responsable, 
     protected $formatter;
 
     /**
-     * Construct the class.
+     * Create a new response builder instance.
      *
      * @param ResponseFactory $responseFactory
      * @param AdapterFactory $adapterFactory

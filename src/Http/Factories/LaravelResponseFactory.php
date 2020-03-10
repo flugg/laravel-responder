@@ -23,7 +23,7 @@ class LaravelResponseFactory implements ResponseFactory
     protected $factory;
 
     /**
-     * Constructs the class.
+     * Create a new Laravel response factory instance.
      *
      * @param IlluminateResponseFactory $factory
      */

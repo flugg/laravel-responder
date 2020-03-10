@@ -3,8 +3,8 @@
 namespace Flugg\Responder;
 
 use Exception;
-use Flugg\Responder\Contracts\Http\ErrorResponseBuilder;
-use Flugg\Responder\Contracts\Http\SuccessResponseBuilder;
+use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder;
+use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
@@ -52,7 +52,7 @@ class Responder implements ResponderContract
      * @param array|Arrayable|Builder|QueryBuilder|Relation $data
      * @return SuccessResponseBuilder
      */
-    public function success($data = null): SuccessResponseBuilder
+    public function success($data = []): SuccessResponseBuilder
     {
         return $this->successResponseBuilder->data($data);
     }

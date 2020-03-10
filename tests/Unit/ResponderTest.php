@@ -2,8 +2,8 @@
 
 namespace Flugg\Responder\Tests\Unit;
 
-use Flugg\Responder\Contracts\Http\ErrorResponseBuilder;
-use Flugg\Responder\Contracts\Http\SuccessResponseBuilder;
+use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder;
+use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Responder;
 use Flugg\Responder\Tests\UnitTestCase;
 use Mockery\MockInterface;
@@ -46,6 +46,7 @@ class ResponderTest extends UnitTestCase
     public function setUp(): void
     {
         parent::setUp();
+
         $this->successResponseBuilder = mock(SuccessResponseBuilder::class);
         $this->errorResponseBuilder = mock(ErrorResponseBuilder::class);
         $this->responder = new Responder($this->successResponseBuilder, $this->errorResponseBuilder);

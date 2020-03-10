@@ -4,7 +4,7 @@ namespace Flugg\Responder\Http\Builders;
 
 use Exception;
 use Flugg\Responder\Contracts\AdapterFactory;
-use Flugg\Responder\Contracts\Http\ErrorMessageResolver;
+use Flugg\Responder\Contracts\ErrorMessageRegistry;
 use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder as ErrorResponseBuilderContract;
 use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
 use Flugg\Responder\Contracts\Validation\Validator;
@@ -32,9 +32,9 @@ class ErrorResponseBuilder extends ResponseBuilder implements ErrorResponseBuild
     /**
      * A resolver used for resolving error messages from error codes.
      *
-     * @var ErrorMessageResolver
+     * @var ErrorMessageRegistry
      */
-    protected $messageResolver;
+    protected $messageRegistry;
 
     /**
      * A validator attached with the error response.
@@ -51,15 +51,15 @@ class ErrorResponseBuilder extends ResponseBuilder implements ErrorResponseBuild
     protected const DEFAULT_STATUS = 500;
 
     /**
-     * Construct the class.
+     * Create a new response builder instance.
      *
      * @param ResponseFactory $responseFactory
      * @param AdapterFactory $adapterFactory
-     * @param ErrorMessageResolver $messageResolver
+     * @param ErrorMessageRegistry $messageRegistry
      */
-    public function __construct(ResponseFactory $responseFactory, AdapterFactory $adapterFactory, ErrorMessageResolver $messageResolver)
+    public function __construct(ResponseFactory $responseFactory, AdapterFactory $adapterFactory, ErrorMessageRegistry $messageRegistry)
     {
-        $this->messageResolver = $messageResolver;
+        $this->messageRegistry = $messageRegistry;
 
         parent::__construct($responseFactory, $adapterFactory);
     }
@@ -79,7 +79,7 @@ class ErrorResponseBuilder extends ResponseBuilder implements ErrorResponseBuild
         } elseif (($exception = $message) instanceof Exception) {
             $this->response = $this->makeResponseFromException($exception, $errorCode);
         } else {
-            $this->response = $this->makeResponse($errorCode, $message ?: $this->messageResolver->resolve($errorCode), self::DEFAULT_STATUS);
+            $this->response = $this->makeResponse($errorCode, $message ?: $this->messageRegistry->resolve($errorCode), self::DEFAULT_STATUS);
         }
 
         return $this;
@@ -112,7 +112,7 @@ class ErrorResponseBuilder extends ResponseBuilder implements ErrorResponseBuild
     protected function makeResponseFromException(Exception $exception, $errorCode = null): ErrorResponse
     {
         $errorCode = $errorCode ?: $this->resolveCodeFromException($exception);
-        $message = $this->messageResolver->resolve($errorCode) ?: $exception->getMessage();
+        $message = $this->messageRegistry->resolve($errorCode) ?: $exception->getMessage();
         $status = $this->resolveStatusFromException($exception);
 
         return $this->makeResponse($errorCode, $message, $status);

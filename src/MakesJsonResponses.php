@@ -3,8 +3,8 @@
 namespace Flugg\Responder;
 
 use Exception;
-use Flugg\Responder\Contracts\Http\ErrorResponseBuilder;
-use Flugg\Responder\Contracts\Http\SuccessResponseBuilder;
+use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder;
+use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Contracts\Responder;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;

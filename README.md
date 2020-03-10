@@ -22,20 +22,20 @@ _The package has been rewritten from scratch with a focus on simplifying the cod
 
 # Table of Contents
 
-- [Introduction](#introduction)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Creating Responses](#creating-responses)
-  - [Creating Success Responses](#creating-success-responses)
-  - [Creating Error Responses](#creating-error-responses)
-  - [Formatting Responses](#formatting-responses)
-  - [Decorating Responses](#formatting-responses)
-  - [Testing Responses](#testing-responses)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [License](#license)
-- [Donating](#contributing)
+-   [Introduction](#introduction)
+-   [Requirements](#requirements)
+-   [Installation](#installation)
+-   [Usage](#usage)
+    -   [Creating Responses](#creating-responses)
+    -   [Creating Success Responses](#creating-success-responses)
+    -   [Creating Error Responses](#creating-error-responses)
+    -   [Formatting Responses](#formatting-responses)
+    -   [Decorating Responses](#formatting-responses)
+    -   [Testing Responses](#testing-responses)
+-   [Configuration](#configuration)
+-   [Contributing](#contributing)
+-   [License](#license)
+-   [Donating](#contributing)
 
 # Introduction
 
@@ -47,8 +47,8 @@ This package used to utilize Fractal, but has since moved over to support API re
 
 This package requires:
 
-- PHP **7.1**+
-- Laravel **5.5**+ or Lumen **5.5**+
+-   PHP **7.1**+
+-   Laravel **5.5**+ or Lumen **5.5**+
 
 # Installation
 
@@ -243,7 +243,7 @@ Assuming we use the default formatter, the above code would output the following
 
 ```json
 {
-  "data": null
+    "data": null
 }
 ```
 
@@ -315,17 +315,17 @@ Assuming there are no results and the default formatter is used, the JSON output
 
 ```json
 {
-  "data": [],
-  "pagination": {
-    "total": 0,
-    "count": 0,
-    "perPage": 15,
-    "currentPage": 1,
-    "totalPages": 1,
-    "links": [
-      // ...
-    ]
-  }
+    "data": [],
+    "pagination": {
+        "total": 0,
+        "count": 0,
+        "perPage": 15,
+        "currentPage": 1,
+        "totalPages": 1,
+        "links": [
+            // ...
+        ]
+    }
 }
 ```
 
@@ -347,8 +347,8 @@ Using the default formatter, the meta data will simply be appended to the respon
 
 ```json
 {
-  "data": [],
-  "count": 0
+    "data": [],
+    "count": 0
 }
 ```
 
@@ -364,12 +364,12 @@ The error response has knowledge about an error code, a corresponding error mess
 
 ```json
 {
-  "success": false,
-  "status": 500,
-  "error": {
-    "code": null,
-    "message": null
-  }
+    "success": false,
+    "status": 500,
+    "error": {
+        "code": null,
+        "message": null
+    }
 }
 ```
 
@@ -403,16 +403,16 @@ return [
 ];
 ```
 
-#### Register Messages Using `ErrorMessageResolver`
+#### Register Messages Using `ErrorMessageRegistry`
 
-Instead of using language files, you may alternatively set error messages directly on the `ErrorMessageResolver` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
+Instead of using language files, you may alternatively set error messages directly on the `ErrorMessageRegistry` class. You can place the code below within `AppServiceProvider` or an entirely new `TransformerServiceProvider`:
 
 ```php
-use Flugg\Responder\ErrorMessageResolver;
+use Flugg\Responder\ErrorMessageRegistry;
 
 public function boot()
 {
-    $this->app->make(ErrorMessageResolver::class)->register([
+    $this->app->make(ErrorMessageRegistry::class)->register([
         'sold_out_error' => 'The requested product is sold out.',
     ]);
 }

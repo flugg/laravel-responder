@@ -2,33 +2,26 @@
 
 namespace Flugg\Responder\Tests\Unit;
 
-use Flugg\Responder\Http\ErrorMessageResolver;
+use Flugg\Responder\ErrorMessageRegistry;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Contracts\Translation\Translator;
 use Mockery\MockInterface;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\ErrorMessageResolver] class.
+ * Unit tests for the [Flugg\Responder\ErrorMessageRegistry] class.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ErrorMessageResolverTest extends UnitTestCase
+class ErrorMessageRegistryTest extends UnitTestCase
 {
-    /**
-     * A mock of a translator service.
-     *
-     * @var MockInterface|Translator
-     */
-    protected $translator;
-
     /**
      * The class being tested.
      *
-     * @var ErrorMessageResolver
+     * @var ErrorMessageRegistry
      */
-    protected $messageResolver;
+    protected $messageRegistry;
 
     /**
      * Setup the test environment.
@@ -39,8 +32,7 @@ class ErrorMessageResolverTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->translator = mock(Translator::class);
-        $this->messageResolver = new ErrorMessageResolver($this->translator);
+        $this->messageRegistry = new ErrorMessageRegistry();
     }
 
     /**
@@ -48,9 +40,9 @@ class ErrorMessageResolverTest extends UnitTestCase
      */
     public function testResolveMethodShouldResolveMessageFromRegister()
     {
-        $this->messageResolver->register($errorCode = 'error_occured', $message = 'An error has occured.');
+        $this->messageRegistry->register($errorCode = 'error_occured', $message = 'An error has occured.');
 
-        $result = $this->messageResolver->resolve($errorCode);
+        $result = $this->messageRegistry->resolve($errorCode);
 
         $this->assertEquals($message, $result);
     }
@@ -60,28 +52,15 @@ class ErrorMessageResolverTest extends UnitTestCase
      */
     public function testRegisterMethodAllowsSettingMultipleMessages()
     {
-        $this->messageResolver->register($messages = [
+        $this->messageRegistry->register($messages = [
             'error_occured' => 'An error has occured.',
             'another_error_occured' => 'Yet another error occured.',
         ]);
 
         foreach ($messages as $errorCode => $message) {
-            $result = $this->messageResolver->resolve($errorCode);
+            $result = $this->messageRegistry->resolve($errorCode);
             $this->assertEquals($message, $result);
         }
-    }
-
-    /**
-     * Assert that the [resolve] method uses a translator to resolve messages.
-     */
-    public function testResolveMethodShouldResolveMessageFromTranslator()
-    {
-        $this->translator->allows('get')->andReturn($message = 'An error has occured.');
-
-        $result = $this->messageResolver->resolve($code = 'error_occured');
-
-        $this->assertEquals($message, $result);
-        $this->translator->shouldHaveReceived('get')->with("errors.$code");
     }
 
     /**
@@ -89,9 +68,7 @@ class ErrorMessageResolverTest extends UnitTestCase
      */
     public function testResolveMethodReturnsNullIfNoMessageIsFound()
     {
-        $this->translator->allows('get')->andReturn(null);
-
-        $message = $this->messageResolver->resolve('error_occured');
+        $message = $this->messageRegistry->resolve('error_occured');
 
         $this->assertNull($message);
     }

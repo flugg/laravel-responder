@@ -3,7 +3,7 @@
 namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\AdapterFactory as AdapterFactoryContract;
-use Flugg\Responder\Contracts\Http\Builders\ErrorMessageResolver as ErrorMessageResolverContract;
+use Flugg\Responder\Contracts\ErrorMessageRegistry as ErrorMessageRegistryContract;
 use Flugg\Responder\Contracts\Http\Builders\ErrorResponseBuilder as ErrorResponseBuilderContract;
 use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
 use Flugg\Responder\Contracts\Http\Formatters\ResponseFormatter;
@@ -11,7 +11,7 @@ use Flugg\Responder\Contracts\Http\Builders\SuccessResponseBuilder as SuccessRes
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
-use Flugg\Responder\Http\ErrorMessageResolver;
+use Flugg\Responder\ErrorMessageRegistry;
 use Flugg\Responder\Http\Factories\LaravelResponseFactory;
 use Flugg\Responder\Http\Factories\LumenResponseFactory;
 use Flugg\Responder\Testing\AssertErrorMacro;
@@ -42,7 +42,7 @@ class ResponderServiceProvider extends ServiceProvider
     {
         $this->registerResponseFactory($this->app instanceof Lumen ? LumenResponseFactory::class : LaravelResponseFactory::class);
         $this->registerAdapterFactory();
-        $this->registerErrorMessageResolver();
+        $this->registerErrorMessageRegistry();
         $this->registerResponseFormatter();
         $this->registerResponseBuilders();
         $this->registerResponderService();
@@ -85,11 +85,11 @@ class ResponderServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerErrorMessageResolver(): void
+    protected function registerErrorMessageRegistry(): void
     {
-        $this->app->singleton(ErrorMessageResolverContract::class, function () {
-            return tap($this->app->make(ErrorMessageResolver::class), function (ErrorMessageResolverContract $messageResolver) {
-                $messageResolver->register(config('responder.error_messages'));
+        $this->app->singleton(ErrorMessageRegistryContract::class, function () {
+            return tap($this->app->make(ErrorMessageRegistry::class), function (ErrorMessageRegistryContract $messageRegistry) {
+                $messageRegistry->register(config('responder.error_messages'));
             });
         });
     }

@@ -82,7 +82,7 @@ class IlluminatePaginatorAdapter implements Paginator
     }
 
     /**
-     * Get the URL for the given page.
+     * Get the URL for the page.
      *
      * @param int $page
      * @return string

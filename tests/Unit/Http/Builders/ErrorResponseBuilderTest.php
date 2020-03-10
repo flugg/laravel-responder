@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Tests\Unit\Http\Responses;
 
 use Flugg\Responder\Contracts\AdapterFactory;
-use Flugg\Responder\Contracts\Http\ErrorMessageResolver;
+use Flugg\Responder\Contracts\ErrorMessageRegistry;
 use Flugg\Responder\Contracts\Http\Factories\ResponseFactory;
 use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
@@ -29,16 +29,16 @@ class ErrorResponseBuilderTest extends UnitTestCase
     /**
      * A mock of an adapter factory.
      *
-     * @var AdapterFactory|MockInterface
+     * @var MockInterface|AdapterFactory
      */
     protected $adapterFactory;
 
     /**
      * A mock of an error message resolver.
      *
-     * @var ErrorMessageResolver|MockInterface
+     * @var MockInterface|ErrorMessageRegistry
      */
-    protected $messageResolver;
+    protected $messageRegistry;
 
     /**
      * A mock of a response formatter.
@@ -65,7 +65,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $this->responseFactory = mock(ResponseFactory::class);
         $this->adapterFactory = mock(AdapterFactory::class);
-        $this->messageResolver = mock(ErrorMessageResolver::class);
-        $this->responseBuilder = new ErrorResponseBuilder($this->responseFactory, $this->adapterFactory, $this->messageResolver);
+        $this->messageRegistry = mock(ErrorMessageRegistry::class);
+        $this->responseBuilder = new ErrorResponseBuilder($this->responseFactory, $this->adapterFactory, $this->messageRegistry);
     }
 }
