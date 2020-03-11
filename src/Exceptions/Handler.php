@@ -27,13 +27,22 @@ class Handler
     protected $handler;
 
     /**
+     * A responder service for making error responses.
+     *
+     * @var Responder
+     */
+    protected $responder;
+
+    /**
      * Create a new exception handler instance.
      *
      * @param ExceptionHandler $handler
+     * @param Responder $responder
      */
-    public function __construct(ExceptionHandler $handler)
+    public function __construct(ExceptionHandler $handler, Responder $responder)
     {
         $this->handler = $handler;
+        $this->responder = $responder;
     }
 
     /**
@@ -48,7 +57,7 @@ class Handler
     public function render($request, Throwable $exception)
     {
         if ($request->expectsJson() && $this->shouldConvertException($exception)) {
-            $this->convertException($exception);
+            return $this->convertException($exception);
         }
 
         return $this->handler->render($request, $exception);
@@ -91,12 +100,12 @@ class Handler
      */
     protected function convertException(Throwable $exception): JsonResponse
     {
-        $response = app(Responder::class)->error($exception);
+        $responseBuilder = $this->responder->error($exception);
 
         if ($exception instanceof ValidationException) {
-            $response->validator($exception->validator);
+            $responseBuilder->validator($exception->validator);
         }
 
-        return $response;
+        return $responseBuilder->respond();
     }
 }

@@ -46,11 +46,8 @@ class ResponderServiceProvider extends ServiceProvider
         $this->registerErrorMessageRegistry();
         $this->registerResponseFormatter();
         $this->registerResponderService();
+        $this->registerExceptionHandler();
         $this->registerTestingMacros();
-
-        $this->app->extend(ExceptionHandler::class, function ($handler) {
-            return new Handler($handler);
-        });
     }
 
     /**
@@ -129,6 +126,19 @@ class ResponderServiceProvider extends ServiceProvider
     protected function registerResponderService(): void
     {
         $this->app->bind(ResponderContract::class, Responder::class);
+    }
+
+    /**
+     * Register exception handler by decorating the bound handler.
+     *
+     * @return void
+     * @throws BindingResolutionException
+     */
+    protected function registerExceptionHandler(): void
+    {
+        $this->app->extend(ExceptionHandler::class, function ($handler) {
+            return new Handler($handler, $this->app->make(ResponderContract::class), config('responder.exceptions'));
+        });
     }
 
     /**
