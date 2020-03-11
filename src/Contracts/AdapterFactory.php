@@ -7,7 +7,7 @@ use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Contracts\Validation\Validator;
 
 /**
- * A contract for creating adapters.
+ * Contract for creating adapters.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

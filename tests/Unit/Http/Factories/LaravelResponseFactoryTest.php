@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Mockery\MockInterface;
 
 /**
- * Unit tests for the [Flugg\Responder\Contracts\Http\LaravelResponseFactory] class.
+ * Unit tests for the [Flugg\Responder\Http\Factories\LaravelResponseFactory] class.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -49,7 +49,7 @@ class LaravelResponseFactoryTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [make] method creates JSON responses using Laravel's response factory.
+     * Assert that [make] creates JSON responses using Laravel's response factory.
      */
     public function testMakeMethodShouldCreateJsonResponses()
     {

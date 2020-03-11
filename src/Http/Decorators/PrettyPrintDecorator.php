@@ -5,7 +5,7 @@ namespace Flugg\Responder\Http\Decorators;
 use Illuminate\Http\JsonResponse;
 
 /**
- * A decorator class for generating JSON using the "JSON_PRETTY_PRINT" option.
+ * Decorator class for generating JSON using the "JSON_PRETTY_PRINT" option.
  *
  * @package flugger/laravel-responder
  * @author Paolo Caleffi <p.caleffi@dreamonkey.com>

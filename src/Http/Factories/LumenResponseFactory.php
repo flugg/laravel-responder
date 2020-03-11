@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Laravel\Lumen\Http\ResponseFactory as BaseLumenResponseFactory;
 
 /**
- * A factory class for creating JSON responses utilizing Lumen.
+ * Factory class for creating JSON responses using Lumen.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -23,7 +23,7 @@ class LumenResponseFactory implements ResponseFactory
     protected $factory;
 
     /**
-     * Create a new Lumen response factory instance.
+     * Create a new response factory instance.
      *
      * @param BaseLumenResponseFactory $factory
      */
@@ -33,7 +33,7 @@ class LumenResponseFactory implements ResponseFactory
     }
 
     /**
-     * Generates a JSON response.
+     * Generate a JSON response.
      *
      * @param array $data
      * @param int $status

@@ -37,7 +37,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
     /**
      * Assert that you can call [assertSuccess] on a test response to assert a valid success response.
      */
-    public function testMacroAssertsASuccessResponse(): void
+    public function testMacroAssertsForValidSuccessResponse(): void
     {
         $this->testResponse->allows('getStatusCode')->andReturn(200);
         $this->testResponse->allows('assertExactJson')->andReturn();
@@ -53,17 +53,17 @@ class TestResponseMacrosTest extends IntegrationTestCase
     /**
      * Assert that you can call [assertError] on a test response to assert a valid error response.
      */
-    public function testMacroAssertsAnErrorResponse(): void
+    public function testMacroAssertsForValidErrorResponse(): void
     {
         $this->testResponse->allows('getStatusCode')->andReturn(500);
         $this->testResponse->allows('assertExactJson')->andReturn();
 
-        $result = $this->testResponse->assertError($errorCode = 'error_occured', $message = 'An error has occured.');
+        $result = $this->testResponse->assertError($code = 'error_occured', $message = 'An error has occured.');
 
         $this->assertSame($this->testResponse, $result);
         $this->testResponse->shouldHaveReceived('assertExactJson')->with([
             'error' => [
-                'code' => $errorCode,
+                'code' => $code,
                 'message' => $message,
             ],
         ]);
@@ -73,7 +73,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
      * Assert that you can call [assertValidationErrors] on a test response to assert a valid error response
      * including validation errors.
      */
-    public function testMacroAssertsAValidationErrorResponse(): void
+    public function testMacroAssertsForValidValidationErrorResponse(): void
     {
         $this->testResponse->allows('getStatusCode')->andReturn(422);
         $this->testResponse->allows('assertExactJson')->andReturn();

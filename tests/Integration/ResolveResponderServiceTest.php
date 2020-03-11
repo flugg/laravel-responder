@@ -91,12 +91,12 @@ class ResolveResponderServiceTest extends IntegrationTestCase
     public function testResolveFromFacade()
     {
         $successResult = ResponderFacade::success($data = ['foo' => 123]);
-        $errorResult = ResponderFacade::error($errorCode = 'error_occured', $message = 'An error has occured.');
+        $errorResult = ResponderFacade::error($code = 'error_occured', $message = 'An error has occured.');
 
         $this->assertSame($this->successResponseBuilder, $successResult);
         $this->assertSame($this->errorResponseBuilder, $errorResult);
         $this->responder->shouldHaveReceived('success')->with($data);
-        $this->responder->shouldHaveReceived('error')->with($errorCode, $message);
+        $this->responder->shouldHaveReceived('error')->with($code, $message);
     }
 
     /**
@@ -105,11 +105,11 @@ class ResolveResponderServiceTest extends IntegrationTestCase
     public function testResolveFromTrait()
     {
         $successResult = $this->trait->success($data = ['foo' => 123]);
-        $errorResult = $this->trait->error($errorCode = 'error_occured', $message = 'An error has occured.');
+        $errorResult = $this->trait->error($code = 'error_occured', $message = 'An error has occured.');
 
         $this->assertSame($this->successResponseBuilder, $successResult);
         $this->assertSame($this->errorResponseBuilder, $errorResult);
         $this->responder->shouldHaveReceived('success')->with($data);
-        $this->responder->shouldHaveReceived('error')->with($errorCode, $message);
+        $this->responder->shouldHaveReceived('error')->with($code, $message);
     }
 }

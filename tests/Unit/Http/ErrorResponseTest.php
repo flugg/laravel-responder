@@ -35,18 +35,18 @@ class ErrorResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [setErrorCode] and [errorCode] methods sets and gets error code respectively.
+     * Assert that [setCode] and [code] sets and gets error code respectively.
      */
-    public function testSetAndGetErrorCode()
+    public function testSetAndGetCode()
     {
-        $result = $this->response->setErrorCode($code = 'error_occured');
+        $result = $this->response->setCode($code = 'error_occured');
 
         $this->assertSame($this->response, $result);
-        $this->assertEquals($code, $this->response->errorCode());
+        $this->assertEquals($code, $this->response->code());
     }
 
     /**
-     * Assert that the [setMessage] and [message] methods sets and gets error message respectively.
+     * Assert that [setMessage] and [message] sets and gets error message respectively.
      */
     public function testSetAndGetMessage()
     {
@@ -57,7 +57,7 @@ class ErrorResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [setStatus] and [status] methods sets and gets status codes respectively.
+     * Assert that [setStatus] and [status] sets and gets status codes respectively.
      */
     public function testSetAndGetStatusCode()
     {
@@ -67,7 +67,7 @@ class ErrorResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [setStatus] method throws an exception when given a non-successful status code.
+     * Assert that [setStatus] throws an exception when given a success status code.
      */
     public function testSetStatusThrowsExceptionForInvalidStatusCodes()
     {
@@ -77,12 +77,22 @@ class ErrorResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [setHeaders] and [headers] methods sets and gets status codes respectively.
+     * Assert that [setHeaders] and [headers] sets and gets status codes respectively.
      */
     public function testSetAndGetHeaders()
     {
         $this->response->setHeaders($headers = ['x-foo' => 123]);
 
         $this->assertEquals($headers, $this->response->headers());
+    }
+
+    /**
+     * Assert that [setMeta] and [meta] sets and gets meta data respectively.
+     */
+    public function testSetAndGetMeta()
+    {
+        $this->response->setMeta($meta = ['foo' => 123]);
+
+        $this->assertEquals($meta, $this->response->meta());
     }
 }

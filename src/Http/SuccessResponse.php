@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Http;
 
 /**
- * A value object class holding information about a success response.
+ * Value object class holding information about a success response.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -17,13 +17,6 @@ class SuccessResponse extends Response
      * @var array
      */
     protected $data = [];
-
-    /**
-     * Additional meta data attached to the success response.
-     *
-     * @var array|null
-     */
-    protected $meta = null;
 
     /**
      * Set the response data.
@@ -40,19 +33,6 @@ class SuccessResponse extends Response
     }
 
     /**
-     * Set the meta data.
-     *
-     * @param array $meta
-     * @return $this
-     */
-    public function setMeta(array $meta)
-    {
-        $this->meta = $meta;
-
-        return $this;
-    }
-
-    /**
      * Get the response data.
      *
      * @return array
@@ -60,16 +40,6 @@ class SuccessResponse extends Response
     public function data(): array
     {
         return $this->data;
-    }
-
-    /**
-     * Get the meta data.
-     *
-     * @return array
-     */
-    public function meta()
-    {
-        return $this->meta;
     }
 
     /**

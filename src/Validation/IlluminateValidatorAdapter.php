@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
- * A paginator adapter class for Illuminate validators.
+ * Paginator adapter class for Illuminate validators.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

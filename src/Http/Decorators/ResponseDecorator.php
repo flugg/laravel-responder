@@ -6,7 +6,7 @@ use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 
 /**
- * A decorator class for decorating responses.
+ * Abstract decorator class for decorating responses.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

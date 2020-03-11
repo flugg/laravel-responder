@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
- * A contract for building success- and error responses.
+ * Contract for building success- and error responses.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

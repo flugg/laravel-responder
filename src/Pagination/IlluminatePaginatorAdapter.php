@@ -6,7 +6,7 @@ use Flugg\Responder\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
- * A paginator adapter class for Illuminate paginators.
+ * Paginator adapter class for Illuminate paginators.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

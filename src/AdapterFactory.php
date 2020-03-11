@@ -8,7 +8,7 @@ use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Contracts\Validation\Validator;
 
 /**
- * A factory class for creating adapters.
+ * Factory class for creating adapters.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

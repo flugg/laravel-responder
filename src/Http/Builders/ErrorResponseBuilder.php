@@ -13,7 +13,7 @@ use Flugg\Responder\Http\ErrorResponse;
 use Illuminate\Support\Str;
 
 /**
- * A builder class for building error responses.
+ * Builder class for building error responses.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -66,19 +66,19 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Make an error response from an error code and message.
      *
-     * @param Exception|int|string|null $errorCode
+     * @param Exception|int|string|null $code
      * @param Exception|string|null $message
      * @return $this
      * @throws InvalidStatusCodeException
      */
-    public function error($errorCode = null, $message = null)
+    public function error($code = null, $message = null)
     {
-        if (($exception = $errorCode) instanceof Exception) {
+        if (($exception = $code) instanceof Exception) {
             $this->response = $this->makeResponseFromException($exception);
         } elseif (($exception = $message) instanceof Exception) {
-            $this->response = $this->makeResponseFromException($exception, $errorCode);
+            $this->response = $this->makeResponseFromException($exception, $code);
         } else {
-            $this->response = $this->makeResponse($errorCode, $message ?: $this->messageRegistry->resolve($errorCode), self::DEFAULT_STATUS);
+            $this->response = $this->makeResponse($code, $message ?: $this->messageRegistry->resolve($code), self::DEFAULT_STATUS);
         }
 
         return $this;
@@ -104,17 +104,17 @@ class ErrorResponseBuilder extends ResponseBuilder
      * Make an error response from the exception.
      *
      * @param Exception $exception
-     * @param int|string|null $errorCode
+     * @param int|string|null $code
      * @return ErrorResponse
      * @throws InvalidStatusCodeException
      */
-    protected function makeResponseFromException(Exception $exception, $errorCode = null): ErrorResponse
+    protected function makeResponseFromException(Exception $exception, $code = null): ErrorResponse
     {
-        $errorCode = $errorCode ?: $this->resolveCodeFromException($exception);
-        $message = $this->messageRegistry->resolve($errorCode) ?: $exception->getMessage();
+        $code = $code ?: $this->resolveCodeFromException($exception);
+        $message = $this->messageRegistry->resolve($code) ?: $exception->getMessage();
         $status = $this->resolveStatusFromException($exception);
 
-        return $this->makeResponse($errorCode, $message, $status);
+        return $this->makeResponse($code, $message, $status);
     }
 
     /**
@@ -125,8 +125,8 @@ class ErrorResponseBuilder extends ResponseBuilder
      */
     protected function resolveCodeFromException(Exception $exception): string
     {
-        if (['code' => $errorCode] = $this->resolveErrorFromException($exception)) {
-            return $errorCode;
+        if (['code' => $code] = $this->resolveErrorFromException($exception)) {
+            return $code;
         }
 
         return Str::snake(Str::replaceLast('Exception', '', class_basename($exception)));
@@ -161,16 +161,16 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Make an error response.
      *
-     * @param int|string $errorCode
+     * @param int|string $code
      * @param string $message
      * @param int $status
      * @param array $headers
      * @return ErrorResponse
      * @throws InvalidStatusCodeException
      */
-    protected function makeResponse($errorCode, string $message, int $status = 500, array $headers = []): ErrorResponse
+    protected function makeResponse($code, string $message, int $status = 500, array $headers = []): ErrorResponse
     {
-        return (new ErrorResponse)->setStatus($status)->setHeaders($headers)->setErrorCode($errorCode)->setMessage($message);
+        return (new ErrorResponse)->setStatus($status)->setHeaders($headers)->setCode($code)->setMessage($message);
     }
 
     /**

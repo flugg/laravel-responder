@@ -39,7 +39,7 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [success] method formats success responses from a success response object.
+     * Assert that [success] formats success responses from a success response value object.
      */
     public function testSuccessMethodFormatsSuccessResponses()
     {
@@ -59,9 +59,9 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [paginator] method formats success responses with pagination meta data.
+     * Assert that [paginator] attaches pagination meta data to response data.
      */
-    public function testPaginatorMethodFormatsPaginatedResponses()
+    public function testPaginatorMethodAttachesPagination()
     {
         $paginator = mock(Paginator::class);
         $paginator->allows([
@@ -99,9 +99,9 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [paginator] method excludes previous and next links when there are none.
+     * Assert that [paginator] excludes previous and next links when there's only one page.
      */
-    public function testPaginatorMethodCanOmitPreviousAndNextLinks()
+    public function testPaginatorMethodOmitsUndefinedLinks()
     {
         $paginator = mock(Paginator::class);
         $paginator->allows([
@@ -137,9 +137,9 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [cursor] method formats success responses with cursor pagination meta data.
+     * Assert that [cursor] attaches cursor pagination meta data to response data.
      */
-    public function testCursorMethodFormatsCursorPaginatedResponses()
+    public function testCursorMethodAttachesCursorPagination()
     {
         $paginator = mock(CursorPaginator::class);
         $paginator->allows([
@@ -165,14 +165,15 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [error] method formats error responses from an error response object.
+     * Assert that [error] formats error responses from an error response value object.
      */
     public function testErrorMethodFormatsSuccessResponses()
     {
         $response = mock(ErrorResponse::class);
         $response->allows([
-            'errorCode' => $code = 'error_occured',
+            'code' => $code = 'error_occured',
             'message' => $message = 'An error has occured.',
+            'meta' => ['foo' => 123]
         ]);
 
         $result = $this->formatter->error($response);
@@ -182,20 +183,22 @@ class SimpleFormatterTest extends UnitTestCase
                 'code' => $code,
                 'message' => $message,
             ],
+            'foo' => 123,
         ], $result);
-        $response->shouldHaveReceived('errorCode');
+        $response->shouldHaveReceived('code');
         $response->shouldHaveReceived('message');
     }
 
     /**
-     * Assert that the [error] method excludes error messages if not set.
+     * Assert that [error] excludes error messages if it's not set.
      */
-    public function testErrorMethodCanOmitMessage()
+    public function testErrorMethodOmitsUndefinedMessage()
     {
         $response = mock(ErrorResponse::class);
         $response->allows([
-            'errorCode' => $code = 'error_occured',
+            'code' => $code = 'error_occured',
             'message' => null,
+            'meta' => []
         ]);
 
         $result = $this->formatter->error($response);
@@ -208,9 +211,9 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [validator] method formats error responses with validation errors.
+     * Assert that [validator] attaches validation meta data to response data.
      */
-    public function testValidationMethodFormatsValidationErrrorResponses()
+    public function testValidationMethodAttachesValidation()
     {
         $validator = mock(Validator::class);
         $validator->allows([

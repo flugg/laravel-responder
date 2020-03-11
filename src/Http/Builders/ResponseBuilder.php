@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
 use JsonSerializable;
 
 /**
- * An abstract builder class for building responses.
+ * Abstract builder class for building responses.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

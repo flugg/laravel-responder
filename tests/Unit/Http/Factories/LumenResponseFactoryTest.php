@@ -9,7 +9,7 @@ use Laravel\Lumen\Http\ResponseFactory;
 use Mockery\MockInterface;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Responses\Factories\LumenResponseFactory] class.
+ * Unit tests for the [Flugg\Responder\Http\Factories\LumenResponseFactory] class.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -49,7 +49,7 @@ class LumenResponseFactoryTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [make] method creates JSON responses using Lumen's response factory.
+     * Assert that [make] creates JSON responses using Lumen's response factory.
      */
     public function testMakeMethodShouldCreateJsonResponses()
     {

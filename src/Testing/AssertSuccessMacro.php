@@ -5,7 +5,7 @@ namespace Flugg\Responder\Testing;
 use Flugg\Responder\Contracts\Responder;
 
 /**
- * A mixin class extending the TestResponse class with an [assertSuccess] method.
+ * Mixin class extending the TestResponse class with an [assertSuccess] method.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

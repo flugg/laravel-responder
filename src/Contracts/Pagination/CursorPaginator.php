@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Contracts\Pagination;
 
 /**
- * A contract for a cursor paginator.
+ * Contract for a cursor paginator.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

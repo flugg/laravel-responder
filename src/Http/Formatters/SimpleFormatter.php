@@ -10,7 +10,7 @@ use Flugg\Responder\Http\ErrorResponse;
 use Flugg\Responder\Http\SuccessResponse;
 
 /**
- * A simple response formatter class.
+ * Simple response formatter.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -32,7 +32,7 @@ class SimpleFormatter implements ResponseFormatter
     }
 
     /**
-     * Format success response data with pagination.
+     * Attach pagination data to the formatted success response data.
      *
      * @param array $data
      * @param Paginator $paginator
@@ -65,7 +65,7 @@ class SimpleFormatter implements ResponseFormatter
     }
 
     /**
-     * Format success response data with cursor pagination.
+     * Attach cursor pagination data to the formatted success response data.
      *
      * @param array $data
      * @param CursorPaginator $paginator
@@ -91,21 +91,21 @@ class SimpleFormatter implements ResponseFormatter
      */
     public function error(ErrorResponse $response): array
     {
-        $data = [
-            'error' => [
-                'code' => $response->errorCode(),
-            ],
+        $error = [
+            'code' => $response->code(),
         ];
 
         if ($message = $response->message()) {
-            $data['error']['message'] = $message;
+            $error['message'] = $message;
         }
 
-        return $data;
+        return array_merge([
+            'error' => $error,
+        ], $response->meta());
     }
 
     /**
-     * Format error response data with a validator.
+     * Attach validation errors to the formatted error response data.
      *
      * @param array $data
      * @param Validator $validator

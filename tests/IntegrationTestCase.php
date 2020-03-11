@@ -8,7 +8,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Orchestra\Testbench\TestCase;
 
 /**
- * A base test case for bootstrapping the testing environment for the integration suite.
+ * Abstract test case for bootstrapping the environment for the integration suite.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

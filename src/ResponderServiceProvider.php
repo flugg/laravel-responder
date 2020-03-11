@@ -25,7 +25,7 @@ use Illuminate\Testing\TestResponse;
 use Laravel\Lumen\Application as Lumen;
 
 /**
- * A service provider bootstrapping the Laravel Responder package.
+ * Service provider bootstrapping the Laravel Responder package.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

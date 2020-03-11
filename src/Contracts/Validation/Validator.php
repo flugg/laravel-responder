@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Contracts\Validation;
 
 /**
- * A contract for a validator.
+ * Contract for a validator.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

@@ -7,7 +7,7 @@ use Illuminate\Contracts\Routing\ResponseFactory as BaseLaravelResponseFactory;
 use Illuminate\Http\JsonResponse;
 
 /**
- * A factory class for creating JSON responses utilizing Laravel.
+ * Factory class for creating JSON responses using Laravel.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -23,7 +23,7 @@ class LaravelResponseFactory implements ResponseFactory
     protected $factory;
 
     /**
-     * Create a new Laravel response factory instance.
+     * Create a new response factory instance.
      *
      * @param BaseLaravelResponseFactory $factory
      */
@@ -33,7 +33,7 @@ class LaravelResponseFactory implements ResponseFactory
     }
 
     /**
-     * Generates a JSON response.
+     * Generate a JSON response.
      *
      * @param array $data
      * @param int $status

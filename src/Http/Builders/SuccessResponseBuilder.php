@@ -14,7 +14,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * A builder class for building success responses.
+ * Builder class for building success responses.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

@@ -5,7 +5,7 @@ namespace Flugg\Responder;
 use Flugg\Responder\Contracts\ErrorMessageRegistry as ErrorMessageRegistryContract;
 
 /**
- * A class for registering and resolving error messages from error codes.
+ * Class for registering and resolving error messages from error codes.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

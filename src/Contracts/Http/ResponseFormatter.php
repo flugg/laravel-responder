@@ -9,7 +9,7 @@ use Flugg\Responder\Http\ErrorResponse;
 use Flugg\Responder\Http\SuccessResponse;
 
 /**
- * A contract for a response formatter.
+ * Contract for a response formatter.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -26,7 +26,7 @@ interface ResponseFormatter
     public function success(SuccessResponse $response): array;
 
     /**
-     * Format success response data with pagination.
+     * Attach pagination data to the formatted success response data.
      *
      * @param array $data
      * @param Paginator $paginator
@@ -35,7 +35,7 @@ interface ResponseFormatter
     public function paginator(array $data, Paginator $paginator): array;
 
     /**
-     * Format success response data with cursor pagination.
+     * Attach cursor pagination data to the formatted success response data.
      *
      * @param array $data
      * @param CursorPaginator $paginator
@@ -52,7 +52,7 @@ interface ResponseFormatter
     public function error(ErrorResponse $response): array;
 
     /**
-     * Format error response data with a validator.
+     * Attach validation errors to the formatted error response data.
      *
      * @param array $data
      * @param Validator $validator

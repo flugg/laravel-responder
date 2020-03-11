@@ -47,7 +47,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
     /**
      * Assert that [failed] returns a list of fields that failed validation.
      */
-    public function testFailedMethodReturnsListOfFailedFields()
+    public function testFailedMethodReturnsFailedFields()
     {
         $this->validator->allows('failed')->andReturn($failed = [
             'foo' => [],

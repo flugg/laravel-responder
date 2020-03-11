@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
- * A service class for building success- and error responses.
+ * Service class for building success- and error responses.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

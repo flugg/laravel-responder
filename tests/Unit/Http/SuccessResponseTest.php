@@ -35,7 +35,7 @@ class SuccessResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [setData] and [data] methods sets and gets data respectively.
+     * Assert that [setData] and [data] sets and gets data respectively.
      */
     public function testSetAndGetData()
     {
@@ -46,7 +46,7 @@ class SuccessResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [setStatus] and [status] methods sets and gets status codes respectively.
+     * Assert that [setStatus] and [status] sets and gets status codes respectively.
      */
     public function testSetAndGetStatusCode()
     {
@@ -56,7 +56,7 @@ class SuccessResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [setStatus] method throws an exception when given a non-successful status code.
+     * Assert that [setStatus] throws an exception when given a non-successful status code.
      */
     public function testSetStatusThrowsExceptionForInvalidStatusCodes()
     {
@@ -66,7 +66,7 @@ class SuccessResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [setHeaders] and [headers] methods sets and gets status codes respectively.
+     * Assert that [setHeaders] and [headers] sets and gets status codes respectively.
      */
     public function testSetAndGetHeaders()
     {
@@ -76,7 +76,7 @@ class SuccessResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [setMeta] and [meta] methods sets and gets meta data respectively.
+     * Assert that [setMeta] and [meta] sets and gets meta data respectively.
      */
     public function testSetAndGetMeta()
     {

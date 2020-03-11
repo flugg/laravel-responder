@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Http;
 
 /**
- * A value object class holding information about an error response.
+ * Value object class holding information about an error response.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -26,13 +26,6 @@ class ErrorResponse extends Response
     protected $message = null;
 
     /**
-     * Additional data attached to the error response.
-     *
-     * @var array|null
-     */
-    protected $data = null;
-
-    /**
      * Get the error code.
      *
      * @return int|string
@@ -50,16 +43,6 @@ class ErrorResponse extends Response
     public function message(): ?string
     {
         return $this->message;
-    }
-
-    /**
-     * Get the error data.
-     *
-     * @return array|null
-     */
-    public function data(): ?array
-    {
-        return $this->data;
     }
 
     /**
@@ -84,19 +67,6 @@ class ErrorResponse extends Response
     public function setMessage(string $message)
     {
         $this->message = $message;
-
-        return $this;
-    }
-
-    /**
-     * Set the error data.
-     *
-     * @param array $data
-     * @return $this
-     */
-    public function setData(array $data)
-    {
-        $this->data = $data;
 
         return $this;
     }

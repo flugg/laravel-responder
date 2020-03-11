@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 /**
- * An exception handler that decorates an existing handler and adds conversion logic.
+ * Exception handler decorating an existing handler and adds conversion logic.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>

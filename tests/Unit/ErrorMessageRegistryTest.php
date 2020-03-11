@@ -4,8 +4,6 @@ namespace Flugg\Responder\Tests\Unit;
 
 use Flugg\Responder\ErrorMessageRegistry;
 use Flugg\Responder\Tests\UnitTestCase;
-use Illuminate\Contracts\Translation\Translator;
-use Mockery\MockInterface;
 
 /**
  * Unit tests for the [Flugg\Responder\ErrorMessageRegistry] class.
@@ -36,40 +34,40 @@ class ErrorMessageRegistryTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [resolve] method resolves error message registered using the [register] method.
+     * Assert that [resolve] returns registered error message.
      */
-    public function testResolveMethodShouldResolveMessageFromRegister()
+    public function testResolveMethodReturnsMessage()
     {
-        $this->messageRegistry->register($errorCode = 'error_occured', $message = 'An error has occured.');
+        $this->messageRegistry->register($code = 'error_occured', $message = 'An error has occured.');
 
-        $result = $this->messageRegistry->resolve($errorCode);
+        $result = $this->messageRegistry->resolve($code);
 
         $this->assertEquals($message, $result);
     }
 
     /**
-     * Assert that the [register] method accepts an array of error messages to register.
+     * Assert that [resolve] returns null if no error messages are registered.
      */
-    public function testRegisterMethodAllowsSettingMultipleMessages()
+    public function testResolveMethodReturnsNull()
+    {
+        $message = $this->messageRegistry->resolve('error_occured');
+
+        $this->assertNull($message);
+    }
+
+    /**
+     * Assert that [register] accepts an array of error messages.
+     */
+    public function testRegisterMethodCanSetMultipleMessages()
     {
         $this->messageRegistry->register($messages = [
             'error_occured' => 'An error has occured.',
             'another_error_occured' => 'Yet another error occured.',
         ]);
 
-        foreach ($messages as $errorCode => $message) {
-            $result = $this->messageRegistry->resolve($errorCode);
+        foreach ($messages as $code => $message) {
+            $result = $this->messageRegistry->resolve($code);
             $this->assertEquals($message, $result);
         }
-    }
-
-    /**
-     * Assert that the [resolve] method returns null if no error messages are registered.
-     */
-    public function testResolveMethodReturnsNullIfNoMessageIsFound()
-    {
-        $message = $this->messageRegistry->resolve('error_occured');
-
-        $this->assertNull($message);
     }
 }

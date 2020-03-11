@@ -49,9 +49,9 @@ class PrettyPrintDecoratorTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [make] method decorates the response data by encoding JSON with the [JSON_PRETTY_PRINT] option.
+     * Assert that [make] decorates the response data by encoding JSON with the [JSON_PRETTY_PRINT] option.
      */
-    public function testMakeMethodPrettifiesJsonResponseData()
+    public function testMakeMethodPrettifiesJson()
     {
         $response = $this->responseDecorator->make($data = ['foo' => ['bar', 'baz' => 1]], 200);
 

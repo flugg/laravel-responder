@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * Unit tests for the [Flugg\Responder\Unit\Exceptions\Handler] class.
+ * Unit tests for the [Flugg\Responder\Exceptions\Handler] class.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -194,7 +194,7 @@ class HandlerTest extends IntegrationTestCase
     /**
      * Assert that [report] forwards the method call to the original handler.
      */
-    public function testReportMethodIsForwardedToOriginalHandler()
+    public function testReportMethodIsForwardedToHandler()
     {
         $this->exceptionHandler->allows('report');
 
@@ -206,7 +206,7 @@ class HandlerTest extends IntegrationTestCase
     /**
      * Assert that [shouldReport] forwards the method call to the original handler.
      */
-    public function testShouldReportMethodIsForwardedToOriginalHandler()
+    public function testShouldReportMethodIsForwardedToHandler()
     {
         $this->exceptionHandler->allows('shouldReport')->andReturn($shouldReport = true);
 
@@ -219,7 +219,7 @@ class HandlerTest extends IntegrationTestCase
     /**
      * Assert that [renderForConsole] forwards the method call to the original handler.
      */
-    public function testRenderForConsoleMethodIsForwardedToOriginalHandler()
+    public function testRenderForConsoleMethodIsForwardedToHandler()
     {
         $this->exceptionHandler->allows('renderForConsole')->andReturn($response = mock(JsonResponse::class));
 
