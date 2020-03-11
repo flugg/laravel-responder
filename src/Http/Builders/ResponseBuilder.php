@@ -48,7 +48,7 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     /**
      * A response formatter.
      *
-     * @var ResponseFormatter
+     * @var ResponseFormatter|null
      */
     protected $formatter;
 
@@ -67,7 +67,7 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     /**
      * Set a response formatter.
      *
-     * @param ResponseFormatter|string $formatter
+     * @param ResponseFormatter|string|null $formatter
      * @return $this
      */
     public function formatter($formatter)

@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Tests\Integration;
 
+use Flugg\Responder\Exceptions\ConvertsExceptions;
 use Flugg\Responder\Tests\IntegrationTestCase;
 
 /**
@@ -13,4 +14,22 @@ use Flugg\Responder\Tests\IntegrationTestCase;
  */
 class ConvertExceptionsTest extends IntegrationTestCase
 {
+    /**
+     * A mock of a trait for converting exceptions.
+     *
+     * @var MockInterface|ConvertsExceptions
+     */
+    protected $trait;
+
+    /**
+     * Setup the test environment.
+     *
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->trait = $this->getMockForTrait(ConvertsExceptions::class);
+    }
 }

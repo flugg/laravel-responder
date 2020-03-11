@@ -8,6 +8,7 @@ use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\ErrorMessageRegistry;
+use Flugg\Responder\Exceptions\Handler;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Http\Factories\LaravelResponseFactory;
@@ -16,7 +17,9 @@ use Flugg\Responder\Testing\AssertErrorMacro;
 use Flugg\Responder\Testing\AssertSuccessMacro;
 use Flugg\Responder\Testing\AssertValidationErrorsMacro;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Application as Laravel;
+use Illuminate\Foundation\Testing\TestResponse as LegacyTestResponse;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\TestResponse;
 use Laravel\Lumen\Application as Lumen;
@@ -38,23 +41,28 @@ class ResponderServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->registerResponseFactory($this->app instanceof Lumen ? LumenResponseFactory::class : LaravelResponseFactory::class);
+        $this->registerResponseFactory();
         $this->registerAdapterFactory();
         $this->registerErrorMessageRegistry();
         $this->registerResponseFormatter();
         $this->registerResponderService();
         $this->registerTestingMacros();
+
+        $this->app->extend(ExceptionHandler::class, function ($handler) {
+            return new Handler($handler);
+        });
     }
 
     /**
      * Register response factory binding with configured decorators.
      *
-     * @param string $class
      * @return void
+     * @throws BindingResolutionException
      */
-    protected function registerResponseFactory(string $class): void
+    protected function registerResponseFactory(): void
     {
-        $this->app->singleton(ResponseFactory::class, function () use ($class) {
+        $this->app->singleton(ResponseFactory::class, function () {
+            $class = $this->app instanceof Lumen ? LumenResponseFactory::class : LaravelResponseFactory::class;
             $factory = $this->app->make($class);
 
             foreach (config('responder.decorators') as $decorator) {
@@ -69,6 +77,7 @@ class ResponderServiceProvider extends ServiceProvider
      * Register adapter factory binding.
      *
      * @return void
+     * @throws BindingResolutionException
      */
     protected function registerAdapterFactory(): void
     {
@@ -81,46 +90,45 @@ class ResponderServiceProvider extends ServiceProvider
      * Register error message resolver binding with configured error messages.
      *
      * @return void
+     * @throws BindingResolutionException
      */
     protected function registerErrorMessageRegistry(): void
     {
         $this->app->singleton(ErrorMessageRegistryContract::class, function () {
-            return tap($this->app->make(ErrorMessageRegistry::class), function (ErrorMessageRegistryContract $messageRegistry) {
+            return tap($this->app->make(ErrorMessageRegistry::class), function (ErrorMessageRegistry $messageRegistry) {
                 $messageRegistry->register(config('responder.error_messages'));
             });
         });
     }
 
     /**
-     * Register configured response formatter binding.
+     * Register configured response formatter binding and extend response builders with formatter.
      *
      * @return void
+     * @throws BindingResolutionException
      */
     protected function registerResponseFormatter(): void
     {
         $this->app->singleton(ResponseFormatter::class, function () {
-            return $this->app->make(config('responder.formatter'));
+            return is_null($class = config('responder.formatter')) ? null : $this->app->make($class);
         });
 
-        $this->app->extend(SuccessResponseBuilder::class, function ($responseBuilder) {
-            return $responseBuilder->formatter($this->app->make(ResponseFormatter::class));
-        });
-
-        $this->app->extend(ErrorResponseBuilder::class, function ($responseBuilder) {
-            return $responseBuilder->formatter($this->app->make(ResponseFormatter::class));
-        });
+        foreach ([SuccessResponseBuilder::class, ErrorResponseBuilder::class] as $class) {
+            $this->app->extend($class, function ($responseBuilder) {
+                return $responseBuilder->formatter($this->app->make(ResponseFormatter::class));
+            });
+        }
     }
 
     /**
      * Register responder service binding.
      *
      * @return void
+     * @throws BindingResolutionException
      */
     protected function registerResponderService(): void
     {
-        $this->app->bind(ResponderContract::class, function () {
-            return $this->app->make(Responder::class);
-        });
+        $this->app->bind(ResponderContract::class, Responder::class);
     }
 
     /**
@@ -131,9 +139,27 @@ class ResponderServiceProvider extends ServiceProvider
      */
     protected function registerTestingMacros(): void
     {
-        TestResponse::macro('assertSuccess', $this->app->make(AssertSuccessMacro::class)());
-        TestResponse::macro('assertError', $this->app->make(AssertErrorMacro::class)());
-        TestResponse::macro('assertValidationErrors', $this->app->make(AssertValidationErrorsMacro::class)());
+        if ($testResponse = $this->getTestResponse()) {
+            $testResponse::macro('assertSuccess', $this->app->make(AssertSuccessMacro::class)());
+            $testResponse::macro('assertError', $this->app->make(AssertErrorMacro::class)());
+            $testResponse::macro('assertValidationErrors', $this->app->make(AssertValidationErrorsMacro::class)());
+        }
+    }
+
+    /**
+     * Register test response macros.
+     *
+     * @return string|null
+     */
+    protected function getTestResponse(): ?string
+    {
+        if (class_exists(TestResponse::class)) {
+            return TestResponse::class;
+        } else if (class_exists(LegacyTestResponse::class)) {
+            return LegacyTestResponse::class;
+        }
+
+        return null;
     }
 
     /**
@@ -143,10 +169,8 @@ class ResponderServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app instanceof Laravel) {
-            if ($this->app->runningInConsole()) {
-                $this->publishes([__DIR__ . '/../config/responder.php' => config_path('responder.php')], 'config');
-            }
+        if ($this->app instanceof Laravel && $this->app->runningInConsole()) {
+            $this->publishes([__DIR__ . '/../config/responder.php' => config_path('responder.php')], 'config');
         } elseif ($this->app instanceof Lumen) {
             $this->app->configure('responder');
         }
