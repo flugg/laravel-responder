@@ -28,28 +28,28 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class HandlerTest extends IntegrationTestCase
 {
     /**
-     * A mock of an exception handler.
+     * Mock of an exception handler.
      *
      * @var MockInterface|ExceptionHandler
      */
     protected $exceptionHandler;
 
     /**
-     * A mock of a responder service.
+     * Mock of a responder service.
      *
      * @var MockInterface|Responder
      */
     protected $responder;
 
     /**
-     * A mock of a request object.
+     * Mock of a request object.
      *
      * @var MockInterface|Request
      */
     protected $request;
 
     /**
-     * An exception handler decorator.
+     * Exception handler decorator.
      *
      * @var MockInterface|Handler
      */

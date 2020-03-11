@@ -19,14 +19,14 @@ use Mockery\MockInterface;
 class IlluminatePaginatorAdapterTest extends UnitTestCase
 {
     /**
-     * A mock of an Illuminate paginator.
+     * Mock of an Illuminate paginator.
      *
      * @var MockInterface|LengthAwarePaginator
      */
     protected $paginator;
 
     /**
-     * The adapter class being tested.
+     * Adapter class being tested.
      *
      * @var IlluminatePaginatorAdapter
      */

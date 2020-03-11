@@ -20,14 +20,14 @@ use Throwable;
 class Handler
 {
     /**
-     * The decorated exception handler.
+     * Decorated exception handler.
      *
      * @var ExceptionHandler
      */
     protected $handler;
 
     /**
-     * A responder service for making error responses.
+     * Responder service for making error responses.
      *
      * @var Responder
      */
@@ -51,7 +51,6 @@ class Handler
      * @param Request $request
      * @param Throwable $exception
      * @return Response
-     *
      * @throws Throwable
      */
     public function render($request, Throwable $exception)

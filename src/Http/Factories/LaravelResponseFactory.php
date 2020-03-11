@@ -16,7 +16,7 @@ use Illuminate\Http\JsonResponse;
 class LaravelResponseFactory implements ResponseFactory
 {
     /**
-     * The Laravel factory for making responses.
+     * Laravel factory class for making responses.
      *
      * @var BaseLaravelResponseFactory
      */

@@ -16,7 +16,7 @@ use Flugg\Responder\Tests\UnitTestCase;
 class ErrorResponseTest extends UnitTestCase
 {
     /**
-     * The class being tested.
+     * Class being tested.
      *
      * @var ErrorResponse
      */

@@ -18,14 +18,14 @@ use Mockery\MockInterface;
 class IlluminateValidatorAdapterTest extends UnitTestCase
 {
     /**
-     * A mock of an Illuminate validator.
+     * Mock of an Illuminate validator.
      *
      * @var MockInterface|Validator
      */
     protected $validator;
 
     /**
-     * The adapter class being tested.
+     * Adapter class being tested.
      *
      * @var IlluminateValidatorAdapter
      */

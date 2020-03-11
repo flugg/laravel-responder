@@ -20,7 +20,7 @@ use Flugg\Responder\Tests\UnitTestCase;
 class SimpleFormatterTest extends UnitTestCase
 {
     /**
-     * The class being tested.
+     * Class being tested.
      *
      * @var SimpleFormatter
      */

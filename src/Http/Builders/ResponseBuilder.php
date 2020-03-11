@@ -25,28 +25,28 @@ use JsonSerializable;
 abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, JsonSerializable
 {
     /**
-     * A factory for making JSON responses.
+     * Factory for making JSON responses.
      *
      * @var ResponseFactory
      */
     protected $responseFactory;
 
     /**
-     * A factory for making adapters.
+     * Factory for making adapters.
      *
      * @var AdapterFactory
      */
     protected $adapterFactory;
 
     /**
-     * A response object.
+     * Response value object.
      *
      * @var Response
      */
     protected $response;
 
     /**
-     * A response formatter.
+     * Response formatter.
      *
      * @var ResponseFormatter|null
      */

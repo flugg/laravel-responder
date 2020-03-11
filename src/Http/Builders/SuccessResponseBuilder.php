@@ -23,28 +23,28 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class SuccessResponseBuilder extends ResponseBuilder
 {
     /**
-     * A response object.
+     * Response value object.
      *
      * @var SuccessResponse
      */
     protected $response;
 
     /**
-     * A paginator object.
+     * Paginator value object.
      *
      * @var Paginator
      */
     protected $paginator;
 
     /**
-     * A cursor paginator object.
+     * Cursor paginator value object.
      *
      * @var CursorPaginator
      */
     protected $cursorPaginator;
 
     /**
-     * A constant defining the status code used if nothing is set.
+     * Constant defining the status code used if nothing is set.
      *
      * @var int
      */

@@ -17,7 +17,7 @@ use Mockery\MockInterface;
 class ErrorMessageRegistryTest extends UnitTestCase
 {
     /**
-     * The class being tested.
+     * Class being tested.
      *
      * @var ErrorMessageRegistry
      */

@@ -16,7 +16,7 @@ use Mockery\MockInterface;
 class TestResponseMacrosTest extends IntegrationTestCase
 {
     /**
-     * A partial mock of a test response.
+     * Partial mock of a test response.
      *
      * @var MockInterface|TestResponse
      */

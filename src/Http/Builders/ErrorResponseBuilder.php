@@ -22,28 +22,28 @@ use Illuminate\Support\Str;
 class ErrorResponseBuilder extends ResponseBuilder
 {
     /**
-     * A response object.
+     * Response value object.
      *
      * @var ErrorResponse
      */
     protected $response;
 
     /**
-     * A resolver used for resolving error messages from error codes.
+     * Resolver used for resolving error messages from error codes.
      *
      * @var ErrorMessageRegistry
      */
     protected $messageRegistry;
 
     /**
-     * A validator attached with the error response.
+     * Validator attached with the error response.
      *
      * @var Validator
      */
     protected $validator;
 
     /**
-     * A constant defining the status code used if nothing is set.
+     * Constant defining the status code used if nothing is set.
      *
      * @var int
      */

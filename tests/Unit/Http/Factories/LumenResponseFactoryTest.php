@@ -18,14 +18,14 @@ use Mockery\MockInterface;
 class LumenResponseFactoryTest extends UnitTestCase
 {
     /**
-     * A mock of a Lumen's response factory.
+     * Mock of Lumen's response factory.
      *
      * @var MockInterface|ResponseFactory
      */
     protected $baseResponseFactory;
 
     /**
-     * The factory class being tested.
+     * Factory class being tested.
      *
      * @var LumenResponseFactory
      */

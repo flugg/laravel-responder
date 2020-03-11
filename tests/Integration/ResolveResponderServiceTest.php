@@ -21,28 +21,28 @@ use Mockery\MockInterface;
 class ResolveResponderServiceTest extends IntegrationTestCase
 {
     /**
-     * A mock of a responder service.
+     * Mock of a responder service.
      *
      * @var MockInterface|Responder
      */
     protected $responder;
 
     /**
-     * A mock of a success response builder.
+     * Mock of a success response builder.
      *
      * @var MockInterface|SuccessResponseBuilder
      */
     protected $successResponseBuilder;
 
     /**
-     * A mock of an error response builder.
+     * Mock of an error response builder.
      *
      * @var MockInterface|ErrorResponseBuilder
      */
     protected $errorResponseBuilder;
 
     /**
-     * A mock of a trait for making JSON responses.
+     * Mock of a trait for making JSON responses.
      *
      * @var MockInterface|MakesJsonResponses
      */

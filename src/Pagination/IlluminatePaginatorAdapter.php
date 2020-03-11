@@ -15,7 +15,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 class IlluminatePaginatorAdapter implements Paginator
 {
     /**
-     * The Illuminate paginator instance.
+     * Illuminate paginator class.
      *
      * @var LengthAwarePaginator
      */

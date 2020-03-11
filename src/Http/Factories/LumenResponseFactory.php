@@ -16,7 +16,7 @@ use Laravel\Lumen\Http\ResponseFactory as BaseLumenResponseFactory;
 class LumenResponseFactory implements ResponseFactory
 {
     /**
-     * The Lumen factory for making responses.
+     * Lumen factory class for making responses.
      *
      * @var BaseLumenResponseFactory
      */

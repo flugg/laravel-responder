@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 class IlluminateValidatorAdapter implements Validator
 {
     /**
-     * The Illuminate validator instance.
+     * Illuminate validator class.
      *
      * @var IlluminateValidator
      */

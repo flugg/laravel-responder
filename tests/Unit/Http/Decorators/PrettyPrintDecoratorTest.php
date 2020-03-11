@@ -18,14 +18,14 @@ use Illuminate\Http\JsonResponse;
 class PrettyPrintDecoratorTest extends UnitTestCase
 {
     /**
-     * A mock of a response factory.
+     * Mock of a response factory.
      *
      * @var MockInterface
      */
     protected $responseFactory;
 
     /**
-     * The decorator class being tested.
+     * Decorator class being tested.
      *
      * @var PrettyPrintDecorator
      */

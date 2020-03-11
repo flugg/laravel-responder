@@ -18,21 +18,21 @@ use Mockery\MockInterface;
 class ResponderTest extends UnitTestCase
 {
     /**
-     * A mock of a success response builder.
+     * Mock of a success response builder.
      *
      * @var MockInterface|SuccessResponseBuilder
      */
     protected $successResponseBuilder;
 
     /**
-     * A mock of an error response builder.
+     * Mock of an error response builder.
      *
      * @var MockInterface|ErrorResponseBuilder
      */
     protected $errorResponseBuilder;
 
     /**
-     * The service class being tested.
+     * Service class being tested.
      *
      * @var Responder
      */

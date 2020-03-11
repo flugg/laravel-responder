@@ -14,7 +14,7 @@ use Flugg\Responder\Contracts\ErrorMessageRegistry as ErrorMessageRegistryContra
 class ErrorMessageRegistry implements ErrorMessageRegistryContract
 {
     /**
-     * A list of registered error messages mapped to error codes.
+     * List of registered error messages mapped to error codes.
      *
      * @var array
      */

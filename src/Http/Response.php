@@ -5,7 +5,7 @@ namespace Flugg\Responder\Http;
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
 
 /**
- * An abstract class holding information about a response.
+ * An abstract value object class holding information about a response.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -28,7 +28,7 @@ abstract class Response
     protected $headers = [];
 
     /**
-     * Set response status code.
+     * Set the response status code.
      *
      * @param int $status
      * @return $this
@@ -46,7 +46,7 @@ abstract class Response
     }
 
     /**
-     * Set response headers.
+     * Set the response headers.
      *
      * @param array $headers
      * @return $this

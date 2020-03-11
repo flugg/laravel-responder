@@ -19,28 +19,28 @@ use Mockery\MockInterface;
 class SuccessResponseBuilderTest extends UnitTestCase
 {
     /**
-     * A mock of a response factory.
+     * Mock of a response factory.
      *
      * @var MockInterface|ResponseFactory
      */
     protected $responseFactory;
 
     /**
-     * A mock of an adapter factory.
+     * Mock of an adapter factory.
      *
      * @var MockInterface|AdapterFactory
      */
     protected $adapterFactory;
 
     /**
-     * A mock of a response formatter.
+     * Mock of a response formatter.
      *
      * @var MockInterface|ResponseFormatter
      */
     protected $formatter;
 
     /**
-     * The builder class being tested.
+     * Builder class being tested.
      *
      * @var SuccessResponseBuilder
      */

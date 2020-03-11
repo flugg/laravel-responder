@@ -15,7 +15,7 @@ use Illuminate\Http\JsonResponse;
 abstract class ResponseDecorator implements ResponseFactory
 {
     /**
-     * The factory being decorated.
+     * Factory class being decorated.
      *
      * @var ResponseFactory
      */

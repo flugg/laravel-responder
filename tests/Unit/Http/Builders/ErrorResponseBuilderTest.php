@@ -20,35 +20,35 @@ use Mockery\MockInterface;
 class ErrorResponseBuilderTest extends UnitTestCase
 {
     /**
-     * A mock of a response factory.
+     * Mock of a response factory.
      *
      * @var MockInterface|ResponseFactory
      */
     protected $responseFactory;
 
     /**
-     * A mock of an adapter factory.
+     * Mock of an adapter factory.
      *
      * @var MockInterface|AdapterFactory
      */
     protected $adapterFactory;
 
     /**
-     * A mock of an error message resolver.
+     * Mock of an error message resolver.
      *
      * @var MockInterface|ErrorMessageRegistry
      */
     protected $messageRegistry;
 
     /**
-     * A mock of a response formatter.
+     * Mock of a response formatter.
      *
      * @var MockInterface|ResponseFormatter
      */
     protected $formatter;
 
     /**
-     * The builder class being tested.
+     * Builder class being tested.
      *
      * @var \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */

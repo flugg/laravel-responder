@@ -18,7 +18,7 @@ use Flugg\Responder\Tests\UnitTestCase;
 class AdapterFactoryTest extends UnitTestCase
 {
     /**
-     * The factory class being tested.
+     * Factory class being tested.
      *
      * @var AdapterFactory
      */

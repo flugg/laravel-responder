@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Http;
 
 /**
- * A class holding information about an error response.
+ * A value object class holding information about an error response.
  *
  * @package flugger/laravel-responder
  * @author Alexander Tømmerås <flugged@gmail.com>
@@ -12,61 +12,91 @@ namespace Flugg\Responder\Http;
 class ErrorResponse extends Response
 {
     /**
-     * An error code representing the error.
+     * Error code representing the error response.
      *
      * @var int|string
      */
-    protected $errorCode;
+    protected $code;
 
     /**
-     * A message explaining the error.
+     * Error message describing the error response.
      *
-     * @var string
+     * @var string|null
      */
-    protected $message;
+    protected $message = null;
 
     /**
-     * Get error code.
+     * Additional data attached to the error response.
+     *
+     * @var array|null
+     */
+    protected $data = null;
+
+    /**
+     * Get the error code.
      *
      * @return int|string
      */
-    public function errorCode()
+    public function code()
     {
-        return $this->errorCode;
+        return $this->code;
     }
 
     /**
-     * Get error message.
+     * Get the error message.
      *
-     * @return string
+     * @return string|null
      */
-    public function message()
+    public function message(): ?string
     {
         return $this->message;
     }
 
     /**
-     * Set error code.
+     * Get the error data.
      *
-     * @param int|string $errorCode
+     * @return array|null
+     */
+    public function data(): ?array
+    {
+        return $this->data;
+    }
+
+    /**
+     * Set the error code.
+     *
+     * @param int|string $code
      * @return $this
      */
-    public function setErrorCode($errorCode)
+    public function setCode($code)
     {
-        $this->errorCode = $errorCode;
+        $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Set error message.
+     * Set the error message.
      *
      * @param string $message
      * @return $this
      */
-    public function setMessage($message)
+    public function setMessage(string $message)
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    /**
+     * Set the error data.
+     *
+     * @param array $data
+     * @return $this
+     */
+    public function setData(array $data)
+    {
+        $this->data = $data;
 
         return $this;
     }

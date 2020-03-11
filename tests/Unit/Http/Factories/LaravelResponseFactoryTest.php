@@ -18,14 +18,14 @@ use Mockery\MockInterface;
 class LaravelResponseFactoryTest extends UnitTestCase
 {
     /**
-     * A mock of a Laravel's response factory.
+     * Mock of Laravel's response factory.
      *
      * @var MockInterface|ResponseFactory
      */
     protected $baseResponseFactory;
 
     /**
-     * The factory class being tested.
+     * Factory class being tested.
      *
      * @var LaravelResponseFactory
      */

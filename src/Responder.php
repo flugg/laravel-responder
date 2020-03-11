@@ -21,14 +21,14 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 class Responder implements ResponderContract
 {
     /**
-     * A builder class for building success responses.
+     * Builder class for building success responses.
      *
      * @var SuccessResponseBuilder
      */
     protected $successResponseBuilder;
 
     /**
-     * A builder class for building error responses.
+     * Builder class for building error responses.
      *
      * @var ErrorResponseBuilder
      */

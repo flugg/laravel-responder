@@ -65,9 +65,9 @@ return [
     | Exceptions
     |--------------------------------------------------------------------------
     |
-    | A map of exceptions that will be converted to JSON error responses when
-    | the exception handler uses the [ConvertsExceptions] trait. Responses
-    | with a status code of 5xx are ignored if debug mode is turned on.
+    | A map of exceptions that will be automatically converted to an error
+    | response for JSON requests. Responses with a status code of 5xx
+    | will be ignored when debug mode is turned on.
     |
     */
 
