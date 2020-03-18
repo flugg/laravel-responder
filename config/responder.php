@@ -1,5 +1,9 @@
 <?php
 
+use Flugg\Responder\Contracts\Http\ArrayableNormalizer;
+use Flugg\Responder\Contracts\Http\QueryBuilderNormalizer;
+use Flugg\Responder\Contracts\Http\RelationNormalizer;
+use Flugg\Responder\Contracts\Http\ResourceNormalizer;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Contracts\Validation\Validator;
@@ -35,6 +39,25 @@ return [
     'decorators' => [
         // \Flugg\Responder\Http\Decorators\PrettyPrintDecorator::class,
         // \Flugg\Responder\Http\Decorators\EscapeHtmlDecorator::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Normalizers
+    |--------------------------------------------------------------------------
+    |
+    | The Laravel Responder package uses adapter classes for pagination and
+    | validation, allowing you to use other implementations. The package
+    | doesn't include an adapter for cursor pagination out of the box.
+    |
+    */
+
+    'normalizers' => [
+        \Illuminate\Database\Query\Builder::class => QueryBuilderNormalizer::class,
+        \Illuminate\Database\Eloquent\Builder::class => QueryBuilderNormalizer::class,
+        \Illuminate\Database\Eloquent\Relations\Relation::class => RelationNormalizer::class,
+        \Illuminate\Http\Resources\Json\JsonResource::class => ResourceNormalizer::class,
+        \Illuminate\Contracts\Support\Arrayable::class => ArrayableNormalizer::class,
     ],
 
     /*

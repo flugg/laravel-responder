@@ -60,13 +60,7 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     public function data($data = [])
     {
-        if ($data instanceof JsonResource) {
-            $this->setPaginatorFromData($data->resource);
-            $this->response = $this->makeResponseFromResource($data);
-        } else {
-            $this->setPaginatorFromData($data);
-            $this->response = $this->makeResponse($this->normalizeData($data), self::DEFAULT_STATUS);
-        }
+        $this->response = $this->normalizeData($data);
 
         return $this;
     }
@@ -74,20 +68,20 @@ class SuccessResponseBuilder extends ResponseBuilder
     /**
      * Attempt to make a paginator from the given data.
      *
-     * @param array|Arrayable|Builder|JsonResource|QueryBuilder|Relation $data
-     * @return array
+     * @param mixed $data
+     * @return SuccessResponse
      * @throws InvalidDataException
      */
-    protected function normalizeData($data): array
+    protected function normalizeData($data): SuccessResponse
     {
         if (is_array($data)) {
-            return $data;
-        } elseif ($data instanceof Arrayable) {
-            return $data->toArray();
-        } elseif ($data instanceof QueryBuilder || $data instanceof Builder) {
-            return $data->get()->toArray();
-        } elseif ($data instanceof Relation) {
-            return $data->getResults();
+            return (new SuccessResponse())->setData($data);
+        }
+
+        foreach ($this->normalizers as $class => $normalizer) {
+            if ($data instanceof $class) {
+                return (new $normalizer())->normalize($data);
+            }
         }
 
         throw new InvalidDataException;
@@ -106,35 +100,6 @@ class SuccessResponseBuilder extends ResponseBuilder
         } elseif ($cursorPaginator = $this->adapterFactory->makeCursorPaginator($data)) {
             $this->cursorPaginator = $cursorPaginator;
         }
-    }
-
-    /**
-     * Make a success response from the resource.
-     *
-     * @param JsonResource $resource
-     * @return SuccessResponse
-     * @throws InvalidStatusCodeException
-     */
-    protected function makeResponseFromResource(JsonResource $resource): SuccessResponse
-    {
-        $response = $resource->response();
-        $meta = array_merge_recursive($resource->with(app('request')), $resource->additional);
-
-        return $this->makeResponse($resource->resolve(), $response->status(), $response->headers->all())->setMeta($meta);
-    }
-
-    /**
-     * Make a success response.
-     *
-     * @param array $data
-     * @param int $status
-     * @param array $headers
-     * @return SuccessResponse
-     * @throws InvalidStatusCodeException
-     */
-    protected function makeResponse(array $data, int $status, array $headers = []): SuccessResponse
-    {
-        return (new SuccessResponse)->setStatus($status)->setHeaders($headers)->setData($data);
     }
 
     /**

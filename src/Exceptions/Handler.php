@@ -7,6 +7,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -17,7 +18,7 @@ use Throwable;
  * @author Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class Handler
+class Handler implements ExceptionHandler
 {
     /**
      * Decorated exception handler.
@@ -46,6 +47,29 @@ class Handler
     }
 
     /**
+     * Report or log an exception.
+     *
+     * @param Throwable $exception
+     * @return void
+     * @throws Exception
+     */
+    public function report(Throwable $exception)
+    {
+        return $this->handler->report($exception);
+    }
+
+    /**
+     * Determine if the exception should be reported.
+     *
+     * @param Throwable $exception
+     * @return bool
+     */
+    public function shouldReport(Throwable $exception)
+    {
+        return $this->handler->shouldReport($exception);
+    }
+
+    /**
      * Render an exception into an HTTP response.
      *
      * @param Request $request
@@ -60,6 +84,18 @@ class Handler
         }
 
         return $this->handler->render($request, $exception);
+    }
+
+    /**
+     * Render an exception to the console.
+     *
+     * @param OutputInterface $output
+     * @param Throwable $exception
+     * @return void
+     */
+    public function renderForConsole($output, Throwable $exception)
+    {
+        return $this->handler->renderForConsole($output, $exception);
     }
 
     /**

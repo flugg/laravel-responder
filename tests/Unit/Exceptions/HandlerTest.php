@@ -228,4 +228,17 @@ class HandlerTest extends IntegrationTestCase
         $this->assertSame($response, $result);
         $this->exceptionHandler->shouldHaveReceived('renderForConsole')->with($output, $exception);
     }
+
+    /**
+     * Assert that it forwards all other method calls to the original handler.
+     */
+    public function testOtherMethodsAreForwardedToHandler()
+    {
+        $this->exceptionHandler->allows('foo')->andReturn($bar = 123);
+
+        $result = $this->handler->foo($baz = 456);
+
+        $this->assertSame($bar, $result);
+        $this->exceptionHandler->shouldHaveReceived('foo')->with($baz);
+    }
 }

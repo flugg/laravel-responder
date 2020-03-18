@@ -62,7 +62,7 @@ class ResponderServiceProvider extends ServiceProvider
             $class = $this->app instanceof Lumen ? LumenResponseFactory::class : LaravelResponseFactory::class;
             $factory = $this->app->make($class);
 
-            foreach (config('responder.decorators') as $decorator) {
+            foreach ((config('responder.decorators') ?? []) as $decorator) {
                 $factory = new $decorator($factory);
             }
 
@@ -79,7 +79,7 @@ class ResponderServiceProvider extends ServiceProvider
     protected function registerAdapterFactory(): void
     {
         $this->app->singleton(AdapterFactoryContract::class, function () {
-            return new AdapterFactory(config('responder.adapters'));
+            return new AdapterFactory(config('responder.adapters') ?? []);
         });
     }
 
@@ -137,7 +137,7 @@ class ResponderServiceProvider extends ServiceProvider
     protected function registerExceptionHandler(): void
     {
         $this->app->extend(ExceptionHandler::class, function ($handler) {
-            return new Handler($handler, $this->app->make(ResponderContract::class), config('responder.exceptions'));
+            return new Handler($handler, $this->app->make(ResponderContract::class));
         });
     }
 
