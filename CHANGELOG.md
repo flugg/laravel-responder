@@ -1,3 +1,8 @@
+# 3.1.1 (2020-03-18)
+
+### Bug Fixes
+
+* Remove typehint from exception handler
 
 # 3.1.0 (2020-03-09)
 
