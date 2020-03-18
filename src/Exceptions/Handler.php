@@ -21,10 +21,10 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \Throwable               $exception
+     * @param  \Exception|\Throwable    $exception
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function render($request, Throwable $exception)
+    public function render($request, $exception)
     {
         if ($request->wantsJson()) {
             $this->convertDefaultException($exception);
