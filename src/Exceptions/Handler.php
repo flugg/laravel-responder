@@ -4,7 +4,6 @@ namespace Flugg\Responder\Exceptions;
 
 use Flugg\Responder\Exceptions\Http\HttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
 
 /**
  * An exception handler responsible for handling exceptions.
@@ -20,11 +19,13 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Exception|\Throwable    $exception
+     * @param \Illuminate\Http\Request $request
+     * @param \Throwable $exception
      * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Throwable
      */
-    public function render($request, $exception)
+    public function render($request, \Throwable $exception)
     {
         if ($request->wantsJson()) {
             $this->convertDefaultException($exception);
