@@ -313,6 +313,20 @@ class TransformBuilder
                 return $eagerLoads;
             }
 
+            // Note, currently only works one level deep for now, ex. 'comments.user'
+            // Note, $transformer->relations must have transformer associated with each relation even if parent as includeRelation method
+            // because this is how we check the nested transformer,
+            // method_exists($transformer->relations[$parent], 'include' . ucfirst($nestedRelation))
+            $nestedRelations = explode('.', $identifier);
+            if (count($nestedRelations) > 1) {
+                $parent = $nestedRelations[0];
+                $nestedRelation = last($nestedRelations);
+
+                if (method_exists($transformer->getRelations()[$parent], 'include' . ucfirst($nestedRelation))) {
+                    return $eagerLoads;
+                }
+            }
+
             return array_merge($eagerLoads, [$identifier => $requested[$relation] ?: function () { }]);
         }, []);
 
