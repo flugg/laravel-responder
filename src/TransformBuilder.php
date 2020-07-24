@@ -307,7 +307,11 @@ class TransformBuilder
     protected function eagerLoadRelations($data, array $requested, $transformer)
     {
         $relations = collect(array_keys($requested))->reduce(function ($eagerLoads, $relation) use ($requested, $transformer) {
-            $identifier = Str::camel($this->stripParametersFromRelation($relation));
+            $identifier = $this->stripParametersFromRelation($relation);
+
+            if(config('responder.use_camel_case_relations')) {
+                $identifier = Str::camel($identifier);
+            }
 
             if (method_exists($transformer, 'include' . ucfirst($identifier))) {
                 return $eagerLoads;

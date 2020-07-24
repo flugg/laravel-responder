@@ -203,7 +203,11 @@ trait HasRelationships
      */
     protected function resolveQueryConstraint(string $identifier)
     {
-        if (! method_exists($this, $method = 'load' . ucfirst(Str::camel($identifier)))) {
+        if(config('responder.use_camel_case_relations')) {
+            $identifier = Str::camel($identifier);
+        }
+
+        if (! method_exists($this, $method = 'load' . ucfirst($identifier))) {
             return null;
         }
 
@@ -221,7 +225,10 @@ trait HasRelationships
      */
     protected function resolveRelation(Model $model, string $identifier)
     {
-        $identifier = Str::camel($identifier);
+        if(config('responder.use_camel_case_relations')) {
+            $identifier = Str::camel($identifier);
+        }
+
         $relation = $model->$identifier;
 
         if (method_exists($this, $method = 'filter' . ucfirst($identifier))) {

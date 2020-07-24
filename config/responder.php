@@ -99,4 +99,16 @@ return [
 
     'error_message_files' => ['errors'],
 
+    /*
+    |--------------------------------------------------------------------------
+    | CamelCase Relations
+    |--------------------------------------------------------------------------
+    |
+    | By default laravel responder will convert relations request to camel-case
+    | but some people would like to use snake-case, so you can set it below
+    |
+    */
+
+    'use_camel_case_relations' => true,
+
 ];

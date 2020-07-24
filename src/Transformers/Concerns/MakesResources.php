@@ -58,7 +58,11 @@ trait MakesResources
     {
         $transformer = $this->mappedTransformerClass($identifier);
 
-        if (method_exists($this, $method = 'include' . ucfirst(Str::camel($identifier)))) {
+        if(config('responder.use_camel_case_relations')) {
+            $identifier = Str::camel($identifier);
+        }
+
+        if (method_exists($this, $method = 'include' . ucfirst($identifier))) {
             $resource = $this->resource($this->$method($data, collect($parameters)), $transformer, $identifier);
         } elseif ($data instanceof Model) {
             $resource = $this->includeResourceFromModel($data, $identifier, $transformer);
