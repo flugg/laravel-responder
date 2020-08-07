@@ -1,14 +1,10 @@
 <?php
 
 use Flugg\Responder\Contracts\Http\ArrayableNormalizer;
+use Flugg\Responder\Contracts\Http\PaginatorNormalizer;
 use Flugg\Responder\Contracts\Http\QueryBuilderNormalizer;
 use Flugg\Responder\Contracts\Http\RelationNormalizer;
 use Flugg\Responder\Contracts\Http\ResourceNormalizer;
-use Flugg\Responder\Contracts\Pagination\CursorPaginator;
-use Flugg\Responder\Contracts\Pagination\Paginator;
-use Flugg\Responder\Contracts\Validation\Validator;
-use Flugg\Responder\Pagination\IlluminatePaginatorAdapter;
-use Flugg\Responder\Validation\IlluminateValidatorAdapter;
 
 return [
 
@@ -56,31 +52,11 @@ return [
         \Illuminate\Database\Query\Builder::class => QueryBuilderNormalizer::class,
         \Illuminate\Database\Eloquent\Builder::class => QueryBuilderNormalizer::class,
         \Illuminate\Database\Eloquent\Relations\Relation::class => RelationNormalizer::class,
+        \Illuminate\Database\Eloquent\Model::class => ModelNormalizer::class,
+        \Illuminate\Database\Eloquent\Collection::class => CollectionNormalizer::class,
+        \Illuminate\Contracts\Pagination\LengthAwarePaginator::class => PaginatorNormalizer::class,
         \Illuminate\Http\Resources\Json\JsonResource::class => ResourceNormalizer::class,
         \Illuminate\Contracts\Support\Arrayable::class => ArrayableNormalizer::class,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Adapters
-    |--------------------------------------------------------------------------
-    |
-    | The Laravel Responder package uses adapter classes for pagination and
-    | validation, allowing you to use other implementations. The package
-    | doesn't include an adapter for cursor pagination out of the box.
-    |
-    */
-
-    'adapters' => [
-        Paginator::class => [
-            Illuminate\Contracts\Pagination\LengthAwarePaginator::class => IlluminatePaginatorAdapter::class,
-        ],
-        CursorPaginator::class => [
-            //
-        ],
-        Validator::class => [
-            \Illuminate\Contracts\Validation\Validator::class => IlluminateValidatorAdapter::class,
-        ],
     ],
 
     /*

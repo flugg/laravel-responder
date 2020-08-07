@@ -2,23 +2,24 @@
 
 namespace Flugg\Responder\Tests\Unit\Http;
 
+use Flugg\Responder\Contracts\Pagination\CursorPaginator;
+use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
+use Flugg\Responder\Http\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
 
 /**
  * Unit tests for the [Flugg\Responder\Http\SuccessResponse] class.
  *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Http\SuccessResponse
  */
 class SuccessResponseTest extends UnitTestCase
 {
     /**
      * Class being tested.
      *
-     * @var SuccessResponse
+     * @var \Flugg\Responder\Http\SuccessResponse
      */
     protected $response;
 
@@ -35,14 +36,34 @@ class SuccessResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that [setData] and [data] sets and gets data respectively.
+     * Assert that [setResource] and [resource] sets and gets resource respectively.
      */
-    public function testSetAndGetData()
+    public function testSetAndGetResource()
     {
-        $result = $this->response->setData($data = ['foo' => 123]);
+        $result = $this->response->setResource($resource = new Resource([]));
 
         $this->assertSame($this->response, $result);
-        $this->assertEquals($data, $this->response->data());
+        $this->assertEquals($resource, $this->response->resource());
+    }
+
+    /**
+     * Assert that [setPaginator] and [paginator] sets and gets paginator respectively.
+     */
+    public function testSetAndGetPaginator()
+    {
+        $this->response->setPaginator($paginator = mock(Paginator::class));
+
+        $this->assertEquals($paginator, $this->response->paginator());
+    }
+
+    /**
+     * Assert that [setCursorPaginator] and [cursorPaginator] sets and gets cursor paginator respectively.
+     */
+    public function testSetAndGetCursorPaginator()
+    {
+        $this->response->setCursorPaginator($paginator = mock(CursorPaginator::class));
+
+        $this->assertEquals($paginator, $this->response->cursorPaginator());
     }
 
     /**

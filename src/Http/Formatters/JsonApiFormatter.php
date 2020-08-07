@@ -13,42 +13,79 @@ use InvalidArgumentException;
 
 /**
  * Response formatter following the JSON API specification.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 class JsonApiFormatter implements ResponseFormatter
 {
     /**
      * Format success response data.
      *
-     * @param SuccessResponse $response
+     * @param \Flugg\Responder\Http\SuccessResponse $response
      * @return array
      */
     public function success(SuccessResponse $response): array
     {
-        if (Arr::isAssoc($response->data())) {
+        if (Arr::isAssoc($response->resource()->data())) {
             return [
-                'data' => $this->formatResource($response->data())
+                'data' => $this->resource($response->resource()->data())
             ];
         }
 
         return [
             'data' => array_map(function ($resource) {
-                return $this->formatResource($resource);
-            }, $response->data())
+                return $this->resource($resource);
+            }, $response->resource()->data())
         ];
     }
 
     /**
-     * Attach pagination data to the formatted success response data.
+     * Format error response data.
      *
-     * @param array $data
-     * @param Paginator $paginator
+     * @param \Flugg\Responder\Http\ErrorResponse $response
      * @return array
      */
-    public function paginator(array $data, Paginator $paginator): array
+    public function error(ErrorResponse $response): array
+    {
+        $error = [
+            'code' => $response->code(),
+        ];
+
+        if ($message = $response->message()) {
+            $error['message'] = $message;
+        }
+
+        return array_merge([
+            'error' => $error,
+        ], $response->meta());
+    }
+
+    /**
+     * Format a JSON API resource.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function resource(array $data): array
+    {
+        if (!array_key_exists('id', $data)) {
+            throw new InvalidArgumentException('JSON API resource objects must have an ID');
+        }
+
+        $resource = [
+            'type' => 'RESOURCE_KEY',
+            'id' => $data['id'],
+            'attributes' => Arr::except($data, 'id'),
+        ];
+
+        return $resource;
+    }
+
+    /**
+     * Format pagination meta data.
+     *
+     * @param \Flugg\Responder\Contracts\Pagination\Paginator $paginator
+     * @return array
+     */
+    protected function paginator(Paginator $paginator): array
     {
         $pagination = [
             'count' => (int) $paginator->count(),
@@ -71,86 +108,44 @@ class JsonApiFormatter implements ResponseFormatter
             $pagination['links']['next'] = $paginator->url($currentPage + 1);
         }
 
-        return array_merge($data, ['pagination' => $pagination]);
+        return $pagination;
     }
 
     /**
-     * Attach cursor pagination data to the formatted success response data.
+     * Format cursor pagination meta data.
      *
-     * @param array $data
-     * @param CursorPaginator $paginator
+     * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $paginator
      * @return array
      */
-    public function cursor(array $data, CursorPaginator $paginator): array
-    {
-        return array_merge($data, [
-            'cursor' => [
-                'current' => $paginator->current(),
-                'previous' => $paginator->previous(),
-                'next' => $paginator->next(),
-                'count' => $paginator->count(),
-            ],
-        ]);
-    }
-
-    /**
-     * Format error response data.
-     *
-     * @param ErrorResponse $response
-     * @return array
-     */
-    public function error(ErrorResponse $response): array
-    {
-        $error = [
-            'code' => $response->code(),
-        ];
-
-        if ($message = $response->message()) {
-            $error['message'] = $message;
-        }
-
-        return array_merge([
-            'error' => $error,
-        ], $response->meta());
-    }
-
-    /**
-     * Attach validation errors to the formatted error response data.
-     *
-     * @param array $data
-     * @param Validator $validator
-     * @return array
-     */
-    public function validator(array $data, Validator $validator): array
+    protected function cursor(CursorPaginator $paginator): array
     {
         return [
-            'error' => array_merge($data['error'], [
-                'fields' => array_reduce($validator->failed(), function ($fields, $field) use ($validator) {
-                    return array_merge($fields, [
-                        $field => array_map(function ($rule) use ($field, $validator) {
-                            return [
-                                'rule' => $rule,
-                                'message' => $validator->messages()["$field.$rule"],
-                            ];
-                        }, $validator->errors()[$field]),
-                    ]);
-                }, []),
-            ]),
+            'current' => $paginator->current(),
+            'previous' => $paginator->previous(),
+            'next' => $paginator->next(),
+            'count' => $paginator->count(),
         ];
     }
 
-    protected function formatResource(array $data): array
+    /**
+     * Format validator meta data.
+     *
+     * @param \Flugg\Responder\Contracts\Validation\Validator $validator
+     * @return array
+     */
+    protected function validator(Validator $validator): array
     {
-        if (!array_key_exists('id', $data)) {
-            throw new InvalidArgumentException('JSON API resource objects must have an ID');
-        }
-
-        $resource = [
-            'type' => 'RESOURCE_KEY',
-            'id' => $data['id'],
-            'attributes' => Arr::except($data, 'id'),
+        return [
+            'fields' => array_reduce($validator->failed(), function ($fields, $field) use ($validator) {
+                return array_merge($fields, [
+                    $field => array_map(function ($rule) use ($field, $validator) {
+                        return [
+                            'rule' => $rule,
+                            'message' => $validator->messages()["$field.$rule"],
+                        ];
+                    }, $validator->errors()[$field]),
+                ]);
+            }, []),
         ];
-
-        return $resource;
     }
 }

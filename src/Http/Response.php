@@ -5,11 +5,7 @@ namespace Flugg\Responder\Http;
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
 
 /**
- * Abstract value object class holding information about a response.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * Abstract data transfer object class for a response.
  */
 abstract class Response
 {
@@ -35,11 +31,41 @@ abstract class Response
     protected $meta = [];
 
     /**
+     * Get the response status code.
+     *
+     * @return int
+     */
+    public function status()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Get the response headers.
+     *
+     * @return array
+     */
+    public function headers()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Get the meta data attached to the response.
+     *
+     * @return array
+     */
+    public function meta()
+    {
+        return $this->meta;
+    }
+
+    /**
      * Set the response status code.
      *
      * @param int $status
      * @return $this
-     * @throws InvalidStatusCodeException
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
      */
     public function setStatus(int $status)
     {
@@ -66,7 +92,7 @@ abstract class Response
     }
 
     /**
-     * Set the meta data.
+     * Set meta data attached to the response.
      *
      * @param array $meta
      * @return $this
@@ -76,36 +102,6 @@ abstract class Response
         $this->meta = $meta;
 
         return $this;
-    }
-
-    /**
-     * Get the response status code.
-     *
-     * @return int
-     */
-    public function status()
-    {
-        return $this->status;
-    }
-
-    /**
-     * Get the response headers.
-     *
-     * @return array
-     */
-    public function headers()
-    {
-        return $this->headers;
-    }
-
-    /**
-     * Get the meta data.
-     *
-     * @return array
-     */
-    public function meta()
-    {
-        return $this->meta;
     }
 
     /**

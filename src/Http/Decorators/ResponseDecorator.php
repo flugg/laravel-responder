@@ -7,24 +7,20 @@ use Illuminate\Http\JsonResponse;
 
 /**
  * Abstract decorator class for decorating responses.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 abstract class ResponseDecorator implements ResponseFactory
 {
     /**
      * Factory class being decorated.
      *
-     * @var ResponseFactory
+     * @var \Flugg\Responder\Contracts\Http\ResponseFactory
      */
     protected $factory;
 
     /**
      * Create a new response decorator instance.
      *
-     * @param ResponseFactory $factory
+     * @param \Flugg\Responder\Contracts\Http\ResponseFactory $factory
      */
     public function __construct(ResponseFactory $factory)
     {
@@ -32,12 +28,12 @@ abstract class ResponseDecorator implements ResponseFactory
     }
 
     /**
-     * Generate a JSON response.
+     * Create a JSON response.
      *
      * @param array $data
      * @param int $status
      * @param array $headers
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function make(array $data, int $status, array $headers = []): JsonResponse
     {

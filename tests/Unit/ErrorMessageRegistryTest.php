@@ -8,16 +8,14 @@ use Flugg\Responder\Tests\UnitTestCase;
 /**
  * Unit tests for the [Flugg\Responder\ErrorMessageRegistry] class.
  *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\ErrorMessageRegistry
  */
 class ErrorMessageRegistryTest extends UnitTestCase
 {
     /**
      * Class being tested.
      *
-     * @var ErrorMessageRegistry
+     * @var \Flugg\Responder\ErrorMessageRegistry
      */
     protected $messageRegistry;
 

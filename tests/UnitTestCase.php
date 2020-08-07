@@ -8,10 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Abstract test case for bootstrapping the environment for the unit suite.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 abstract class UnitTestCase extends TestCase
 {

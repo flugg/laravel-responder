@@ -48,7 +48,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
     protected $formatter;
 
     /**
-     * Builder class being tested.
+     * Class being tested.
      *
      * @var \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */

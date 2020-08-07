@@ -4,21 +4,16 @@ namespace Flugg\Responder\Tests\Integration;
 
 use Flugg\Responder\Tests\IntegrationTestCase;
 use Illuminate\Testing\TestResponse;
-use Mockery\MockInterface;
 
 /**
  * Integration tests for testing [Illuminate\Testing\TestResponse] macros.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 class TestResponseMacrosTest extends IntegrationTestCase
 {
     /**
      * Partial mock of a test response.
      *
-     * @var MockInterface|TestResponse
+     * @var \Mockery\MockInterface|\Illuminate\Testing\TestResponse
      */
     protected $testResponse;
 

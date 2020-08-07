@@ -1,20 +1,19 @@
-<p align="center"><img src="http://designiack.no/package-logo.png" width="396" height="111"></p>
+<p align="center"><img src="https://i.imgur.com/5heMuZH.png" width="561" height="156"></p>
 
 <p align="center">
-    <a href="https://github.com/flugger/laravel-responder"><img src="https://poser.pugx.org/flugger/laravel-responder/v/stable?format=flat-square" alt="Latest Stable Version"></a>
+    <a href="https://github.com/flugger/laravel-responder/releases"><img src="https://img.shields.io/github/v/tag/flugger/laravel-responder?style=flat-square" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/flugger/laravel-responder"><img src="https://img.shields.io/packagist/dt/flugger/laravel-responder.svg?style=flat-square" alt="Packagist Downloads"></a>
     <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square" alt="Software License"></a>
     <a href="https://travis-ci.org/flugger/laravel-responder"><img src="https://img.shields.io/travis/flugger/laravel-responder/master.svg?style=flat-square" alt="Build Status"></a>
-    <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/?branch=master"><img src="https://img.shields.io/scrutinizer/g/flugger/laravel-responder.svg?style=flat-square" alt="Code Quality"></a>
     <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/code-structure/master"><img src="https://img.shields.io/scrutinizer/coverage/g/flugger/laravel-responder.svg?style=flat-square" alt="Test Coverage"></a>
-    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PRMC9WLJY8E46&lc=NO&item_name=Laravel%20Responder&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"><img src="https://img.shields.io/badge/donate-PayPal-yellow.svg?style=flat-square" alt="Donate"></a>
+    <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/?branch=master"><img src="https://img.shields.io/scrutinizer/g/flugger/laravel-responder.svg?style=flat-square" alt="Code Quality"></a>
 </p>
 
 Laravel Responder is a package for building API responses in Laravel and Lumen. It supports [API Resources](https://laravel.com/docs/master/eloquent-resources) and gives you the tools to format both success- and error responses consistently.
 
 ---
 
-### **2020 Update: Version 4.0 Released!** 🔥
+## **Summer 2020 Update: Version 4.0 Released!** 🔥
 
 _The package has been rewritten from scratch with a focus on simplifying the code. Now, instead of utilizing [Fractal](https://fractal.thephpleague.com) behind the scenes, the package instead relies on Laravel's own [API Resources](https://laravel.com/docs/master/eloquent-resources). Make sure to check out the [changelog](CHANGELOG.md) and the new documentation to get an overview of all the hot new features._
 
@@ -47,8 +46,8 @@ This package used to utilize Fractal, but has since moved over to support API re
 
 This package requires:
 
--   PHP **7.1**+
--   Laravel **5.5**+ or Lumen **5.5**+
+-   PHP **7.2**+
+-   Laravel **6.0**+ or Lumen **6.0**+
 
 # Installation
 
@@ -60,14 +59,14 @@ composer require flugger/laravel-responder
 
 ## Laravel
 
-The package supports auto-discovery so the `Flugg\Responder\ResponderServiceProvider` provider and `Flugg\Responder\Facades\Responder` facade will automatically be registered by Laravel.
+The package supports auto-discovery, so the `ResponderServiceProvider` provider and `Responder` facade will automatically be registered by Laravel.
 
 #### Publish Configuration _(optional)_
 
 You may additionally publish the package configuration using the `vendor:publish` Artisan command:
 
 ```shell
-php artisan vendor:publish --provider="Flugg\Responder\ResponderServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Flugg\Responder\ResponderServiceProvider"
 ```
 
 This will publish a `responder.php` configuration file in your `config` folder.
@@ -90,9 +89,11 @@ You may also add the following lines to `app/bootstrap.php` to register the `Res
 class_alias(Flugg\Responder\Facades\Responder::class, 'Responder');
 ```
 
-#### Publish Configuration _(optional)_
+---
 
 Seeing there is no `vendor:publish` command in Lumen, you will have to create your own `config/responder.php` file if you want to configure the package.
+
+---
 
 # Usage
 
@@ -100,7 +101,7 @@ This documentation assumes some knowledge of how [API Resources](https://laravel
 
 ## Creating Responses
 
-The package has a `Responder` service class, which has a `success` and `error` method to build success- and error responses respectively. To use the service and begin creating responses, pick one of the options below:
+The package has a `Responder` service class, which has a `success` and `error` method to build success- and error responses respectively. To begin creating responses, use the service by picking one of the options below:
 
 #### Option 1: Inject `Responder` Service
 
@@ -163,7 +164,7 @@ _Which option you pick is up to you, they are all equivalent, the important thin
 
 ### Using Response Builders
 
-The `success` and `error` methods return a `SuccessResponseBuilder` and `ErrorResponseBuilder` respectively, which both extend an abstract `ResponseBuilder`, giving them common behaviors. They will be converted to JSON when returned from a controller, but you can explicitly create an instance of `Illuminate\Http\JsonResponse` with the `respond` method:
+The `success` and `error` methods return a `SuccessResponseBuilder` and `ErrorResponseBuilder` respectively, which both extend an abstract `ResponseBuilder`, giving them common behavior. They will be converted to JSON when returned from a controller, but you can explicitly create an instance of `Illuminate\Http\JsonResponse` with the `respond` method:
 
 ```php
 return responder()->success()->respond();

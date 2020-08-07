@@ -2,77 +2,69 @@
 
 namespace Flugg\Responder\Http\Builders;
 
-use Flugg\Responder\Contracts\AdapterFactory;
 use Flugg\Responder\Contracts\Http\ResponseFactory;
-use Flugg\Responder\Contracts\Http\ResponseFormatter;
-use Flugg\Responder\Exceptions\InvalidStatusCodeException;
-use Flugg\Responder\Http\Response;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use JsonSerializable;
 
 /**
  * Abstract builder class for building responses.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, JsonSerializable
 {
     /**
      * Factory for making JSON responses.
      *
-     * @var ResponseFactory
+     * @var \Flugg\Responder\Contracts\Http\ResponseFactory
      */
     protected $responseFactory;
 
     /**
-     * Factory for making adapters.
+     * A service container.
      *
-     * @var AdapterFactory
+     * @var \Illuminate\Contracts\Container\Container
      */
-    protected $adapterFactory;
+    protected $container;
 
     /**
      * Response value object.
      *
-     * @var Response
+     * @var \Flugg\Responder\Http\Response
      */
     protected $response;
 
     /**
      * Response formatter.
      *
-     * @var ResponseFormatter|null
+     * @var \Flugg\Responder\Contracts\Http\ResponseFormatter|null
      */
     protected $formatter;
 
     /**
      * Create a new response builder instance.
      *
-     * @param ResponseFactory $responseFactory
-     * @param AdapterFactory $adapterFactory
+     * @param \Flugg\Responder\Contracts\Http\ResponseFactory $responseFactory
+     * @param \Illuminate\Contracts\Container\Container $container
      */
-    public function __construct(ResponseFactory $responseFactory, AdapterFactory $adapterFactory)
+    public function __construct(ResponseFactory $responseFactory, Container $container)
     {
         $this->responseFactory = $responseFactory;
-        $this->adapterFactory = $adapterFactory;
+        $this->container = $container;
     }
 
     /**
      * Set a response formatter.
      *
-     * @param ResponseFormatter|string|null $formatter
+     * @param \Flugg\Responder\Contracts\Http\ResponseFormatter|string|null $formatter
      * @return $this
      */
     public function formatter($formatter)
     {
-        $this->formatter = is_string($formatter) ? new $formatter : $formatter;
+        $this->formatter = is_string($formatter) ? $this->container->make($formatter) : $formatter;
 
         return $this;
     }
@@ -95,12 +87,12 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     }
 
     /**
-     * Add additional meta data to the response content.
+     * Attach meta data to the response content.
      *
      * @param array $meta
      * @return $this
      */
-    public function meta(array $meta): self
+    public function meta(array $meta)
     {
         $this->response->setMeta($meta);
 
@@ -112,8 +104,8 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
      *
      * @param int|null $status
      * @param array $headers
-     * @return JsonResponse
-     * @throws InvalidStatusCodeException
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
      */
     public function respond(int $status = null, array $headers = []): JsonResponse
     {
@@ -123,18 +115,18 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
 
         $this->response->setHeaders(array_merge($this->response->headers(), $headers));
 
-        return $this->toResponse(app('request'));
+        return $this->responseFactory->make($this->format(), $this->response->status(), $this->response->headers());
     }
 
     /**
      * Create an HTTP response that represents the object.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function toResponse($request): JsonResponse
     {
-        return $this->responseFactory->make($this->content(), $this->response->status(), $this->response->headers());
+        return $this->respond();
     }
 
     /**
@@ -150,7 +142,7 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     /**
      * Convert the response to an Illuminate collection.
      *
-     * @return Collection
+     * @return \Illuminate\Support\Collection
      */
     public function toCollection(): Collection
     {
@@ -165,7 +157,7 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
      */
     public function toJson($options = 0): string
     {
-        return json_encode($this->toArray(), $options);
+        return json_encode($this->jsonSerialize(), $options);
     }
 
     /**
@@ -179,9 +171,9 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     }
 
     /**
-     * Get the response content.
+     * Format the response data.
      *
      * @return array
      */
-    abstract protected function content(): array;
+    abstract protected function format(): array;
 }

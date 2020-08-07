@@ -2,49 +2,44 @@
 
 namespace Flugg\Responder\Tests\Integration;
 
-use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
-use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Facades\Responder as ResponderFacade;
+use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
+use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\MakesJsonResponses;
 use Flugg\Responder\Responder;
 use Flugg\Responder\Tests\IntegrationTestCase;
-use Mockery\MockInterface;
 
 /**
  * Integration tests for testing different ways of resolving the [Flugg\Responder\Responder] service.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 class ResolveResponderServiceTest extends IntegrationTestCase
 {
     /**
      * Mock of a responder service.
      *
-     * @var MockInterface|Responder
+     * @var \Mockery\MockInterface|\Flugg\Responder\Contracts\Responder
      */
     protected $responder;
 
     /**
      * Mock of a success response builder.
      *
-     * @var MockInterface|SuccessResponseBuilder
+     * @var \Mockery\MockInterface|\Flugg\Responder\Http\Builders\SuccessResponseBuilder
      */
     protected $successResponseBuilder;
 
     /**
      * Mock of an error response builder.
      *
-     * @var MockInterface|ErrorResponseBuilder
+     * @var \Mockery\MockInterface|\Flugg\Responder\Http\Builders\ErrorResponseBuilder
      */
     protected $errorResponseBuilder;
 
     /**
      * Mock of a trait for making JSON responses.
      *
-     * @var MockInterface|MakesJsonResponses
+     * @var \Mockery\MockInterface|\Flugg\Responder\MakesJsonResponses
      */
     protected $trait;
 
@@ -66,7 +61,7 @@ class ResolveResponderServiceTest extends IntegrationTestCase
     }
 
     /**
-     * Assert that you can get access to the service through the IoC container and dependency injection.
+     * Assert that you can get access to the service through the service container and dependency injection.
      */
     public function testResolveFromContainer()
     {

@@ -9,10 +9,6 @@ use Orchestra\Testbench\TestCase;
 
 /**
  * Abstract test case for bootstrapping the environment for the integration suite.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 abstract class IntegrationTestCase extends TestCase
 {

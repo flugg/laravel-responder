@@ -6,35 +6,32 @@ use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Responder;
 use Flugg\Responder\Tests\UnitTestCase;
-use Mockery\MockInterface;
 
 /**
  * Unit tests for the [Flugg\Responder\Responder] class.
  *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Responder
  */
 class ResponderTest extends UnitTestCase
 {
     /**
      * Mock of a success response builder.
      *
-     * @var MockInterface|SuccessResponseBuilder
+     * @var \Mockery\MockInterface|\Flugg\Responder\Http\Builders\SuccessResponseBuilder
      */
     protected $successResponseBuilder;
 
     /**
      * Mock of an error response builder.
      *
-     * @var MockInterface|ErrorResponseBuilder
+     * @var \Mockery\MockInterface|\Flugg\Responder\Http\Builders\ErrorResponseBuilder
      */
     protected $errorResponseBuilder;
 
     /**
-     * Service class being tested.
+     * Class being tested.
      *
-     * @var Responder
+     * @var \Flugg\Responder\Responder
      */
     protected $responder;
 
@@ -57,11 +54,11 @@ class ResponderTest extends UnitTestCase
      */
     public function testSuccessMethodShouldCallOnSuccessResponseBuilder()
     {
-        $this->successResponseBuilder->allows('data')->andReturnSelf();
+        $this->successResponseBuilder->allows('make')->andReturnSelf();
         $result = $this->responder->success($data = ['foo' => 1]);
 
         $this->assertSame($this->successResponseBuilder, $result);
-        $this->successResponseBuilder->shouldHaveReceived('data')->with($data);
+        $this->successResponseBuilder->shouldHaveReceived('make')->with($data);
     }
 
     /**
@@ -69,10 +66,10 @@ class ResponderTest extends UnitTestCase
      */
     public function testErrorMethodShouldCallOnErrorResponseBuilder()
     {
-        $this->errorResponseBuilder->allows('error')->andReturnSelf();
+        $this->errorResponseBuilder->allows('make')->andReturnSelf();
         $result = $this->responder->error($error = 'error_occured', $message = 'An error has occured.');
 
         $this->assertSame($this->errorResponseBuilder, $result);
-        $this->errorResponseBuilder->shouldHaveReceived('error')->with($error, $message);
+        $this->errorResponseBuilder->shouldHaveReceived('make')->with($error, $message);
     }
 }

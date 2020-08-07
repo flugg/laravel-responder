@@ -6,11 +6,7 @@ use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * Facade class for easy access to the responder service.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * Facade class for accessing the responder service.
  *
  * @see \Flugg\Responder\Responder
  */

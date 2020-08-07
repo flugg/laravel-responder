@@ -5,82 +5,79 @@ namespace Flugg\Responder\Http\Builders;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidDataException;
-use Flugg\Responder\Exceptions\InvalidStatusCodeException;
+use Flugg\Responder\Http\Resource;
 use Flugg\Responder\Http\SuccessResponse;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Builder class for building success responses.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 class SuccessResponseBuilder extends ResponseBuilder
 {
     /**
      * Response value object.
      *
-     * @var SuccessResponse
+     * @var \Flugg\Responder\Http\SuccessResponse
      */
     protected $response;
 
     /**
-     * Paginator value object.
+     * Build a success response.
      *
-     * @var Paginator
-     */
-    protected $paginator;
-
-    /**
-     * Cursor paginator value object.
-     *
-     * @var CursorPaginator
-     */
-    protected $cursorPaginator;
-
-    /**
-     * Constant defining the status code used if nothing is set.
-     *
-     * @var int
-     */
-    protected const DEFAULT_STATUS = 200;
-
-    /**
-     * Make a success response from the given data.
-     *
-     * @param array|Arrayable|Builder|JsonResource|QueryBuilder|Relation $data
+     * @param mixed $data
      * @return $this
-     * @throws InvalidDataException
-     * @throws InvalidStatusCodeException
+     * @throws \Flugg\Responder\Exceptions\InvalidDataException
      */
-    public function data($data = [])
+    public function make($data = [])
     {
-        $this->response = $this->normalizeData($data);
+        if (is_array($data)) {
+            $this->response = (new SuccessResponse())->setResource(new Resource($data));
+        } elseif (is_object($data)) {
+            $this->response = $this->normalizeData($data);
+        } else {
+            throw new InvalidDataException;
+        }
 
         return $this;
     }
 
     /**
-     * Attempt to make a paginator from the given data.
+     * Attach a paginator to the success response.
      *
-     * @param mixed $data
-     * @return SuccessResponse
-     * @throws InvalidDataException
+     * @param \Flugg\Responder\Contracts\Pagination\Paginator $paginator
+     * @return $this
      */
-    protected function normalizeData($data): SuccessResponse
+    public function paginator(Paginator $paginator)
     {
-        if (is_array($data)) {
-            return (new SuccessResponse())->setData($data);
-        }
+        $this->response->setPaginator($paginator);
 
+        return $this;
+    }
+
+    /**
+     * Attach a cursor paginator to the success response.
+     *
+     * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $paginator
+     * @return $this
+     */
+    public function cursor(CursorPaginator $paginator)
+    {
+        $this->response->setCursorPaginator($paginator);
+
+        return $this;
+    }
+
+    /**
+     * Normalize the data into a success response value object.
+     *
+     * @param object $data
+     * @return \Flugg\Responder\Http\SuccessResponse
+     * @throws \Flugg\Responder\Exceptions\InvalidDataException
+     */
+    protected function normalizeData(object $data): SuccessResponse
+    {
         foreach ($this->normalizers as $class => $normalizer) {
             if ($data instanceof $class) {
-                return (new $normalizer())->normalize($data);
+                return $this->container->make($normalizer)->normalize($data);
             }
         }
 
@@ -88,52 +85,16 @@ class SuccessResponseBuilder extends ResponseBuilder
     }
 
     /**
-     * Attempt to set a paginator from the given data using an adapter.
-     *
-     * @param array|Arrayable|Builder|JsonResource|QueryBuilder|Relation $data
-     * @return void
-     */
-    protected function setPaginatorFromData($data): void
-    {
-        if ($paginator = $this->adapterFactory->makePaginator($data)) {
-            $this->paginator = $paginator;
-        } elseif ($cursorPaginator = $this->adapterFactory->makeCursorPaginator($data)) {
-            $this->cursorPaginator = $cursorPaginator;
-        }
-    }
-
-    /**
-     * Get the response content.
-     *
-     * @return array
-     */
-    protected function content(): array
-    {
-        if (!$this->formatter) {
-            return $this->response->data();
-        }
-
-        return $this->format($this->response);
-    }
-
-    /**
      * Format the response data.
      *
-     * @param SuccessResponse $response
      * @return array
      */
-    protected function format(SuccessResponse $response): array
+    protected function format(): array
     {
-        $data = $this->formatter->success($response);
-
-        if ($this->paginator) {
-            $data = $this->formatter->paginator($data, $this->paginator);
+        if (!$this->formatter) {
+            return $this->response->resource();
         }
 
-        if ($this->cursorPaginator) {
-            $data = $this->formatter->cursor($data, $this->cursorPaginator);
-        }
-
-        return $data;
+        return $this->formatter->success($this->response);
     }
 }

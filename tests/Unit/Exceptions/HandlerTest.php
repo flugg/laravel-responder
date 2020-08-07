@@ -3,17 +3,19 @@
 namespace Flugg\Responder\Tests\Unit\Exceptions;
 
 use Exception;
-use Flugg\Responder\Responder;
+use Flugg\Responder\Adapters\IlluminateValidatorAdapter;
+use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Exceptions\Handler;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
-use Flugg\Responder\Tests\IntegrationTestCase;
+use Flugg\Responder\Tests\UnitTestCase;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use LogicException;
-use Mockery\MockInterface;
+use Mockery;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -21,37 +23,35 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 /**
  * Unit tests for the [Flugg\Responder\Exceptions\Handler] class.
  *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Exceptions\Handler
  */
-class HandlerTest extends IntegrationTestCase
+class HandlerTest extends UnitTestCase
 {
     /**
      * Mock of an exception handler.
      *
-     * @var MockInterface|ExceptionHandler
+     * @var \Mockery\MockInterface|\Illuminate\Contracts\Debug\ExceptionHandler
      */
     protected $exceptionHandler;
 
     /**
      * Mock of a responder service.
      *
-     * @var MockInterface|Responder
+     * @var \Mockery\MockInterface|\Flugg\Responder\Contracts\Responder
      */
     protected $responder;
 
     /**
      * Mock of a request object.
      *
-     * @var MockInterface|Request
+     * @var \Mockery\MockInterface|\Illuminate\Http\Request
      */
     protected $request;
 
     /**
      * Exception handler decorator.
      *
-     * @var MockInterface|Handler
+     * @var \Mockery\MockInterface|\Flugg\Responder\Exceptions\Handler
      */
     protected $handler;
 
@@ -65,14 +65,10 @@ class HandlerTest extends IntegrationTestCase
         parent::setUp();
 
         $this->exceptionHandler = mock(ExceptionHandler::class);
+        $this->config = mock(Repository::class);
         $this->responder = mock(Responder::class);
         $this->request = mock(Request::class);
-        $this->handler = new Handler($this->exceptionHandler, $this->responder);
-
-        config()->set('responder.exceptions', [
-            BadRequestHttpException::class => ['code' => 'client_error', 'status' => 400],
-            LogicException::class => ['code' => 'server_error', 'status' => 500]
-        ]);
+        $this->handler = new Handler($this->exceptionHandler, $this->config, $this->responder);
     }
 
     /**
@@ -83,6 +79,10 @@ class HandlerTest extends IntegrationTestCase
         $this->request->allows('expectsJson')->andReturn(true);
         $this->responder->allows('error')->andReturn($responseBuilder = mock(ErrorResponseBuilder::class));
         $responseBuilder->allows('respond')->andReturn($response = mock(JsonResponse::class));
+        $this->config->allows('get')->with('responder.exceptions')->andReturn([
+            LogicException::class => ['code' => 'server_error', 'status' => 500]
+        ]);
+        $this->config->allows('get')->with('app.debug')->andReturn(false);
 
         $result = $this->handler->render($this->request, $exception = new LogicException());
 
@@ -99,9 +99,10 @@ class HandlerTest extends IntegrationTestCase
         $this->request->allows('expectsJson')->andReturn(true);
         $this->responder->allows('error')->andReturn($responseBuilder = mock(ErrorResponseBuilder::class));
         $responseBuilder->allows('respond')->andReturn($response = mock(JsonResponse::class));
-        config()->set('responder.exceptions', [
+        $this->config->allows('get')->with('responder.exceptions')->andReturn([
             Exception::class => ['code' => 'error', 'status' => 500],
         ]);
+        $this->config->allows('get')->with('app.debug')->andReturn(false);
 
         $result = $this->handler->render($this->request, $exception = new FileException());
 
@@ -119,15 +120,18 @@ class HandlerTest extends IntegrationTestCase
         $this->responder->allows('error')->andReturn($responseBuilder = mock(ErrorResponseBuilder::class));
         $responseBuilder->allows('validator')->andReturnSelf();
         $responseBuilder->allows('respond')->andReturn($response = mock(JsonResponse::class));
-        config()->set('responder.exceptions', [
+        $this->config->allows('get')->with('responder.exceptions')->andReturn([
             ValidationException::class => ['code' => 'validation_error', 'status' => 422],
         ]);
+        $this->config->allows('get')->with('app.debug')->andReturn(false);
 
-        $result = $this->handler->render($this->request, $exception = new ValidationException($validator = mock(Validator::class)));
+        $result = $this->handler->render($this->request, $exception = new ValidationException(mock(Validator::class)));
 
         $this->assertSame($response, $result);
         $this->responder->shouldHaveReceived('error')->with($exception);
-        $responseBuilder->shouldHaveReceived('validator')->with($validator);
+        $responseBuilder->shouldHaveReceived('validator')->with(Mockery::on(function ($argument) {
+            return $argument instanceof IlluminateValidatorAdapter;
+        }));
         $responseBuilder->shouldHaveReceived('respond');
     }
 
@@ -139,7 +143,10 @@ class HandlerTest extends IntegrationTestCase
         $this->request->allows('expectsJson')->andReturn(true);
         $this->responder->allows('error')->andReturn($responseBuilder = mock(ErrorResponseBuilder::class));
         $responseBuilder->allows('respond')->andReturn($response = mock(JsonResponse::class));
-        config()->set('app.debug', true);
+        $this->config->allows('get')->with('responder.exceptions')->andReturn([
+            BadRequestHttpException::class => ['code' => 'error', 'status' => 400],
+        ]);
+        $this->config->allows('get')->with('app.debug')->andReturn(true);
 
         $result = $this->handler->render($this->request, $exception = new BadRequestHttpException());
 
@@ -155,7 +162,10 @@ class HandlerTest extends IntegrationTestCase
     {
         $this->request->allows('expectsJson')->andReturn(true);
         $this->exceptionHandler->allows('render')->andReturn($response = mock(JsonResponse::class));
-        config()->set('app.debug', true);
+        $this->config->allows('get')->with('responder.exceptions')->andReturn([
+            LogicException::class => ['code' => 'error', 'status' => 500],
+        ]);
+        $this->config->allows('get')->with('app.debug')->andReturn(true);
 
         $result = $this->handler->render($this->request, $exception = new LogicException());
 
@@ -184,6 +194,7 @@ class HandlerTest extends IntegrationTestCase
     {
         $this->request->allows('expectsJson')->andReturn(true);
         $this->exceptionHandler->allows('render')->andReturn($response = mock(JsonResponse::class));
+        $this->config->allows('get')->with('responder.exceptions')->andReturn([]);
 
         $result = $this->handler->render($this->request, $exception = new FileException());
 

@@ -6,29 +6,25 @@ use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Flugg\Responder\Http\Decorators\EscapeHtmlDecorator;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Http\JsonResponse;
-use Mockery\MockInterface;
 
 /**
  * Unit tests for the [Flugg\Responder\Http\Decorators\EscapeHtmlDecorator] class.
  *
- * @package flugger/laravel-responder
- * @author Paolo Caleffi <p.caleffi@dreamonkey.com>
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Http\Decorators\EscapeHtmlDecorator
  */
 class EscapeHtmlDecoratorTest extends UnitTestCase
 {
     /**
      * Mock of a response factory.
      *
-     * @var MockInterface
+     * @var \Mockery\MockInterface|\Flugg\Responder\Contracts\Http\ResponseFactory
      */
     protected $responseFactory;
 
     /**
-     * Decorator class being tested.
+     * Class being tested.
      *
-     * @var EscapeHtmlDecorator
+     * @var \Flugg\Responder\Http\Decorators\EscapeHtmlDecorator
      */
     protected $responseDecorator;
 

@@ -8,24 +8,20 @@ use Illuminate\Http\JsonResponse;
 
 /**
  * Factory class for creating JSON responses using Laravel.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 class LaravelResponseFactory implements ResponseFactory
 {
     /**
      * Laravel factory class for making responses.
      *
-     * @var BaseLaravelResponseFactory
+     * @var \Illuminate\Contracts\Routing\ResponseFactory
      */
     protected $factory;
 
     /**
      * Create a new response factory instance.
      *
-     * @param BaseLaravelResponseFactory $factory
+     * @param \Illuminate\Contracts\Routing\ResponseFactory $factory
      */
     public function __construct(BaseLaravelResponseFactory $factory)
     {
@@ -33,12 +29,12 @@ class LaravelResponseFactory implements ResponseFactory
     }
 
     /**
-     * Generate a JSON response.
+     * Create a JSON response.
      *
      * @param array $data
      * @param int $status
      * @param array $headers
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function make(array $data, int $status, array $headers = []): JsonResponse
     {

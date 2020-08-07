@@ -2,44 +2,109 @@
 
 namespace Flugg\Responder\Http;
 
+use Flugg\Responder\Contracts\Pagination\CursorPaginator;
+use Flugg\Responder\Contracts\Pagination\Paginator;
+
 /**
- * Value object class holding information about a success response.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * Data transfer object class for a success response.
  */
 class SuccessResponse extends Response
 {
     /**
-     * Data attached to the success response.
+     * Response status code.
      *
-     * @var array
+     * @var int
      */
-    protected $data = [];
+    protected $status = 200;
 
     /**
-     * Set the response data.
+     * Resource attached to the response.
      *
-     * @param array $data
+     * @var \Flugg\Responder\Http\Resource
+     */
+    protected $resource;
+
+    /**
+     * Paginator attached to the response.
      *
+     * @var \Flugg\Responder\Contracts\Pagination\Paginator|null
+     */
+    protected $paginator = null;
+
+    /**
+     * Cursor paginator attached to the response.
+     *
+     * @var \Flugg\Responder\Contracts\Pagination\CursorPaginator|null
+     */
+    protected $cursorPaginator = null;
+
+    /**
+     * Get the response resource.
+     *
+     * @return \Flugg\Responder\Http\Resource
+     */
+    public function resource(): Resource
+    {
+        return $this->resource;
+    }
+
+    /**
+     * Get the paginator attached to the response.
+     *
+     * @return \Flugg\Responder\Contracts\Pagination\Paginator|null
+     */
+    public function paginator(): ?Paginator
+    {
+        return $this->paginator;
+    }
+
+    /**
+     * Get the cursor paginator attached to the response.
+     *
+     * @return \Flugg\Responder\Contracts\Pagination\CursorPaginator|null
+     */
+    public function cursorPaginator(): ?CursorPaginator
+    {
+        return $this->cursorPaginator;
+    }
+
+    /**
+     * Set the response resource.
+     *
+     * @param \Flugg\Responder\Http\Resource $resource
      * @return $this
      */
-    public function setData(array $data)
+    public function setResource(Resource $resource)
     {
-        $this->data = $data;
+        $this->resource = $resource;
 
         return $this;
     }
 
     /**
-     * Get the response data.
+     * Set the paginator attached to the response.
      *
-     * @return array
+     * @param \Flugg\Responder\Contracts\Pagination\Paginator $paginator
+     * @return $this
      */
-    public function data(): array
+    public function setPaginator(Paginator $paginator)
     {
-        return $this->data;
+        $this->paginator = $paginator;
+
+        return $this;
+    }
+
+    /**
+     * Set the cursor paginator attached to the response.
+     *
+     * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $cursor
+     * @return $this
+     */
+    public function setCursorPaginator(CursorPaginator $cursorPaginator)
+    {
+        $this->cursorPaginator = $cursorPaginator;
+
+        return $this;
     }
 
     /**

@@ -4,10 +4,6 @@ namespace Flugg\Responder\Contracts;
 
 /**
  * Contract for registering and resolving error messages from error codes.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 interface ErrorMessageRegistry
 {

@@ -4,10 +4,6 @@ namespace Flugg\Responder\Contracts\Validation;
 
 /**
  * Contract for a validator.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 interface Validator
 {

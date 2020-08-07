@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Tests\Unit\Http;
 
+use Flugg\Responder\Contracts\Validation\Validator;
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
 use Flugg\Responder\Http\ErrorResponse;
 use Flugg\Responder\Tests\UnitTestCase;
@@ -9,16 +10,14 @@ use Flugg\Responder\Tests\UnitTestCase;
 /**
  * Unit tests for the [Flugg\Responder\Http\ErrorResponse] class.
  *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Http\ErrorResponse
  */
 class ErrorResponseTest extends UnitTestCase
 {
     /**
      * Class being tested.
      *
-     * @var ErrorResponse
+     * @var \Flugg\Responder\Http\ErrorResponse
      */
     protected $response;
 
@@ -54,6 +53,16 @@ class ErrorResponseTest extends UnitTestCase
 
         $this->assertSame($this->response, $result);
         $this->assertEquals($message, $this->response->message());
+    }
+
+    /**
+     * Assert that [setValidator] and [validator] sets and gets validator respectively.
+     */
+    public function testSetAndGetValidator()
+    {
+        $this->response->setValidator($validator = mock(Validator::class));
+
+        $this->assertEquals($validator, $this->response->validator());
     }
 
     /**

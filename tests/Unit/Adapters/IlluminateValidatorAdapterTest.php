@@ -1,33 +1,30 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit\Validation;
+namespace Flugg\Responder\Tests\Unit\Adapters;
 
+use Flugg\Responder\Adapters\IlluminateValidatorAdapter as AdaptersIlluminateValidatorAdapter;
 use Flugg\Responder\Tests\UnitTestCase;
-use Flugg\Responder\Validation\IlluminateValidatorAdapter;
 use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Contracts\Validation\Validator;
-use Mockery\MockInterface;
 
 /**
- * Unit tests for the [Flugg\Responder\Validation\IlluminateValidatorAdapter] class.
+ * Unit tests for the [Flugg\Responder\Adapters\IlluminateValidatorAdapter] class.
  *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Adapters\IlluminateValidatorAdapter
  */
 class IlluminateValidatorAdapterTest extends UnitTestCase
 {
     /**
      * Mock of an Illuminate validator.
      *
-     * @var MockInterface|Validator
+     * @var \Mockery\MockInterface|\Illuminate\Contracts\Validation\Validator
      */
     protected $validator;
 
     /**
-     * Adapter class being tested.
+     * Class being tested.
      *
-     * @var IlluminateValidatorAdapter
+     * @var \Flugg\Responder\Adapters\IlluminateValidatorAdapter
      */
     protected $adapter;
 
@@ -41,7 +38,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
         parent::setUp();
 
         $this->validator = mock(Validator::class);
-        $this->adapter = new IlluminateValidatorAdapter($this->validator);
+        $this->adapter = new AdaptersIlluminateValidatorAdapter($this->validator);
     }
 
     /**

@@ -1,30 +1,26 @@
 <?php
 
-namespace Flugg\Responder\Pagination;
+namespace Flugg\Responder\Adapters;
 
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
  * Paginator adapter class for Illuminate paginators.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 class IlluminatePaginatorAdapter implements Paginator
 {
     /**
      * Illuminate paginator class.
      *
-     * @var LengthAwarePaginator
+     * @var \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     protected $paginator;
 
     /**
-     * Create a new Illuminate paginator adapter instance.
+     * Create a new paginator adapter instance.
      *
-     * @param LengthAwarePaginator $paginator
+     * @param \Illuminate\Contracts\Pagination\LengthAwarePaginator $paginator
      */
     public function __construct(LengthAwarePaginator $paginator)
     {

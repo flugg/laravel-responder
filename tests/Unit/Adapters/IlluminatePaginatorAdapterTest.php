@@ -1,34 +1,30 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit\Pagination;
+namespace Flugg\Responder\Tests\Unit\Adapters;
 
-use Flugg\Responder\Pagination\IlluminatePaginatorAdapter;
+use Flugg\Responder\Adapters\IlluminatePaginatorAdapter as AdaptersIlluminatePaginatorAdapter;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Mockery\MockInterface;
-
 
 /**
- * Unit tests for the [Flugg\Responder\Pagination\IlluminatePaginatorAdapter] class.
+ * Unit tests for the [Flugg\Responder\Adapters\IlluminatePaginatorAdapter] class.
  *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Adapters\IlluminatePaginatorAdapter
  */
 class IlluminatePaginatorAdapterTest extends UnitTestCase
 {
     /**
      * Mock of an Illuminate paginator.
      *
-     * @var MockInterface|LengthAwarePaginator
+     * @var \Mockery\MockInterface|\Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     protected $paginator;
 
     /**
-     * Adapter class being tested.
+     * Class being tested.
      *
-     * @var IlluminatePaginatorAdapter
+     * @var \Flugg\Responder\Adapters\IlluminatePaginatorAdapter
      */
     protected $adapter;
 
@@ -42,7 +38,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
         parent::setUp();
 
         $this->paginator = mock(LengthAwarePaginator::class);
-        $this->adapter = new IlluminatePaginatorAdapter($this->paginator);
+        $this->adapter = new AdaptersIlluminatePaginatorAdapter($this->paginator);
     }
 
     /**

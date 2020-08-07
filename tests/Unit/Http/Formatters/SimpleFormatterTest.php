@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Tests\Unit\Formatters;
+namespace Flugg\Responder\Tests\Unit\Http\Formatters;
 
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
@@ -13,16 +13,14 @@ use Flugg\Responder\Tests\UnitTestCase;
 /**
  * Unit tests for the [Flugg\Responder\Http\Formatters\SimpleFormatter] class.
  *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Http\Formatters\SimpleFormatter
  */
 class SimpleFormatterTest extends UnitTestCase
 {
     /**
      * Class being tested.
      *
-     * @var SimpleFormatter
+     * @var \Flugg\Responder\Http\Formatters\SimpleFormatter
      */
     protected $formatter;
 
@@ -47,6 +45,8 @@ class SimpleFormatterTest extends UnitTestCase
         $response->allows([
             'data' => $data = ['foo' => 123],
             'meta' => $meta = ['bar' => 456],
+            'paginator' => null,
+            'cursorPaginator' => null,
         ]);
 
         $result = $this->formatter->success($response);
@@ -63,7 +63,13 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testPaginatorMethodAttachesPagination()
     {
-        $paginator = mock(Paginator::class);
+        $response = mock(SuccessResponse::class);
+        $response->allows([
+            'data' => $data = ['foo' => 123],
+            'meta' => [],
+            'paginator' => $paginator = mock(Paginator::class),
+            'cursorPaginator' => null,
+        ]);
         $paginator->allows([
             'count' => $count = 10,
             'total' => $total = 15,
@@ -75,12 +81,10 @@ class SimpleFormatterTest extends UnitTestCase
         $paginator->allows('url')->with(2)->andReturn($selfUrl = 'example.com?page=2');
         $paginator->allows('url')->with(3)->andReturn($lastPageUrl = 'example.com?page=3');
 
-        $result = $this->formatter->paginator($data = [
-            'data' => ['foo' => 123],
-            'bar' => 456,
-        ], $paginator);
+        $result = $this->formatter->success($response);
 
-        $this->assertEquals(array_merge($data, [
+        $this->assertEquals([
+            'data' => $data,
             'pagination' => [
                 'count' => $count,
                 'total' => $total,
@@ -95,7 +99,7 @@ class SimpleFormatterTest extends UnitTestCase
                     'next' => $lastPageUrl,
                 ],
             ],
-        ]), $result);
+        ], $result);
     }
 
     /**
@@ -103,7 +107,13 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testPaginatorMethodOmitsUndefinedLinks()
     {
-        $paginator = mock(Paginator::class);
+        $response = mock(SuccessResponse::class);
+        $response->allows([
+            'data' => $data = ['foo' => 123],
+            'meta' => [],
+            'paginator' => $paginator = mock(Paginator::class),
+            'cursorPaginator' => null,
+        ]);
         $paginator->allows([
             'count' => $count = 5,
             'total' => $total = 5,
@@ -115,12 +125,10 @@ class SimpleFormatterTest extends UnitTestCase
         $paginator->allows('url')->with(2)->andReturn($selfUrl = 'example.com?page=1');
         $paginator->allows('url')->with(3)->andReturn($lastPageUrl = 'example.com?page=1');
 
-        $result = $this->formatter->paginator($data = [
-            'data' => ['foo' => 123],
-            'bar' => 456,
-        ], $paginator);
+        $result = $this->formatter->success($response);
 
-        $this->assertEquals(array_merge($data, [
+        $this->assertEquals([
+            'data' => $data,
             'pagination' => [
                 'count' => $count,
                 'total' => $total,
@@ -133,7 +141,7 @@ class SimpleFormatterTest extends UnitTestCase
                     'last' => $lastPageUrl,
                 ],
             ],
-        ]), $result);
+        ], $result);
     }
 
     /**
@@ -141,7 +149,13 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testCursorMethodAttachesCursorPagination()
     {
-        $paginator = mock(CursorPaginator::class);
+        $response = mock(SuccessResponse::class);
+        $response->allows([
+            'data' => $data = ['foo' => 123],
+            'meta' => [],
+            'paginator' => null,
+            'cursorPaginator' => $paginator = mock(CursorPaginator::class),
+        ]);
         $paginator->allows([
             'current' => $current = 10,
             'previous' => $previous = 5,
@@ -149,19 +163,17 @@ class SimpleFormatterTest extends UnitTestCase
             'count' => $count = 30,
         ]);
 
-        $result = $this->formatter->cursor($data = [
-            'data' => ['foo' => 123],
-            'bar' => 456,
-        ], $paginator);
+        $result = $this->formatter->success($response);
 
-        $this->assertEquals(array_merge($data, [
+        $this->assertEquals([
+            'data' => $data,
             'cursor' => [
                 'current' => $current,
                 'previous' => $previous,
                 'next' => $next,
                 'count' => $count,
             ],
-        ]), $result);
+        ], $result);
     }
 
     /**
@@ -173,7 +185,8 @@ class SimpleFormatterTest extends UnitTestCase
         $response->allows([
             'code' => $code = 'error_occured',
             'message' => $message = 'An error has occured.',
-            'meta' => ['foo' => 123]
+            'meta' => ['foo' => 123],
+            'validator' => null
         ]);
 
         $result = $this->formatter->error($response);
@@ -198,7 +211,8 @@ class SimpleFormatterTest extends UnitTestCase
         $response->allows([
             'code' => $code = 'error_occured',
             'message' => null,
-            'meta' => []
+            'meta' => [],
+            'validator' => null
         ]);
 
         $result = $this->formatter->error($response);
@@ -215,7 +229,13 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testValidationMethodAttachesValidation()
     {
-        $validator = mock(Validator::class);
+        $response = mock(ErrorResponse::class);
+        $response->allows([
+            'code' => $code = 'error_occured',
+            'message' => null,
+            'meta' => [],
+            'validator' => $validator = mock(Validator::class)
+        ]);
         $validator->allows([
             'failed' => ['foo', 'bar.baz'],
             'errors' => [
@@ -229,15 +249,11 @@ class SimpleFormatterTest extends UnitTestCase
             ],
         ]);
 
-        $result = $this->formatter->validator([
-            'error' => $error = [
-                'code' => 'error_occured',
-                'message' => 'An error has occured',
-            ],
-        ], $validator);
+        $result = $this->formatter->error($response);
 
         $this->assertEquals([
-            'error' => array_merge($error, [
+            'error' => [
+                'code' => $code,
                 'fields' => [
                     'foo' => [
                         ['rule' => 'min', 'message' => $minMessage],
@@ -247,7 +263,7 @@ class SimpleFormatterTest extends UnitTestCase
                         ['rule' => 'required', 'message' => $requiredMessage],
                     ],
                 ],
-            ]),
+            ],
         ], $result);
     }
 }

@@ -5,22 +5,17 @@ namespace Flugg\Responder\Http\Decorators;
 use Illuminate\Http\JsonResponse;
 
 /**
- * Decorator class for generating JSON using the "JSON_PRETTY_PRINT" option.
- *
- * @package flugger/laravel-responder
- * @author Paolo Caleffi <p.caleffi@dreamonkey.com>
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * Decorator class for creating JSON using the "JSON_PRETTY_PRINT" option.
  */
 class PrettyPrintDecorator extends ResponseDecorator
 {
     /**
-     * Generate a JSON response.
+     * Create a JSON response.
      *
      * @param array $data
      * @param int $status
      * @param array $headers
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function make(array $data, int $status, array $headers = []): JsonResponse
     {

@@ -10,24 +10,21 @@ use Illuminate\Http\JsonResponse;
 /**
  * Unit tests for the [Flugg\Responder\Http\Decorators\PrettyPrintDecorator] class.
  *
- * @package flugger/laravel-responder
- * @author Paolo Caleffi <p.caleffi@dreamonkey.com>
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Http\Decorators\PrettyPrintDecorator
  */
 class PrettyPrintDecoratorTest extends UnitTestCase
 {
     /**
      * Mock of a response factory.
      *
-     * @var MockInterface
+     * @var \Mockery\MockInterface|\Flugg\Responder\Contracts\Http\ResponseFactory
      */
     protected $responseFactory;
 
     /**
-     * Decorator class being tested.
+     * Class being tested.
      *
-     * @var PrettyPrintDecorator
+     * @var \Flugg\Responder\Http\Decorators\PrettyPrintDecorator
      */
     protected $responseDecorator;
 

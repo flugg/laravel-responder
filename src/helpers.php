@@ -4,9 +4,9 @@ use Flugg\Responder\Contracts\Responder;
 
 if (!function_exists('responder')) {
     /**
-     * A helper function to resolve the responder service out of the service container.
+     * Helper function to resolve the responder service out of the service container.
      *
-     * @return Responder
+     * @return \Flugg\Responder\Contracts\Responder
      */
     function responder(): Responder
     {

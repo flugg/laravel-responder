@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Validation;
+namespace Flugg\Responder\Adapters;
 
 use Flugg\Responder\Contracts\Validation\Validator;
 use Illuminate\Contracts\Validation\Validator as IlluminateValidator;
@@ -8,25 +8,21 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
- * Paginator adapter class for Illuminate validators.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * Validator adapter class for Illuminate validators.
  */
 class IlluminateValidatorAdapter implements Validator
 {
     /**
      * Illuminate validator class.
      *
-     * @var IlluminateValidator
+     * @var \Illuminate\Contracts\Validation\Validator
      */
     protected $validator;
 
     /**
-     * Create a new Illuminate validator adapter instance.
+     * Create a new validator adapter instance.
      *
-     * @param IlluminateValidator $validator
+     * @param \Illuminate\Contracts\Validation\Validator $validator
      */
     public function __construct(IlluminateValidator $validator)
     {

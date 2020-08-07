@@ -6,10 +6,6 @@ use Flugg\Responder\Http\SuccessResponse;
 
 /**
  * Contract for a response data normalizer.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 interface Normalizer
 {
@@ -19,5 +15,5 @@ interface Normalizer
      * @param object $data
      * @return \Flugg\Responder\Http\SuccessResponse
      */
-    public function normalize($data): SuccessResponse;
+    public function normalize(object $data): SuccessResponse;
 }

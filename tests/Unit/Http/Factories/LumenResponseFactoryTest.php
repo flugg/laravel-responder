@@ -6,28 +6,25 @@ use Flugg\Responder\Http\Factories\LumenResponseFactory;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Http\JsonResponse;
 use Laravel\Lumen\Http\ResponseFactory;
-use Mockery\MockInterface;
 
 /**
  * Unit tests for the [Flugg\Responder\Http\Factories\LumenResponseFactory] class.
  *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * @see \Flugg\Responder\Http\Factories\LumenResponseFactory
  */
 class LumenResponseFactoryTest extends UnitTestCase
 {
     /**
      * Mock of Lumen's response factory.
      *
-     * @var MockInterface|ResponseFactory
+     * @var \Mockery\MockInterface|ResponseFactory
      */
     protected $baseResponseFactory;
 
     /**
-     * Factory class being tested.
+     * Class being tested.
      *
-     * @var LumenResponseFactory
+     * @var \Laravel\Lumen\Http\ResponseFactory
      */
     protected $responseFactory;
 

@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Testing;
 
+use Flugg\Responder\Adapters\IlluminateValidatorAdapter;
 use Flugg\Responder\Contracts\Responder;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
@@ -9,11 +10,7 @@ use Illuminate\Validation\ValidationRuleParser;
 use Illuminate\Validation\Validator;
 
 /**
- * Mixin class extending the TestResponse class with an [assertValidationErrors] method.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * Mixin class extending [Illuminate\Testing\TestResponse] with an [assertValidationErrors] method.
  */
 class AssertValidationErrorsMacro
 {
@@ -34,10 +31,12 @@ class AssertValidationErrorsMacro
                 }
             }
 
-            $this->assertExactJson(app(Responder::class)
-                ->error(new ValidationException($validator))
-                ->validator($validator)
-                ->respond($this->getStatusCode())->getData(true));
+            $this->assertExactJson(
+                app(Responder::class)
+                    ->error(new ValidationException($validator))
+                    ->validator(new IlluminateValidatorAdapter($validator))
+                    ->respond($this->getStatusCode())->getData(true)
+            );
 
             return $this;
         };

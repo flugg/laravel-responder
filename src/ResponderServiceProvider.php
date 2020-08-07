@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder;
 
-use Flugg\Responder\Contracts\AdapterFactory as AdapterFactoryContract;
 use Flugg\Responder\Contracts\ErrorMessageRegistry as ErrorMessageRegistryContract;
 use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Flugg\Responder\Contracts\Http\ResponseFormatter;
@@ -16,7 +15,6 @@ use Flugg\Responder\Http\Factories\LumenResponseFactory;
 use Flugg\Responder\Testing\AssertErrorMacro;
 use Flugg\Responder\Testing\AssertSuccessMacro;
 use Flugg\Responder\Testing\AssertValidationErrorsMacro;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Foundation\Testing\TestResponse as LegacyTestResponse;
@@ -26,10 +24,6 @@ use Laravel\Lumen\Application as Lumen;
 
 /**
  * Service provider bootstrapping the Laravel Responder package.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 class ResponderServiceProvider extends ServiceProvider
 {
@@ -37,13 +31,12 @@ class ResponderServiceProvider extends ServiceProvider
      * Register the service provider.
      *
      * @return void
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function register(): void
     {
-        $this->registerResponseFactory();
-        $this->registerAdapterFactory();
         $this->registerErrorMessageRegistry();
+        $this->registerResponseFactory();
         $this->registerResponseFormatter();
         $this->registerResponderService();
         $this->registerExceptionHandler();
@@ -51,10 +44,25 @@ class ResponderServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register error message resolver binding with configured error messages.
+     *
+     * @return void
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function registerErrorMessageRegistry(): void
+    {
+        $this->app->singleton(ErrorMessageRegistryContract::class, function () {
+            return tap($this->app->make(ErrorMessageRegistry::class), function (ErrorMessageRegistry $messageRegistry) {
+                $messageRegistry->register(config('responder.error_messages'));
+            });
+        });
+    }
+
+    /**
      * Register response factory binding with configured decorators.
      *
      * @return void
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerResponseFactory(): void
     {
@@ -71,38 +79,10 @@ class ResponderServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register adapter factory binding.
-     *
-     * @return void
-     * @throws BindingResolutionException
-     */
-    protected function registerAdapterFactory(): void
-    {
-        $this->app->singleton(AdapterFactoryContract::class, function () {
-            return new AdapterFactory(config('responder.adapters') ?? []);
-        });
-    }
-
-    /**
-     * Register error message resolver binding with configured error messages.
-     *
-     * @return void
-     * @throws BindingResolutionException
-     */
-    protected function registerErrorMessageRegistry(): void
-    {
-        $this->app->singleton(ErrorMessageRegistryContract::class, function () {
-            return tap($this->app->make(ErrorMessageRegistry::class), function (ErrorMessageRegistry $messageRegistry) {
-                $messageRegistry->register(config('responder.error_messages'));
-            });
-        });
-    }
-
-    /**
      * Register configured response formatter binding and extend response builders with formatter.
      *
      * @return void
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerResponseFormatter(): void
     {
@@ -121,7 +101,7 @@ class ResponderServiceProvider extends ServiceProvider
      * Register responder service binding.
      *
      * @return void
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerResponderService(): void
     {
@@ -132,12 +112,12 @@ class ResponderServiceProvider extends ServiceProvider
      * Register exception handler by decorating the bound handler.
      *
      * @return void
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerExceptionHandler(): void
     {
         $this->app->extend(ExceptionHandler::class, function ($handler) {
-            return new Handler($handler, $this->app->make(ResponderContract::class));
+            return new Handler($handler, $this->app->config, $this->app->make(ResponderContract::class));
         });
     }
 
@@ -145,7 +125,7 @@ class ResponderServiceProvider extends ServiceProvider
      * Register test response macros.
      *
      * @return void
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerTestingMacros(): void
     {
@@ -157,7 +137,7 @@ class ResponderServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register test response macros.
+     * Get the correct test response class depending on the version of Laravel.
      *
      * @return string|null
      */
@@ -165,7 +145,7 @@ class ResponderServiceProvider extends ServiceProvider
     {
         if (class_exists(TestResponse::class)) {
             return TestResponse::class;
-        } else if (class_exists(LegacyTestResponse::class)) {
+        } elseif (class_exists(LegacyTestResponse::class)) {
             return LegacyTestResponse::class;
         }
 

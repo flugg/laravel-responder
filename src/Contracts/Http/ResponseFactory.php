@@ -5,21 +5,17 @@ namespace Flugg\Responder\Contracts\Http;
 use Illuminate\Http\JsonResponse;
 
 /**
- * Contract for creating JSON responses.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * Contract for a factory creating JSON responses.
  */
 interface ResponseFactory
 {
     /**
-     * Generate a JSON response.
+     * Create a JSON response.
      *
      * @param array $data
      * @param int $status
      * @param array $headers
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function make(array $data, int $status, array $headers = []): JsonResponse;
 }

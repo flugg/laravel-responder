@@ -4,10 +4,6 @@ namespace Flugg\Responder\Contracts\Pagination;
 
 /**
  * Contract for a cursor paginator.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 interface CursorPaginator
 {

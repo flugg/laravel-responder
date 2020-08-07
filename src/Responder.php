@@ -3,45 +3,39 @@
 namespace Flugg\Responder;
 
 use Exception;
+use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
-use Flugg\Responder\Contracts\Responder as ResponderContract;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
  * Service class for building success- and error responses.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 class Responder implements ResponderContract
 {
     /**
      * Builder class for building success responses.
      *
-     * @var SuccessResponseBuilder
+     * @var \Flugg\Responder\Http\Builders\SuccessResponseBuilder
      */
     protected $successResponseBuilder;
 
     /**
      * Builder class for building error responses.
      *
-     * @var ErrorResponseBuilder
+     * @var \Flugg\Responder\Http\Builders\ErrorResponseBuilder
      */
     protected $errorResponseBuilder;
 
     /**
-     * Create a new responder instance.
+     * Create a new service instance.
      *
-     * @param SuccessResponseBuilder $successResponseBuilder
-     * @param ErrorResponseBuilder $errorResponseBuilder
+     * @param \Flugg\Responder\Http\Builders\SuccessResponseBuilder $successResponseBuilder
+     * @param \Flugg\Responder\Http\Builders\ErrorResponseBuilder $errorResponseBuilder
      */
-    public function __construct(SuccessResponseBuilder $successResponseBuilder, ErrorResponseBuilder $errorResponseBuilder)
-    {
+    public function __construct(
+        SuccessResponseBuilder $successResponseBuilder,
+        ErrorResponseBuilder $errorResponseBuilder
+    ) {
         $this->successResponseBuilder = $successResponseBuilder;
         $this->errorResponseBuilder = $errorResponseBuilder;
     }
@@ -49,23 +43,23 @@ class Responder implements ResponderContract
     /**
      * Build a success response.
      *
-     * @param array|Arrayable|Builder|QueryBuilder|Relation $data
-     * @return SuccessResponseBuilder
+     * @param mixed $data
+     * @return \Flugg\Responder\Http\Builders\SuccessResponseBuilder
      */
     public function success($data = []): SuccessResponseBuilder
     {
-        return $this->successResponseBuilder->data($data);
+        return $this->successResponseBuilder->make($data);
     }
 
     /**
      * Build an error response.
      *
-     * @param int|string|Exception|null $code
-     * @param string|Exception|null $message
-     * @return ErrorResponseBuilder
+     * @param int|string|\Exception|null $code
+     * @param string|\Exception|null $message
+     * @return \Flugg\Responder\Http\Builders\ErrorResponseBuilder
      */
     public function error($code = null, $message = null): ErrorResponseBuilder
     {
-        return $this->errorResponseBuilder->error($code, $message);
+        return $this->errorResponseBuilder->make($code, $message);
     }
 }

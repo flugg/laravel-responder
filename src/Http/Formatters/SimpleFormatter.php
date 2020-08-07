@@ -11,34 +11,62 @@ use Flugg\Responder\Http\SuccessResponse;
 
 /**
  * Simple response formatter.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
  */
 class SimpleFormatter implements ResponseFormatter
 {
     /**
      * Format success response data.
      *
-     * @param SuccessResponse $response
+     * @param \Flugg\Responder\Http\SuccessResponse $response
      * @return array
      */
     public function success(SuccessResponse $response): array
     {
-        return array_merge([
-            'data' => $response->data(),
+        $data = array_merge([
+            'data' => $response->resource()->data(),
         ], $response->meta());
+
+        if ($paginator = $response->paginator()) {
+            $data['pagination'] = $this->paginator($paginator);
+        } elseif ($paginator = $response->cursorPaginator()) {
+            $data['cursor'] = $this->cursor($paginator);
+        }
+
+        return $data;
     }
 
     /**
-     * Attach pagination data to the formatted success response data.
+     * Format error response data.
      *
-     * @param array $data
-     * @param Paginator $paginator
+     * @param \Flugg\Responder\Http\ErrorResponse $response
      * @return array
      */
-    public function paginator(array $data, Paginator $paginator): array
+    public function error(ErrorResponse $response): array
+    {
+        $data = array_merge([
+            'error' => [
+                'code' => $response->code(),
+            ]
+        ], $response->meta());
+
+        if ($message = $response->message()) {
+            $data['error']['message'] = $message;
+        }
+
+        if ($validator = $response->validator()) {
+            $data['error'] = array_merge($data['error'], $this->validator($validator));
+        }
+
+        return $data;
+    }
+
+    /**
+     * Format pagination meta data.
+     *
+     * @param \Flugg\Responder\Contracts\Pagination\Paginator $paginator
+     * @return array
+     */
+    protected function paginator(Paginator $paginator): array
     {
         $pagination = [
             'count' => $paginator->count(),
@@ -61,71 +89,44 @@ class SimpleFormatter implements ResponseFormatter
             $pagination['links']['next'] = $paginator->url($currentPage + 1);
         }
 
-        return array_merge($data, ['pagination' => $pagination]);
+        return $pagination;
     }
 
     /**
-     * Attach cursor pagination data to the formatted success response data.
+     * Format cursor pagination meta data.
      *
-     * @param array $data
-     * @param CursorPaginator $paginator
+     * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $paginator
      * @return array
      */
-    public function cursor(array $data, CursorPaginator $paginator): array
+    protected function cursor(CursorPaginator $paginator): array
     {
-        return array_merge($data, [
-            'cursor' => [
-                'current' => $paginator->current(),
-                'previous' => $paginator->previous(),
-                'next' => $paginator->next(),
-                'count' => $paginator->count(),
-            ],
-        ]);
-    }
-
-    /**
-     * Format error response data.
-     *
-     * @param ErrorResponse $response
-     * @return array
-     */
-    public function error(ErrorResponse $response): array
-    {
-        $error = [
-            'code' => $response->code(),
+        return  [
+            'current' => $paginator->current(),
+            'previous' => $paginator->previous(),
+            'next' => $paginator->next(),
+            'count' => $paginator->count(),
         ];
-
-        if ($message = $response->message()) {
-            $error['message'] = $message;
-        }
-
-        return array_merge([
-            'error' => $error,
-        ], $response->meta());
     }
 
     /**
-     * Attach validation errors to the formatted error response data.
+     * Format validator meta data.
      *
-     * @param array $data
-     * @param Validator $validator
+     * @param \Flugg\Responder\Contracts\Validation\Validator $validator
      * @return array
      */
-    public function validator(array $data, Validator $validator): array
+    protected function validator(Validator $validator): array
     {
         return [
-            'error' => array_merge($data['error'], [
-                'fields' => array_reduce($validator->failed(), function ($fields, $field) use ($validator) {
-                    return array_merge($fields, [
-                        $field => array_map(function ($rule) use ($field, $validator) {
-                            return [
-                                'rule' => $rule,
-                                'message' => $validator->messages()["$field.$rule"],
-                            ];
-                        }, $validator->errors()[$field]),
-                    ]);
-                }, []),
-            ]),
+            'fields' => array_reduce($validator->failed(), function ($fields, $field) use ($validator) {
+                return array_merge($fields, [
+                    $field => array_map(function ($rule) use ($field, $validator) {
+                        return [
+                            'rule' => $rule,
+                            'message' => $validator->messages()["$field.$rule"],
+                        ];
+                    }, $validator->errors()[$field]),
+                ]);
+            }, []),
         ];
     }
 }

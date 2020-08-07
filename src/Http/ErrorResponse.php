@@ -2,15 +2,20 @@
 
 namespace Flugg\Responder\Http;
 
+use Flugg\Responder\Contracts\Validation\Validator;
+
 /**
- * Value object class holding information about an error response.
- *
- * @package flugger/laravel-responder
- * @author Alexander Tømmerås <flugged@gmail.com>
- * @license The MIT License
+ * Data transfer object class for an error response.
  */
 class ErrorResponse extends Response
 {
+    /**
+     * Response status code.
+     *
+     * @var int
+     */
+    protected $status = 500;
+
     /**
      * Error code representing the error response.
      *
@@ -24,6 +29,13 @@ class ErrorResponse extends Response
      * @var string|null
      */
     protected $message = null;
+
+    /**
+     * Validator attached to the response.
+     *
+     * @var \Flugg\Responder\Contracts\Validation\Validator
+     */
+    protected $validator = null;
 
     /**
      * Get the error code.
@@ -46,6 +58,16 @@ class ErrorResponse extends Response
     }
 
     /**
+     * Get the validator attached to the response.
+     *
+     * @return \Flugg\Responder\Contracts\Validation\Validator|null
+     */
+    public function validator(): ?Validator
+    {
+        return $this->validator;
+    }
+
+    /**
      * Set the error code.
      *
      * @param int|string $code
@@ -61,12 +83,25 @@ class ErrorResponse extends Response
     /**
      * Set the error message.
      *
-     * @param string $message
+     * @param string|null $message
      * @return $this
      */
-    public function setMessage(string $message)
+    public function setMessage(?string $message)
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    /**
+     * Set the validator attached to the response.
+     *
+     * @param \Flugg\Responder\Contracts\Validation\Validator $validator
+     * @return $this
+     */
+    public function setValidator(Validator $validator)
+    {
+        $this->validator = $validator;
 
         return $this;
     }
