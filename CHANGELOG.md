@@ -1,3 +1,9 @@
+# 3.1.2 (2020-09-10)
+
+### Features
+
+* Add Laravel 8.0 support
+
 # 3.1.1 (2020-03-18)
 
 ### Bug Fixes
