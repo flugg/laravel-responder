@@ -37,11 +37,11 @@ trait ConvertsExceptions
     /**
      * Convert an exception to another exception
      *
-     * @param  \Exception $exception
+     * @param  \Exception|\Throwable $exception
      * @param  array      $convert
      * @return void
      */
-    protected function convert(Exception $exception, array $convert)
+    protected function convert($exception, array $convert)
     {
         foreach ($convert as $source => $target) {
             if ($exception instanceof $source) {
@@ -57,10 +57,10 @@ trait ConvertsExceptions
     /**
      * Convert a default exception to an API exception.
      *
-     * @param  \Exception $exception
+     * @param  \Exception|\Throwable $exception
      * @return void
      */
-    protected function convertDefaultException(Exception $exception)
+    protected function convertDefaultException($exception)
     {
         $this->convert($exception, array_diff_key([
             AuthenticationException::class => UnauthenticatedException::class,
