@@ -5,6 +5,7 @@ namespace Flugg\Responder\Console;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -65,8 +66,9 @@ class MakeTransformer extends GeneratorCommand
     /**
      * Build the class with the given name.
      *
-     * @param  string $name
+     * @param string $name
      * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function buildClass($name)
     {
