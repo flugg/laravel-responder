@@ -436,5 +436,3 @@ Contributions are more than welcome and you're free to create a pull request on 
 Laravel Responder is free software distributed under the terms of the MIT license. See [license.md](license.md) for more details.
 
 # Donating
-
-The package is completely free to use, however, a lot of time has been put into making it. If you want to show your appreciation by leaving a small donation, you can do so by clicking [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PRMC9WLJY8E46&lc=NO&item_name=Laravel%20Responder&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted). Thanks!

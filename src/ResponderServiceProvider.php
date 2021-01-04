@@ -83,7 +83,7 @@ class ResponderServiceProvider extends ServiceProvider
     protected function registerResponseFormatter(): void
     {
         $this->app->singleton(Formatter::class, function () {
-            return is_null($class = config('responder.formatter')) ? null : $this->app->make($class);
+            return ($class = config('responder.formatter')) ? $this->app->make($class) : null;
         });
 
         foreach ([SuccessResponseBuilder::class, ErrorResponseBuilder::class] as $class) {
