@@ -7,6 +7,8 @@ use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Contracts\Validation\Validator;
 use Flugg\Responder\Http\ErrorResponse;
 use Flugg\Responder\Http\Formatters\SimpleFormatter;
+use Flugg\Responder\Http\Resources\Collection;
+use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
 
@@ -37,16 +39,83 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that [success] formats success responses from a success response value object.
+     * Assert that [success] formats success responses where the resource is an resource item.
      */
-    public function testSuccessMethodFormatsSuccessResponses()
+    public function testSuccessMethodFormatsSuccessResponsesWithItem()
     {
         $response = mock(SuccessResponse::class);
         $response->allows([
-            'data' => $data = ['foo' => 123],
+            'resource' => $item = mock(Item::class),
             'meta' => $meta = ['bar' => 456],
             'paginator' => null,
             'cursorPaginator' => null,
+        ]);
+        $item->allows([
+            'data' => $data = ['foo' => 123],
+            'key' => $key = 'baz',
+            'relations' => []
+        ]);
+
+        $result = $this->formatter->success($response);
+
+        $this->assertEquals(array_merge([
+            $key => $data,
+        ], $meta), $result);
+        $response->shouldHaveReceived('resource');
+        $response->shouldHaveReceived('meta');
+    }
+
+    /**
+     * Assert that [success] formats success responses where the resource is a resource collection.
+     */
+    public function testSuccessMethodFormatsSuccessResponsesWithCollection()
+    {
+        $response = mock(SuccessResponse::class);
+        $response->allows([
+            'resource' => $collection = mock(Collection::class),
+            'meta' => $meta = ['bar' => 456],
+            'paginator' => null,
+            'cursorPaginator' => null,
+        ]);
+        $collection->allows([
+            'items' => [$item1 = mock(Item::class), $item2 = mock(Item::class)],
+            'key' => $key = 'baz',
+            'relations' => []
+        ]);
+        $item1->allows([
+            'data' => $data1 = ['foo' => 123],
+            'relations' => []
+        ]);
+        $item2->allows([
+            'data' => $data2 = ['bar' => 456],
+            'relations' => []
+        ]);
+
+        $result = $this->formatter->success($response);
+
+        $this->assertEquals(array_merge([
+            $key => [$data1, $data2],
+        ], $meta), $result);
+        $response->shouldHaveReceived('resource');
+        $response->shouldHaveReceived('meta');
+    }
+
+    /**
+     * Assert that [success] formats success responses with a "data" wrapper if no resource key is set.
+     */
+    public function testSuccessMethodWrapperDefaultsToData()
+    {
+        $response = mock(SuccessResponse::class);
+        $response->allows([
+            'resource' => $item = mock(Item::class),
+            'meta' => $meta = ['bar' => 456],
+            'paginator' => null,
+            'cursorPaginator' => null,
+        ]);
+        $item->allows([
+            'data' => $data = ['foo' => 123],
+            'key' => null,
+            'relations' => []
         ]);
 
         $result = $this->formatter->success($response);
@@ -54,21 +123,73 @@ class SimpleFormatterTest extends UnitTestCase
         $this->assertEquals(array_merge([
             'data' => $data,
         ], $meta), $result);
-        $response->shouldHaveReceived('data');
-        $response->shouldHaveReceived('meta');
     }
 
     /**
-     * Assert that [paginator] attaches pagination meta data to response data.
+     * Assert that [success] formats success responses with related resources.
      */
-    public function testPaginatorMethodAttachesPagination()
+    public function testSuccessMethodFormatsRelations()
     {
         $response = mock(SuccessResponse::class);
         $response->allows([
+            'resource' => $item = mock(Item::class),
+            'meta' => $meta = ['bar' => 456],
+            'paginator' => null,
+            'cursorPaginator' => null,
+        ]);
+        $item->allows([
             'data' => $data = ['foo' => 123],
+            'key' => null,
+            'relations' => [
+                $relatedItemKey = 'bar' => $relatedItem = mock(Item::class),
+                $relatedCollectionKey = 'baz' => $relatedCollection = mock(Collection::class),
+            ]
+        ]);
+        $relatedItem->allows([
+            'data' => $relatedItemData = ['bar' => 456],
+            'relations' => [
+                $nestedItem1Key = 'foo' => $nestedItem1 = mock(Item::class)
+            ]
+        ]);
+        $relatedCollection->allows([
+            'items' => [$nestedItem2 = mock(Item::class), $nestedItem3 = mock(Item::class)],
+            'relations' => []
+        ]);
+        $nestedItem1->allows(['data' => $nestedItem1Data = ['foo' => 123], 'relations' => []]);
+        $nestedItem2->allows(['data' => $nestedItem2Data = ['foo' => 123], 'relations' => []]);
+        $nestedItem3->allows(['data' => $nestedItem3Data = ['bar' => 456], 'relations' => []]);
+
+        $result = $this->formatter->success($response);
+
+        $this->assertEquals(array_merge([
+            'data' => array_merge($data, [
+                $relatedItemKey => array_merge($relatedItemData, [
+                    $nestedItem1Key => $nestedItem1Data
+                ]),
+                $relatedCollectionKey => [
+                    $nestedItem2Data,
+                    $nestedItem3Data,
+                ]
+            ]),
+        ], $meta), $result);
+    }
+
+    /**
+     * Assert that [success] method attaches pagination metadata to response data.
+     */
+    public function testSuccessMethodAttachesPagination()
+    {
+        $response = mock(SuccessResponse::class);
+        $response->allows([
+            'resource' => $item = mock(Item::class),
             'meta' => [],
             'paginator' => $paginator = mock(Paginator::class),
             'cursorPaginator' => null,
+        ]);
+        $item->allows([
+            'data' => $data = ['foo' => 123],
+            'key' => $key = 'baz',
+            'relations' => []
         ]);
         $paginator->allows([
             'count' => $count = 10,
@@ -84,7 +205,7 @@ class SimpleFormatterTest extends UnitTestCase
         $result = $this->formatter->success($response);
 
         $this->assertEquals([
-            'data' => $data,
+            $key => $data,
             'pagination' => [
                 'count' => $count,
                 'total' => $total,
@@ -103,16 +224,21 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that [paginator] excludes previous and next links when there's only one page.
+     * Assert that [success] method excludes previous and next pagination links when there's only one page.
      */
-    public function testPaginatorMethodOmitsUndefinedLinks()
+    public function testSucessMethodOmitsUndefinedLinksForPagination()
     {
         $response = mock(SuccessResponse::class);
         $response->allows([
-            'data' => $data = ['foo' => 123],
+            'resource' => $item = mock(Item::class),
             'meta' => [],
             'paginator' => $paginator = mock(Paginator::class),
             'cursorPaginator' => null,
+        ]);
+        $item->allows([
+            'data' => $data = ['foo' => 123],
+            'key' => $key = 'baz',
+            'relations' => []
         ]);
         $paginator->allows([
             'count' => $count = 5,
@@ -128,7 +254,7 @@ class SimpleFormatterTest extends UnitTestCase
         $result = $this->formatter->success($response);
 
         $this->assertEquals([
-            'data' => $data,
+            $key => $data,
             'pagination' => [
                 'count' => $count,
                 'total' => $total,
@@ -145,16 +271,21 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that [cursor] attaches cursor pagination meta data to response data.
+     * Assert that [success] method attaches cursor pagination metadata to response data.
      */
-    public function testCursorMethodAttachesCursorPagination()
+    public function testSuccessMethodAttachesCursorPagination()
     {
         $response = mock(SuccessResponse::class);
         $response->allows([
-            'data' => $data = ['foo' => 123],
+            'resource' => $item = mock(Item::class),
             'meta' => [],
             'paginator' => null,
             'cursorPaginator' => $paginator = mock(CursorPaginator::class),
+        ]);
+        $item->allows([
+            'data' => $data = ['foo' => 123],
+            'key' => $key = 'baz',
+            'relations' => []
         ]);
         $paginator->allows([
             'current' => $current = 10,
@@ -166,7 +297,7 @@ class SimpleFormatterTest extends UnitTestCase
         $result = $this->formatter->success($response);
 
         $this->assertEquals([
-            'data' => $data,
+            $key => $data,
             'cursor' => [
                 'current' => $current,
                 'previous' => $previous,
@@ -179,7 +310,7 @@ class SimpleFormatterTest extends UnitTestCase
     /**
      * Assert that [error] formats error responses from an error response value object.
      */
-    public function testErrorMethodFormatsSuccessResponses()
+    public function testErrorMethodFormatsErrorResponses()
     {
         $response = mock(ErrorResponse::class);
         $response->allows([
@@ -225,7 +356,7 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that [validator] attaches validation meta data to response data.
+     * Assert that [validator] attaches validation metadata to response data.
      */
     public function testValidationMethodAttachesValidation()
     {

@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder;
 
-use Exception;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
@@ -45,6 +44,7 @@ class Responder implements ResponderContract
      *
      * @param mixed $data
      * @return \Flugg\Responder\Http\Builders\SuccessResponseBuilder
+     * @throws \Flugg\Responder\Exceptions\InvalidDataException
      */
     public function success($data = []): SuccessResponseBuilder
     {

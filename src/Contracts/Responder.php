@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder\Contracts;
 
-use Exception;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 

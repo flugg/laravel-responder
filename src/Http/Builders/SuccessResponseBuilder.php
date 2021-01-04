@@ -5,7 +5,7 @@ namespace Flugg\Responder\Http\Builders;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidDataException;
-use Flugg\Responder\Http\Resource;
+use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
 
 /**
@@ -30,7 +30,7 @@ class SuccessResponseBuilder extends ResponseBuilder
     public function make($data = [])
     {
         if (is_array($data)) {
-            $this->response = (new SuccessResponse())->setResource(new Resource($data));
+            $this->response = (new SuccessResponse())->setResource(new Item($data));
         } elseif (is_object($data)) {
             $this->response = $this->normalizeData($data);
         } else {
@@ -75,9 +75,9 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     protected function normalizeData(object $data): SuccessResponse
     {
-        foreach ($this->normalizers as $class => $normalizer) {
+        foreach ($this->config->get('responder.normalizers') as $class => $normalizer) {
             if ($data instanceof $class) {
-                return $this->container->make($normalizer)->normalize($data);
+                return $this->container->makeWith($normalizer, ['data' => $data])->normalize();
             }
         }
 

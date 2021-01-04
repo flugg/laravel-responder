@@ -2,52 +2,47 @@
 
 namespace Flugg\Responder\Tests\Unit\Http\Normalizers;
 
-use Flugg\Responder\Http\Normalizers\QueryBuilderNormalizer;
+use Flugg\Responder\Http\Normalizers\CollectionNormalizer;
 use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\ModelWithGetResourceKey;
 use Flugg\Responder\Tests\UnitTestCase;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection as IlluminateCollection;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Normalizers\QueryBuilderNormalizer] class.
+ * Unit tests for the [Flugg\Responder\Http\Normalizers\CollectionNormalizer] class.
  *
- * @see \Flugg\Responder\Http\Normalizers\QueryBuilderNormalizer
+ * @see \Flugg\Responder\Http\Normalizers\CollectionNormalizer
  */
-class QueryBuilderNormalizerTest extends UnitTestCase
+class CollectionNormalizerTest extends UnitTestCase
 {
     /**
-     * Assert that [normalize] normalizes query builder to a success response value object.
+     * Assert that [normalize] normalizes collection to a success response value object.
      */
-    public function testNormalizeMethodNormalizesQueryBuilder()
+    public function testNormalizeMethodNormalizesCollection()
     {
-        $queryBuilder = mock(Builder::class);
-        $queryBuilder->allows('get')->andReturns($collection = mock(IlluminateCollection::class));
-        $collection->allows(['toArray' => $data = ['foo' => 123]]);
-        $normalizer = new QueryBuilderNormalizer($queryBuilder);
+        $collection = mock(IlluminateCollection::class);
+        $collection->allows('toArray')->andReturns($data = ['foo' => 123]);
+        $normalizer = new CollectionNormalizer($collection);
 
         $result = $normalizer->normalize();
-        $resource = $result->resource();
 
         $this->assertInstanceOf(SuccessResponse::class, $result);
-        $this->assertInstanceOf(Item::class, $resource);
+        $this->assertInstanceOf(Item::class, $result->resource());
         $this->assertEquals(200, $result->status());
-        $this->assertEquals($data, $resource->toArray());
+        $this->assertSame($data, $result->resource()->toArray());
         $this->assertNull($result->resource()->key());
     }
 
     /**
-     * Assert that [normalize] normalizes Eloquent query builder to a success response value object.
+     * Assert that [normalize] normalizes Eloquent collection to a success response value object.
      */
-    public function testNormalizeMethodNormalizesEloquentQueryBuilder()
+    public function testNormalizeMethodNormalizesEloquentCollection()
     {
-        $queryBuilder = mock(EloquentBuilder::class);
-        $queryBuilder->allows('get')->andReturns($collection = mock(EloquentCollection::class));
+        $collection = mock(EloquentCollection::class);
         $collection->allows([
             'isEmpty' => false,
             'all' => [$model1 = mock(Model::class), $model2 = mock(Model::class)],
@@ -65,7 +60,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
             'withoutRelations' => $model2,
             'toArray' => $data2 = ['bar' => 456]
         ]);
-        $normalizer = new QueryBuilderNormalizer($queryBuilder);
+        $normalizer = new CollectionNormalizer($collection);
 
         $result = $normalizer->normalize();
         $resource = $result->resource();
@@ -85,8 +80,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodSetsResourceKeyUsingMethodOnFirstModel()
     {
-        $queryBuilder = mock(EloquentBuilder::class);
-        $queryBuilder->allows('get')->andReturns($collection = mock(EloquentCollection::class));
+        $collection = mock(EloquentCollection::class);
         $collection->allows([
             'isEmpty' => false,
             'all' => [$model = mock(ModelWithGetResourceKey::class)],
@@ -99,7 +93,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
             'withoutRelations' => $model,
             'toArray' => []
         ]);
-        $normalizer = new QueryBuilderNormalizer($queryBuilder);
+        $normalizer = new CollectionNormalizer($collection);
 
         $result = $normalizer->normalize();
 
@@ -111,13 +105,12 @@ class QueryBuilderNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodSetsResourceKeyToNullWhenEmpty()
     {
-        $queryBuilder = mock(EloquentBuilder::class);
-        $queryBuilder->allows('get')->andReturns($collection = mock(EloquentCollection::class));
+        $collection = mock(EloquentCollection::class);
         $collection->allows([
             'isEmpty' => true,
             'all' => [],
         ]);
-        $normalizer = new QueryBuilderNormalizer($queryBuilder);
+        $normalizer = new CollectionNormalizer($collection);
 
         $result = $normalizer->normalize();
 
@@ -129,8 +122,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesEloquentCollectionWithItemRelation()
     {
-        $queryBuilder = mock(EloquentBuilder::class);
-        $queryBuilder->allows('get')->andReturns($collection = mock(EloquentCollection::class));
+        $collection = mock(EloquentCollection::class);
         $collection->allows([
             'isEmpty' => false,
             'all' => [$model = mock(Model::class)],
@@ -148,7 +140,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
             'withoutRelations' => $relation,
             'toArray' => $relatedData = ['bar' => 456]
         ]);
-        $normalizer = new QueryBuilderNormalizer($queryBuilder);
+        $normalizer = new CollectionNormalizer($collection);
 
         $result = $normalizer->normalize();
         $resource = $result->resource();
@@ -164,8 +156,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesEloquentCollectionWithCollectionRelation()
     {
-        $queryBuilder = mock(EloquentBuilder::class);
-        $queryBuilder->allows('get')->andReturns($collection = mock(EloquentCollection::class));
+        $collection = mock(EloquentCollection::class);
         $collection->allows([
             'isEmpty' => false,
             'all' => [$model = mock(Model::class)],
@@ -188,7 +179,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
             'withoutRelations' => $relation,
             'toArray' => $relatedData = ['bar' => 456]
         ]);
-        $normalizer = new QueryBuilderNormalizer($queryBuilder);
+        $normalizer = new CollectionNormalizer($collection);
 
         $result = $normalizer->normalize();
         $resource = $result->resource();

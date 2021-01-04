@@ -5,26 +5,27 @@ namespace Flugg\Responder\Http\Normalizers;
 use Flugg\Responder\Contracts\Http\Normalizer;
 use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 
 /**
- * Class for normalizing query builders to success responses.
+ * Class for normalizing Eloquent collections to success responses.
  */
-class QueryBuilderNormalizer extends EloquentNormalizer implements Normalizer
+class CollectionNormalizer extends EloquentNormalizer implements Normalizer
 {
     /**
      * The data being normalized.
      *
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     * @var \Illuminate\Support\Collection
      */
     protected $data;
 
     /**
      * Create a new response normalizer instance.
      *
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $data
+     * @param \Illuminate\Support\Collection $data
      */
-    public function __construct($data)
+    public function __construct(Collection $data)
     {
         $this->data = $data;
     }
@@ -36,9 +37,7 @@ class QueryBuilderNormalizer extends EloquentNormalizer implements Normalizer
      */
     public function normalize(): SuccessResponse
     {
-        $resource = $this->data instanceof EloquentBuilder
-            ? $this->buildCollection($this->data->get())
-            : new Item($this->data->get()->toArray());
+        $resource = $this->data instanceof EloquentCollection ? $this->buildCollection($this->data) : new Item($this->data->toArray());
 
         return (new SuccessResponse())->setResource($resource);
     }

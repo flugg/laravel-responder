@@ -4,8 +4,8 @@ namespace Flugg\Responder\Tests\Unit\Http\Builders;
 
 use Flugg\Responder\Contracts\AdapterFactory;
 use Flugg\Responder\Contracts\ErrorMessageRegistry;
+use Flugg\Responder\Contracts\Http\Formatter;
 use Flugg\Responder\Contracts\Http\ResponseFactory;
-use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Tests\UnitTestCase;
 use Mockery\MockInterface;
@@ -25,28 +25,24 @@ class ErrorResponseBuilderTest extends UnitTestCase
      * @var MockInterface|ResponseFactory
      */
     protected $responseFactory;
-
     /**
      * Mock of an adapter factory.
      *
      * @var MockInterface|AdapterFactory
      */
     protected $adapterFactory;
-
     /**
      * Mock of an error message resolver.
      *
      * @var MockInterface|ErrorMessageRegistry
      */
     protected $messageRegistry;
-
     /**
      * Mock of a response formatter.
      *
-     * @var MockInterface|ResponseFormatter
+     * @var MockInterface|Formatter
      */
     protected $formatter;
-
     /**
      * Class being tested.
      *

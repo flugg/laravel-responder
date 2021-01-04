@@ -8,7 +8,7 @@ use Flugg\Responder\Http\SuccessResponse;
 /**
  * Contract for a response formatter.
  */
-interface ResponseFormatter
+interface Formatter
 {
     /**
      * Format success response data.

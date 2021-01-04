@@ -8,6 +8,7 @@ use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 /**
@@ -21,14 +22,12 @@ class Handler implements ExceptionHandler
      * @var \Illuminate\Contracts\Debug\ExceptionHandler
      */
     protected $handler;
-
     /**
      * Config repository.
      *
      * @var \Illuminate\Contracts\Config\Repository
      */
     protected $config;
-
     /**
      * Responder service for making error responses.
      *
@@ -53,65 +52,41 @@ class Handler implements ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param \Throwable $exception
+     * @param \Throwable $e
      * @return void
      * @throws \Exception
      */
-    public function report(Throwable $exception)
+    public function report(Throwable $e): void
     {
-        return $this->handler->report($exception);
+        $this->handler->report($e);
     }
 
     /**
      * Determine if the exception should be reported.
      *
-     * @param \Throwable $exception
+     * @param \Throwable $e
      * @return bool
      */
-    public function shouldReport(Throwable $exception)
+    public function shouldReport(Throwable $e): bool
     {
-        return $this->handler->shouldReport($exception);
+        return $this->handler->shouldReport($e);
     }
 
     /**
      * Render an exception into an HTTP response.
      *
      * @param \Illuminate\Http\Request $request
-     * @param \Throwable $exception
+     * @param \Throwable $e
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Throwable
      */
-    public function render($request, Throwable $exception)
+    public function render($request, Throwable $e): Response
     {
-        if ($request->expectsJson() && $this->shouldConvertException($exception)) {
-            return $this->convertException($exception);
+        if ($request->expectsJson() && $this->shouldConvertException($e)) {
+            return $this->convertException($e);
         }
 
-        return $this->handler->render($request, $exception);
-    }
-
-    /**
-     * Render an exception to the console.
-     *
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Throwable $exception
-     * @return void
-     */
-    public function renderForConsole($output, Throwable $exception)
-    {
-        return $this->handler->renderForConsole($output, $exception);
-    }
-
-    /**
-     * Forward method calls to the original exception handler.
-     *
-     * @param string $method
-     * @param array $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return $this->handler->{$method}(...$parameters);
+        return $this->handler->render($request, $e);
     }
 
     /**
@@ -136,6 +111,7 @@ class Handler implements ExceptionHandler
      *
      * @param \Throwable $exception
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
      */
     protected function convertException(Throwable $exception): JsonResponse
     {
@@ -146,5 +122,29 @@ class Handler implements ExceptionHandler
         }
 
         return $responseBuilder->respond();
+    }
+
+    /**
+     * Render an exception to the console.
+     *
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Throwable $e
+     * @return void
+     */
+    public function renderForConsole($output, Throwable $e): void
+    {
+        $this->handler->renderForConsole($output, $e);
+    }
+
+    /**
+     * Forward method calls to the original exception handler.
+     *
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
+     */
+    public function __call(string $method, array $parameters)
+    {
+        return $this->handler->{$method}(...$parameters);
     }
 }

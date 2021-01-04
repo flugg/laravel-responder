@@ -3,6 +3,7 @@
 namespace Flugg\Responder\Http\Builders;
 
 use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -31,6 +32,13 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     protected $container;
 
     /**
+     * Config repository.
+     *
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
+
+    /**
      * Response value object.
      *
      * @var \Flugg\Responder\Http\Response
@@ -40,7 +48,7 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     /**
      * Response formatter.
      *
-     * @var \Flugg\Responder\Contracts\Http\ResponseFormatter|null
+     * @var \Flugg\Responder\Contracts\Http\Formatter|null
      */
     protected $formatter;
 
@@ -49,18 +57,21 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
      *
      * @param \Flugg\Responder\Contracts\Http\ResponseFactory $responseFactory
      * @param \Illuminate\Contracts\Container\Container $container
+     * @param \Illuminate\Contracts\Config\Repository $config
      */
-    public function __construct(ResponseFactory $responseFactory, Container $container)
+    public function __construct(ResponseFactory $responseFactory, Container $container, Repository $config)
     {
         $this->responseFactory = $responseFactory;
         $this->container = $container;
+        $this->config = $config;
     }
 
     /**
      * Set a response formatter.
      *
-     * @param \Flugg\Responder\Contracts\Http\ResponseFormatter|string|null $formatter
+     * @param \Flugg\Responder\Contracts\Http\Formatter|string|null $formatter
      * @return $this
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function formatter($formatter)
     {
@@ -87,7 +98,7 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     }
 
     /**
-     * Attach meta data to the response content.
+     * Attach metadata to the response content.
      *
      * @param array $meta
      * @return $this
@@ -97,6 +108,18 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
         $this->response->setMeta($meta);
 
         return $this;
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     */
+    public function toResponse($request): JsonResponse
+    {
+        return $this->respond();
     }
 
     /**
@@ -119,30 +142,10 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     }
 
     /**
-     * Create an HTTP response that represents the object.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function toResponse($request): JsonResponse
-    {
-        return $this->respond();
-    }
-
-    /**
-     * Convert the response to an array.
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->respond()->getData(true);
-    }
-
-    /**
      * Convert the response to an Illuminate collection.
      *
      * @return \Illuminate\Support\Collection
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
      */
     public function toCollection(): Collection
     {
@@ -150,10 +153,22 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     }
 
     /**
+     * Convert the response to an array.
+     *
+     * @return array
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     */
+    public function toArray(): array
+    {
+        return $this->respond()->getData(true);
+    }
+
+    /**
      * Convert the response to JSON.
      *
      * @param int $options
      * @return string
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
      */
     public function toJson($options = 0): string
     {
@@ -164,8 +179,9 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
      * Convert the object into something JSON serializable.
      *
      * @return array
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }

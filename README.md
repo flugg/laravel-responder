@@ -1,19 +1,19 @@
-<p align="center"><img src="https://i.imgur.com/5heMuZH.png" width="561"></p>
+<p align="center"><img src="https://i.imgur.com/gwzk1eO.png" style="width: 100%; max-width: 560px; height: auto"></p>
 
 <p align="center">
-    <a href="https://github.com/flugger/laravel-responder/releases"><img src="https://img.shields.io/github/v/tag/flugger/laravel-responder" alt="Latest Stable Version"></a>
+    <a href="https://github.com/flugger/laravel-responder/releases"><img src="https://img.shields.io/github/v/tag/flugger/laravel-responder?label=version" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/flugger/laravel-responder"><img src="https://img.shields.io/packagist/dt/flugger/laravel-responder.svg" alt="Packagist Downloads"></a>
     <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-brightgreen.svg" alt="Software License"></a>
-    <a href="https://travis-ci.org/flugger/laravel-responder"><img src="https://img.shields.io/travis/flugger/laravel-responder/master.svg" alt="Build Status"></a>
+    <a href='https://github.com/flugg/laravel-responder/actions?query=workflow%3A"Run+tests"'><img src="https://img.shields.io/github/workflow/status/flugg/laravel-responder/run-tests?label=tests" alt="Tests Status"></a>
     <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/code-structure/master"><img src="https://img.shields.io/scrutinizer/coverage/g/flugger/laravel-responder.svg" alt="Test Coverage"></a>
-    <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/?branch=master"><img src="https://img.shields.io/scrutinizer/g/flugger/laravel-responder.svg" alt="Code Quality"></a>
+    <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/?branch=master?label="><img src="https://img.shields.io/scrutinizer/g/flugger/laravel-responder.svg" alt="Code Quality"></a>
 </p>
 
 Laravel Responder is a package for building API responses in Laravel and Lumen. It supports [API Resources](https://laravel.com/docs/master/eloquent-resources) and gives you the tools to format both success- and error responses consistently.
 
 ---
 
-## **Summer 2020 Update: Version 4.0 Released!** 🔥
+## **2021 Update: Version 4.0 Released!** 🔥
 
 _The package has been rewritten from scratch with a focus on simplifying the code. Now, instead of utilizing [Fractal](https://fractal.thephpleague.com) behind the scenes, the package instead relies on Laravel's own [API Resources](https://laravel.com/docs/master/eloquent-resources). Make sure to check out the [changelog](CHANGELOG.md) and the new documentation to get an overview of all the hot new features._
 
@@ -306,7 +306,7 @@ _The package will run the queries and convert them to collections behind the sce
 
 #### Paginators
 
-Sending a paginator to the `success` method will attach additional pagination meta data to the response.
+Sending a paginator to the `success` method will attach additional pagination metadata to the response.
 
 ```php
 return responder()->success(User::paginate())->respond();
@@ -336,15 +336,15 @@ _You can modify the response using a different [response formatter](#formatting-
 
 ---
 
-### Adding Meta Data
+### Adding metadata
 
-You may want to attach additional meta data to the response. You can do this using the `meta` method:
+You may want to attach additional metadata to the response. You can do this using the `meta` method:
 
 ```php
 return responder()->success(User::all())->meta(['count' => User::count()])->respond();
 ```
 
-Using the default formatter, the meta data will simply be appended to the response array:
+Using the default formatter, the metadata will simply be appended to the response array:
 
 ```json
 {

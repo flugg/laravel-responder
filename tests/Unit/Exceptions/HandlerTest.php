@@ -234,9 +234,8 @@ class HandlerTest extends UnitTestCase
     {
         $this->exceptionHandler->allows('renderForConsole')->andReturn($response = mock(JsonResponse::class));
 
-        $result = $this->handler->renderForConsole($output = mock(OutputInterface::class), $exception = new LogicException());
+        $this->handler->renderForConsole($output = mock(OutputInterface::class), $exception = new LogicException());
 
-        $this->assertSame($response, $result);
         $this->exceptionHandler->shouldHaveReceived('renderForConsole')->with($output, $exception);
     }
 

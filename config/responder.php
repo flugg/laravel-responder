@@ -1,10 +1,12 @@
 <?php
 
-use Flugg\Responder\Contracts\Http\ArrayableNormalizer;
-use Flugg\Responder\Contracts\Http\PaginatorNormalizer;
-use Flugg\Responder\Contracts\Http\QueryBuilderNormalizer;
-use Flugg\Responder\Contracts\Http\RelationNormalizer;
-use Flugg\Responder\Contracts\Http\ResourceNormalizer;
+use Flugg\Responder\Http\Normalizers\ArrayableNormalizer;
+use Flugg\Responder\Http\Normalizers\CollectionNormalizer;
+use Flugg\Responder\Http\Normalizers\ModelNormalizer;
+use Flugg\Responder\Http\Normalizers\PaginatorNormalizer;
+use Flugg\Responder\Http\Normalizers\QueryBuilderNormalizer;
+use Flugg\Responder\Http\Normalizers\RelationNormalizer;
+use Flugg\Responder\Http\Normalizers\ResourceNormalizer;
 
 return [
 
@@ -15,7 +17,7 @@ return [
     |
     | The response formatter is used to format the structure of the response
     | data of both success- and error responses. You may override this on
-    | a per-response basis or set to null to simply disable formatting.
+    | a per-response basis or set to null to fully disable formatting.
     |
     */
 
@@ -27,8 +29,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Response decorators are used to decorate both your success- and error
-    | responses. These are typically used for adding headers or altering
-    | the response data and are executed after the response formatter.
+    | responses and are typically used for adding headers or editing the
+    | final output. These are exceuted after the response formatters.
     |
     */
 
@@ -39,24 +41,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Normalizers
+    | Response Normalizers
     |--------------------------------------------------------------------------
     |
-    | The Laravel Responder package uses adapter classes for pagination and
-    | validation, allowing you to use other implementations. The package
-    | doesn't include an adapter for cursor pagination out of the box.
+    | Response normalizers are used to normalize data given when building a
+    | success response. Feel free to extend the list below with your own
+    | normalizer in order for the package to support more data types.
     |
     */
 
     'normalizers' => [
-        \Illuminate\Database\Query\Builder::class => QueryBuilderNormalizer::class,
-        \Illuminate\Database\Eloquent\Builder::class => QueryBuilderNormalizer::class,
-        \Illuminate\Database\Eloquent\Relations\Relation::class => RelationNormalizer::class,
-        \Illuminate\Database\Eloquent\Model::class => ModelNormalizer::class,
-        \Illuminate\Database\Eloquent\Collection::class => CollectionNormalizer::class,
-        \Illuminate\Contracts\Pagination\LengthAwarePaginator::class => PaginatorNormalizer::class,
-        \Illuminate\Http\Resources\Json\JsonResource::class => ResourceNormalizer::class,
         \Illuminate\Contracts\Support\Arrayable::class => ArrayableNormalizer::class,
+        \Illuminate\Database\Eloquent\Builder::class => QueryBuilderNormalizer::class,
+        \Illuminate\Database\Eloquent\Collection::class => CollectionNormalizer::class,
+        \Illuminate\Database\Eloquent\Model::class => ModelNormalizer::class,
+        \Illuminate\Database\Eloquent\Relations\Relation::class => RelationNormalizer::class,
+        \Illuminate\Database\Query\Builder::class => QueryBuilderNormalizer::class,
+        \Illuminate\Http\Resources\Json\JsonResource::class => ResourceNormalizer::class,
+        \Illuminate\Pagination\LengthAwarePaginator::class => PaginatorNormalizer::class,
     ],
 
     /*
@@ -65,8 +67,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | A map of exceptions that will be automatically converted to an error
-    | response for JSON requests. Responses with a status code of 5xx
-    | will be ignored when debug mode is turned on.
+    | response for JSON requests. Responses having a status code of 5xx
+    | will be ignored when debug mode is on for ease of development.
     |
     */
 
@@ -106,9 +108,9 @@ return [
     | Error Messages
     |--------------------------------------------------------------------------
     |
-    | Response decorators are used to decorate both your success- and error
-    | responses. A decorator can be disabled by removing it from the list
-    | below. You may additionally add your own decorators to the list.
+    | A list of error codes mapped to error messages. Feel free to add your
+    | own error codes and error messages to the list. Alternatively, you
+    | may also use the error message registry class to register them.
     |
     */
 

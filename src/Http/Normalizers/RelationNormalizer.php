@@ -3,7 +3,6 @@
 namespace Flugg\Responder\Http\Normalizers;
 
 use Flugg\Responder\Contracts\Http\Normalizer;
-use Flugg\Responder\Http\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -12,35 +11,55 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
- * Class for normalizing Eloquent relation query builders to success responses.
+ * Class for normalizing Eloquent relations to success responses.
  */
-class RelationNormalizer implements Normalizer
+class RelationNormalizer extends EloquentNormalizer implements Normalizer
 {
     /**
-     * Normalize response data.
+     * The data being normalized.
+     *
+     * @var \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    protected $data;
+
+    /**
+     * Create a new response normalizer instance.
      *
      * @param \Illuminate\Database\Eloquent\Relations\Relation $data
-     * @return \Flugg\Responder\Http\SuccessResponse
      */
-    public function normalize($data): SuccessResponse
+    public function __construct(Relation $data)
     {
-        return (new SuccessResponse())->setResource(new Resource($this->makeArrayFromRelation($data)));
+        $this->data = $data;
     }
 
     /**
-     * Make an array from the Eloquent relation query builder.
+     * Normalize response data.
      *
-     * @param \Illuminate\Database\Eloquent\Relations\Relation $data
-     * @return array
+     * @return \Flugg\Responder\Http\SuccessResponse
      */
-    protected function makeArrayFromRelation(Relation $data): array
+    public function normalize(): SuccessResponse
+    {
+        $resource = $this->isOneToOneRelation($this->data)
+            ? $this->buildResource($this->data->first())
+            : $this->buildCollection($this->data->get());
+
+        return (new SuccessResponse())->setResource($resource);
+    }
+
+    /**
+     * Check if the relationship is a one-to-one relation.
+     *
+     * @param \Illuminate\Database\Eloquent\Relations\Relation $relation
+     * @return bool
+     */
+    protected function isOneToOneRelation(Relation $relation): bool
     {
         foreach ([BelongsTo::class, HasOne::class, MorphOne::class, MorphTo::class] as $class) {
-            if ($data instanceof $class) {
-                return $data->first()->toArray();
+            if ($relation instanceof $class) {
+                return true;
             }
         }
 
-        return $data->get()->toArray();
+        return false;
     }
 }

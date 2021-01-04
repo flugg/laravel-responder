@@ -2,10 +2,9 @@
 
 namespace Flugg\Responder;
 
-use Exception;
+use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
-use Flugg\Responder\Contracts\Responder;
 
 /**
  * Trait for building success- and error responses.

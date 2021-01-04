@@ -8,6 +8,8 @@ use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use InvalidArgumentException;
+use stdClass;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 /**
@@ -129,5 +131,16 @@ class ResourceNormalizerTest extends UnitTestCase
         $this->assertSame(['id' => 2], $result->resource()->relations()[0]->data());
         $this->assertSame(['id' => 3], $result->resource()->relations()[0]->relations()[0]->data());
         $this->assertSame([['id' => 4], ['id' => 5]], $result->resource()->relations()[1]->data());
+    }
+
+    /**
+     * Assert that [normalize] throws error when not given an API resource.
+     */
+    public function testNormalizeMethodThrowsErrorOnInvalidArgument()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Data must be instance of ' . JsonResource::class);
+
+        $this->normalizer->normalize(new stdClass());
     }
 }

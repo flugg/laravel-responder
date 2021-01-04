@@ -25,9 +25,7 @@ class ErrorMessageRegistry implements ErrorMessageRegistryContract
      */
     public function register($code, string $message = null): void
     {
-        $this->messages = array_merge($this->messages, is_array($code) ? $code : [
-            $code => $message,
-        ]);
+        $this->messages = array_merge($this->messages, is_array($code) ? $code : [$code => $message]);
     }
 
     /**

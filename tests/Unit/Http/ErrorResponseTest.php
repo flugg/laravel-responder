@@ -96,7 +96,7 @@ class ErrorResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that [setMeta] and [meta] sets and gets meta data respectively.
+     * Assert that [setMeta] and [meta] sets and gets metadata respectively.
      */
     public function testSetAndGetMeta()
     {

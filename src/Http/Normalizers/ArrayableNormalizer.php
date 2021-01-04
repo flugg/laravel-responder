@@ -3,10 +3,9 @@
 namespace Flugg\Responder\Http\Normalizers;
 
 use Flugg\Responder\Contracts\Http\Normalizer;
-use Flugg\Responder\Http\Resource;
+use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
 use Illuminate\Contracts\Support\Arrayable;
-use InvalidArgumentException;
 
 /**
  * Class for normalizing query builders to success responses.
@@ -14,18 +13,29 @@ use InvalidArgumentException;
 class ArrayableNormalizer implements Normalizer
 {
     /**
-     * Normalize response data.
+     * The data being normalized.
+     *
+     * @var \Illuminate\Contracts\Support\Arrayable
+     */
+    protected $data;
+
+    /**
+     * Create a new response normalizer instance.
      *
      * @param \Illuminate\Contracts\Support\Arrayable $data
-     * @return \Flugg\Responder\Http\SuccessResponse
-     * @throws \InvalidArgumentException
      */
-    public function normalize($data): SuccessResponse
+    public function __construct(Arrayable $data)
     {
-        if (!$data instanceof Arrayable) {
-            throw new InvalidArgumentException('Data must be instance of ' . Arrayable::class);
-        }
+        $this->data = $data;
+    }
 
-        return (new SuccessResponse())->setResource(new Resource($data->toArray()));
+    /**
+     * Normalize response data.
+     *
+     * @return \Flugg\Responder\Http\SuccessResponse
+     */
+    public function normalize(): SuccessResponse
+    {
+        return (new SuccessResponse())->setResource(new Item($this->data->toArray()));
     }
 }

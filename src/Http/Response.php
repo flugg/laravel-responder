@@ -24,7 +24,7 @@ abstract class Response
     protected $headers = [];
 
     /**
-     * Additional meta data attached to the response data.
+     * Additional metadata attached to the response data.
      *
      * @var array
      */
@@ -35,7 +35,7 @@ abstract class Response
      *
      * @return int
      */
-    public function status()
+    public function status(): int
     {
         return $this->status;
     }
@@ -45,17 +45,17 @@ abstract class Response
      *
      * @return array
      */
-    public function headers()
+    public function headers(): array
     {
         return $this->headers;
     }
 
     /**
-     * Get the meta data attached to the response.
+     * Get the metadata attached to the response.
      *
      * @return array
      */
-    public function meta()
+    public function meta(): array
     {
         return $this->meta;
     }
@@ -70,7 +70,7 @@ abstract class Response
     public function setStatus(int $status)
     {
         if (!$this->isValidStatusCode($status)) {
-            throw new InvalidStatusCodeException();
+            throw new InvalidStatusCodeException;
         }
 
         $this->status = $status;
@@ -92,7 +92,7 @@ abstract class Response
     }
 
     /**
-     * Set meta data attached to the response.
+     * Set metadata attached to the response.
      *
      * @param array $meta
      * @return $this
@@ -105,7 +105,7 @@ abstract class Response
     }
 
     /**
-     * Verify that the status code is valid.
+     * Check if the status code is valid.
      *
      * @param int $status
      * @return bool

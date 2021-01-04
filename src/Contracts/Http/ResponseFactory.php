@@ -5,7 +5,7 @@ namespace Flugg\Responder\Contracts\Http;
 use Illuminate\Http\JsonResponse;
 
 /**
- * Contract for a factory creating JSON responses.
+ * Contract for a JSON response factory.
  */
 interface ResponseFactory
 {

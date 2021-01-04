@@ -5,7 +5,7 @@ namespace Flugg\Responder\Tests\Unit\Http;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
-use Flugg\Responder\Http\Resource;
+use Flugg\Responder\Http\Resources\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
 
@@ -40,7 +40,7 @@ class SuccessResponseTest extends UnitTestCase
      */
     public function testSetAndGetResource()
     {
-        $result = $this->response->setResource($resource = new Resource([]));
+        $result = $this->response->setResource($resource = mock(Resource::class));
 
         $this->assertSame($this->response, $result);
         $this->assertEquals($resource, $this->response->resource());
@@ -97,7 +97,7 @@ class SuccessResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that [setMeta] and [meta] sets and gets meta data respectively.
+     * Assert that [setMeta] and [meta] sets and gets metadata respectively.
      */
     public function testSetAndGetMeta()
     {

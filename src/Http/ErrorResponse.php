@@ -107,7 +107,7 @@ class ErrorResponse extends Response
     }
 
     /**
-     * Verify that the status code is valid.
+     * Check if the status code is valid.
      *
      * @param int $status
      * @return bool

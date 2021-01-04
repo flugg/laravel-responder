@@ -2,17 +2,20 @@
 
 namespace Flugg\Responder\Http\Formatters;
 
-use Flugg\Responder\Contracts\Http\ResponseFormatter;
+use Flugg\Responder\Contracts\Http\Formatter;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Contracts\Validation\Validator;
 use Flugg\Responder\Http\ErrorResponse;
+use Flugg\Responder\Http\Resources\Collection;
+use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
+use Illuminate\Support\Collection as IlluminateCollection;
 
 /**
  * Simple response formatter.
  */
-class SimpleFormatter implements ResponseFormatter
+class SimpleFormatter implements Formatter
 {
     /**
      * Format success response data.
@@ -22,8 +25,11 @@ class SimpleFormatter implements ResponseFormatter
      */
     public function success(SuccessResponse $response): array
     {
+        $resource = $response->resource();
         $data = array_merge([
-            'data' => $response->resource()->data(),
+            ($resource->key() ?: 'data') => $resource instanceof Item
+                ? $this->item($resource)
+                : ($resource instanceof Collection ? $this->collection($resource) : []),
         ], $response->meta());
 
         if ($paginator = $response->paginator()) {
@@ -46,7 +52,7 @@ class SimpleFormatter implements ResponseFormatter
         $data = array_merge([
             'error' => [
                 'code' => $response->code(),
-            ]
+            ],
         ], $response->meta());
 
         if ($message = $response->message()) {
@@ -61,7 +67,32 @@ class SimpleFormatter implements ResponseFormatter
     }
 
     /**
-     * Format pagination meta data.
+     * Format an item resource.
+     *
+     * @param \Flugg\Responder\Http\Resources\Item $item
+     * @return array
+     */
+    protected function item(Item $item): array
+    {
+        return array_merge($item->data(), IlluminateCollection::make($item->relations())
+            ->mapWithKeys(function ($value, $key) {
+                return [$key => $value instanceof Item ? $this->item($value) : $this->collection($value)];
+            })->toArray());
+    }
+
+    /**
+     * Format an item collection.
+     *
+     * @param \Flugg\Responder\Http\Resources\Collection $collection
+     * @return array
+     */
+    protected function collection(Collection $collection): array
+    {
+        return array_map([$this, 'item'], $collection->items());
+    }
+
+    /**
+     * Format pagination metadata.
      *
      * @param \Flugg\Responder\Contracts\Pagination\Paginator $paginator
      * @return array
@@ -93,14 +124,14 @@ class SimpleFormatter implements ResponseFormatter
     }
 
     /**
-     * Format cursor pagination meta data.
+     * Format cursor pagination metadata.
      *
      * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $paginator
      * @return array
      */
     protected function cursor(CursorPaginator $paginator): array
     {
-        return  [
+        return [
             'current' => $paginator->current(),
             'previous' => $paginator->previous(),
             'next' => $paginator->next(),
@@ -109,7 +140,7 @@ class SimpleFormatter implements ResponseFormatter
     }
 
     /**
-     * Format validator meta data.
+     * Format validator metadata.
      *
      * @param \Flugg\Responder\Contracts\Validation\Validator $validator
      * @return array

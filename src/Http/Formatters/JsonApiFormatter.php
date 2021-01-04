@@ -2,11 +2,13 @@
 
 namespace Flugg\Responder\Http\Formatters;
 
-use Flugg\Responder\Contracts\Http\ResponseFormatter;
+use Flugg\Responder\Contracts\Http\Formatter;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Contracts\Validation\Validator;
 use Flugg\Responder\Http\ErrorResponse;
+use Flugg\Responder\Http\Resources\Collection;
+use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
@@ -14,7 +16,7 @@ use InvalidArgumentException;
 /**
  * Response formatter following the JSON API specification.
  */
-class JsonApiFormatter implements ResponseFormatter
+class JsonApiFormatter implements Formatter
 {
     /**
      * Format success response data.
@@ -24,16 +26,12 @@ class JsonApiFormatter implements ResponseFormatter
      */
     public function success(SuccessResponse $response): array
     {
-        if (Arr::isAssoc($response->resource()->data())) {
-            return [
-                'data' => $this->resource($response->resource()->data())
-            ];
-        }
+        $resource = $response->resource();
 
         return [
-            'data' => array_map(function ($resource) {
-                return $this->resource($resource);
-            }, $response->resource()->data())
+            'data' => $resource instanceof Collection
+                ? array_map([$this, 'resource'], $resource->items())
+                : $this->resource($resource),
         ];
     }
 
@@ -45,42 +43,53 @@ class JsonApiFormatter implements ResponseFormatter
      */
     public function error(ErrorResponse $response): array
     {
-        $error = [
-            'code' => $response->code(),
-        ];
+        $error = ['code' => $response->code()];
 
         if ($message = $response->message()) {
             $error['message'] = $message;
         }
 
-        return array_merge([
-            'error' => $error,
-        ], $response->meta());
+        return array_merge(['error' => $error], $response->meta());
     }
 
     /**
      * Format a JSON API resource.
      *
-     * @param array $data
+     * @param Item $resource
      * @return array
      */
-    protected function resource(array $data): array
+    protected function resource(Item $resource): array
     {
-        if (!array_key_exists('id', $data)) {
+        if (!isset($resource['id'])) {
             throw new InvalidArgumentException('JSON API resource objects must have an ID');
         }
 
-        $resource = [
-            'type' => 'RESOURCE_KEY',
-            'id' => $data['id'],
-            'attributes' => Arr::except($data, 'id'),
+        $data = [
+            'type' => $resource->key(),
+            'id' => $resource['id'],
+            'attributes' => Arr::except($resource->data(), 'id'),
         ];
 
-        return $resource;
+        if (count($resource->relations())) {
+            $data['relationships'] = array_reduce($resource->relations(), function ($previous, $relation) {
+                if ($relation instanceof Item) {
+                    return array_merge($previous, [
+                        $relation->key() => [
+                            'data' => [
+                                'type' => $relation->key(),
+                                'id' => $relation['id'],
+                            ],
+                        ],
+                    ]);
+                }
+            }, []);
+        }
+
+        return $data;
     }
 
     /**
-     * Format pagination meta data.
+     * Format pagination metadata.
      *
      * @param \Flugg\Responder\Contracts\Pagination\Paginator $paginator
      * @return array
@@ -112,7 +121,7 @@ class JsonApiFormatter implements ResponseFormatter
     }
 
     /**
-     * Format cursor pagination meta data.
+     * Format cursor pagination metadata.
      *
      * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $paginator
      * @return array
@@ -128,7 +137,7 @@ class JsonApiFormatter implements ResponseFormatter
     }
 
     /**
-     * Format validator meta data.
+     * Format validator metadata.
      *
      * @param \Flugg\Responder\Contracts\Validation\Validator $validator
      * @return array

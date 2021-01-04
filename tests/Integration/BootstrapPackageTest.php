@@ -3,8 +3,8 @@
 namespace Flugg\Responder\Tests\Integration;
 
 use Flugg\Responder\Contracts\ErrorMessageRegistry as ErrorMessageRegistryContract;
+use Flugg\Responder\Contracts\Http\Formatter;
 use Flugg\Responder\Contracts\Http\ResponseFactory;
-use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\ErrorMessageRegistry;
 use Flugg\Responder\Exceptions\Handler;
@@ -57,34 +57,34 @@ class BootstrapPackageTest extends IntegrationTestCase
     }
 
     /**
-     * Assert that the package registers binding for the [ResponseFormatter] interface.
+     * Assert that the package registers binding for the [Formatter] interface.
      */
     public function testResponseFormatterBinding()
     {
-        $result = $this->app->make(ResponseFormatter::class);
+        $result = $this->app->make(Formatter::class);
 
         $this->assertInstanceOf(SimpleFormatter::class, $result);
     }
 
     /**
-     * Assert that the [ResponseFormatter] binding is a singleton.
+     * Assert that the [Formatter] binding is a singleton.
      */
     public function testResponseFormatterRegistryIsSingleton()
     {
-        $singleton = $this->app->make(ResponseFormatter::class);
-        $result = $this->app->make(ResponseFormatter::class);
+        $singleton = $this->app->make(Formatter::class);
+        $result = $this->app->make(Formatter::class);
 
         $this->assertSame($singleton, $result);
     }
 
     /**
-     * Assert that the configured response formatter is resolved from the [ResponseFormatter] binding.
+     * Assert that the configured response formatter is resolved from the [Formatter] binding.
      */
     public function testResponseFormatterCanBeConfigured()
     {
         config()->set('responder.formatter', JsonApiFormatter::class);
 
-        $result = $this->app->make(ResponseFormatter::class);
+        $result = $this->app->make(Formatter::class);
 
         $this->assertInstanceOf(JsonApiFormatter::class, $result);
     }
@@ -96,7 +96,7 @@ class BootstrapPackageTest extends IntegrationTestCase
     {
         config()->set('responder.formatter', null);
 
-        $result = $this->app->make(ResponseFormatter::class);
+        $result = $this->app->make(Formatter::class);
 
         $this->assertNull($result);
     }
@@ -106,7 +106,7 @@ class BootstrapPackageTest extends IntegrationTestCase
      */
     public function testSuccessResponseBuildersAreExtendedWithResponseFormatter()
     {
-        $this->app->instance(ResponseFormatter::class, $formatter = mock(ResponseFormatter::class));
+        $this->app->instance(Formatter::class, $formatter = mock(Formatter::class));
         $formatter->allows('success')->andReturns([]);
         $responseBuilder = $this->app->make(SuccessResponseBuilder::class)->make();
 
@@ -120,7 +120,7 @@ class BootstrapPackageTest extends IntegrationTestCase
      */
     public function testErrorResponseBuildersAreExtendedWithResponseFormatter()
     {
-        $this->app->instance(ResponseFormatter::class, $formatter = mock(ResponseFormatter::class));
+        $this->app->instance(Formatter::class, $formatter = mock(Formatter::class));
         $formatter->allows('error')->andReturns([]);
         $responseBuilder = $this->app->make(ErrorResponseBuilder::class)->make();
 

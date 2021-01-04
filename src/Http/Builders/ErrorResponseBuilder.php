@@ -24,13 +24,6 @@ class ErrorResponseBuilder extends ResponseBuilder
     protected $response;
 
     /**
-     * Config repository.
-     *
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
-
-    /**
      * Registry class for resolving error messages.
      *
      * @var \Flugg\Responder\Contracts\ErrorMessageRegistry
@@ -51,10 +44,9 @@ class ErrorResponseBuilder extends ResponseBuilder
         Repository $config,
         ErrorMessageRegistry $messageRegistry
     ) {
-        $this->config = $config;
         $this->messageRegistry = $messageRegistry;
 
-        parent::__construct($responseFactory, $container);
+        parent::__construct($responseFactory, $container, $config);
     }
 
     /**
@@ -120,7 +112,6 @@ class ErrorResponseBuilder extends ResponseBuilder
     {
         return Str::snake(Str::replaceLast('Exception', '', class_basename($exception)));
     }
-
 
     /**
      * Format the response data.

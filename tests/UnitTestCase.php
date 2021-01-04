@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Tests;
 
+use Illuminate\Database\Eloquent\Model;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
@@ -23,5 +24,13 @@ abstract class UnitTestCase extends TestCase
         parent::setUp();
 
         Mockery::globalHelpers();
+    }
+}
+
+class ModelWithGetResourceKey extends Model
+{
+    public function getResourceKey()
+    {
+        //
     }
 }

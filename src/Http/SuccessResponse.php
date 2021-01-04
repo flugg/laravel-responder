@@ -4,6 +4,7 @@ namespace Flugg\Responder\Http;
 
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
+use Flugg\Responder\Http\Resources\Resource;
 
 /**
  * Data transfer object class for a success response.
@@ -20,7 +21,7 @@ class SuccessResponse extends Response
     /**
      * Resource attached to the response.
      *
-     * @var \Flugg\Responder\Http\Resource
+     * @var \Flugg\Responder\Http\Resources\Resource
      */
     protected $resource;
 
@@ -41,7 +42,7 @@ class SuccessResponse extends Response
     /**
      * Get the response resource.
      *
-     * @return \Flugg\Responder\Http\Resource
+     * @return \Flugg\Responder\Http\Resources\Resource
      */
     public function resource(): Resource
     {
@@ -71,7 +72,7 @@ class SuccessResponse extends Response
     /**
      * Set the response resource.
      *
-     * @param \Flugg\Responder\Http\Resource $resource
+     * @param \Flugg\Responder\Http\Resources\Resource $resource
      * @return $this
      */
     public function setResource(Resource $resource)
@@ -97,7 +98,7 @@ class SuccessResponse extends Response
     /**
      * Set the cursor paginator attached to the response.
      *
-     * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $cursor
+     * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $cursorPaginator
      * @return $this
      */
     public function setCursorPaginator(CursorPaginator $cursorPaginator)
@@ -108,7 +109,7 @@ class SuccessResponse extends Response
     }
 
     /**
-     * Verify that the status code is valid.
+     * Check if the status code is valid.
      *
      * @param int $status
      * @return bool

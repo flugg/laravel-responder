@@ -3,10 +3,9 @@
 namespace Flugg\Responder;
 
 use Flugg\Responder\Contracts\ErrorMessageRegistry as ErrorMessageRegistryContract;
+use Flugg\Responder\Contracts\Http\Formatter;
 use Flugg\Responder\Contracts\Http\ResponseFactory;
-use Flugg\Responder\Contracts\Http\ResponseFormatter;
 use Flugg\Responder\Contracts\Responder as ResponderContract;
-use Flugg\Responder\ErrorMessageRegistry;
 use Flugg\Responder\Exceptions\Handler;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
@@ -47,7 +46,6 @@ class ResponderServiceProvider extends ServiceProvider
      * Register error message resolver binding with configured error messages.
      *
      * @return void
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerErrorMessageRegistry(): void
     {
@@ -62,7 +60,6 @@ class ResponderServiceProvider extends ServiceProvider
      * Register response factory binding with configured decorators.
      *
      * @return void
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerResponseFactory(): void
     {
@@ -82,17 +79,16 @@ class ResponderServiceProvider extends ServiceProvider
      * Register configured response formatter binding and extend response builders with formatter.
      *
      * @return void
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerResponseFormatter(): void
     {
-        $this->app->singleton(ResponseFormatter::class, function () {
+        $this->app->singleton(Formatter::class, function () {
             return is_null($class = config('responder.formatter')) ? null : $this->app->make($class);
         });
 
         foreach ([SuccessResponseBuilder::class, ErrorResponseBuilder::class] as $class) {
             $this->app->extend($class, function ($responseBuilder) {
-                return $responseBuilder->formatter($this->app->make(ResponseFormatter::class));
+                return $responseBuilder->formatter($this->app->make(Formatter::class));
             });
         }
     }
@@ -101,7 +97,6 @@ class ResponderServiceProvider extends ServiceProvider
      * Register responder service binding.
      *
      * @return void
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerResponderService(): void
     {
@@ -112,7 +107,6 @@ class ResponderServiceProvider extends ServiceProvider
      * Register exception handler by decorating the bound handler.
      *
      * @return void
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function registerExceptionHandler(): void
     {

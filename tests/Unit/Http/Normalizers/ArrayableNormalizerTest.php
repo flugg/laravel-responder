@@ -15,35 +15,19 @@ use Illuminate\Contracts\Support\Arrayable;
 class ArrayableNormalizerTest extends UnitTestCase
 {
     /**
-     * Class being tested.
-     *
-     * @var \Flugg\Responder\Http\Normalizers\ArrayableNormalizer
-     */
-    protected $normalizer;
-
-    /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->normalizer = new ArrayableNormalizer;
-    }
-
-    /**
      * Assert that [normalize] normalizes arrayable to a success response value object.
      */
     public function testNormalizeMethodNormalizesArrayable()
     {
         $arrayable = mock(Arrayable::class);
         $arrayable->allows('toArray')->andReturns($data = ['foo' => 123]);
+        $normalizer = new ArrayableNormalizer($arrayable);
 
-        $result = $this->normalizer->normalize($arrayable);
+        $result = $normalizer->normalize();
 
         $this->assertInstanceOf(SuccessResponse::class, $result);
-        $this->assertSame($data, $result->data());
+        $this->assertEquals(200, $result->status());
+        $this->assertSame($data, $result->resource()->toArray());
+        $this->assertNull($result->resource()->key());
     }
 }

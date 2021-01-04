@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
- * Validator adapter class for Illuminate validators.
+ * Validator adapter class for an Illuminate validator.
  */
 class IlluminateValidatorAdapter implements Validator
 {
@@ -40,18 +40,6 @@ class IlluminateValidatorAdapter implements Validator
     }
 
     /**
-     * Get a list of fields mapped to a list of failed rules.
-     *
-     * @return array
-     */
-    public function errors(): array
-    {
-        return Collection::make($this->validator->failed())->mapWithKeys(function ($rules, $field) {
-            return [$field => array_map([Str::class, 'snake'], array_keys($rules))];
-        })->all();
-    }
-
-    /**
      * Get a list of fields and rules mapped to corresponding messages.
      *
      * @return array
@@ -62,6 +50,18 @@ class IlluminateValidatorAdapter implements Validator
             return Collection::make($rules)->mapWithKeys(function ($rule) use ($rules, $field) {
                 return ["$field.$rule" => $this->validator->errors()->get($field)[array_search($rule, $rules)]];
             });
+        })->all();
+    }
+
+    /**
+     * Get a list of fields mapped to a list of failed rules.
+     *
+     * @return array
+     */
+    public function errors(): array
+    {
+        return Collection::make($this->validator->failed())->mapWithKeys(function ($rules, $field) {
+            return [$field => array_map([Str::class, 'snake'], array_keys($rules))];
         })->all();
     }
 }

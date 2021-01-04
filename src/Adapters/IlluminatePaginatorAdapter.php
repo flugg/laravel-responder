@@ -6,7 +6,7 @@ use Flugg\Responder\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 /**
- * Paginator adapter class for Illuminate paginators.
+ * Paginator adapter class for an Illuminate paginator.
  */
 class IlluminatePaginatorAdapter implements Paginator
 {
