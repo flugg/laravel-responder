@@ -26,7 +26,7 @@
         "illuminate/validation": "^7.0|^8.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^5.0|^6.0"
+        "orchestra/testbench": "^5.0|^6.9"
     },
     "autoload": {
         "psr-4": {
