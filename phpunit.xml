@@ -22,6 +22,9 @@
             <exclude>
                 <directory suffix=".php">./src/Contracts</directory>
                 <directory suffix="Exception.php">./src</directory>
+                <file>./src/Http/Builders/SuccessResponseBuilder.php</directory>
+                <file>./src/Http/Normalizers/ResourceNormalizer.php</directory>
+                <file>./src/Http/Formatters/JsonApiFormatter.php</directory>
             </exclude>
         </whitelist>
     </filter>
