@@ -16,14 +16,6 @@
             <directory>./tests/Integration</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src</directory>
-            <exclude>
-                <file>./src/ResponderServiceProvider.php</file>
-            </exclude>
-        </whitelist>
-    </filter>
     <logging>
         <log type="coverage-html" target="coverage" />
         <log type="coverage-clover" target="coverage/coverage.xml" />
