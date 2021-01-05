@@ -1,10 +1,10 @@
-<p align="center"><img src="https://i.imgur.com/gwzk1eO.png" style="width: 100%; max-width: 560px; height: auto"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/1271812/103592890-8c6ef200-4ef4-11eb-935e-f0a52fed4021.png" width="540px"></p>
 
 <p align="center">
     <a href="https://github.com/flugger/laravel-responder/releases"><img src="https://img.shields.io/github/v/tag/flugger/laravel-responder?label=version" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/flugger/laravel-responder"><img src="https://img.shields.io/packagist/dt/flugger/laravel-responder.svg" alt="Packagist Downloads"></a>
     <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-brightgreen.svg" alt="Software License"></a>
-    <a href='https://github.com/flugg/laravel-responder/actions?query=workflow%3A"Run+tests"'><img src="https://img.shields.io/github/workflow/status/flugg/laravel-responder/run-tests?label=tests" alt="Tests Status"></a>
+    <a href='https://github.com/flugg/laravel-responder/actions?query=workflow%3A"Run+tests"'><img src="https://img.shields.io/github/workflow/status/flugg/laravel-responder/Run%20tests/feature/api-resources?label=tests" alt="Tests Status"></a>
     <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/code-structure/master"><img src="https://img.shields.io/scrutinizer/coverage/g/flugger/laravel-responder.svg" alt="Test Coverage"></a>
     <a href="https://www.codacy.com/gh/flugg/laravel-responder/dashboard"><img src="https://img.shields.io/codacy/grade/1f14a6f74861492d8d8433019182f5a5/feature/api-resources" alt="Code Quality"></a>
 </p>
