@@ -16,6 +16,11 @@
             <directory>./tests/Integration</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
     <logging>
         <log type="coverage-html" target="coverage" />
         <log type="coverage-clover" target="coverage/coverage.xml" />
