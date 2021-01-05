@@ -16,7 +16,11 @@ jobs:
             testbench: 5.*
           - laravel: 8.*
             testbench: 6.*
-          - php: 7.2, 7.3, 7.4
+          - php: 7.2
+            mockery: ^1.3.0
+          - php: 7.3
+            mockery: ^1.3.0
+          - php: 7.4
             mockery: ^1.3.0
           - php: 8.0
             mockery: ^1.4.0
