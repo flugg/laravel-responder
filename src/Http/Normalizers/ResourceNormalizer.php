@@ -55,8 +55,11 @@ class ResourceNormalizer implements Normalizer
     public function normalize(): SuccessResponse
     {
         $response = (new SuccessResponse())
-            ->setResource($this->data instanceof ResourceCollection ? $this->buildCollection($this->data)
-                : $this->buildResource($this->data))
+            ->setResource(
+                $this->data instanceof ResourceCollection
+                    ? $this->buildCollection($this->data)
+                    : $this->buildResource($this->data)
+            )
             ->setStatus($this->data->response()->status())
             ->setHeaders($this->data->response()->headers->all())
             ->setMeta(array_merge_recursive($this->data->with($this->request), $this->data->additional));

@@ -19,6 +19,9 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src</directory>
+            <exclude>
+                <directory suffix=".php">./src/Contracts</directory>
+            </exclude>
         </whitelist>
     </filter>
     <logging>

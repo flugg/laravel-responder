@@ -324,7 +324,7 @@ Assuming there are no results and the default formatter is used, the JSON output
         "currentPage": 1,
         "totalPages": 1,
         "links": [
-            // ...
+            ...
         ]
     }
 }
