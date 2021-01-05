@@ -10,7 +10,7 @@ jobs:
       matrix:
         php: [7.2, 7.3, 7.4, 8.0]
         laravel: [7.*, 8.*]
-        dependency-version: [prefer-stable]
+        dependency-version: [prefer-lowest, prefer-stable]
         include:
           - laravel: 7.*
             testbench: 5.*
@@ -41,9 +41,3 @@ jobs:
 
       - name: Run tests
         run: vendor/bin/phpunit
-
-      - name: Report coverage
-        uses: codacy/codacy-coverage-reporter-action@master
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: coverage/coverage.xml

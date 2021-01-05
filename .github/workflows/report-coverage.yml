@@ -1,0 +1,21 @@
+name: Report coverage
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+
+    name: Report coverage
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Report coverage
+        uses: codacy/codacy-coverage-reporter-action@master
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: coverage/coverage.xml
