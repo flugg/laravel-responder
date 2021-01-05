@@ -96,7 +96,7 @@ class ErrorResponseBuilder extends ResponseBuilder
         $message = $this->messageRegistry->resolve($code) ?: $exception->getMessage();
 
         return tap((new ErrorResponse)->setCode($code)->setMessage($message), function ($response) use ($error) {
-            if ($status = $error['status']) {
+            if ($error && $status = $error['status']) {
                 $response->setStatus($status);
             }
         });

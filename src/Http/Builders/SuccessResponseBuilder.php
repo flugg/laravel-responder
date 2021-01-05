@@ -92,7 +92,7 @@ class SuccessResponseBuilder extends ResponseBuilder
     protected function format(): array
     {
         if (!$this->formatter) {
-            return $this->response->resource();
+            return $this->response->resource()->toArray();
         }
 
         return $this->formatter->success($this->response);

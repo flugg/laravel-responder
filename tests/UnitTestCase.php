@@ -2,7 +2,9 @@
 
 namespace Flugg\Responder\Tests;
 
+use Flugg\Responder\Http\Decorators\ResponseDecorator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
@@ -27,10 +29,20 @@ abstract class UnitTestCase extends TestCase
     }
 }
 
+/** Stub model with a [getResourceKey] method. */
 class ModelWithGetResourceKey extends Model
 {
     public function getResourceKey()
     {
         //
+    }
+}
+
+/** Stub class to increase status code by one. */
+class IncreaseStatusByOneDecorator extends ResponseDecorator
+{
+    public function make(array $data, int $status, array $headers = []): JsonResponse
+    {
+        return parent::make($data, $status + 1, $headers);
     }
 }

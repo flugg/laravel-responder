@@ -142,17 +142,6 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     }
 
     /**
-     * Convert the response to an Illuminate collection.
-     *
-     * @return \Illuminate\Support\Collection
-     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
-     */
-    public function toCollection(): Collection
-    {
-        return Collection::make($this->toArray());
-    }
-
-    /**
      * Convert the response to an array.
      *
      * @return array
@@ -161,6 +150,17 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     public function toArray(): array
     {
         return $this->respond()->getData(true);
+    }
+
+    /**
+     * Convert the response to an Illuminate collection.
+     *
+     * @return \Illuminate\Support\Collection
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     */
+    public function toCollection(): Collection
+    {
+        return Collection::make($this->toArray());
     }
 
     /**
