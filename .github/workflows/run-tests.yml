@@ -16,11 +16,11 @@ jobs:
             testbench: 6.*
           - laravel: 7.*
             testbench: 5.*
+          - php: 8.0
+            mockery: 1.4.*
         exclude:
           - laravel: 8.*
             php: 7.2
-          - php: 8.0
-            dependency-version: prefer-lowest
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} (${{ matrix.dependency-version }})
 
@@ -36,7 +36,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "mockery/mockery:${{ matrix.mockery }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
       - name: Run tests
