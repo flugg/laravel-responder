@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  *
  * @see \Flugg\Responder\Http\Normalizers\ResourceNormalizer
  */
-class ResourceNormalizerTest extends UnitTestCase
+class ResourceNormalizerX extends UnitTestCase
 {
     /**
      * Mock of a request.

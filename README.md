@@ -6,7 +6,7 @@
     <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-brightgreen.svg" alt="Software License"></a>
     <a href='https://github.com/flugg/laravel-responder/actions?query=workflow%3A"Run+tests"'><img src="https://img.shields.io/github/workflow/status/flugg/laravel-responder/run-tests?label=tests" alt="Tests Status"></a>
     <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/code-structure/master"><img src="https://img.shields.io/scrutinizer/coverage/g/flugger/laravel-responder.svg" alt="Test Coverage"></a>
-    <a href="https://scrutinizer-ci.com/g/flugger/laravel-responder/?branch=master?label="><img src="https://img.shields.io/scrutinizer/g/flugger/laravel-responder.svg" alt="Code Quality"></a>
+    <a href="https://www.codacy.com/gh/flugg/laravel-responder/dashboard"><img src="https://img.shields.io/codacy/grade/1f14a6f74861492d8d8433019182f5a5/feature/api-resources" alt="Code Quality"></a>
 </p>
 
 Laravel Responder is a package for building API responses in Laravel and Lumen. It supports [API Resources](https://laravel.com/docs/master/eloquent-resources) and gives you the tools to format both success- and error responses consistently.
