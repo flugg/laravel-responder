@@ -134,6 +134,7 @@ class ResponderServiceProvider extends ServiceProvider
      * Get the correct test response class depending on the version of Laravel.
      *
      * @return string|null
+     * @codeCoverageIgnore
      */
     protected function getTestResponse(): ?string
     {
@@ -150,6 +151,7 @@ class ResponderServiceProvider extends ServiceProvider
      * Bootstrap the application events.
      *
      * @return void
+     * @codeCoverageIgnore
      */
     public function boot(): void
     {
