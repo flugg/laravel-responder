@@ -43,7 +43,7 @@ jobs:
         run: vendor/bin/phpunit
 
       - name: Report coverage
-        if: matrix.php == 7.4 && matrix.laravel == 8.* && dependency-version == 'prefer-stable'
+        if: matrix.php == 7.4
         uses: codacy/codacy-coverage-reporter-action@master
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
