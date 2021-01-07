@@ -1,3 +1,9 @@
+# 3.1.3 (2021-01-07)
+
+### Features
+
+* Add PHP 8.0 support
+
 # 3.1.2 (2020-09-10)
 
 ### Features
