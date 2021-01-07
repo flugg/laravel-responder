@@ -37,7 +37,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->validator = $this->mock(Validator::class);
+        $this->validator = $this->prophesize(Validator::class);
         $this->adapter = new IlluminateValidatorAdapter($this->validator->reveal());
     }
 
@@ -75,7 +75,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
      */
     public function testMessagesMethodReturnsMapOfValidationMessages()
     {
-        $messageBag = $this->mock(MessageBag::class);
+        $messageBag = $this->prophesize(MessageBag::class);
         $messageBag->get('foo')->willReturn([$minMessage = 'Must be larger', $emailMessage = 'Invalid email']);
         $messageBag->get('bar.baz')->willReturn([$requiredMessage = 'Required field']);
         $this->validator->failed()->willReturn([

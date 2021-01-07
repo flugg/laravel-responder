@@ -1,26 +1,24 @@
 name: Run tests
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      COMPOSER_NO_INTERACTION: 1
+
     strategy:
-      fail-fast: true
       matrix:
-        php: [7.2, 7.3, 7.4, 8.0]
-        laravel: [7.*, 8.*]
+        php: [7.3, 7.4, 8.0]
+        laravel: [8.*]
         dependency-version: [prefer-lowest, prefer-stable]
-        include:
-          - laravel: 7.*
-            testbench: 5.*
-          - laravel: 8.*
-            testbench: 6.*
-          - php: 8.0
-            mockery: ^1.4.0
-        exclude:
-          - laravel: 8.*
-            php: 7.2
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} (${{ matrix.dependency-version }})
 
@@ -28,7 +26,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup environment
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -36,8 +34,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "mockery/mockery:${{ matrix.mockery || '^1.3.0' }}" --no-interaction --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-update --no-progress
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-progress
 
       - name: Run tests
         run: vendor/bin/phpunit --coverage-clover=coverage.xml

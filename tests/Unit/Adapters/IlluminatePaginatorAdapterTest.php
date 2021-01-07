@@ -37,7 +37,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->paginator = $this->mock(LengthAwarePaginator::class);
+        $this->paginator = $this->prophesize(LengthAwarePaginator::class);
         $this->adapter = new IlluminatePaginatorAdapter($this->paginator->reveal());
     }
 

@@ -7,10 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Exception\Prediction\PredictionException;
-use Prophecy\Prophecy\ObjectProphecy;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Abstract test case for bootstrapping the environment for the unit suite.
@@ -18,13 +16,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 abstract class UnitTestCase extends TestCase
 {
     use MockeryPHPUnitIntegration;
-
-    /**
-     * An instance of a prophet class.
-     *
-     * @var \Prophecy\Prophet
-     */
-    private $prophet;
+    use ProphecyTrait;
 
     /**
      * This method is called before each test.
@@ -35,38 +27,7 @@ abstract class UnitTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->prophet = new \Prophecy\Prophet;
         Mockery::globalHelpers();
-    }
-
-    /**
-     * This method is called after each test.
-     *
-     * @return void
-     */
-    public function tearDown(): void
-    {
-        try {
-            $this->prophet->checkPredictions();
-        } catch (PredictionException $e) {
-            throw new AssertionFailedError($e->getMessage());
-        } finally {
-            $this->addToAssertionCount(count($this->prophet->getProphecies()));
-        }
-
-        parent::tearDown();
-    }
-
-    /**
-     * Create a new Prophecy mock instance from the given class or interface.
-     *
-     * @param string|null $classOrInterface
-     * @return \Prophecy\Prophecy\ObjectProphecy
-     * @throws \Prophecy\Exception\Doubler\DoubleException
-     */
-    protected function mock(?string $classOrInterface = null): ObjectProphecy
-    {
-        return $this->prophet->prophesize($classOrInterface);
     }
 }
 
