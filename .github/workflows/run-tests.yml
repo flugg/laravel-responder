@@ -3,7 +3,7 @@ name: Run tests
 on:
   push:
     branches:
-      - master
+      - feature/api-resources
   pull_request:
     branches:
       - "*"
