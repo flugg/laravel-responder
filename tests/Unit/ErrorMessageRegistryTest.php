@@ -6,7 +6,7 @@ use Flugg\Responder\ErrorMessageRegistry;
 use Flugg\Responder\Tests\UnitTestCase;
 
 /**
- * Unit tests for the [Flugg\Responder\ErrorMessageRegistry] class.
+ * Unit tests for the [ErrorMessageRegistry] class.
  *
  * @see \Flugg\Responder\ErrorMessageRegistry
  */
@@ -36,7 +36,7 @@ class ErrorMessageRegistryTest extends UnitTestCase
      */
     public function testResolveMethodReturnsMessage()
     {
-        $this->messageRegistry->register($code = 'error_occured', $message = 'An error has occured.');
+        $this->messageRegistry->register($code = 'error_occurred', $message = 'An error has occurred.');
 
         $result = $this->messageRegistry->resolve($code);
 
@@ -48,9 +48,9 @@ class ErrorMessageRegistryTest extends UnitTestCase
      */
     public function testResolveMethodReturnsNull()
     {
-        $message = $this->messageRegistry->resolve('error_occured');
+        $result = $this->messageRegistry->resolve('error_occurred');
 
-        $this->assertNull($message);
+        $this->assertNull($result);
     }
 
     /**
@@ -59,12 +59,13 @@ class ErrorMessageRegistryTest extends UnitTestCase
     public function testRegisterMethodCanSetMultipleMessages()
     {
         $this->messageRegistry->register($messages = [
-            'error_occured' => 'An error has occured.',
-            'another_error_occured' => 'Yet another error occured.',
+            'error_occurred' => 'An error has occurred.',
+            'another_error_occurred' => 'Yet another error occurred.',
         ]);
 
         foreach ($messages as $code => $message) {
             $result = $this->messageRegistry->resolve($code);
+
             $this->assertEquals($message, $result);
         }
     }

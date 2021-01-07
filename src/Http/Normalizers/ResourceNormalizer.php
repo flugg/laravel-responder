@@ -64,7 +64,6 @@ class ResourceNormalizer implements Normalizer
             ->setHeaders($this->data->response()->headers->all())
             ->setMeta(array_merge_recursive($this->data->with($this->request), $this->data->additional));
 
-
         if ($this->data->resource instanceof LengthAwarePaginator) {
             $response->setPaginator(new IlluminatePaginatorAdapter($this->data->resource));
         }

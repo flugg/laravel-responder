@@ -26,7 +26,8 @@
         "illuminate/validation": "^7.0|^8.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^5.0|^6.9"
+        "orchestra/testbench": "^6.0",
+        "phpspec/prophecy-phpunit": "^2.0"
     },
     "autoload": {
         "psr-4": {

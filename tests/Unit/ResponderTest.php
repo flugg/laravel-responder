@@ -8,23 +8,23 @@ use Flugg\Responder\Responder;
 use Flugg\Responder\Tests\UnitTestCase;
 
 /**
- * Unit tests for the [Flugg\Responder\Responder] class.
+ * Unit tests for the [Responder] class.
  *
  * @see \Flugg\Responder\Responder
  */
 class ResponderTest extends UnitTestCase
 {
     /**
-     * Mock of a success response builder.
+     * Mock of a [\Flugg\Responder\Http\Builders\SuccessResponseBuilder] class.
      *
-     * @var \Mockery\MockInterface|\Flugg\Responder\Http\Builders\SuccessResponseBuilder
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $successResponseBuilder;
 
     /**
-     * Mock of an error response builder.
+     * Mock of a [\Flugg\Responder\Http\Builders\ErrorResponseBuilder] class.
      *
-     * @var \Mockery\MockInterface|\Flugg\Responder\Http\Builders\ErrorResponseBuilder
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $errorResponseBuilder;
 
@@ -44,9 +44,9 @@ class ResponderTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->successResponseBuilder = mock(SuccessResponseBuilder::class);
-        $this->errorResponseBuilder = mock(ErrorResponseBuilder::class);
-        $this->responder = new Responder($this->successResponseBuilder, $this->errorResponseBuilder);
+        $this->successResponseBuilder = $this->prophesize(SuccessResponseBuilder::class);
+        $this->errorResponseBuilder = $this->prophesize(ErrorResponseBuilder::class);
+        $this->responder = new Responder($this->successResponseBuilder->reveal(), $this->errorResponseBuilder->reveal());
     }
 
     /**
@@ -54,11 +54,12 @@ class ResponderTest extends UnitTestCase
      */
     public function testSuccessMethodShouldCallOnSuccessResponseBuilder()
     {
-        $this->successResponseBuilder->allows('make')->andReturnSelf();
-        $result = $this->responder->success($data = ['foo' => 1]);
+        $data = ['foo' => 1];
+        $this->successResponseBuilder->make($data)->willReturn($this->successResponseBuilder);
 
-        $this->assertSame($this->successResponseBuilder, $result);
-        $this->successResponseBuilder->shouldHaveReceived('make')->with($data);
+        $result = $this->responder->success($data);
+
+        $this->assertSame($this->successResponseBuilder->reveal(), $result);
     }
 
     /**
@@ -66,10 +67,11 @@ class ResponderTest extends UnitTestCase
      */
     public function testErrorMethodShouldCallOnErrorResponseBuilder()
     {
-        $this->errorResponseBuilder->allows('make')->andReturnSelf();
-        $result = $this->responder->error($error = 'error_occured', $message = 'An error has occured.');
+        [$error, $message] = ['error_occurred', 'An error has occurred.'];
+        $this->errorResponseBuilder->make($error, $message)->willReturn($this->errorResponseBuilder);
 
-        $this->assertSame($this->errorResponseBuilder, $result);
-        $this->errorResponseBuilder->shouldHaveReceived('make')->with($error, $message);
+        $result = $this->responder->error($error, $message);
+
+        $this->assertSame($this->errorResponseBuilder->reveal(), $result);
     }
 }

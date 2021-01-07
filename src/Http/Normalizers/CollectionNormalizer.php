@@ -37,7 +37,8 @@ class CollectionNormalizer extends EloquentNormalizer implements Normalizer
      */
     public function normalize(): SuccessResponse
     {
-        $resource = $this->data instanceof EloquentCollection ? $this->buildCollection($this->data) : new Item($this->data->toArray());
+        $resource = $this->data instanceof EloquentCollection ? $this->buildCollection($this->data)
+            : new Item($this->data->toArray());
 
         return (new SuccessResponse())->setResource($resource);
     }

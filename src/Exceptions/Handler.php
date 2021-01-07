@@ -22,12 +22,14 @@ class Handler implements ExceptionHandler
      * @var \Illuminate\Contracts\Debug\ExceptionHandler
      */
     protected $handler;
+
     /**
      * Config repository.
      *
      * @var \Illuminate\Contracts\Config\Repository
      */
     protected $config;
+
     /**
      * Responder service for making error responses.
      *
@@ -90,6 +92,30 @@ class Handler implements ExceptionHandler
     }
 
     /**
+     * Render an exception to the console.
+     *
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Throwable $e
+     * @return void
+     */
+    public function renderForConsole($output, Throwable $e): void
+    {
+        $this->handler->renderForConsole($output, $e);
+    }
+
+    /**
+     * Forward method calls to the original exception handler.
+     *
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
+     */
+    public function __call(string $method, array $parameters)
+    {
+        return $this->handler->{$method}(...$parameters);
+    }
+
+    /**
      * Check if the exception should be converted to an error response.
      *
      * @param \Throwable $exception
@@ -122,29 +148,5 @@ class Handler implements ExceptionHandler
         }
 
         return $responseBuilder->respond();
-    }
-
-    /**
-     * Render an exception to the console.
-     *
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Throwable $e
-     * @return void
-     */
-    public function renderForConsole($output, Throwable $e): void
-    {
-        $this->handler->renderForConsole($output, $e);
-    }
-
-    /**
-     * Forward method calls to the original exception handler.
-     *
-     * @param string $method
-     * @param array $parameters
-     * @return mixed
-     */
-    public function __call(string $method, array $parameters)
-    {
-        return $this->handler->{$method}(...$parameters);
     }
 }

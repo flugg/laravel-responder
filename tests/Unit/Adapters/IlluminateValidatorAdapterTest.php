@@ -2,22 +2,22 @@
 
 namespace Flugg\Responder\Tests\Unit\Adapters;
 
-use Flugg\Responder\Adapters\IlluminateValidatorAdapter as AdaptersIlluminateValidatorAdapter;
+use Flugg\Responder\Adapters\IlluminateValidatorAdapter;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Contracts\Validation\Validator;
 
 /**
- * Unit tests for the [Flugg\Responder\Adapters\IlluminateValidatorAdapter] class.
+ * Unit tests for the [IlluminateValidatorAdapter] class.
  *
  * @see \Flugg\Responder\Adapters\IlluminateValidatorAdapter
  */
 class IlluminateValidatorAdapterTest extends UnitTestCase
 {
     /**
-     * Mock of an Illuminate validator.
+     * Mock of an [\Illuminate\Contracts\Validation\Validator] class.
      *
-     * @var \Mockery\MockInterface|\Illuminate\Contracts\Validation\Validator
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $validator;
 
@@ -37,8 +37,8 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->validator = mock(Validator::class);
-        $this->adapter = new AdaptersIlluminateValidatorAdapter($this->validator);
+        $this->validator = $this->prophesize(Validator::class);
+        $this->adapter = new IlluminateValidatorAdapter($this->validator->reveal());
     }
 
     /**
@@ -46,7 +46,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
      */
     public function testFailedMethodReturnsFailedFields()
     {
-        $this->validator->allows('failed')->andReturn($failed = [
+        $this->validator->failed()->willReturn($failed = [
             'foo' => [],
             'bar.baz' => [],
         ]);
@@ -59,7 +59,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
      */
     public function testErrorsMethodReturnsMapOfFailedRules()
     {
-        $this->validator->allows('failed')->andReturn([
+        $this->validator->failed()->willReturn([
             'foo' => ['Min' => [10], 'Email' => []],
             'bar.baz' => ['Required' => []],
         ]);
@@ -75,13 +75,14 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
      */
     public function testMessagesMethodReturnsMapOfValidationMessages()
     {
-        $this->validator->allows('failed')->andReturn([
+        $messageBag = $this->prophesize(MessageBag::class);
+        $messageBag->get('foo')->willReturn([$minMessage = 'Must be larger', $emailMessage = 'Invalid email']);
+        $messageBag->get('bar.baz')->willReturn([$requiredMessage = 'Required field']);
+        $this->validator->failed()->willReturn([
             'foo' => ['Min' => [10], 'Email' => []],
             'bar.baz' => ['Required' => []],
         ]);
-        $this->validator->allows('errors')->andReturn($messageBag = mock(MessageBag::class));
-        $messageBag->allows('get')->with('foo')->andReturn([$minMessage = 'Must be larger', $emailMessage = 'Invalid email']);
-        $messageBag->allows('get')->with('bar.baz')->andReturn([$requiredMessage = 'Required field']);
+        $this->validator->errors()->willReturn($messageBag);
 
         $this->assertEquals([
             'foo.min' => $minMessage,

@@ -43,6 +43,23 @@ class ResponderServiceProvider extends ServiceProvider
     }
 
     /**
+     * Bootstrap the application events.
+     *
+     * @return void
+     * @codeCoverageIgnore
+     */
+    public function boot(): void
+    {
+        if ($this->app instanceof Laravel && $this->app->runningInConsole()) {
+            $this->publishes([__DIR__ . '/../config/responder.php' => config_path('responder.php')], 'config');
+        } elseif ($this->app instanceof Lumen) {
+            $this->app->configure('responder');
+        }
+
+        $this->mergeConfigFrom(__DIR__ . '/../config/responder.php', 'responder');
+    }
+
+    /**
      * Register error message resolver binding with configured error messages.
      *
      * @return void
@@ -145,22 +162,5 @@ class ResponderServiceProvider extends ServiceProvider
         }
 
         return null;
-    }
-
-    /**
-     * Bootstrap the application events.
-     *
-     * @return void
-     * @codeCoverageIgnore
-     */
-    public function boot(): void
-    {
-        if ($this->app instanceof Laravel && $this->app->runningInConsole()) {
-            $this->publishes([__DIR__ . '/../config/responder.php' => config_path('responder.php')], 'config');
-        } elseif ($this->app instanceof Lumen) {
-            $this->app->configure('responder');
-        }
-
-        $this->mergeConfigFrom(__DIR__ . '/../config/responder.php', 'responder');
     }
 }

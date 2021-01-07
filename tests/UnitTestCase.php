@@ -8,12 +8,14 @@ use Illuminate\Http\JsonResponse;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * Abstract test case for bootstrapping the environment for the unit suite.
  */
 abstract class UnitTestCase extends TestCase
 {
+    use ProphecyTrait;
     use MockeryPHPUnitIntegration;
 
     /**

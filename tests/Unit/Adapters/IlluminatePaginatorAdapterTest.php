@@ -2,22 +2,22 @@
 
 namespace Flugg\Responder\Tests\Unit\Adapters;
 
-use Flugg\Responder\Adapters\IlluminatePaginatorAdapter as AdaptersIlluminatePaginatorAdapter;
+use Flugg\Responder\Adapters\IlluminatePaginatorAdapter;
 use Flugg\Responder\Tests\UnitTestCase;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
- * Unit tests for the [Flugg\Responder\Adapters\IlluminatePaginatorAdapter] class.
+ * Unit tests for the [IlluminatePaginatorAdapter] class.
  *
  * @see \Flugg\Responder\Adapters\IlluminatePaginatorAdapter
  */
 class IlluminatePaginatorAdapterTest extends UnitTestCase
 {
     /**
-     * Mock of an Illuminate paginator.
+     * Mock of an [\Illuminate\Pagination\LengthAwarePaginator] class.
      *
-     * @var \Mockery\MockInterface|\Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $paginator;
 
@@ -37,8 +37,8 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->paginator = mock(LengthAwarePaginator::class);
-        $this->adapter = new AdaptersIlluminatePaginatorAdapter($this->paginator);
+        $this->paginator = $this->prophesize(LengthAwarePaginator::class);
+        $this->adapter = new IlluminatePaginatorAdapter($this->paginator->reveal());
     }
 
     /**
@@ -46,7 +46,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
      */
     public function testCurrentPageMethodReturnsCurrentPage()
     {
-        $this->paginator->allows('currentPage')->andReturn($page = 2);
+        $this->paginator->currentPage()->willReturn($page = 2);
 
         $this->assertEquals($page, $this->adapter->currentPage());
     }
@@ -56,7 +56,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
      */
     public function testLastPageMethodReturnsLastPage()
     {
-        $this->paginator->allows('lastPage')->andReturn($page = 3);
+        $this->paginator->lastPage()->willReturn($page = 3);
 
         $this->assertEquals($page, $this->adapter->lastPage());
     }
@@ -66,7 +66,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
      */
     public function testTotalMethodReturnsTotalCount()
     {
-        $this->paginator->allows('total')->andReturn($count = 30);
+        $this->paginator->total()->willReturn($count = 30);
 
         $this->assertEquals($count, $this->adapter->total());
     }
@@ -76,8 +76,8 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
      */
     public function testCountMethodReturnsCurrentCount()
     {
-        $items = new Collection(range(0, 9));
-        $this->paginator->allows('items')->andReturn($items);
+        ;
+        $this->paginator->items()->willReturn($items = Collection::make(range(0, 9)));
 
         $this->assertEquals(count($items), $this->adapter->count());
     }
@@ -87,21 +87,18 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
      */
     public function testPerPageMethodReturnsCountPerPage()
     {
-        $this->paginator->allows('perPage')->andReturn($count = 10);
+        $this->paginator->perPage()->willReturn($count = 10);
 
         $this->assertEquals($count, $this->adapter->perPage());
     }
 
     /**
-     * Assert that [url] returns the URL for the page.
+     * Assert that [url] returns the URL for the given page.
      */
     public function testUrlMethodReturnsUrlForPage()
     {
-        $url = 'test.com?page=';
-        $this->paginator->allows('url')->andReturnUsing(function ($page) use ($url) {
-            return $url . $page;
-        });
+        $this->paginator->url($page = 2)->willReturn($url = 'foo');
 
-        $this->assertEquals($url . ($page = 2), $this->adapter->url($page));
+        $this->assertEquals($url, $this->adapter->url($page));
     }
 }
