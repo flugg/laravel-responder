@@ -18,16 +18,15 @@
         }
     ],
     "require": {
-        "php": "^7.2.5|^8.0",
-        "illuminate/contracts": "^7.0|^8.0",
-        "illuminate/database": "^7.0|^8.0",
-        "illuminate/support": "^7.0|^8.0",
-        "illuminate/testing": "^7.0|^8.0",
-        "illuminate/validation": "^7.0|^8.0"
+        "php": "^7.3|^8.0",
+        "illuminate/contracts": "^8.0",
+        "illuminate/database": "^8.0",
+        "illuminate/support": "^8.0",
+        "illuminate/testing": "^8.0",
+        "illuminate/validation": "^8.0"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",
-        "phpspec/prophecy": "^1.0",
         "phpspec/prophecy-phpunit": "^2.0"
     },
     "autoload": {
