@@ -46,8 +46,8 @@ This package used to utilize Fractal, but has since moved over to support API re
 
 This package requires:
 
--   PHP **7.2**+
--   Laravel **6.0**+ or Lumen **6.0**+
+-   PHP **7.3**+
+-   Laravel **8.0**+ or Lumen **8.0**+
 
 # Installation
 

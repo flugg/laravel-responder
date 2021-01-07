@@ -9,16 +9,17 @@ on:
       - "*"
 
 jobs:
-  test:
+  run-tests:
     runs-on: ubuntu-latest
-    env:
-      COMPOSER_NO_INTERACTION: 1
 
     strategy:
       matrix:
         php: [7.3, 7.4, 8.0]
         laravel: [8.*]
         dependency-version: [prefer-lowest, prefer-stable]
+        exclude:
+          - php: 8.0
+            dependency-version: prefer-lowest
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} (${{ matrix.dependency-version }})
 
@@ -34,8 +35,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" --no-update --no-progress
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-progress
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-update --no-progress --no-interaction
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-progress --no-interaction
 
       - name: Run tests
         run: vendor/bin/phpunit --coverage-clover=coverage.xml
