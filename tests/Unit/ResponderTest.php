@@ -44,8 +44,8 @@ class ResponderTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->successResponseBuilder = $this->prophesize(SuccessResponseBuilder::class);
-        $this->errorResponseBuilder = $this->prophesize(ErrorResponseBuilder::class);
+        $this->successResponseBuilder = $this->mock(SuccessResponseBuilder::class);
+        $this->errorResponseBuilder = $this->mock(ErrorResponseBuilder::class);
         $this->responder = new Responder($this->successResponseBuilder->reveal(), $this->errorResponseBuilder->reveal());
     }
 

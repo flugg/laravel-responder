@@ -37,7 +37,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->paginator = $this->prophesize(LengthAwarePaginator::class);
+        $this->paginator = $this->mock(LengthAwarePaginator::class);
         $this->adapter = new IlluminatePaginatorAdapter($this->paginator->reveal());
     }
 
@@ -75,8 +75,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
      * Assert that [count] returns the current count of items.
      */
     public function testCountMethodReturnsCurrentCount()
-    {
-        ;
+    {;
         $this->paginator->items()->willReturn($items = Collection::make(range(0, 9)));
 
         $this->assertEquals(count($items), $this->adapter->count());

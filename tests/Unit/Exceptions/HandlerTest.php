@@ -15,12 +15,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use LogicException;
-use Mockery;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Unit tests for the [Handler] class.
@@ -66,9 +64,9 @@ class HandlerTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->exceptionHandler = $this->prophesize(ExceptionHandler::class);
-        $this->config = $this->prophesize(Repository::class);
-        $this->responder = $this->prophesize(Responder::class);
+        $this->exceptionHandler = $this->mock(ExceptionHandler::class);
+        $this->config = $this->mock(Repository::class);
+        $this->responder = $this->mock(Responder::class);
         $this->handler = new Handler($this->exceptionHandler->reveal(), $this->config->reveal(), $this->responder->reveal());
     }
 
@@ -112,7 +110,7 @@ class HandlerTest extends UnitTestCase
     public function testRenderMethodConvertsValidationExceptionsWithValidator()
     {
         $request = $this->mockRequest();
-        $validator = $this->prophesize(Validator::class);
+        $validator = $this->mock(Validator::class);
         $exception = new ValidationException($validator->reveal());
         $responseBuilder = $this->mockResponseBuilder($response = new JsonResponse());
         $this->responder->error($exception)->willReturn($responseBuilder);
@@ -197,7 +195,7 @@ class HandlerTest extends UnitTestCase
     {
         $this->handler->report($exception = new LogicException());
 
-        $this->exceptionHandler->report($exception)->shouldHaveBeenCalledOnce();
+        $this->exceptionHandler->report($exception)->shouldHaveBeenCalledOnce(1);
     }
 
     /**
@@ -219,7 +217,7 @@ class HandlerTest extends UnitTestCase
      */
     public function testRenderForConsoleMethodIsForwardedToHandler()
     {
-        $output = $this->prophesize(OutputInterface::class);
+        $output = $this->mock(OutputInterface::class);
         $exception = new LogicException();
 
         $this->handler->renderForConsole($output->reveal(), $exception);
@@ -232,7 +230,7 @@ class HandlerTest extends UnitTestCase
      */
     public function testOtherMethodsAreForwardedToHandler()
     {
-        $exceptionHandler = $this->prophesize(ExceptionHandler::class);
+        $exceptionHandler = $this->mock(ExceptionHandler::class);
         $exceptionHandler->willExtend(ClassWithFooMethod::class);
         $exceptionHandler->foo($foo = 1)->willReturn($bar = 2);
         $this->handler = new Handler($exceptionHandler->reveal(), $this->config->reveal(), $this->responder->reveal());
@@ -245,14 +243,14 @@ class HandlerTest extends UnitTestCase
 
     protected function mockRequest($json = true): ObjectProphecy
     {
-        return tap($this->prophesize(Request::class), function ($request) use ($json) {
+        return tap($this->mock(Request::class), function ($request) use ($json) {
             $request->expectsJson()->willReturn($json);
         });
     }
 
     protected function mockResponseBuilder(JsonResponse $response): ObjectProphecy
     {
-        return tap($this->prophesize(ErrorResponseBuilder::class), function ($responseBuilder) use ($response) {
+        return tap($this->mock(ErrorResponseBuilder::class), function ($responseBuilder) use ($response) {
             $responseBuilder->respond()->willReturn($response);
         });
     }
