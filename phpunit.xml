@@ -12,5 +12,9 @@
         <include>
             <directory suffix=".php">./src</directory>
         </include>
+        <exclude>
+            <directory suffix=".php">./src/Contracts</directory>
+            <directory suffix="Exception.php">./src</directory>
+        </exclude>
     </coverage>
 </phpunit>
