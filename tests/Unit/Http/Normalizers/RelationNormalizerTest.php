@@ -45,7 +45,7 @@ class RelationNormalizerTest extends UnitTestCase
                 'getTable' => $key = 'foo',
                 'getRelations' => [],
                 'withoutRelations' => $model,
-                'toArray' => $data = ['foo' => 123]
+                'toArray' => $data = ['foo' => 123],
             ]);
             $normalizer = new RelationNormalizer($relation);
 
@@ -72,7 +72,7 @@ class RelationNormalizerTest extends UnitTestCase
                 'getTable' => 'bar',
                 'getRelations' => [],
                 'withoutRelations' => $model,
-                'toArray' => []
+                'toArray' => [],
             ]);
             $normalizer = new RelationNormalizer($relation);
 
@@ -94,13 +94,13 @@ class RelationNormalizerTest extends UnitTestCase
                 'getTable' => 'foo',
                 'getRelations' => ['bar' => $relatedModel = mock(Model::class)],
                 'withoutRelations' => $model,
-                'toArray' => []
+                'toArray' => [],
             ]);
             $relatedModel->allows([
                 'getTable' => 'bar',
                 'getRelations' => [],
                 'withoutRelations' => $relatedModel,
-                'toArray' => $relatedData = ['bar' => 456]
+                'toArray' => $relatedData = ['bar' => 456],
             ]);
             $normalizer = new RelationNormalizer($relation);
 
@@ -126,18 +126,18 @@ class RelationNormalizerTest extends UnitTestCase
                 'getTable' => 'foo',
                 'getRelations' => ['bar' => $relatedCollection = mock(EloquentCollection::class)],
                 'withoutRelations' => $model,
-                'toArray' => []
+                'toArray' => [],
             ]);
             $relatedCollection->allows([
                 'isEmpty' => false,
                 'all' => [$relatedModel = mock(Model::class)],
-                'first' => $relatedModel
+                'first' => $relatedModel,
             ]);
             $relatedModel->allows([
                 'getTable' => 'bar',
                 'getRelations' => [],
                 'withoutRelations' => $relatedModel,
-                'toArray' => $relatedData = ['bar' => 456]
+                'toArray' => $relatedData = ['bar' => 456],
             ]);
             $normalizer = new RelationNormalizer($relation);
 
@@ -162,19 +162,19 @@ class RelationNormalizerTest extends UnitTestCase
             $collection->allows([
                 'isEmpty' => false,
                 'all' => [$model1 = mock(Model::class), $model2 = mock(Model::class)],
-                'first' => $model1
+                'first' => $model1,
             ]);
             $model1->allows([
                 'getTable' => $key = 'foo',
                 'getRelations' => [],
                 'withoutRelations' => $model1,
-                'toArray' => $data1 = ['foo' => 123]
+                'toArray' => $data1 = ['foo' => 123],
             ]);
             $model2->allows([
                 'getTable' => 'bar',
                 'getRelations' => [],
                 'withoutRelations' => $model2,
-                'toArray' => $data2 = ['bar' => 456]
+                'toArray' => $data2 = ['bar' => 456],
             ]);
             $normalizer = new RelationNormalizer($relation);
 
@@ -203,14 +203,14 @@ class RelationNormalizerTest extends UnitTestCase
             $collection->allows([
                 'isEmpty' => false,
                 'all' => [$model = mock(ModelWithGetResourceKey::class)],
-                'first' => $model
+                'first' => $model,
             ]);
             $model->allows([
                 'getResourceKey' => $key = 'foo',
                 'getTable' => 'bar',
                 'getRelations' => [],
                 'withoutRelations' => $model,
-                'toArray' => []
+                'toArray' => [],
             ]);
             $normalizer = new RelationNormalizer($relation);
 
@@ -251,19 +251,19 @@ class RelationNormalizerTest extends UnitTestCase
             $collection->allows([
                 'isEmpty' => false,
                 'all' => [$model = mock(Model::class)],
-                'first' => $model
+                'first' => $model,
             ]);
             $model->allows([
                 'getTable' => 'foo',
                 'getRelations' => ['bar' => $relatedModel = mock(Model::class)],
                 'withoutRelations' => $model,
-                'toArray' => []
+                'toArray' => [],
             ]);
             $relatedModel->allows([
                 'getTable' => 'bar',
                 'getRelations' => [],
                 'withoutRelations' => $relatedModel,
-                'toArray' => $relatedData = ['bar' => 456]
+                'toArray' => $relatedData = ['bar' => 456],
             ]);
             $normalizer = new RelationNormalizer($relation);
 
@@ -288,24 +288,24 @@ class RelationNormalizerTest extends UnitTestCase
             $collection->allows([
                 'isEmpty' => false,
                 'all' => [$model = mock(Model::class)],
-                'first' => $model
+                'first' => $model,
             ]);
             $model->allows([
                 'getTable' => 'foo',
                 'getRelations' => ['bar' => $relatedCollection = mock(EloquentCollection::class)],
                 'withoutRelations' => $model,
-                'toArray' => []
+                'toArray' => [],
             ]);
             $relatedCollection->allows([
                 'isEmpty' => false,
                 'all' => [$relatedModel = mock(Model::class)],
-                'first' => $relatedModel
+                'first' => $relatedModel,
             ]);
             $relatedModel->allows([
                 'getTable' => 'bar',
                 'getRelations' => [],
                 'withoutRelations' => $relatedModel,
-                'toArray' => $relatedData = ['bar' => 456]
+                'toArray' => $relatedData = ['bar' => 456],
             ]);
             $normalizer = new RelationNormalizer($relation);
 

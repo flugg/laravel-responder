@@ -53,7 +53,7 @@ class SimpleFormatterTest extends UnitTestCase
         $item->allows([
             'data' => $data = ['foo' => 123],
             'key' => $key = 'baz',
-            'relations' => []
+            'relations' => [],
         ]);
 
         $result = $this->formatter->success($response);
@@ -80,15 +80,15 @@ class SimpleFormatterTest extends UnitTestCase
         $collection->allows([
             'items' => [$item1 = mock(Item::class), $item2 = mock(Item::class)],
             'key' => $key = 'baz',
-            'relations' => []
+            'relations' => [],
         ]);
         $item1->allows([
             'data' => $data1 = ['foo' => 123],
-            'relations' => []
+            'relations' => [],
         ]);
         $item2->allows([
             'data' => $data2 = ['bar' => 456],
-            'relations' => []
+            'relations' => [],
         ]);
 
         $result = $this->formatter->success($response);
@@ -115,7 +115,7 @@ class SimpleFormatterTest extends UnitTestCase
         $item->allows([
             'data' => $data = ['foo' => 123],
             'key' => null,
-            'relations' => []
+            'relations' => [],
         ]);
 
         $result = $this->formatter->success($response);
@@ -143,17 +143,17 @@ class SimpleFormatterTest extends UnitTestCase
             'relations' => [
                 $relatedItemKey = 'bar' => $relatedItem = mock(Item::class),
                 $relatedCollectionKey = 'baz' => $relatedCollection = mock(Collection::class),
-            ]
+            ],
         ]);
         $relatedItem->allows([
             'data' => $relatedItemData = ['bar' => 456],
             'relations' => [
                 $nestedItem1Key = 'foo' => $nestedItem1 = mock(Item::class)
-            ]
+            ],
         ]);
         $relatedCollection->allows([
             'items' => [$nestedItem2 = mock(Item::class), $nestedItem3 = mock(Item::class)],
-            'relations' => []
+            'relations' => [],
         ]);
         $nestedItem1->allows(['data' => $nestedItem1Data = ['foo' => 123], 'relations' => []]);
         $nestedItem2->allows(['data' => $nestedItem2Data = ['foo' => 123], 'relations' => []]);
@@ -189,7 +189,7 @@ class SimpleFormatterTest extends UnitTestCase
         $item->allows([
             'data' => $data = ['foo' => 123],
             'key' => $key = 'baz',
-            'relations' => []
+            'relations' => [],
         ]);
         $paginator->allows([
             'count' => $count = 10,
@@ -238,7 +238,7 @@ class SimpleFormatterTest extends UnitTestCase
         $item->allows([
             'data' => $data = ['foo' => 123],
             'key' => $key = 'baz',
-            'relations' => []
+            'relations' => [],
         ]);
         $paginator->allows([
             'count' => $count = 5,
@@ -285,7 +285,7 @@ class SimpleFormatterTest extends UnitTestCase
         $item->allows([
             'data' => $data = ['foo' => 123],
             'key' => $key = 'baz',
-            'relations' => []
+            'relations' => [],
         ]);
         $paginator->allows([
             'current' => $current = 10,
@@ -343,7 +343,7 @@ class SimpleFormatterTest extends UnitTestCase
             'code' => $code = 'error_occured',
             'message' => null,
             'meta' => [],
-            'validator' => null
+            'validator' => null,
         ]);
 
         $result = $this->formatter->error($response);
@@ -365,7 +365,7 @@ class SimpleFormatterTest extends UnitTestCase
             'code' => $code = 'error_occured',
             'message' => null,
             'meta' => [],
-            'validator' => $validator = mock(Validator::class)
+            'validator' => $validator = mock(Validator::class),
         ]);
         $validator->allows([
             'failed' => ['foo', 'bar.baz'],

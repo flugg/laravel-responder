@@ -207,7 +207,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
         $this->responseBuilder->make()->decorate([
             IncreaseStatusByOneDecorator::class,
             IncreaseStatusByOneDecorator::class,
-            IncreaseStatusByOneDecorator::class
+            IncreaseStatusByOneDecorator::class,
         ])->respond();
 
         $this->responseFactory->shouldHaveReceived('make')->with(null, 203, null)->once();

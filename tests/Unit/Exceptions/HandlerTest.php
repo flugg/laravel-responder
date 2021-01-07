@@ -126,7 +126,7 @@ class HandlerTest extends UnitTestCase
     /**
      * Assert that [render] converts exceptions to an error response when status code is 4xx and in debug mode.
      */
-    public function testRenderMethodConverts4xxStatusCodesInDebug()
+    public function testRenderMethodConvertsExceptionsWith4xxStatusCodesInDebugMode()
     {
         $request = $this->mockRequest();
         $exception = new LogicException();
@@ -141,9 +141,9 @@ class HandlerTest extends UnitTestCase
     }
 
     /**
-     * Assert that [render] forwards the exception to the base exception handler when status code is 5xx and in debug mode.
+     * Assert that [render] forwards the exception to the base handler when status code is 5xx and in debug mode.
      */
-    public function testRenderMethodForwards5xxStatusCodeInDebug()
+    public function testRenderMethodIsForwardedWith5xxStatusCodeInDebugMode()
     {
         $request = $this->mockRequest();
         $exception = new LogicException();
@@ -157,9 +157,9 @@ class HandlerTest extends UnitTestCase
     }
 
     /**
-     * Assert that [render] forwards the exception to the base exception handler when it's not a JSON request.
+     * Assert that [render] forwards the exception to the base handler when it's not a JSON request.
      */
-    public function testRenderMethodForwardsWhenNotJson()
+    public function testRenderMethodIsForwardedWhenNotJson()
     {
         $request = $this->mockRequest(false);
         $exception = new LogicException();
@@ -173,9 +173,9 @@ class HandlerTest extends UnitTestCase
     }
 
     /**
-     * Assert that [render] forwards the exception to the base exception handler when given an unconfigured exception.
+     * Assert that [render] forwards the call to the base handler when given a non configured exception.
      */
-    public function testRenderMethodForwardsUnconfiguredExceptions()
+    public function testRenderMethodIsForwardedWithNonConfiguredExceptions()
     {
         $request = $this->mockRequest(false);
         $exception = new LogicException();
@@ -189,9 +189,9 @@ class HandlerTest extends UnitTestCase
     }
 
     /**
-     * Assert that [report] forwards the exception to the base exception handler.
+     * Assert that [report] forwards the call to the base handler.
      */
-    public function testReportMethodForwardsException()
+    public function testReportMethodIsForwarded()
     {
         $this->handler->report($exception = new LogicException());
 
@@ -199,9 +199,9 @@ class HandlerTest extends UnitTestCase
     }
 
     /**
-     * Assert that [shouldReport] forwards the method call to the original handler.
+     * Assert that [report] forwards the call to the base handler.
      */
-    public function testShouldReportMethodIsForwardedToHandler()
+    public function testShouldReportMethodIsForwarded()
     {
         $exception = new LogicException();
         $this->exceptionHandler->shouldReport($exception)->willReturn($shouldReport = true);
@@ -213,9 +213,9 @@ class HandlerTest extends UnitTestCase
     }
 
     /**
-     * Assert that [renderForConsole] forwards the method call to the original handler.
+     * Assert that [renderForConsole] forwards the call to the base handler.
      */
-    public function testRenderForConsoleMethodIsForwardedToHandler()
+    public function testRenderForConsoleMethodIsForwarded()
     {
         $output = $this->prophesize(OutputInterface::class);
         $exception = new LogicException();
@@ -226,12 +226,12 @@ class HandlerTest extends UnitTestCase
     }
 
     /**
-     * Assert that it forwards all other method calls to the original handler.
+     * Assert that the handler forwards all other method calls to the base handler.
      */
-    public function testOtherMethodsAreForwardedToHandler()
+    public function testOtherMethodsAreForwarded()
     {
-        $exceptionHandler = $this->prophesize(ExceptionHandler::class);
-        $exceptionHandler->willExtend(ClassWithFooMethod::class);
+        $exceptionHandler = $this->prophesize(ClassWithFooMethod::class);
+        $exceptionHandler->willImplement(ExceptionHandler::class);
         $exceptionHandler->foo($foo = 1)->willReturn($bar = 2);
         $this->handler = new Handler($exceptionHandler->reveal(), $this->config->reveal(), $this->responder->reveal());
 
@@ -241,6 +241,12 @@ class HandlerTest extends UnitTestCase
         $exceptionHandler->foo($foo)->shouldHaveBeenCalledOnce();
     }
 
+    /**
+     * Make a Prophecy mock of an [\Illuminate\Http\Request] class.
+     *
+     * @param bool $json
+     * @return \Prophecy\Prophecy\ObjectProphecy
+     */
     protected function mockRequest($json = true): ObjectProphecy
     {
         return tap($this->prophesize(Request::class), function ($request) use ($json) {
@@ -248,6 +254,12 @@ class HandlerTest extends UnitTestCase
         });
     }
 
+    /**
+     * Make a Prophecy mock of a [\Flugg\Responder\Http\Builders\ErrorResponseBuilder] class.
+     *
+     * @param \Illuminate\Http\JsonResponse $response
+     * @return \Prophecy\Prophecy\ObjectProphecy
+     */
     protected function mockResponseBuilder(JsonResponse $response): ObjectProphecy
     {
         return tap($this->prophesize(ErrorResponseBuilder::class), function ($responseBuilder) use ($response) {
@@ -256,11 +268,8 @@ class HandlerTest extends UnitTestCase
     }
 }
 
-/** Stub class with a [foo] method. */
-class ClassWithFooMethod
+/** Abstract stub class with a [foo] method. */
+abstract class ClassWithFooMethod
 {
-    public function foo()
-    {
-        //
-    }
+    abstract public function foo($foo);
 }

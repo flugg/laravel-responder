@@ -27,7 +27,7 @@ class ModelNormalizerTest extends UnitTestCase
             'getTable' => $key = 'foo',
             'getRelations' => [],
             'withoutRelations' => $model,
-            'toArray' => $data = ['foo' => 123]
+            'toArray' => $data = ['foo' => 123],
         ]);
         $normalizer = new ModelNormalizer($model);
 
@@ -50,7 +50,7 @@ class ModelNormalizerTest extends UnitTestCase
             'getTable' => 'foo',
             'getRelations' => [],
             'withoutRelations' => $model,
-            'toArray' => []
+            'toArray' => [],
         ]);
         $model->wasRecentlyCreated = 201;
         $normalizer = new ModelNormalizer($model);
@@ -71,7 +71,7 @@ class ModelNormalizerTest extends UnitTestCase
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $model,
-            'toArray' => []
+            'toArray' => [],
         ]);
         $normalizer = new ModelNormalizer($model);
 
@@ -90,13 +90,13 @@ class ModelNormalizerTest extends UnitTestCase
             'getTable' => 'foo',
             'getRelations' => ['bar' => $relation = mock(Model::class)],
             'withoutRelations' => $model,
-            'toArray' => []
+            'toArray' => [],
         ]);
         $relation->allows([
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 456]
+            'toArray' => $relatedData = ['bar' => 456],
         ]);
         $normalizer = new ModelNormalizer($model);
 
@@ -119,18 +119,18 @@ class ModelNormalizerTest extends UnitTestCase
             'getTable' => 'foo',
             'getRelations' => ['bar' => $relatedCollection = mock(EloquentCollection::class)],
             'withoutRelations' => $model,
-            'toArray' => []
+            'toArray' => [],
         ]);
         $relatedCollection->allows([
             'isEmpty' => false,
             'all' => [$relation = mock(Model::class)],
-            'first' => $relation
+            'first' => $relation,
         ]);
         $relation->allows([
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 456]
+            'toArray' => $relatedData = ['bar' => 456],
         ]);
         $normalizer = new ModelNormalizer($model);
 
