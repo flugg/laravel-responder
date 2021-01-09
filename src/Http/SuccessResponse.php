@@ -37,7 +37,7 @@ class SuccessResponse extends Response
      *
      * @var \Flugg\Responder\Contracts\Pagination\CursorPaginator|null
      */
-    protected $cursorPaginator = null;
+    protected $cursor = null;
 
     /**
      * Get the response resource.
@@ -64,9 +64,9 @@ class SuccessResponse extends Response
      *
      * @return \Flugg\Responder\Contracts\Pagination\CursorPaginator|null
      */
-    public function cursorPaginator(): ?CursorPaginator
+    public function cursor(): ?CursorPaginator
     {
-        return $this->cursorPaginator;
+        return $this->cursor;
     }
 
     /**
@@ -98,12 +98,12 @@ class SuccessResponse extends Response
     /**
      * Set the cursor paginator attached to the response.
      *
-     * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $cursorPaginator
+     * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $cursor
      * @return $this
      */
-    public function setCursorPaginator(CursorPaginator $cursorPaginator)
+    public function setCursor(CursorPaginator $cursor)
     {
-        $this->cursorPaginator = $cursorPaginator;
+        $this->cursor = $cursor;
 
         return $this;
     }

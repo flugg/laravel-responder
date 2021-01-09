@@ -5,7 +5,9 @@ namespace Flugg\Responder\Tests\Unit\Http\Builders;
 use Flugg\Responder\Contracts\ErrorMessageRegistry;
 use Flugg\Responder\Contracts\Http\Formatter;
 use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Flugg\Responder\Contracts\Validation\Validator;
 use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
+use Flugg\Responder\Http\ErrorResponse;
 use Flugg\Responder\Tests\IncreaseStatusByOneDecorator;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Contracts\Config\Repository;
@@ -14,39 +16,40 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Prophecy\Argument;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Builders\ErrorResponseBuilder] class.
+ * Unit tests for the [ErrorResponseBuilder] class.
  *
  * @see \Flugg\Responder\Http\Builders\ErrorResponseBuilder
  */
 class ErrorResponseBuilderTest extends UnitTestCase
 {
     /**
-     * Mock of a response factory.
+     * Mock of a [\Flugg\Responder\Contracts\Http\ResponseFactory] interface.
      *
-     * @var \Flugg\Responder\Contracts\Http\ResponseFactory
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $responseFactory;
 
     /**
-     * Mock of a service container.
+     * Mock of an [\Illuminate\Contracts\Container\Container] interface.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $container;
 
     /**
-     * Mock of a config repository.
+     * Mock of an [\Illuminate\Contracts\Config\Repository] class.
      *
-     * @var \Illuminate\Contracts\Config\Repository
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $config;
 
     /**
-     * Mock of an error message registry.
+     * Mock of a [\Flugg\Responder\Contracts\ErrorMessageRegistry] interface.
      *
-     * @var Flugg\Responder\Contracts\ErrorMessageRegistry
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $messageRegistry;
 
@@ -66,59 +69,172 @@ class ErrorResponseBuilderTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->responseFactory = mock(ResponseFactory::class);
-        $this->container = mock(Container::class);
-        $this->config = mock(Repository::class);
-        $this->messageRegistry = mock(ErrorMessageRegistry::class);
-        $this->responseBuilder = new ErrorResponseBuilder($this->responseFactory, $this->container, $this->config, $this->messageRegistry);
+        $this->responseFactory = $this->prophesize(ResponseFactory::class);
+        $this->container = $this->prophesize(Container::class);
+        $this->config = $this->prophesize(Repository::class);
+        $this->messageRegistry = $this->prophesize(ErrorMessageRegistry::class);
+        $this->responseBuilder = new ErrorResponseBuilder(
+            $this->responseFactory->reveal(),
+            $this->container->reveal(),
+            $this->config->reveal(),
+            $this->messageRegistry->reveal()
+        );
     }
 
     /**
-     * Assert that the [respond] method generate a response using [ResponseFactory].
+     * Assert that [get] returns an [ErrorResponse] object.
      */
-    public function testRespondMethodShouldMakeResponse()
+    public function testGetMethodReturnsErrorResponseeObject()
     {
-        $this->responseFactory->allows(['make' => $response = mock(JsonResponse::class)]);
+        $result = $this->responseBuilder->make()->get();
+
+        $this->assertInstanceOf(ErrorResponse::class, $result);
+    }
+
+    /**
+     * Assert that [make] sets error code and message on response object.
+     */
+    public function testMakeMethodSetsErrorCodeAndMessage()
+    {
+        $result = $this->responseBuilder->make($code = 'foo', $message = 'bar');
+
+        $this->assertSame($this->responseBuilder, $result);
+        $this->assertEquals($code, $result->get()->code());
+        $this->assertEquals($message, $result->get()->message());
+    }
+
+    /**
+     * Assert that [make] resolves an error code and message from config when given an exception.
+     */
+    public function testMakeMethodAcceptsAnException()
+    {
+        $this->config->get('responder.exceptions')->willReturn([InvalidArgumentException::class => [
+            'code' => $code = 'foo',
+            'status' => $status = 400,
+        ]]);
+        $this->messageRegistry->resolve($code)->willReturn($message = 'bar');
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+
+        $result = $this->responseBuilder->make(new InvalidArgumentException)->get();
+
+        $this->assertEquals($code, $result->code());
+        $this->assertEquals($message, $result->message());
+        $this->assertEquals($status, $result->status());
+    }
+
+    /**
+     * Assert that [make] resolves an error code from an exception class name when no config is found.
+     */
+    public function testMakeMethodResolvesErrorCodeFromExceptionName()
+    {
+        $code = 'invalid_argument';
+        $this->config->get('responder.exceptions')->willReturn([]);
+        $this->messageRegistry->resolve($code)->willReturn($message = 'bar');
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+
+        $result = $this->responseBuilder->make(new InvalidArgumentException)->get();
+
+        $this->assertEquals($code = 'invalid_argument', $result->code());
+        $this->assertEquals($message, $result->message());
+        $this->assertEquals(500, $result->status());
+    }
+
+    /**
+     * Assert that [make] resolves an error message from an exception when no message is found.
+     */
+    public function testMakeMethodResolvesErrorMessageFromException()
+    {
+        $this->config->get('responder.exceptions')->willReturn([InvalidArgumentException::class => [
+            'code' => $code = 'foo',
+            'status' => $status = 400,
+        ]]);
+        $this->messageRegistry->resolve($code)->willReturn(null);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+
+        $result = $this->responseBuilder->make(new InvalidArgumentException($message = 'bar'))->get();
+
+        $this->assertEquals($code, $result->code());
+        $this->assertEquals($message, $result->message());
+        $this->assertEquals($status, $result->status());
+    }
+
+    /**
+     * Assert that [make] accepts an error code as first argument and exception as second.
+     */
+    public function testMakeMethodAcceptsAnErrorCodeAndException()
+    {
+        $this->config->get('responder.exceptions')->willReturn([InvalidArgumentException::class => [
+            'code' => 'foo',
+            'status' => $status = 400,
+        ]]);
+        $this->messageRegistry->resolve($code = 'baz')->willReturn($message = 'bar');
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+
+        $result = $this->responseBuilder->make($code, new InvalidArgumentException)->get();
+
+        $this->assertEquals($code, $result->code());
+        $this->assertEquals($message, $result->message());
+        $this->assertEquals($status, $result->status());
+    }
+
+    /**
+     * Assert that [validator] sets a validator on response object.
+     */
+    public function testValidatorMethodSetsValidatorOnResponseObject()
+    {
+        $validator = $this->prophesize(Validator::class);
+
+        $result = $this->responseBuilder->make()->validator($validator->reveal())->get();
+
+        $this->assertEquals($validator->reveal(), $result->validator());
+    }
+
+    /**
+     * Assert that [respond] generates a response using [ResponseFactory].
+     */
+    public function testRespondMethodMakesResponse()
+    {
+        $this->responseFactory->make(Argument::cetera())->willReturn($response = new JsonResponse);
 
         $result = $this->responseBuilder->make()->respond($status = 400, $headers = ['x-foo' => 1]);
 
         $this->assertEquals($response, $result);
-        $this->responseFactory->shouldHaveReceived('make')->with(['message' => null], $status, $headers)->once();
+        $this->responseFactory->make(['message' => null], $status, $headers)->shouldHaveBeenCalledOnce();
     }
 
     /**
-     * Assert that the [respond] method defaults to a status code of 500.
+     * Assert that [respond] defaults to a status code of 500.
      */
     public function testRespondMethodDefaultsToStatusCode500()
     {
-        $this->responseFactory->allows(['make' => $response = mock(JsonResponse::class)]);
+        $this->responseFactory->make(Argument::cetera())->willReturn($response = new JsonResponse);
 
         $result = $this->responseBuilder->make()->respond();
 
         $this->assertEquals($response, $result);
-        $this->responseFactory->shouldHaveReceived('make')->with(['message' => null], 500, null)->once();
+        $this->responseFactory->make(['message' => null], 500, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
-     * Assert that the [toResponse] method is an alternative of the [respond] method.
+     * Assert that [toResponse] is an alternative of the [respond] method.
      */
-    public function testToResponseMethodShouldMakeResponse()
+    public function testToResponseMethodMakesResponse()
     {
-        $this->responseFactory->allows(['make' => $response = mock(JsonResponse::class)]);
+        $this->responseFactory->make(Argument::cetera())->willReturn($response = new JsonResponse);
 
         $result = $this->responseBuilder->make()->toResponse(mock(Request::class));
 
         $this->assertEquals($response, $result);
-        $this->responseFactory->shouldHaveReceived('make')->with(['message' => null], 500, null)->once();
+        $this->responseFactory->make(['message' => null], 500, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
-     * Assert that the [toArray] method returns response data as an array.
+     * Assert that [toArray] returns response data as an array.
      */
-    public function testToArrayMethodReturnsResponseAsArray()
+    public function testToArrayMethodReturnsArray()
     {
-        $this->responseFactory->allows(['make' => $response = mock(JsonResponse::class)]);
-        $response->allows(['getData' => $data = ['foo' => 1]]);
+        $response = new JsonResponse($data = ['foo' => 1]);
+        $this->responseFactory->make(Argument::cetera())->willReturn($response);
 
         $result = $this->responseBuilder->make()->toArray();
 
@@ -126,12 +242,12 @@ class ErrorResponseBuilderTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [toCollection] method returns response data as an Illuminate collection.
+     * Assert that [toCollection] returns response data as a collection.
      */
-    public function testToArrayMethodReturnsResponseAsCollection()
+    public function testToCollectionMethodReturnsCollection()
     {
-        $this->responseFactory->allows(['make' => $response = mock(JsonResponse::class)]);
-        $response->allows(['getData' => $data = ['foo' => 1]]);
+        $response = new JsonResponse($data = ['foo' => 1]);
+        $this->responseFactory->make(Argument::cetera())->willReturn($response);
 
         $result = $this->responseBuilder->make()->toCollection();
 
@@ -139,12 +255,12 @@ class ErrorResponseBuilderTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [toJson] method returns response data as a JSON string.
+     * Assert that [toJson] returns response data as a JSON string.
      */
     public function testToJsonMethodReturnsResponseAsJson()
     {
-        $this->responseFactory->allows(['make' => $response = mock(JsonResponse::class)]);
-        $response->allows(['getData' => $data = ['foo' => 1]]);
+        $response = new JsonResponse($data = ['foo' => 1]);
+        $this->responseFactory->make(Argument::cetera())->willReturn($response);
 
         $result = $this->responseBuilder->make()->toJson(JSON_PRETTY_PRINT);
 
@@ -152,12 +268,12 @@ class ErrorResponseBuilderTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [JsonSerialize] method returns response data as an array.
+     * Assert that [JsonSerialize] returns response data as an array.
      */
     public function testJsonSerializeMethodReturnsResponseAsArray()
     {
-        $this->responseFactory->allows(['make' => $response = mock(JsonResponse::class)]);
-        $response->allows(['getData' => $data = ['foo' => 1]]);
+        $response = new JsonResponse($data = ['foo' => 1]);
+        $this->responseFactory->make(Argument::cetera())->willReturn($response);
 
         $result = $this->responseBuilder->make()->toArray();
 
@@ -165,54 +281,52 @@ class ErrorResponseBuilderTest extends UnitTestCase
     }
 
     /**
-     * Assert that the [formatter] method sets a response formatter used to format the response data.
+     * Assert that [formatter] sets response formatter.
      */
     public function testFormatterMethodSetsFormatter()
     {
-        $formatter = mock(Formatter::class);
-        $formatter->allows(['error' => $data = ['foo' => 1]]);
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
+        $formatter = $this->prophesize(Formatter::class);
+        $formatter->error(Argument::any())->willReturn($data = ['foo' => 1]);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
 
-        $this->responseBuilder->make()->formatter($formatter)->respond();
+        $this->responseBuilder->make()->formatter($formatter->reveal())->respond();
 
-        $formatter->shouldHaveReceived('error')->once();
-        $this->responseFactory->shouldHaveReceived('make')->with($data, 500, null)->once();
+        $this->responseFactory->make($data, 500, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
-     * Assert that the [formatter] method resolves a formatter from the service container when given a string.
+     * Assert that [formatter] resolves a formatter from the service container when given a string.
      */
     public function testFormatterMethodResolvesFormatterFromContainer()
     {
-        $this->container->allows(['make' => $formatter = mock(Formatter::class)]);
-        $formatter->allows(['error' => $data = ['foo' => 1]]);
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
+        $formatter = $this->prophesize(Formatter::class);
+        $formatter->error(Argument::any())->willReturn($data = ['foo' => 1]);
+        $this->container->make($binding = 'foo')->willReturn($formatter);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
 
-        $this->responseBuilder->make()->formatter('foo')->respond();
+        $this->responseBuilder->make()->formatter($binding)->respond();
 
-        $formatter->shouldHaveReceived('error')->once();
-        $this->container->shouldHaveReceived('make')->with('foo')->once();
-        $this->responseFactory->shouldHaveReceived('make')->with($data, 500, null)->once();
+        $this->responseFactory->make($data, 500, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
-     * Assert that the [decorate] method decorates the [ResponseFactory].
+     * Assert that [decorate] decorates the response.
      */
     public function testDecorateMethodDecoratesResponseFactory()
     {
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
 
         $this->responseBuilder->make()->decorate(IncreaseStatusByOneDecorator::class)->respond();
 
-        $this->responseFactory->shouldHaveReceived('make')->with(['message' => null], 501, null)->once();
+        $this->responseFactory->make(Argument::any(), 501, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
-     * Assert that the [decorate] method accepts multiple decorators.
+     * Assert that [decorate] accepts multiple decorators.
      */
     public function testDecorateMethodAcceptsMultipleDecorators()
     {
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
 
         $this->responseBuilder->make()->decorate([
             IncreaseStatusByOneDecorator::class,
@@ -220,120 +334,22 @@ class ErrorResponseBuilderTest extends UnitTestCase
             IncreaseStatusByOneDecorator::class,
         ])->respond();
 
-        $this->responseFactory->shouldHaveReceived('make')->with(['message' => null], 503, null)->once();
+        $this->responseFactory->make(Argument::any(), 503, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
-     * Assert that the [meta] method sets metadata attached to the response.
+     * Assert that [meta] sets metadata attached to the response.
      */
     public function testMetaMethodSetsMetadata()
     {
-        $formatter = mock(Formatter::class);
-        $formatter->allows('error')->andReturnUsing(function ($response) {
-            return ['meta' => $response->meta()];
+        $formatter = $this->prophesize(Formatter::class);
+        $formatter->error(Argument::any())->will(function ($args) {
+            return ['meta' => $args[0]->meta()];
         });
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
 
-        $this->responseBuilder->make()->meta($meta = ['foo' => 1])->formatter($formatter)->respond();
+        $this->responseBuilder->make()->meta($meta = ['foo' => 1])->formatter($formatter->reveal())->respond();
 
-        $this->responseFactory->shouldHaveReceived('make')->with(['meta' => $meta], 500, null)->once();
-    }
-
-    /**
-     * Assert that [make] sets error code and message on response.
-     */
-    public function testMakeMethodShouldSetErrorCodeAndMessage()
-    {
-        $formatter = mock(Formatter::class);
-        $formatter->allows('error')->andReturnUsing(function ($response) {
-            return ['code' => $response->code(), 'message' => $response->message()];
-        });
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
-
-        $this->responseBuilder->make($code = 'foo', $message = 'bar')->formatter($formatter)->respond();
-        $this->responseFactory->shouldHaveReceived('make')->with(['code' => $code, 'message' => $message], 500, null)->once();
-    }
-
-    /**
-     * Assert that [make] resolves an error code and message from config when given an exception.
-     */
-    public function testMakeMethodShouldAcceptAnException()
-    {
-        $formatter = mock(Formatter::class);
-        $formatter->allows('error')->andReturnUsing(function ($response) {
-            return ['code' => $response->code(), 'message' => $response->message()];
-        });
-        $this->config->allows(['get' => [InvalidArgumentException::class => [
-            'code' => $code = 'foo',
-            'status' => $status = 400,
-        ]]]);
-        $this->messageRegistry->allows(['resolve' => $message = 'bar']);
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
-
-        $this->responseBuilder->make(new InvalidArgumentException)->formatter($formatter)->respond();
-
-        $this->config->shouldHaveReceived('get')->with('responder.exceptions')->once();
-        $this->messageRegistry->shouldHaveReceived('resolve')->with($code)->once();
-        $this->responseFactory->shouldHaveReceived('make')->with(['code' => $code, 'message' => $message], $status, null)->once();
-    }
-
-    /**
-     * Assert that [make] resolves an error code from an exception class name when no config is found.
-     */
-    public function testMakeMethodShouldResolveErrorCodeFromExceptionName()
-    {
-        $formatter = mock(Formatter::class);
-        $formatter->allows('error')->andReturnUsing(function ($response) {
-            return ['code' => $response->code(), 'message' => $response->message()];
-        });
-        $this->config->allows(['get' => null]);
-        $this->messageRegistry->allows(['resolve' => $message = 'bar']);
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
-
-        $this->responseBuilder->make(new InvalidArgumentException)->formatter($formatter)->respond();
-
-        $this->responseFactory->shouldHaveReceived('make')->with(['code' => 'invalid_argument', 'message' => $message], 500, null)->once();
-    }
-
-    /**
-     * Assert that [make] resolves an error message from an exception when no message is found.
-     */
-    public function testMakeMethodShouldResolveErrorMessageFromException()
-    {
-        $formatter = mock(Formatter::class);
-        $formatter->allows('error')->andReturnUsing(function ($response) {
-            return ['code' => $response->code(), 'message' => $response->message()];
-        });
-        $this->config->allows(['get' => [InvalidArgumentException::class => [
-            'code' => $code = 'foo',
-            'status' => $status = 400,
-        ]]]);
-        $this->messageRegistry->allows(['resolve' => $message = 'bar']);
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
-
-        $this->responseBuilder->make(new InvalidArgumentException($message = 'bar'))->formatter($formatter)->respond();
-
-        $this->responseFactory->shouldHaveReceived('make')->with(['code' => $code, 'message' => $message], $status, null)->once();
-    }
-
-    /**
-     * Assert that [make] accepts an error code as first argument and exception as second.
-     */
-    public function testMakeMethodShouldAcceptAnErrorCodeAndException()
-    {
-        $formatter = mock(Formatter::class);
-        $formatter->allows('error')->andReturnUsing(function ($response) {
-            return ['code' => $response->code(), 'message' => $response->message()];
-        });
-        $this->config->allows(['get' => [InvalidArgumentException::class => [
-            'code' => 'foo',
-            'status' => $status = 400,
-        ]]]);
-        $this->messageRegistry->allows(['resolve' => $message = 'bar']);
-        $this->responseFactory->allows(['make' => mock(JsonResponse::class)]);
-
-        $this->responseBuilder->make($code = 'baz', new InvalidArgumentException)->formatter($formatter)->respond();
-
-        $this->responseFactory->shouldHaveReceived('make')->with(['code' => $code, 'message' => $message], $status, null)->once();
+        $this->responseFactory->make(['meta' => $meta], 500, [])->shouldHaveBeenCalledOnce();
     }
 }

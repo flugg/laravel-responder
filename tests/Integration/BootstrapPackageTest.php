@@ -106,8 +106,7 @@ class BootstrapPackageTest extends IntegrationTestCase
      */
     public function testSuccessResponseBuildersAreExtendedWithResponseFormatter()
     {
-        $this->app->instance(Formatter::class, $formatter = mock(Formatter::class));
-        $formatter->allows('success')->andReturns([]);
+        $formatter = $this->spy(Formatter::class);
         $responseBuilder = $this->app->make(SuccessResponseBuilder::class)->make();
 
         $responseBuilder->respond();
@@ -120,8 +119,7 @@ class BootstrapPackageTest extends IntegrationTestCase
      */
     public function testErrorResponseBuildersAreExtendedWithResponseFormatter()
     {
-        $this->app->instance(Formatter::class, $formatter = mock(Formatter::class));
-        $formatter->allows('error')->andReturns([]);
+        $formatter = $this->spy(Formatter::class);
         $responseBuilder = $this->app->make(ErrorResponseBuilder::class)->make();
 
         $responseBuilder->respond();
@@ -155,9 +153,7 @@ class BootstrapPackageTest extends IntegrationTestCase
      */
     public function testResponseFactoryCanBeDecorated()
     {
-        config()->set('responder.decorators', [
-            PrettyPrintDecorator::class,
-        ]);
+        config()->set('responder.decorators', [PrettyPrintDecorator::class]);
 
         $result = $this->app->make(ResponseFactory::class);
 

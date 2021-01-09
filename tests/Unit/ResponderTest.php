@@ -52,7 +52,7 @@ class ResponderTest extends UnitTestCase
     /**
      * Assert that the parameters sent to [success] is forwarded to the success response builder.
      */
-    public function testSuccessMethodShouldCallOnSuccessResponseBuilder()
+    public function testSuccessMethodForwardsCallToSuccessResponseBuilder()
     {
         $data = ['foo' => 1];
         $this->successResponseBuilder->make($data)->willReturn($this->successResponseBuilder);
@@ -65,7 +65,7 @@ class ResponderTest extends UnitTestCase
     /**
      * Assert that the parameters sent to [error] is forwarded to the error response builder.
      */
-    public function testErrorMethodShouldCallOnErrorResponseBuilder()
+    public function testErrorMethodForwardsCallToErrorResponseBuilder()
     {
         [$error, $message] = ['error_occurred', 'An error has occurred.'];
         $this->errorResponseBuilder->make($error, $message)->willReturn($this->errorResponseBuilder);

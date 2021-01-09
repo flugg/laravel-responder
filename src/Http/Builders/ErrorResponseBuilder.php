@@ -83,6 +83,16 @@ class ErrorResponseBuilder extends ResponseBuilder
     }
 
     /**
+     * Retrieve the response data transer object.
+     *
+     * @return \Flugg\Responder\Http\ErrorResponse
+     */
+    public function get(): ErrorResponse
+    {
+        return $this->response;
+    }
+
+    /**
      * Make an error response from the exception.
      *
      * @param \Exception $exception

@@ -6,7 +6,7 @@ use Flugg\Responder\Tests\IntegrationTestCase;
 use Illuminate\Testing\TestResponse;
 
 /**
- * Integration tests for testing [Illuminate\Testing\TestResponse] macros.
+ * Integration tests for testing macros.
  */
 class TestResponseMacrosTest extends IntegrationTestCase
 {
@@ -30,14 +30,14 @@ class TestResponseMacrosTest extends IntegrationTestCase
     }
 
     /**
-     * Assert that you can call [assertSuccess] on a test response to assert a valid success response.
+     * Assert that [assertSuccess] asserts for a a valid success response.
      */
     public function testMacroAssertsForValidSuccessResponse(): void
     {
         $this->testResponse->allows('getStatusCode')->andReturn(200);
         $this->testResponse->allows('assertExactJson')->andReturn();
 
-        $result = $this->testResponse->assertSuccess($data = ['foo' => 123]);
+        $result = $this->testResponse->assertSuccess($data = ['foo' => 1]);
 
         $this->assertSame($this->testResponse, $result);
         $this->testResponse->shouldHaveReceived('assertExactJson')->with([
@@ -46,7 +46,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
     }
 
     /**
-     * Assert that you can call [assertError] on a test response to assert a valid error response.
+     * Assert that [assertError] asserts for a a valid error response.
      */
     public function testMacroAssertsForValidErrorResponse(): void
     {
@@ -65,8 +65,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
     }
 
     /**
-     * Assert that you can call [assertValidationErrors] on a test response to assert a valid error response
-     * including validation errors.
+     * Assert that [assertValidationErrors] asserts for a a valid error response with validation errors.
      */
     public function testMacroAssertsForValidValidationErrorResponse(): void
     {

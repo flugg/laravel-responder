@@ -5,7 +5,7 @@ namespace Flugg\Responder\Http\Resources;
 use ArrayAccess;
 
 /**
- * Data transfer object class for a resource, representing an entitiy in the response data.
+ * Class for a resource, representing an entitiy in the response data.
  */
 class Item extends Resource implements ArrayAccess
 {

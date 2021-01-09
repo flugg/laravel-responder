@@ -8,16 +8,16 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Factories\LaravelResponseFactory] class.
+ * Unit tests for the [LaravelResponseFactory] class.
  *
  * @see \Flugg\Responder\Http\Factories\LaravelResponseFactory
  */
 class LaravelResponseFactoryTest extends UnitTestCase
 {
     /**
-     * Mock of Laravel's response factory.
+     * Mock of an [\Illuminate\Contracts\Routing\ResponseFactory] class.
      *
-     * @var \Mockery\MockInterface|\Illuminate\Contracts\Routing\ResponseFactory
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $baseResponseFactory;
 
@@ -37,24 +37,20 @@ class LaravelResponseFactoryTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->baseResponseFactory = mock(ResponseFactory::class);
-        $this->baseResponseFactory->allows('json')->andReturnUsing(function ($data, $status, $headers) {
-            return new JsonResponse($data, $status, $headers);
-        });
-
-        $this->responseFactory = new LaravelResponseFactory($this->baseResponseFactory);
+        $this->baseResponseFactory = $this->prophesize(ResponseFactory::class);
+        $this->responseFactory = new LaravelResponseFactory($this->baseResponseFactory->reveal());
     }
 
     /**
      * Assert that [make] creates JSON responses using Laravel's response factory.
      */
-    public function testMakeMethodShouldCreateJsonResponses()
+    public function testMakeMethodCreatesJsonResponses()
     {
-        $response = $this->responseFactory->make($data = ['foo' => 1], $status = 201, $headers = ['x-foo' => 1]);
+        $response = new JsonResponse($data = ['foo' => 1], $status = 201, $headers = ['x-foo' => 1]);
+        $this->baseResponseFactory->json($data, $status, $headers)->willReturn($response);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals($data, $response->getData(true));
-        $this->assertEquals($status, $response->getStatusCode());
-        $this->assertEquals($headers['x-foo'], $response->headers->get('x-foo'));
+        $result = $this->responseFactory->make($data, $status, $headers);
+
+        $this->assertSame($response, $result);
     }
 }

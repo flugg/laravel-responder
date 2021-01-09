@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class ResourceNormalizerTest extends UnitTestCase
 {
     /**
-     * Mock of a request.
+     * Mock of an [\Illuminate\Http\Request] class.
      *
      * @var \Mockery\MockInterface|\Illuminate\Http\Request
      */
@@ -72,12 +72,12 @@ class ResourceNormalizerTest extends UnitTestCase
         $this->resource->allows([
             'resolve' => $data = [1, 2, 3],
             'toArray' => $data,
-            'with' => $meta = ['foo' => ['bar' => 123]]
+            'with' => $meta = ['foo' => ['bar' => 1]],
         ]);
-        $this->resource->additional = $additional = ['foo' => ['baz' => 123]];
+        $this->resource->additional = $additional = ['foo' => ['baz' => 1]];
         $this->response->allows('status')->andReturns($status = 200);
         $this->response->headers = $bag = mock(ResponseHeaderBag::class);
-        $bag->allows('all')->andReturn($headers = ['x-foo' => 123]);
+        $bag->allows('all')->andReturn($headers = ['x-foo' => 1]);
 
         $result = $this->normalizer->normalize($this->resource);
 
@@ -98,16 +98,16 @@ class ResourceNormalizerTest extends UnitTestCase
             'resolve' => [
                 'id' => 1,
                 'foo' => ['id' => 2, 'bar' => [
-                    'bar' => ['id' => 3]
+                    'bar' => ['id' => 3],
                 ]],
-                'baz' => [['id' => 4], ['id' => 5]]
+                'baz' => [['id' => 4], ['id' => 5]],
             ],
             'toArray' => [
                 'id' => 1,
                 'foo' => $fooResource = mock(JsonResource::class),
-                'baz' => $bazResource = mock(ResourceCollection::class)
+                'baz' => $bazResource = mock(ResourceCollection::class),
             ],
-            'with' => []
+            'with' => [],
         ]);
         $fooResource->allows([
             'resolve' => ['id' => 2],
@@ -136,7 +136,7 @@ class ResourceNormalizerTest extends UnitTestCase
     /**
      * Assert that [normalize] throws error when not given an API resource.
      */
-    public function xestNormalizeMethodThrowsErrorOnInvalidArgument()
+    public function xestNormalizeMethodThrowsExceptionOnInvalidArgument()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Data must be instance of ' . JsonResource::class);

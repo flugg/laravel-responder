@@ -36,7 +36,7 @@ class ModelNormalizer extends EloquentNormalizer implements Normalizer
      */
     public function normalize(): SuccessResponse
     {
-        return (new SuccessResponse())
+        return (new SuccessResponse)
             ->setResource($this->buildResource($this->data))
             ->setStatus($this->data->wasRecentlyCreated ? 201 : 200);
     }

@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Tests\Unit\Http;
 
+use Flugg\Responder\Contracts\Pagination\Cursor;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
@@ -10,7 +11,7 @@ use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\SuccessResponse] class.
+ * Unit tests for the [SuccessResponse] class.
  *
  * @see \Flugg\Responder\Http\SuccessResponse
  */
@@ -40,10 +41,12 @@ class SuccessResponseTest extends UnitTestCase
      */
     public function testSetAndGetResource()
     {
-        $result = $this->response->setResource($resource = mock(Resource::class));
+        $resource = $this->prophesize(Resource::class);
+
+        $result = $this->response->setResource($resource->reveal());
 
         $this->assertSame($this->response, $result);
-        $this->assertEquals($resource, $this->response->resource());
+        $this->assertEquals($resource->reveal(), $this->response->resource());
     }
 
     /**
@@ -51,19 +54,23 @@ class SuccessResponseTest extends UnitTestCase
      */
     public function testSetAndGetPaginator()
     {
-        $this->response->setPaginator($paginator = mock(Paginator::class));
+        $paginator = $this->prophesize(Paginator::class);
 
-        $this->assertEquals($paginator, $this->response->paginator());
+        $this->response->setPaginator($paginator->reveal());
+
+        $this->assertEquals($paginator->reveal(), $this->response->paginator());
     }
 
     /**
-     * Assert that [setCursorPaginator] and [cursorPaginator] sets and gets cursor paginator respectively.
+     * Assert that [setCursor] and [cursor] sets and gets cursor paginator respectively.
      */
-    public function testSetAndGetCursorPaginator()
+    public function testSetAndGetCursor()
     {
-        $this->response->setCursorPaginator($paginator = mock(CursorPaginator::class));
+        $paginator = $this->prophesize(CursorPaginator::class);
 
-        $this->assertEquals($paginator, $this->response->cursorPaginator());
+        $this->response->setCursor($paginator->reveal());
+
+        $this->assertEquals($paginator->reveal(), $this->response->cursor());
     }
 
     /**
@@ -87,11 +94,11 @@ class SuccessResponseTest extends UnitTestCase
     }
 
     /**
-     * Assert that [setHeaders] and [headers] sets and gets status codes respectively.
+     * Assert that [setHeaders] and [headers] sets and gets headers respectively.
      */
     public function testSetAndGetHeaders()
     {
-        $this->response->setHeaders($headers = ['x-foo' => 123]);
+        $this->response->setHeaders($headers = ['x-foo' => 1]);
 
         $this->assertEquals($headers, $this->response->headers());
     }
@@ -101,7 +108,7 @@ class SuccessResponseTest extends UnitTestCase
      */
     public function testSetAndGetMeta()
     {
-        $this->response->setMeta($meta = ['foo' => 123]);
+        $this->response->setMeta($meta = ['foo' => 1]);
 
         $this->assertEquals($meta, $this->response->meta());
     }

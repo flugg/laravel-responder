@@ -28,7 +28,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
     {
         $queryBuilder = mock(Builder::class);
         $queryBuilder->allows('get')->andReturns($collection = mock(IlluminateCollection::class));
-        $collection->allows(['toArray' => $data = ['foo' => 123]]);
+        $collection->allows(['toArray' => $data = ['foo' => 1]]);
         $normalizer = new QueryBuilderNormalizer($queryBuilder);
 
         $result = $normalizer->normalize();
@@ -57,13 +57,13 @@ class QueryBuilderNormalizerTest extends UnitTestCase
             'getTable' => $key = 'foo',
             'getRelations' => [],
             'withoutRelations' => $model1,
-            'toArray' => $data1 = ['foo' => 123],
+            'toArray' => $data1 = ['foo' => 1],
         ]);
         $model2->allows([
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $model2,
-            'toArray' => $data2 = ['bar' => 456],
+            'toArray' => $data2 = ['bar' => 2],
         ]);
         $normalizer = new QueryBuilderNormalizer($queryBuilder);
 
@@ -146,7 +146,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 456],
+            'toArray' => $relatedData = ['bar' => 2],
         ]);
         $normalizer = new QueryBuilderNormalizer($queryBuilder);
 
@@ -186,7 +186,7 @@ class QueryBuilderNormalizerTest extends UnitTestCase
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 456],
+            'toArray' => $relatedData = ['bar' => 2],
         ]);
         $normalizer = new QueryBuilderNormalizer($queryBuilder);
 

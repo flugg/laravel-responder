@@ -34,7 +34,7 @@ class SimpleFormatter implements Formatter
 
         if ($paginator = $response->paginator()) {
             $data['pagination'] = $this->paginator($paginator);
-        } elseif ($paginator = $response->cursorPaginator()) {
+        } elseif ($paginator = $response->cursor()) {
             $data['cursor'] = $this->cursor($paginator);
         }
 

@@ -6,17 +6,14 @@ use Exception;
 use Flugg\Responder\Adapters\IlluminateValidatorAdapter;
 use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Exceptions\Handler;
-use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use LogicException;
 use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
@@ -28,21 +25,21 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class HandlerTest extends UnitTestCase
 {
     /**
-     * Mock of an [\Illuminate\Contracts\Debug\ExceptionHandler] class.
+     * Mock of an [\Illuminate\Contracts\Debug\ExceptionHandler] interface.
      *
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $exceptionHandler;
 
     /**
-     * Mock of a [\Illuminate\Contracts\Config\Repository] class.
+     * Mock of a [\Illuminate\Contracts\Config\Repository] interface.
      *
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $config;
 
     /**
-     * Mock of a [\Flugg\Responder\Contracts\Responder] class.
+     * Mock of a [\Flugg\Responder\Contracts\Responder] interface.
      *
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
@@ -77,7 +74,7 @@ class HandlerTest extends UnitTestCase
     {
         $request = $this->mockRequest();
         $exception = new LogicException();
-        $responseBuilder = $this->mockResponseBuilder($response = new JsonResponse());
+        $responseBuilder = $this->mockErrorResponseBuilder($response = new JsonResponse());
         $this->responder->error($exception)->willReturn($responseBuilder);
         $this->config->get('responder.exceptions')->willReturn([LogicException::class => []]);
         $this->config->get('app.debug')->willReturn(false);
@@ -94,7 +91,7 @@ class HandlerTest extends UnitTestCase
     {
         $request = $this->mockRequest();
         $exception = new FileException();
-        $responseBuilder = $this->mockResponseBuilder($response = new JsonResponse());
+        $responseBuilder = $this->mockErrorResponseBuilder($response = new JsonResponse());
         $this->responder->error($exception)->willReturn($responseBuilder);
         $this->config->get('responder.exceptions')->willReturn([Exception::class => []]);
         $this->config->get('app.debug')->willReturn(false);
@@ -112,7 +109,7 @@ class HandlerTest extends UnitTestCase
         $request = $this->mockRequest();
         $validator = $this->prophesize(Validator::class);
         $exception = new ValidationException($validator->reveal());
-        $responseBuilder = $this->mockResponseBuilder($response = new JsonResponse());
+        $responseBuilder = $this->mockErrorResponseBuilder($response = new JsonResponse());
         $this->responder->error($exception)->willReturn($responseBuilder);
         $this->config->get('responder.exceptions')->willReturn([ValidationException::class => []]);
         $this->config->get('app.debug')->willReturn(false);
@@ -130,7 +127,7 @@ class HandlerTest extends UnitTestCase
     {
         $request = $this->mockRequest();
         $exception = new LogicException();
-        $responseBuilder = $this->mockResponseBuilder($response = new JsonResponse());
+        $responseBuilder = $this->mockErrorResponseBuilder($response = new JsonResponse());
         $this->responder->error($exception)->willReturn($responseBuilder);
         $this->config->get('responder.exceptions')->willReturn([LogicException::class => ['status' => 400]]);
         $this->config->get('app.debug')->willReturn(true);
@@ -177,7 +174,7 @@ class HandlerTest extends UnitTestCase
      */
     public function testRenderMethodIsForwardedWithNonConfiguredExceptions()
     {
-        $request = $this->mockRequest(false);
+        $request = $this->mockRequest();
         $exception = new LogicException();
         $this->exceptionHandler->render($request, $exception)->willReturn($response = new JsonResponse());
         $this->config->get('responder.exceptions')->willReturn([]);
@@ -239,32 +236,6 @@ class HandlerTest extends UnitTestCase
 
         $this->assertEquals($bar, $result);
         $exceptionHandler->foo($foo)->shouldHaveBeenCalledOnce();
-    }
-
-    /**
-     * Make a Prophecy mock of an [\Illuminate\Http\Request] class.
-     *
-     * @param bool $json
-     * @return \Prophecy\Prophecy\ObjectProphecy
-     */
-    protected function mockRequest($json = true): ObjectProphecy
-    {
-        return tap($this->prophesize(Request::class), function ($request) use ($json) {
-            $request->expectsJson()->willReturn($json);
-        });
-    }
-
-    /**
-     * Make a Prophecy mock of a [\Flugg\Responder\Http\Builders\ErrorResponseBuilder] class.
-     *
-     * @param \Illuminate\Http\JsonResponse $response
-     * @return \Prophecy\Prophecy\ObjectProphecy
-     */
-    protected function mockResponseBuilder(JsonResponse $response): ObjectProphecy
-    {
-        return tap($this->prophesize(ErrorResponseBuilder::class), function ($responseBuilder) use ($response) {
-            $responseBuilder->respond()->willReturn($response);
-        });
     }
 }
 

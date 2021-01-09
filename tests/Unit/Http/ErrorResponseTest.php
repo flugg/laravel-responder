@@ -8,7 +8,7 @@ use Flugg\Responder\Http\ErrorResponse;
 use Flugg\Responder\Tests\UnitTestCase;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\ErrorResponse] class.
+ * Unit tests for the [ErrorResponse] class.
  *
  * @see \Flugg\Responder\Http\ErrorResponse
  */
@@ -60,9 +60,11 @@ class ErrorResponseTest extends UnitTestCase
      */
     public function testSetAndGetValidator()
     {
-        $this->response->setValidator($validator = mock(Validator::class));
+        $validator = $this->prophesize(Validator::class);
 
-        $this->assertEquals($validator, $this->response->validator());
+        $this->response->setValidator($validator->reveal());
+
+        $this->assertEquals($validator->reveal(), $this->response->validator());
     }
 
     /**
@@ -90,7 +92,7 @@ class ErrorResponseTest extends UnitTestCase
      */
     public function testSetAndGetHeaders()
     {
-        $this->response->setHeaders($headers = ['x-foo' => 123]);
+        $this->response->setHeaders($headers = ['x-foo' => 1]);
 
         $this->assertEquals($headers, $this->response->headers());
     }
@@ -100,7 +102,7 @@ class ErrorResponseTest extends UnitTestCase
      */
     public function testSetAndGetMeta()
     {
-        $this->response->setMeta($meta = ['foo' => 123]);
+        $this->response->setMeta($meta = ['foo' => 1]);
 
         $this->assertEquals($meta, $this->response->meta());
     }

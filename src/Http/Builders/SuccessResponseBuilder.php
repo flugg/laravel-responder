@@ -30,7 +30,7 @@ class SuccessResponseBuilder extends ResponseBuilder
     public function make($data = [])
     {
         if (is_array($data)) {
-            $this->response = (new SuccessResponse())->setResource(new Item($data));
+            $this->response = (new SuccessResponse)->setResource(new Item($data));
         } elseif (is_object($data)) {
             $this->response = $this->normalizeData($data);
         } else {
@@ -61,9 +61,19 @@ class SuccessResponseBuilder extends ResponseBuilder
      */
     public function cursor(CursorPaginator $paginator)
     {
-        $this->response->setCursorPaginator($paginator);
+        $this->response->setCursor($paginator);
 
         return $this;
+    }
+
+    /**
+     * Retrieve the response data transer object.
+     *
+     * @return \Flugg\Responder\Http\SuccessResponse
+     */
+    public function get(): SuccessResponse
+    {
+        return $this->response;
     }
 
     /**

@@ -25,7 +25,7 @@ class CollectionNormalizerTest extends UnitTestCase
     public function testNormalizeMethodNormalizesCollection()
     {
         $collection = mock(IlluminateCollection::class);
-        $collection->allows('toArray')->andReturns($data = ['foo' => 123]);
+        $collection->allows('toArray')->andReturns($data = ['foo' => 1]);
         $normalizer = new CollectionNormalizer($collection);
 
         $result = $normalizer->normalize();
@@ -52,13 +52,13 @@ class CollectionNormalizerTest extends UnitTestCase
             'getTable' => $key = 'foo',
             'getRelations' => [],
             'withoutRelations' => $model1,
-            'toArray' => $data1 = ['foo' => 123],
+            'toArray' => $data1 = ['foo' => 1],
         ]);
         $model2->allows([
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $model2,
-            'toArray' => $data2 = ['bar' => 456],
+            'toArray' => $data2 = ['bar' => 2],
         ]);
         $normalizer = new CollectionNormalizer($collection);
 
@@ -138,7 +138,7 @@ class CollectionNormalizerTest extends UnitTestCase
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 456],
+            'toArray' => $relatedData = ['bar' => 2],
         ]);
         $normalizer = new CollectionNormalizer($collection);
 
@@ -177,7 +177,7 @@ class CollectionNormalizerTest extends UnitTestCase
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 456],
+            'toArray' => $relatedData = ['bar' => 2],
         ]);
         $normalizer = new CollectionNormalizer($collection);
 

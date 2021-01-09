@@ -3,6 +3,7 @@
 namespace Flugg\Responder\Http\Builders;
 
 use Flugg\Responder\Contracts\Http\ResponseFactory;
+use Flugg\Responder\Http\Response;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
@@ -185,6 +186,13 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     {
         return $this->toArray();
     }
+
+    /**
+     * Retrieve the response data transer object.
+     *
+     * @return \Flugg\Responder\Http\Response
+     */
+    abstract public function get(): Response;
 
     /**
      * Format the response data.

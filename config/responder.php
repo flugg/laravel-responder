@@ -30,7 +30,7 @@ return [
     |
     | Response decorators are used to decorate both your success- and error
     | responses and are typically used for adding headers or editing the
-    | final output. These are exceuted after the response formatters.
+    | final output. These are executed after the response formatters.
     |
     */
 

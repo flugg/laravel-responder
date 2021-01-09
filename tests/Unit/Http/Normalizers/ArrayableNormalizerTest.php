@@ -20,7 +20,7 @@ class ArrayableNormalizerTest extends UnitTestCase
     public function testNormalizeMethodNormalizesArrayable()
     {
         $arrayable = mock(Arrayable::class);
-        $arrayable->allows('toArray')->andReturns($data = ['foo' => 123]);
+        $arrayable->allows('toArray')->andReturns($data = ['foo' => 1]);
         $normalizer = new ArrayableNormalizer($arrayable);
 
         $result = $normalizer->normalize();

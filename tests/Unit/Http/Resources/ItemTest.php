@@ -7,7 +7,7 @@ use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Tests\UnitTestCase;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Resources\Item] class.
+ * Unit tests for the [Item] class.
  *
  * @see \Flugg\Responder\Http\Resources\Item
  */
@@ -33,6 +33,18 @@ class ItemTest extends UnitTestCase
     }
 
     /**
+     * Assert that the constructor sets data and resource key.
+     */
+    public function testInitializePropertiesInConstructor()
+    {
+        $resource = new Item($data = ['foo' => 1], $key = 'bar', $relations = ['baz' => new Item()]);
+
+        $this->assertEquals($data, $resource->data());
+        $this->assertEquals($key, $resource->key());
+        $this->assertEquals($relations, $resource->relations());
+    }
+
+    /**
      * Assert that [setKey] and [key] sets and gets resource key respectively.
      */
     public function testSetAndGetKey()
@@ -48,7 +60,7 @@ class ItemTest extends UnitTestCase
      */
     public function testSetAndGetData()
     {
-        $result = $this->item->setData($data = ['foo' => 123]);
+        $result = $this->item->setData($data = ['foo' => 1]);
 
         $this->assertSame($this->item, $result);
         $this->assertEquals($data, $this->item->data());
@@ -65,23 +77,11 @@ class ItemTest extends UnitTestCase
     }
 
     /**
-     * Assert that the constructor sets data and resource key.
-     */
-    public function testInitializePropertiesInConstructor()
-    {
-        $resource = new Item($data = ['foo' => 123], $key = 'foo', $relations = ['foo' => new Item()]);
-
-        $this->assertEquals($data, $resource->data());
-        $this->assertEquals($key, $resource->key());
-        $this->assertEquals($relations, $resource->relations());
-    }
-
-    /**
      * Assert that [toArray] returns the data as an array.
      */
     public function testToArrayMethodReturnsData()
     {
-        $this->item->setData($data = ['foo' => 123]);
+        $this->item->setData($data = ['foo' => 1]);
 
         $this->assertEquals($data, $this->item->toArray());
     }
@@ -91,17 +91,17 @@ class ItemTest extends UnitTestCase
      */
     public function testArrayAccessMethodsAccessesData()
     {
-        $this->item->setData(['foo' => 123]);
+        $this->item->setData(['foo' => 1]);
 
         $this->assertTrue(isset($this->item['foo']));
         $this->assertFalse(isset($this->item['bar']));
-        $this->assertEquals(123, $this->item['foo']);
+        $this->assertEquals(1, $this->item['foo']);
 
         unset($this->item['foo']);
-        $this->item['bar'] = 456;
+        $this->item['bar'] = 2;
 
         $this->assertFalse(isset($this->item['foo']));
         $this->assertTrue(isset($this->item['bar']));
-        $this->assertEquals(456, $this->item['bar']);
+        $this->assertEquals(2, $this->item['bar']);
     }
 }

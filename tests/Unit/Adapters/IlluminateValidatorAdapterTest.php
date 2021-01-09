@@ -15,7 +15,7 @@ use Illuminate\Contracts\Validation\Validator;
 class IlluminateValidatorAdapterTest extends UnitTestCase
 {
     /**
-     * Mock of an [\Illuminate\Contracts\Validation\Validator] class.
+     * Mock of an [\Illuminate\Contracts\Validation\Validator] interface.
      *
      * @var \Prophecy\Prophecy\ObjectProphecy
      */

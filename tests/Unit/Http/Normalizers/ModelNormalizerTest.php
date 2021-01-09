@@ -27,7 +27,7 @@ class ModelNormalizerTest extends UnitTestCase
             'getTable' => $key = 'foo',
             'getRelations' => [],
             'withoutRelations' => $model,
-            'toArray' => $data = ['foo' => 123],
+            'toArray' => $data = ['foo' => 1],
         ]);
         $normalizer = new ModelNormalizer($model);
 
@@ -96,7 +96,7 @@ class ModelNormalizerTest extends UnitTestCase
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 456],
+            'toArray' => $relatedData = ['bar' => 2],
         ]);
         $normalizer = new ModelNormalizer($model);
 
@@ -130,7 +130,7 @@ class ModelNormalizerTest extends UnitTestCase
             'getTable' => 'bar',
             'getRelations' => [],
             'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 456],
+            'toArray' => $relatedData = ['bar' => 2],
         ]);
         $normalizer = new ModelNormalizer($model);
 

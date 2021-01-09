@@ -17,7 +17,7 @@ class LumenResponseFactoryTest extends UnitTestCase
     /**
      * Mock of Lumen's response factory.
      *
-     * @var \Mockery\MockInterface|ResponseFactory
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $baseResponseFactory;
 
@@ -37,24 +37,20 @@ class LumenResponseFactoryTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->baseResponseFactory = mock(ResponseFactory::class);
-        $this->baseResponseFactory->allows('json')->andReturnUsing(function ($data, $status, $headers) {
-            return new JsonResponse($data, $status, $headers);
-        });
-
-        $this->responseFactory = new LumenResponseFactory($this->baseResponseFactory);
+        $this->baseResponseFactory = $this->prophesize(ResponseFactory::class);
+        $this->responseFactory = new LumenResponseFactory($this->baseResponseFactory->reveal());
     }
 
     /**
      * Assert that [make] creates JSON responses using Lumen's response factory.
      */
-    public function testMakeMethodShouldCreateJsonResponses()
+    public function testMakeMethodCreatesJsonResponses()
     {
-        $response = $this->responseFactory->make($data = ['foo' => 1], $status = 201, $headers = ['x-foo' => 1]);
+        $response = new JsonResponse($data = ['foo' => 1], $status = 201, $headers = ['x-foo' => 1]);
+        $this->baseResponseFactory->json($data, $status, $headers)->willReturn($response);
 
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals($data, $response->getData(true));
-        $this->assertEquals($status, $response->getStatusCode());
-        $this->assertEquals($headers['x-foo'], $response->headers->get('x-foo'));
+        $result = $this->responseFactory->make($data, $status, $headers);
+
+        $this->assertSame($response, $result);
     }
 }

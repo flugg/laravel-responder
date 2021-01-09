@@ -7,7 +7,7 @@ use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Tests\UnitTestCase;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Resources\Collection] class.
+ * Unit tests for the [Collection] class.
  *
  * @see \Flugg\Responder\Http\Resources\Collection
  */
@@ -33,6 +33,17 @@ class CollectionTest extends UnitTestCase
     }
 
     /**
+     * Assert that the constructor sets data and resource key.
+     */
+    public function testInitializePropertiesInConstructor()
+    {
+        $collection = new Collection($items = ['foo' => 1], $key = 'foo');
+
+        $this->assertEquals($items, $collection->items());
+        $this->assertEquals($key, $collection->key());
+    }
+
+    /**
      * Assert that [setKey] and [key] sets and gets resource key respectively.
      */
     public function testSetAndGetKey()
@@ -44,7 +55,7 @@ class CollectionTest extends UnitTestCase
     }
 
     /**
-     * Assert that [setItems] and [items] sets and gets resource items respectively.
+     * Assert that [setItems] and [items] sets and gets colletion items respectively.
      */
     public function testSetAndGetItems()
     {
@@ -52,17 +63,6 @@ class CollectionTest extends UnitTestCase
 
         $this->assertSame($this->collection, $result);
         $this->assertEquals($items, $this->collection->items());
-    }
-
-    /**
-     * Assert that the constructor sets data and resource key.
-     */
-    public function testInitializePropertiesInConstructor()
-    {
-        $collection = new Collection($items = ['foo' => 123], $key = 'foo');
-
-        $this->assertEquals($items, $collection->items());
-        $this->assertEquals($key, $collection->key());
     }
 
     /**

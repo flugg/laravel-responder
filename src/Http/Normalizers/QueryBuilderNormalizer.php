@@ -40,6 +40,6 @@ class QueryBuilderNormalizer extends EloquentNormalizer implements Normalizer
             ? $this->buildCollection($this->data->get())
             : new Item($this->data->get()->toArray());
 
-        return (new SuccessResponse())->setResource($resource);
+        return (new SuccessResponse)->setResource($resource);
     }
 }

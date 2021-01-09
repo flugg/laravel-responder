@@ -54,7 +54,7 @@ class ResourceNormalizer implements Normalizer
      */
     public function normalize(): SuccessResponse
     {
-        $response = (new SuccessResponse())
+        $response = (new SuccessResponse)
             ->setResource(
                 $this->data instanceof ResourceCollection
                     ? $this->buildCollection($this->data)

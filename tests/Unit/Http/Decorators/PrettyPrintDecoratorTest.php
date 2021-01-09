@@ -8,16 +8,16 @@ use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Http\JsonResponse;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Decorators\PrettyPrintDecorator] class.
+ * Unit tests for the [PrettyPrintDecorator] class.
  *
  * @see \Flugg\Responder\Http\Decorators\PrettyPrintDecorator
  */
 class PrettyPrintDecoratorTest extends UnitTestCase
 {
     /**
-     * Mock of a response factory.
+     * Mock of a [\Flugg\Responder\Contracts\Http\ResponseFactory] interface.
      *
-     * @var \Mockery\MockInterface|\Flugg\Responder\Contracts\Http\ResponseFactory
+     * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $responseFactory;
 
@@ -37,12 +37,8 @@ class PrettyPrintDecoratorTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->responseFactory = mock(ResponseFactory::class);
-        $this->responseDecorator = new PrettyPrintDecorator($this->responseFactory);
-
-        $this->responseFactory->allows('make')->andReturnUsing(function ($data, $status, $headers) {
-            return new JsonResponse($data, $status, $headers);
-        });
+        $this->responseFactory = $this->prophesize(ResponseFactory::class);
+        $this->responseDecorator = new PrettyPrintDecorator($this->responseFactory->reveal());
     }
 
     /**
@@ -50,7 +46,11 @@ class PrettyPrintDecoratorTest extends UnitTestCase
      */
     public function testMakeMethodPrettifiesJson()
     {
-        $response = $this->responseDecorator->make($data = ['foo' => ['bar', 'baz' => 1]], 200);
+        $this->responseFactory->make($data = ['foo' => ['bar', 'baz' => 1]], $status = 200, [])->will(function ($args) {
+            return new JsonResponse($args[0]);
+        });
+
+        $response = $this->responseDecorator->make($data, $status);
 
         $this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), $response->getContent());
     }

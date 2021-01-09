@@ -36,7 +36,7 @@ class PaginatorNormalizer extends EloquentNormalizer implements Normalizer
      */
     public function normalize(): SuccessResponse
     {
-        return (new SuccessResponse())
+        return (new SuccessResponse)
             ->setResource($this->buildCollection($this->data->getCollection()))
             ->setPaginator(new IlluminatePaginatorAdapter($this->data));
     }

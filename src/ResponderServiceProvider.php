@@ -16,7 +16,6 @@ use Flugg\Responder\Testing\AssertSuccessMacro;
 use Flugg\Responder\Testing\AssertValidationErrorsMacro;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Application as Laravel;
-use Illuminate\Foundation\Testing\TestResponse as LegacyTestResponse;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Testing\TestResponse;
 use Laravel\Lumen\Application as Lumen;
@@ -140,27 +139,8 @@ class ResponderServiceProvider extends ServiceProvider
      */
     protected function registerTestingMacros(): void
     {
-        if ($testResponse = $this->getTestResponse()) {
-            $testResponse::macro('assertSuccess', $this->app->make(AssertSuccessMacro::class)());
-            $testResponse::macro('assertError', $this->app->make(AssertErrorMacro::class)());
-            $testResponse::macro('assertValidationErrors', $this->app->make(AssertValidationErrorsMacro::class)());
-        }
-    }
-
-    /**
-     * Get the correct test response class depending on the version of Laravel.
-     *
-     * @return string|null
-     * @codeCoverageIgnore
-     */
-    protected function getTestResponse(): ?string
-    {
-        if (class_exists(TestResponse::class)) {
-            return TestResponse::class;
-        } elseif (class_exists(LegacyTestResponse::class)) {
-            return LegacyTestResponse::class;
-        }
-
-        return null;
+        TestResponse::macro('assertSuccess', $this->app->make(AssertSuccessMacro::class)());
+        TestResponse::macro('assertError', $this->app->make(AssertErrorMacro::class)());
+        TestResponse::macro('assertValidationErrors', $this->app->make(AssertValidationErrorsMacro::class)());
     }
 }

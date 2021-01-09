@@ -11,9 +11,10 @@ use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Formatters\SimpleFormatter] class.
+ * Unit tests for the [SimpleFormatter] class.
  *
  * @see \Flugg\Responder\Http\Formatters\SimpleFormatter
  */
@@ -39,65 +40,36 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that [success] formats success responses where the resource is an resource item.
+     * Assert that [success] formats success responses with an item resource.
      */
     public function testSuccessMethodFormatsSuccessResponsesWithItem()
     {
-        $response = mock(SuccessResponse::class);
-        $response->allows([
-            'resource' => $item = mock(Item::class),
-            'meta' => $meta = ['bar' => 456],
-            'paginator' => null,
-            'cursorPaginator' => null,
-        ]);
-        $item->allows([
-            'data' => $data = ['foo' => 123],
-            'key' => $key = 'baz',
-            'relations' => [],
-        ]);
+        $item = $this->mockItem($data = ['foo' => 1], $key = 'baz');
+        $response = $this->mockSuccessResponse($item, $meta = ['bar' => 2]);
 
-        $result = $this->formatter->success($response);
+        $result = $this->formatter->success($response->reveal());
 
         $this->assertEquals(array_merge([
             $key => $data,
         ], $meta), $result);
-        $response->shouldHaveReceived('resource');
-        $response->shouldHaveReceived('meta');
     }
 
     /**
-     * Assert that [success] formats success responses where the resource is a resource collection.
+     * Assert that [success] formats success responses with a resource collection.
      */
     public function testSuccessMethodFormatsSuccessResponsesWithCollection()
     {
-        $response = mock(SuccessResponse::class);
-        $response->allows([
-            'resource' => $collection = mock(Collection::class),
-            'meta' => $meta = ['bar' => 456],
-            'paginator' => null,
-            'cursorPaginator' => null,
-        ]);
-        $collection->allows([
-            'items' => [$item1 = mock(Item::class), $item2 = mock(Item::class)],
-            'key' => $key = 'baz',
-            'relations' => [],
-        ]);
-        $item1->allows([
-            'data' => $data1 = ['foo' => 123],
-            'relations' => [],
-        ]);
-        $item2->allows([
-            'data' => $data2 = ['bar' => 456],
-            'relations' => [],
-        ]);
+        $collection = $this->mockCollection([
+            $this->mockItem($data1 = ['foo' => 1]),
+            $this->mockItem($data2 = ['bar' => 2]),
+        ], $key = 'baz');
+        $response = $this->mockSuccessResponse($collection, $meta = ['bar' => 2]);
 
-        $result = $this->formatter->success($response);
+        $result = $this->formatter->success($response->reveal());
 
         $this->assertEquals(array_merge([
             $key => [$data1, $data2],
         ], $meta), $result);
-        $response->shouldHaveReceived('resource');
-        $response->shouldHaveReceived('meta');
     }
 
     /**
@@ -105,20 +77,10 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodWrapperDefaultsToData()
     {
-        $response = mock(SuccessResponse::class);
-        $response->allows([
-            'resource' => $item = mock(Item::class),
-            'meta' => $meta = ['bar' => 456],
-            'paginator' => null,
-            'cursorPaginator' => null,
-        ]);
-        $item->allows([
-            'data' => $data = ['foo' => 123],
-            'key' => null,
-            'relations' => [],
-        ]);
+        $item = $this->mockItem($data = ['foo' => 1]);
+        $response = $this->mockSuccessResponse($item, $meta = ['bar' => 2]);
 
-        $result = $this->formatter->success($response);
+        $result = $this->formatter->success($response->reveal());
 
         $this->assertEquals(array_merge([
             'data' => $data,
@@ -130,45 +92,25 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodFormatsRelations()
     {
-        $response = mock(SuccessResponse::class);
-        $response->allows([
-            'resource' => $item = mock(Item::class),
-            'meta' => $meta = ['bar' => 456],
-            'paginator' => null,
-            'cursorPaginator' => null,
+        $item = $this->mockItem($data = ['foo' => 1], null, [
+            'foo' => $this->mockItem($relatedItemData = ['foo' => 1], null, [
+                'bar' => $this->mockItem($nestedItemData = ['bar' => 2])
+            ]),
+            'bar' => $this->mockCollection([
+                'baz' => $this->mockItem($collectionItemData = ['baz' => 3])
+            ]),
         ]);
-        $item->allows([
-            'data' => $data = ['foo' => 123],
-            'key' => null,
-            'relations' => [
-                $relatedItemKey = 'bar' => $relatedItem = mock(Item::class),
-                $relatedCollectionKey = 'baz' => $relatedCollection = mock(Collection::class),
-            ],
-        ]);
-        $relatedItem->allows([
-            'data' => $relatedItemData = ['bar' => 456],
-            'relations' => [
-                $nestedItem1Key = 'foo' => $nestedItem1 = mock(Item::class)
-            ],
-        ]);
-        $relatedCollection->allows([
-            'items' => [$nestedItem2 = mock(Item::class), $nestedItem3 = mock(Item::class)],
-            'relations' => [],
-        ]);
-        $nestedItem1->allows(['data' => $nestedItem1Data = ['foo' => 123], 'relations' => []]);
-        $nestedItem2->allows(['data' => $nestedItem2Data = ['foo' => 123], 'relations' => []]);
-        $nestedItem3->allows(['data' => $nestedItem3Data = ['bar' => 456], 'relations' => []]);
+        $response = $this->mockSuccessResponse($item, $meta = ['bar' => 2]);
 
-        $result = $this->formatter->success($response);
+        $result = $this->formatter->success($response->reveal());
 
         $this->assertEquals(array_merge([
             'data' => array_merge($data, [
-                $relatedItemKey => array_merge($relatedItemData, [
-                    $nestedItem1Key => $nestedItem1Data
+                'foo' => array_merge($relatedItemData, [
+                    'bar' => $nestedItemData
                 ]),
-                $relatedCollectionKey => [
-                    $nestedItem2Data,
-                    $nestedItem3Data,
+                'bar' => [
+                    'baz' => $collectionItemData,
                 ]
             ]),
         ], $meta), $result);
@@ -179,30 +121,15 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodAttachesPagination()
     {
-        $response = mock(SuccessResponse::class);
-        $response->allows([
-            'resource' => $item = mock(Item::class),
-            'meta' => [],
-            'paginator' => $paginator = mock(Paginator::class),
-            'cursorPaginator' => null,
-        ]);
-        $item->allows([
-            'data' => $data = ['foo' => 123],
-            'key' => $key = 'baz',
-            'relations' => [],
-        ]);
-        $paginator->allows([
-            'count' => $count = 10,
-            'total' => $total = 15,
-            'perPage' => $perPage = 5,
-            'currentPage' => $currentPage = 2,
-            'lastPage' => $lastPage = 3,
-        ]);
-        $paginator->allows('url')->with(1)->andReturn($firstPageUrl = 'example.com?page=1');
-        $paginator->allows('url')->with(2)->andReturn($selfUrl = 'example.com?page=2');
-        $paginator->allows('url')->with(3)->andReturn($lastPageUrl = 'example.com?page=3');
+        $item = $this->mockItem($data = ['foo' => 1], $key = 'baz');
+        $paginator = $this->mockPaginator($count = 10, $total = 15, $perPage = 5, $currentPage = 2, $lastPage = 3);
+        $paginator->url(1)->willReturn($firstPageUrl = 'example.com?page=1');
+        $paginator->url(2)->willReturn($selfUrl = 'example.com?page=2');
+        $paginator->url(3)->willReturn($lastPageUrl = 'example.com?page=3');
+        $response = $this->mockSuccessResponse($item);
+        $response->paginator()->willReturn($paginator);
 
-        $result = $this->formatter->success($response);
+        $result = $this->formatter->success($response->reveal());
 
         $this->assertEquals([
             $key => $data,
@@ -226,32 +153,17 @@ class SimpleFormatterTest extends UnitTestCase
     /**
      * Assert that [success] method excludes previous and next pagination links when there's only one page.
      */
-    public function testSucessMethodOmitsUndefinedLinksForPagination()
+    public function testSucessMethodOmitsPreviousAndNextLinksWhenNotSet()
     {
-        $response = mock(SuccessResponse::class);
-        $response->allows([
-            'resource' => $item = mock(Item::class),
-            'meta' => [],
-            'paginator' => $paginator = mock(Paginator::class),
-            'cursorPaginator' => null,
-        ]);
-        $item->allows([
-            'data' => $data = ['foo' => 123],
-            'key' => $key = 'baz',
-            'relations' => [],
-        ]);
-        $paginator->allows([
-            'count' => $count = 5,
-            'total' => $total = 5,
-            'perPage' => $perPage = 5,
-            'currentPage' => $currentPage = 1,
-            'lastPage' => $lastPage = 1,
-        ]);
-        $paginator->allows('url')->with(1)->andReturn($firstPageUrl = 'example.com?page=1');
-        $paginator->allows('url')->with(2)->andReturn($selfUrl = 'example.com?page=1');
-        $paginator->allows('url')->with(3)->andReturn($lastPageUrl = 'example.com?page=1');
+        $item = $this->mockItem($data = ['foo' => 1], $key = 'baz');
+        $paginator = $this->mockPaginator($count = 5, $total = 5, $perPage = 5, $currentPage = 1, $lastPage = 1);
+        $paginator->url(1)->willReturn($url = 'example.com?page=1');
+        $paginator->url(2)->willReturn($url);
+        $paginator->url(3)->willReturn($url);
+        $response = $this->mockSuccessResponse($item);
+        $response->paginator()->willReturn($paginator);
 
-        $result = $this->formatter->success($response);
+        $result = $this->formatter->success($response->reveal());
 
         $this->assertEquals([
             $key => $data,
@@ -262,9 +174,9 @@ class SimpleFormatterTest extends UnitTestCase
                 'currentPage' => $currentPage,
                 'lastPage' => $lastPage,
                 'links' => [
-                    'self' => $selfUrl,
-                    'first' => $firstPageUrl,
-                    'last' => $lastPageUrl,
+                    'self' => $url,
+                    'first' => $url,
+                    'last' => $url,
                 ],
             ],
         ], $result);
@@ -275,26 +187,12 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodAttachesCursorPagination()
     {
-        $response = mock(SuccessResponse::class);
-        $response->allows([
-            'resource' => $item = mock(Item::class),
-            'meta' => [],
-            'paginator' => null,
-            'cursorPaginator' => $paginator = mock(CursorPaginator::class),
-        ]);
-        $item->allows([
-            'data' => $data = ['foo' => 123],
-            'key' => $key = 'baz',
-            'relations' => [],
-        ]);
-        $paginator->allows([
-            'current' => $current = 10,
-            'previous' => $previous = 5,
-            'next' => $next = 15,
-            'count' => $count = 30,
-        ]);
+        $item = $this->mockItem($data = ['foo' => 1], $key = 'baz');
+        $paginator = $this->mockCursor($count = 30, $current = 10, $previous = 5, $next = 15);
+        $response = $this->mockSuccessResponse($item);
+        $response->cursor()->willReturn($paginator);
 
-        $result = $this->formatter->success($response);
+        $result = $this->formatter->success($response->reveal());
 
         $this->assertEquals([
             $key => $data,
@@ -312,25 +210,16 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testErrorMethodFormatsErrorResponses()
     {
-        $response = mock(ErrorResponse::class);
-        $response->allows([
-            'code' => $code = 'error_occured',
-            'message' => $message = 'An error has occured.',
-            'meta' => ['foo' => 123],
-            'validator' => null
-        ]);
+        $response = $this->mockErrorResponse($code = 'foo', $message = 'A foo error.', $meta = ['foo' => 1]);
 
-        $result = $this->formatter->error($response);
+        $result = $this->formatter->error($response->reveal());
 
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             'error' => [
                 'code' => $code,
                 'message' => $message,
             ],
-            'foo' => 123,
-        ], $result);
-        $response->shouldHaveReceived('code');
-        $response->shouldHaveReceived('message');
+        ], $meta), $result);
     }
 
     /**
@@ -338,15 +227,9 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testErrorMethodOmitsUndefinedMessage()
     {
-        $response = mock(ErrorResponse::class);
-        $response->allows([
-            'code' => $code = 'error_occured',
-            'message' => null,
-            'meta' => [],
-            'validator' => null,
-        ]);
+        $response = $this->mockErrorResponse($code = 'foo');
 
-        $result = $this->formatter->error($response);
+        $result = $this->formatter->error($response->reveal());
 
         $this->assertEquals([
             'error' => [
@@ -360,27 +243,19 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testValidationMethodAttachesValidation()
     {
-        $response = mock(ErrorResponse::class);
-        $response->allows([
-            'code' => $code = 'error_occured',
-            'message' => null,
-            'meta' => [],
-            'validator' => $validator = mock(Validator::class),
-        ]);
-        $validator->allows([
-            'failed' => ['foo', 'bar.baz'],
-            'errors' => [
-                'foo' => ['min', 'email'],
-                'bar.baz' => ['required'],
-            ],
-            'messages' => [
+        $validator = $this->mockValidator(
+            ['foo', 'bar.baz'],
+            ['foo' => ['min', 'email'], 'bar.baz' => ['required']],
+            [
                 'foo.min' => $minMessage = 'Must be larger',
                 'foo.email' => $emailMessage = 'Invalid email',
                 'bar.baz.required' => $requiredMessage = 'Required field',
-            ],
-        ]);
+            ]
+        );
+        $response = $this->mockErrorResponse($code = 'foo');
+        $response->validator()->willReturn($validator);
 
-        $result = $this->formatter->error($response);
+        $result = $this->formatter->error($response->reveal());
 
         $this->assertEquals([
             'error' => [

@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Http\Resources;
 
 /**
- * Data transfer object class for a resource collection, representing a list of entities in the response data.
+ * Class for a resource collection, representing a list of entities in the response data.
  */
 class Collection extends Resource
 {
