@@ -192,7 +192,7 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
      *
      * @return \Flugg\Responder\Http\Response
      */
-    abstract public function get(): Response;
+    abstract public function get();
 
     /**
      * Format the response data.
