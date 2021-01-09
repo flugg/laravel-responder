@@ -50,12 +50,12 @@ class ResponderServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app instanceof Laravel && $this->app->runningInConsole()) {
-            $this->publishes([__DIR__ . '/../config/responder.php' => config_path('responder.php')], 'config');
+            $this->publishes([__DIR__.'/../config/responder.php' => config_path('responder.php')], 'config');
         } elseif ($this->app instanceof Lumen) {
             $this->app->configure('responder');
         }
 
-        $this->mergeConfigFrom(__DIR__ . '/../config/responder.php', 'responder');
+        $this->mergeConfigFrom(__DIR__.'/../config/responder.php', 'responder');
     }
 
     /**

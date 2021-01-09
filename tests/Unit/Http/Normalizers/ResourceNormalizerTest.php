@@ -139,7 +139,7 @@ class ResourceNormalizerTest extends UnitTestCase
     public function xestNormalizeMethodThrowsExceptionOnInvalidArgument()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Data must be instance of ' . JsonResource::class);
+        $this->expectExceptionMessage('Data must be instance of '.JsonResource::class);
 
         $this->normalizer->normalize(new stdClass());
     }
