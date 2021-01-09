@@ -65,9 +65,9 @@ abstract class Response
      *
      * @param int $status
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
-     * @return self
+     * @return $this
      */
-    public function setStatus(int $status): self
+    public function setStatus(int $status)
     {
         if (! $this->isValidStatusCode($status)) {
             throw new InvalidStatusCodeException;
@@ -82,9 +82,9 @@ abstract class Response
      * Set the response headers.
      *
      * @param array $headers
-     * @return self
+     * @return $this
      */
-    public function setHeaders(array $headers): self
+    public function setHeaders(array $headers)
     {
         $this->headers = $headers;
 
@@ -95,9 +95,9 @@ abstract class Response
      * Set metadata attached to the response.
      *
      * @param array $meta
-     * @return self
+     * @return $this
      */
-    public function setMeta(array $meta): self
+    public function setMeta(array $meta)
     {
         $this->meta = $meta;
 

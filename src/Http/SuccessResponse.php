@@ -73,9 +73,9 @@ class SuccessResponse extends Response
      * Set the response resource.
      *
      * @param \Flugg\Responder\Http\Resources\Resource $resource
-     * @return self
+     * @return $this
      */
-    public function setResource(Resource $resource): self
+    public function setResource(Resource $resource)
     {
         $this->resource = $resource;
 
@@ -86,9 +86,9 @@ class SuccessResponse extends Response
      * Set the paginator attached to the response.
      *
      * @param \Flugg\Responder\Contracts\Pagination\Paginator $paginator
-     * @return self
+     * @return $this
      */
-    public function setPaginator(Paginator $paginator): self
+    public function setPaginator(Paginator $paginator)
     {
         $this->paginator = $paginator;
 
@@ -99,9 +99,9 @@ class SuccessResponse extends Response
      * Set the cursor paginator attached to the response.
      *
      * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $cursor
-     * @return self
+     * @return $this
      */
-    public function setCursor(CursorPaginator $cursor): self
+    public function setCursor(CursorPaginator $cursor)
     {
         $this->cursor = $cursor;
 

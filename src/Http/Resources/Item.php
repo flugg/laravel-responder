@@ -61,9 +61,9 @@ class Item extends Resource implements ArrayAccess
      * Set the resource data.
      *
      * @param array $data
-     * @return self
+     * @return $this
      */
-    public function setData(array $data): self
+    public function setData(array $data)
     {
         $this->data = $data;
 
@@ -74,9 +74,9 @@ class Item extends Resource implements ArrayAccess
      * Set a map of nested resources.
      *
      * @param array $relations
-     * @return self
+     * @return $this
      */
-    public function setRelations(array $relations): self
+    public function setRelations(array $relations)
     {
         $this->relations = $relations;
 

@@ -25,9 +25,9 @@ class SuccessResponseBuilder extends ResponseBuilder
      *
      * @param mixed $data
      * @throws \Flugg\Responder\Exceptions\InvalidDataException
-     * @return self
+     * @return $this
      */
-    public function make($data = []): self
+    public function make($data = [])
     {
         if (is_array($data)) {
             $this->response = (new SuccessResponse)->setResource(new Item($data));
@@ -44,9 +44,9 @@ class SuccessResponseBuilder extends ResponseBuilder
      * Attach a paginator to the success response.
      *
      * @param \Flugg\Responder\Contracts\Pagination\Paginator $paginator
-     * @return self
+     * @return $this
      */
-    public function paginator(Paginator $paginator): self
+    public function paginator(Paginator $paginator)
     {
         $this->response->setPaginator($paginator);
 
@@ -57,9 +57,9 @@ class SuccessResponseBuilder extends ResponseBuilder
      * Attach a cursor paginator to the success response.
      *
      * @param \Flugg\Responder\Contracts\Pagination\CursorPaginator $paginator
-     * @return self
+     * @return $this
      */
-    public function cursor(CursorPaginator $paginator): self
+    public function cursor(CursorPaginator $paginator)
     {
         $this->response->setCursor($paginator);
 

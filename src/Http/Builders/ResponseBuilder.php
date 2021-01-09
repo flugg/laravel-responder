@@ -71,9 +71,9 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable,
      *
      * @param \Flugg\Responder\Contracts\Http\Formatter|string|null $formatter
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     * @return self
+     * @return $this
      */
-    public function formatter($formatter): self
+    public function formatter($formatter)
     {
         $this->formatter = is_string($formatter) ? $this->container->make($formatter) : $formatter;
 
@@ -84,9 +84,9 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable,
      * Decorate the response with the given decorators.
      *
      * @param string|string[] $decorators
-     * @return self
+     * @return $this
      */
-    public function decorate($decorators): self
+    public function decorate($decorators)
     {
         $decorators = is_array($decorators) ? $decorators : func_get_args();
 
@@ -101,9 +101,9 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable,
      * Attach metadata to the response content.
      *
      * @param array $meta
-     * @return self
+     * @return $this
      */
-    public function meta(array $meta): self
+    public function meta(array $meta)
     {
         $this->response->setMeta($meta);
 
