@@ -2,7 +2,7 @@
 
 use Flugg\Responder\Contracts\Responder;
 
-if (!function_exists('responder')) {
+if (! function_exists('responder')) {
     /**
      * Helper function to resolve the responder service out of the service container.
      *

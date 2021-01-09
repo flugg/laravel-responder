@@ -10,11 +10,11 @@ interface ErrorMessageRegistry
     /**
      * Register error messages mapped to error codes.
      *
-     * @param int|string|array $code
+     * @param array|int|string $code
      * @param string|null $message
      * @return void
      */
-    public function register($code, string $message = null): void;
+    public function register($code, ?string $message = null): void;
 
     /**
      * Resolve an error message from an error code.

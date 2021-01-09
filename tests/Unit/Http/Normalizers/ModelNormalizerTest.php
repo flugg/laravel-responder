@@ -35,7 +35,7 @@ class ModelNormalizerTest extends UnitTestCase
 
         $this->assertInstanceOf(SuccessResponse::class, $result);
         $this->assertInstanceOf(Item::class, $result->resource());
-        $this->assertEquals(200, $result->status());
+        $this->assertSame(200, $result->status());
         $this->assertSame($data, $result->resource()->toArray());
         $this->assertSame($key, $result->resource()->key());
     }
@@ -57,7 +57,7 @@ class ModelNormalizerTest extends UnitTestCase
 
         $result = $normalizer->normalize();
 
-        $this->assertEquals(201, $result->status());
+        $this->assertSame(201, $result->status());
     }
 
     /**
@@ -77,7 +77,7 @@ class ModelNormalizerTest extends UnitTestCase
 
         $result = $normalizer->normalize();
 
-        $this->assertEquals($key, $result->resource()->key());
+        $this->assertSame($key, $result->resource()->key());
     }
 
     /**
@@ -105,7 +105,7 @@ class ModelNormalizerTest extends UnitTestCase
 
         $this->assertInstanceOf(Item::class, $resource);
         if ($resource instanceof Item) {
-            $this->assertEquals($relatedData, $resource->relations()['bar']->toArray());
+            $this->assertSame($relatedData, $resource->relations()['bar']->toArray());
         }
     }
 
@@ -139,7 +139,7 @@ class ModelNormalizerTest extends UnitTestCase
 
         $this->assertInstanceOf(Item::class, $resource);
         if ($resource instanceof Item) {
-            $this->assertEquals([$relatedData], $resource->relations()['bar']->toArray());
+            $this->assertSame([$relatedData], $resource->relations()['bar']->toArray());
         }
     }
 }

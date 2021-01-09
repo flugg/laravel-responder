@@ -52,8 +52,8 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Build an error response.
      *
-     * @param int|string|\Exception|null $code
-     * @param string|\Exception|null $message
+     * @param \Exception|int|string|null $code
+     * @param \Exception|string|null $message
      * @return self
      */
     public function make($code = null, $message = null): self
@@ -130,7 +130,7 @@ class ErrorResponseBuilder extends ResponseBuilder
      */
     protected function format(): array
     {
-        if (!$this->formatter) {
+        if (! $this->formatter) {
             return ['message' => $this->response->message()];
         }
 

@@ -53,7 +53,7 @@ class RelationNormalizerTest extends UnitTestCase
 
             $this->assertInstanceOf(SuccessResponse::class, $result);
             $this->assertInstanceOf(Item::class, $result->resource());
-            $this->assertEquals(200, $result->status());
+            $this->assertSame(200, $result->status());
             $this->assertSame($data, $result->resource()->toArray());
             $this->assertSame($key, $result->resource()->key());
         }
@@ -78,7 +78,7 @@ class RelationNormalizerTest extends UnitTestCase
 
             $result = $normalizer->normalize();
 
-            $this->assertEquals($key, $result->resource()->key());
+            $this->assertSame($key, $result->resource()->key());
         }
     }
 
@@ -109,7 +109,7 @@ class RelationNormalizerTest extends UnitTestCase
 
             $this->assertInstanceOf(Item::class, $resource);
             if ($resource instanceof Item) {
-                $this->assertEquals($relatedData, $resource->relations()['bar']->toArray());
+                $this->assertSame($relatedData, $resource->relations()['bar']->toArray());
             }
         }
     }
@@ -146,7 +146,7 @@ class RelationNormalizerTest extends UnitTestCase
 
             $this->assertInstanceOf(Item::class, $resource);
             if ($resource instanceof Item) {
-                $this->assertEquals([$relatedData], $resource->relations()['bar']->toArray());
+                $this->assertSame([$relatedData], $resource->relations()['bar']->toArray());
             }
         }
     }
@@ -183,9 +183,9 @@ class RelationNormalizerTest extends UnitTestCase
 
             $this->assertInstanceOf(SuccessResponse::class, $result);
             $this->assertInstanceOf(Collection::class, $resource);
-            $this->assertEquals(200, $result->status());
-            $this->assertEquals([$data1, $data2], $resource->toArray());
-            $this->assertEquals($key, $result->resource()->key());
+            $this->assertSame(200, $result->status());
+            $this->assertSame([$data1, $data2], $resource->toArray());
+            $this->assertSame($key, $result->resource()->key());
             if ($resource instanceof Collection) {
                 $this->assertCount(2, $resource->items());
             }
@@ -216,7 +216,7 @@ class RelationNormalizerTest extends UnitTestCase
 
             $result = $normalizer->normalize();
 
-            $this->assertEquals($key, $result->resource()->key());
+            $this->assertSame($key, $result->resource()->key());
         }
     }
 
@@ -272,7 +272,7 @@ class RelationNormalizerTest extends UnitTestCase
 
             $this->assertInstanceOf(Collection::class, $resource);
             if ($resource instanceof Collection) {
-                $this->assertEquals($relatedData, $resource->items()[0]->relations()['bar']->toArray());
+                $this->assertSame($relatedData, $resource->items()[0]->relations()['bar']->toArray());
             }
         }
     }
@@ -314,7 +314,7 @@ class RelationNormalizerTest extends UnitTestCase
 
             $this->assertInstanceOf(Collection::class, $resource);
             if ($resource instanceof Collection) {
-                $this->assertEquals([$relatedData], $resource->items()[0]->relations()['bar']->toArray());
+                $this->assertSame([$relatedData], $resource->items()[0]->relations()['bar']->toArray());
             }
         }
     }

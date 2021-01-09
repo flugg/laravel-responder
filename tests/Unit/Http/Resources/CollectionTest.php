@@ -25,7 +25,7 @@ class CollectionTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,8 +39,8 @@ class CollectionTest extends UnitTestCase
     {
         $collection = new Collection($items = ['foo' => 1], $key = 'foo');
 
-        $this->assertEquals($items, $collection->items());
-        $this->assertEquals($key, $collection->key());
+        $this->assertSame($items, $collection->items());
+        $this->assertSame($key, $collection->key());
     }
 
     /**
@@ -51,7 +51,7 @@ class CollectionTest extends UnitTestCase
         $result = $this->collection->setKey($key = 'foo');
 
         $this->assertSame($this->collection, $result);
-        $this->assertEquals($key, $this->collection->key());
+        $this->assertSame($key, $this->collection->key());
     }
 
     /**
@@ -62,7 +62,7 @@ class CollectionTest extends UnitTestCase
         $result = $this->collection->setItems($items = [new Item(), new Item()]);
 
         $this->assertSame($this->collection, $result);
-        $this->assertEquals($items, $this->collection->items());
+        $this->assertSame($items, $this->collection->items());
     }
 
     /**
@@ -72,6 +72,6 @@ class CollectionTest extends UnitTestCase
     {
         $this->collection->setItems([$item1 = new Item(), $item2 = new Item()]);
 
-        $this->assertEquals([$item1->toArray(), $item2->toArray()], $this->collection->toArray());
+        $this->assertSame([$item1->toArray(), $item2->toArray()], $this->collection->toArray());
     }
 }

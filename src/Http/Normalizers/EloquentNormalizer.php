@@ -35,7 +35,7 @@ abstract class EloquentNormalizer implements Normalizer
      */
     protected function buildCollection(IlluminateCollection $collection): Collection
     {
-        $resourceKey = !$collection->isEmpty() ? $this->resolveResourceKey($collection->first()) : null;
+        $resourceKey = ! $collection->isEmpty() ? $this->resolveResourceKey($collection->first()) : null;
 
         return new Collection(array_map([$this, 'buildResource'], $collection->all()), $resourceKey);
     }

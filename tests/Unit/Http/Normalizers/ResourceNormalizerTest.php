@@ -22,21 +22,21 @@ class ResourceNormalizerTest extends UnitTestCase
     /**
      * Mock of an [\Illuminate\Http\Request] class.
      *
-     * @var \Mockery\MockInterface|\Illuminate\Http\Request
+     * @var \Illuminate\Http\Request|\Mockery\MockInterface
      */
     protected $request;
 
     /**
      * Mock of a JSON response.
      *
-     * @var \Mockery\MockInterface|\Illuminate\Http\JsonResponse
+     * @var \Illuminate\Http\JsonResponse|\Mockery\MockInterface
      */
     protected $response;
 
     /**
      * Mock of a JSON resource.
      *
-     * @var \Mockery\MockInterface|\Illuminate\Http\Resources\Json\JsonResource
+     * @var \Illuminate\Http\Resources\Json\JsonResource|\Mockery\MockInterface
      */
     protected $resource;
 
@@ -52,7 +52,7 @@ class ResourceNormalizerTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

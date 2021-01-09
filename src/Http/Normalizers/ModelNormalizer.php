@@ -31,8 +31,8 @@ class ModelNormalizer extends EloquentNormalizer implements Normalizer
     /**
      * Normalize response data.
      *
-     * @return \Flugg\Responder\Http\SuccessResponse
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return \Flugg\Responder\Http\SuccessResponse
      */
     public function normalize(): SuccessResponse
     {

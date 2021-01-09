@@ -30,7 +30,7 @@ class Item extends Resource implements ArrayAccess
      * @param string|null $key
      * @param array $relations
      */
-    public function __construct(array $data = [], string $key = null, array $relations = [])
+    public function __construct(array $data = [], ?string $key = null, array $relations = [])
     {
         $this->data = $data;
         $this->key = $key;
@@ -122,7 +122,7 @@ class Item extends Resource implements ArrayAccess
      * @param mixed $value
      * @return void
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->data[$offset] = $value;
     }
@@ -133,7 +133,7 @@ class Item extends Resource implements ArrayAccess
      * @param mixed $offset
      * @return void
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->data[$offset]);
     }

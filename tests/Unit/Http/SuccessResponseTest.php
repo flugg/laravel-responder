@@ -29,7 +29,7 @@ class SuccessResponseTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +46,7 @@ class SuccessResponseTest extends UnitTestCase
         $result = $this->response->setResource($resource->reveal());
 
         $this->assertSame($this->response, $result);
-        $this->assertEquals($resource->reveal(), $this->response->resource());
+        $this->assertSame($resource->reveal(), $this->response->resource());
     }
 
     /**
@@ -58,7 +58,7 @@ class SuccessResponseTest extends UnitTestCase
 
         $this->response->setPaginator($paginator->reveal());
 
-        $this->assertEquals($paginator->reveal(), $this->response->paginator());
+        $this->assertSame($paginator->reveal(), $this->response->paginator());
     }
 
     /**
@@ -70,7 +70,7 @@ class SuccessResponseTest extends UnitTestCase
 
         $this->response->setCursor($paginator->reveal());
 
-        $this->assertEquals($paginator->reveal(), $this->response->cursor());
+        $this->assertSame($paginator->reveal(), $this->response->cursor());
     }
 
     /**
@@ -80,7 +80,7 @@ class SuccessResponseTest extends UnitTestCase
     {
         $this->response->setStatus($status = 201);
 
-        $this->assertEquals($status, $this->response->status());
+        $this->assertSame($status, $this->response->status());
     }
 
     /**
@@ -100,7 +100,7 @@ class SuccessResponseTest extends UnitTestCase
     {
         $this->response->setHeaders($headers = ['x-foo' => 1]);
 
-        $this->assertEquals($headers, $this->response->headers());
+        $this->assertSame($headers, $this->response->headers());
     }
 
     /**
@@ -110,6 +110,6 @@ class SuccessResponseTest extends UnitTestCase
     {
         $this->response->setMeta($meta = ['foo' => 1]);
 
-        $this->assertEquals($meta, $this->response->meta());
+        $this->assertSame($meta, $this->response->meta());
     }
 }

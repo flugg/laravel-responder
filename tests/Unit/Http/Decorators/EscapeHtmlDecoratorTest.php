@@ -6,7 +6,6 @@ use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Flugg\Responder\Http\Decorators\EscapeHtmlDecorator;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Http\JsonResponse;
-use Prophecy\Argument;
 
 /**
  * Unit tests for the [EscapeHtmlDecorator] class.
@@ -34,7 +33,7 @@ class EscapeHtmlDecoratorTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,6 +52,6 @@ class EscapeHtmlDecoratorTest extends UnitTestCase
 
         $response = $this->responseDecorator->make(['foo' => $html = '<html></html>'], $status);
 
-        $this->assertEquals(['foo' => e($html)], $response->getData(true));
+        $this->assertSame(['foo' => e($html)], $response->getData(true));
     }
 }

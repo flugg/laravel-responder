@@ -28,8 +28,8 @@ class ResponderServiceProvider extends ServiceProvider
     /**
      * Register the service provider.
      *
-     * @return void
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return void
      */
     public function register(): void
     {
@@ -134,8 +134,8 @@ class ResponderServiceProvider extends ServiceProvider
     /**
      * Register test response macros.
      *
-     * @return void
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return void
      */
     protected function registerTestingMacros(): void
     {

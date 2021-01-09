@@ -64,12 +64,12 @@ abstract class Response
      * Set the response status code.
      *
      * @param int $status
-     * @return self
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return self
      */
     public function setStatus(int $status): self
     {
-        if (!$this->isValidStatusCode($status)) {
+        if (! $this->isValidStatusCode($status)) {
             throw new InvalidStatusCodeException;
         }
 

@@ -33,7 +33,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -51,7 +51,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
             'bar.baz' => [],
         ]);
 
-        $this->assertEquals(array_keys($failed), $this->adapter->failed());
+        $this->assertSame(array_keys($failed), $this->adapter->failed());
     }
 
     /**
@@ -64,7 +64,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
             'bar.baz' => ['Required' => []],
         ]);
 
-        $this->assertEquals([
+        $this->assertSame([
             'foo' => ['min', 'email'],
             'bar.baz' => ['required'],
         ], $this->adapter->errors());
@@ -84,7 +84,7 @@ class IlluminateValidatorAdapterTest extends UnitTestCase
         ]);
         $this->validator->errors()->willReturn($messageBag);
 
-        $this->assertEquals([
+        $this->assertSame([
             'foo.min' => $minMessage,
             'foo.email' => $emailMessage,
             'bar.baz.required' => $requiredMessage,

@@ -26,7 +26,7 @@ class ErrorResponseTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +41,7 @@ class ErrorResponseTest extends UnitTestCase
         $result = $this->response->setCode($code = 'error_occured');
 
         $this->assertSame($this->response, $result);
-        $this->assertEquals($code, $this->response->code());
+        $this->assertSame($code, $this->response->code());
     }
 
     /**
@@ -52,7 +52,7 @@ class ErrorResponseTest extends UnitTestCase
         $result = $this->response->setMessage($message = 'An error has occured.');
 
         $this->assertSame($this->response, $result);
-        $this->assertEquals($message, $this->response->message());
+        $this->assertSame($message, $this->response->message());
     }
 
     /**
@@ -64,7 +64,7 @@ class ErrorResponseTest extends UnitTestCase
 
         $this->response->setValidator($validator->reveal());
 
-        $this->assertEquals($validator->reveal(), $this->response->validator());
+        $this->assertSame($validator->reveal(), $this->response->validator());
     }
 
     /**
@@ -74,7 +74,7 @@ class ErrorResponseTest extends UnitTestCase
     {
         $this->response->setStatus($status = 400);
 
-        $this->assertEquals($status, $this->response->status());
+        $this->assertSame($status, $this->response->status());
     }
 
     /**
@@ -94,7 +94,7 @@ class ErrorResponseTest extends UnitTestCase
     {
         $this->response->setHeaders($headers = ['x-foo' => 1]);
 
-        $this->assertEquals($headers, $this->response->headers());
+        $this->assertSame($headers, $this->response->headers());
     }
 
     /**
@@ -104,6 +104,6 @@ class ErrorResponseTest extends UnitTestCase
     {
         $this->response->setMeta($meta = ['foo' => 1]);
 
-        $this->assertEquals($meta, $this->response->meta());
+        $this->assertSame($meta, $this->response->meta());
     }
 }

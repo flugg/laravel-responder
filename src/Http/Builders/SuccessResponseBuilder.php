@@ -24,8 +24,8 @@ class SuccessResponseBuilder extends ResponseBuilder
      * Build a success response.
      *
      * @param mixed $data
-     * @return self
      * @throws \Flugg\Responder\Exceptions\InvalidDataException
+     * @return self
      */
     public function make($data = []): self
     {
@@ -80,8 +80,8 @@ class SuccessResponseBuilder extends ResponseBuilder
      * Normalize the data into a success response value object.
      *
      * @param object $data
-     * @return \Flugg\Responder\Http\SuccessResponse
      * @throws \Flugg\Responder\Exceptions\InvalidDataException
+     * @return \Flugg\Responder\Http\SuccessResponse
      */
     protected function normalizeData(object $data): SuccessResponse
     {

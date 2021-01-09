@@ -24,7 +24,7 @@ class ErrorMessageRegistryTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class ErrorMessageRegistryTest extends UnitTestCase
 
         $result = $this->messageRegistry->resolve($code);
 
-        $this->assertEquals($message, $result);
+        $this->assertSame($message, $result);
     }
 
     /**
@@ -66,7 +66,7 @@ class ErrorMessageRegistryTest extends UnitTestCase
         foreach ($messages as $code => $message) {
             $result = $this->messageRegistry->resolve($code);
 
-            $this->assertEquals($message, $result);
+            $this->assertSame($message, $result);
         }
     }
 }

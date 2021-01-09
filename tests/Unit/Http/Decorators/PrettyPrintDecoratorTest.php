@@ -33,7 +33,7 @@ class PrettyPrintDecoratorTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,6 +52,6 @@ class PrettyPrintDecoratorTest extends UnitTestCase
 
         $response = $this->responseDecorator->make($data, $status);
 
-        $this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), $response->getContent());
+        $this->assertSame(json_encode($data, JSON_PRETTY_PRINT), $response->getContent());
     }
 }

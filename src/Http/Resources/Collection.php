@@ -20,7 +20,7 @@ class Collection extends Resource
      * @param \Flugg\Responder\Http\Resources\Item[] $items
      * @param string|null $key
      */
-    public function __construct(array $items = [], string $key = null)
+    public function __construct(array $items = [], ?string $key = null)
     {
         $this->items = $items;
         $this->key = $key;

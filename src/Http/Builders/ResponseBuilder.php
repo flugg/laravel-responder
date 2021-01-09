@@ -16,7 +16,7 @@ use JsonSerializable;
 /**
  * Abstract builder class for building responses.
  */
-abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, JsonSerializable
+abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable, Responsable
 {
     /**
      * Factory for making JSON responses.
@@ -71,8 +71,8 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
      * Set a response formatter.
      *
      * @param \Flugg\Responder\Contracts\Http\Formatter|string|null $formatter
-     * @return self
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return self
      */
     public function formatter($formatter): self
     {
@@ -115,8 +115,8 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
      * Create an HTTP response that represents the object.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return \Illuminate\Http\JsonResponse
      */
     public function toResponse($request): JsonResponse
     {
@@ -128,10 +128,10 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
      *
      * @param int|null $status
      * @param array $headers
-     * @return \Illuminate\Http\JsonResponse
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function respond(int $status = null, array $headers = []): JsonResponse
+    public function respond(?int $status = null, array $headers = []): JsonResponse
     {
         if (is_int($status)) {
             $this->response->setStatus($status);
@@ -145,8 +145,8 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     /**
      * Convert the response to an array.
      *
-     * @return array
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return array
      */
     public function toArray(): array
     {
@@ -156,8 +156,8 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     /**
      * Convert the response to an Illuminate collection.
      *
-     * @return \Illuminate\Support\Collection
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return \Illuminate\Support\Collection
      */
     public function toCollection(): Collection
     {
@@ -168,8 +168,8 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
      * Convert the response to JSON.
      *
      * @param int $options
-     * @return string
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return string
      */
     public function toJson($options = 0): string
     {
@@ -179,8 +179,8 @@ abstract class ResponseBuilder implements Responsable, Arrayable, Jsonable, Json
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return array
      */
     public function jsonSerialize(): array
     {

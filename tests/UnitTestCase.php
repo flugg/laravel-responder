@@ -33,7 +33,7 @@ abstract class UnitTestCase extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -102,7 +102,7 @@ abstract class UnitTestCase extends TestCase
      * @param array $meta
      * @return \Prophecy\Prophecy\ObjectProphecy
      */
-    protected function mockErrorResponse(string $code = null, string $message = null, array $meta = []): ObjectProphecy
+    protected function mockErrorResponse(?string $code = null, ?string $message = null, array $meta = []): ObjectProphecy
     {
         return tap($this->mock(ErrorResponse::class), function ($response) use ($code, $message, $meta) {
             $response->code()->willReturn($code);

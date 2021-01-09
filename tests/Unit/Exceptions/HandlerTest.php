@@ -57,7 +57,7 @@ class HandlerTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -206,7 +206,7 @@ class HandlerTest extends UnitTestCase
 
         $result = $this->handler->shouldReport($exception);
 
-        $this->assertEquals($shouldReport, $result);
+        $this->assertSame($shouldReport, $result);
         $this->exceptionHandler->shouldReport($exception)->shouldHaveBeenCalledOnce();
     }
 
@@ -235,7 +235,7 @@ class HandlerTest extends UnitTestCase
 
         $result = $this->handler->foo($foo);
 
-        $this->assertEquals($bar, $result);
+        $this->assertSame($bar, $result);
         $exceptionHandler->foo($foo)->shouldHaveBeenCalledOnce();
     }
 }

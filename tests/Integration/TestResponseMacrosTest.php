@@ -13,7 +13,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
     /**
      * Partial mock of a test response.
      *
-     * @var \Mockery\MockInterface|\Illuminate\Testing\TestResponse
+     * @var \Illuminate\Testing\TestResponse|\Mockery\MockInterface
      */
     protected $testResponse;
 
@@ -22,7 +22,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

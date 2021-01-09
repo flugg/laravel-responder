@@ -61,7 +61,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -94,7 +94,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
 
         $this->assertSame($this->responseBuilder, $result);
         $this->assertInstanceOf(Item::class, $result->get()->resource());
-        $this->assertEquals($data, $result->get()->resource()->toArray());
+        $this->assertSame($data, $result->get()->resource()->toArray());
     }
 
     /**
@@ -143,7 +143,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->paginator($paginator->reveal())->get();
 
-        $this->assertEquals($paginator->reveal(), $result->paginator());
+        $this->assertSame($paginator->reveal(), $result->paginator());
     }
 
     /**
@@ -155,7 +155,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->cursor($paginator->reveal())->get();
 
-        $this->assertEquals($paginator->reveal(), $result->cursor());
+        $this->assertSame($paginator->reveal(), $result->cursor());
     }
 
     /**
@@ -167,7 +167,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->respond($status = 300, $headers = ['x-foo' => 1]);
 
-        $this->assertEquals($response, $result);
+        $this->assertSame($response, $result);
         $this->responseFactory->make([], $status, $headers)->shouldHaveBeenCalledOnce();
     }
 
@@ -180,7 +180,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->respond();
 
-        $this->assertEquals($response, $result);
+        $this->assertSame($response, $result);
         $this->responseFactory->make([], 200, [])->shouldHaveBeenCalledOnce();
     }
 
@@ -193,7 +193,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->toResponse(mock(Request::class));
 
-        $this->assertEquals($response, $result);
+        $this->assertSame($response, $result);
         $this->responseFactory->make([], 200, [])->shouldHaveBeenCalledOnce();
     }
 
@@ -207,7 +207,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->toArray();
 
-        $this->assertEquals($data, $result);
+        $this->assertSame($data, $result);
     }
 
     /**
@@ -233,7 +233,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->toJson(JSON_PRETTY_PRINT);
 
-        $this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), $result);
+        $this->assertSame(json_encode($data, JSON_PRETTY_PRINT), $result);
     }
 
     /**
@@ -246,7 +246,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->toArray();
 
-        $this->assertEquals($data, $result);
+        $this->assertSame($data, $result);
     }
 
     /**

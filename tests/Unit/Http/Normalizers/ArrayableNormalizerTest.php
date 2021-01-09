@@ -26,7 +26,7 @@ class ArrayableNormalizerTest extends UnitTestCase
         $result = $normalizer->normalize();
 
         $this->assertInstanceOf(SuccessResponse::class, $result);
-        $this->assertEquals(200, $result->status());
+        $this->assertSame(200, $result->status());
         $this->assertSame($data, $result->resource()->toArray());
         $this->assertNull($result->resource()->key());
     }

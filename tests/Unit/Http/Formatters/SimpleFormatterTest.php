@@ -2,16 +2,11 @@
 
 namespace Flugg\Responder\Tests\Unit\Http\Formatters;
 
-use Flugg\Responder\Contracts\Pagination\CursorPaginator;
-use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Contracts\Validation\Validator;
-use Flugg\Responder\Http\ErrorResponse;
 use Flugg\Responder\Http\Formatters\SimpleFormatter;
 use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\Resources\Item;
-use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * Unit tests for the [SimpleFormatter] class.
@@ -32,7 +27,7 @@ class SimpleFormatterTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -49,7 +44,7 @@ class SimpleFormatterTest extends UnitTestCase
 
         $result = $this->formatter->success($response->reveal());
 
-        $this->assertEquals(array_merge([
+        $this->assertSame(array_merge([
             $key => $data,
         ], $meta), $result);
     }
@@ -67,7 +62,7 @@ class SimpleFormatterTest extends UnitTestCase
 
         $result = $this->formatter->success($response->reveal());
 
-        $this->assertEquals(array_merge([
+        $this->assertSame(array_merge([
             $key => [$data1, $data2],
         ], $meta), $result);
     }
@@ -82,7 +77,7 @@ class SimpleFormatterTest extends UnitTestCase
 
         $result = $this->formatter->success($response->reveal());
 
-        $this->assertEquals(array_merge([
+        $this->assertSame(array_merge([
             'data' => $data,
         ], $meta), $result);
     }
@@ -94,24 +89,24 @@ class SimpleFormatterTest extends UnitTestCase
     {
         $item = $this->mockItem($data = ['foo' => 1], null, [
             'foo' => $this->mockItem($relatedItemData = ['foo' => 1], null, [
-                'bar' => $this->mockItem($nestedItemData = ['bar' => 2])
+                'bar' => $this->mockItem($nestedItemData = ['bar' => 2]),
             ]),
             'bar' => $this->mockCollection([
-                'baz' => $this->mockItem($collectionItemData = ['baz' => 3])
+                'baz' => $this->mockItem($collectionItemData = ['baz' => 3]),
             ]),
         ]);
         $response = $this->mockSuccessResponse($item, $meta = ['bar' => 2]);
 
         $result = $this->formatter->success($response->reveal());
 
-        $this->assertEquals(array_merge([
+        $this->assertSame(array_merge([
             'data' => array_merge($data, [
                 'foo' => array_merge($relatedItemData, [
-                    'bar' => $nestedItemData
+                    'bar' => $nestedItemData,
                 ]),
                 'bar' => [
                     'baz' => $collectionItemData,
-                ]
+                ],
             ]),
         ], $meta), $result);
     }
@@ -131,7 +126,7 @@ class SimpleFormatterTest extends UnitTestCase
 
         $result = $this->formatter->success($response->reveal());
 
-        $this->assertEquals([
+        $this->assertSame([
             $key => $data,
             'pagination' => [
                 'count' => $count,
@@ -165,7 +160,7 @@ class SimpleFormatterTest extends UnitTestCase
 
         $result = $this->formatter->success($response->reveal());
 
-        $this->assertEquals([
+        $this->assertSame([
             $key => $data,
             'pagination' => [
                 'count' => $count,
@@ -194,7 +189,7 @@ class SimpleFormatterTest extends UnitTestCase
 
         $result = $this->formatter->success($response->reveal());
 
-        $this->assertEquals([
+        $this->assertSame([
             $key => $data,
             'cursor' => [
                 'current' => $current,
@@ -214,7 +209,7 @@ class SimpleFormatterTest extends UnitTestCase
 
         $result = $this->formatter->error($response->reveal());
 
-        $this->assertEquals(array_merge([
+        $this->assertSame(array_merge([
             'error' => [
                 'code' => $code,
                 'message' => $message,
@@ -231,7 +226,7 @@ class SimpleFormatterTest extends UnitTestCase
 
         $result = $this->formatter->error($response->reveal());
 
-        $this->assertEquals([
+        $this->assertSame([
             'error' => [
                 'code' => $code,
             ],
@@ -257,7 +252,7 @@ class SimpleFormatterTest extends UnitTestCase
 
         $result = $this->formatter->error($response->reveal());
 
-        $this->assertEquals([
+        $this->assertSame([
             'error' => [
                 'code' => $code,
                 'fields' => [

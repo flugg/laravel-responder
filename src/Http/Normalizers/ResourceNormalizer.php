@@ -49,8 +49,8 @@ class ResourceNormalizer implements Normalizer
     /**
      * Normalize response data.
      *
-     * @return \Flugg\Responder\Http\SuccessResponse
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return \Flugg\Responder\Http\SuccessResponse
      */
     public function normalize(): SuccessResponse
     {
@@ -94,7 +94,7 @@ class ResourceNormalizer implements Normalizer
     protected function buildCollection(ResourceCollection $collection): Collection
     {
         $resources = $collection->collection;
-        $resourceKey = !$resources->isEmpty() ? $this->resolveResourceKey($resources->first()) : null;
+        $resourceKey = ! $resources->isEmpty() ? $this->resolveResourceKey($resources->first()) : null;
 
         return new Collection(array_map([$this, 'buildResource'], $resources->all()), $resourceKey);
     }
@@ -125,7 +125,7 @@ class ResourceNormalizer implements Normalizer
     protected function extractRelations(JsonResource $resource): array
     {
         return IlluminateCollection::make($resource->toArray($this->request))->filter(function ($value) {
-            return $value instanceof JsonResource && !$value->resource instanceof MissingValue;
+            return $value instanceof JsonResource && ! $value->resource instanceof MissingValue;
         })->mapWithKeys(function ($relation, $relationKey) {
             return [
                 $relationKey => $relation instanceof ResourceCollection

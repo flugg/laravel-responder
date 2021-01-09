@@ -65,7 +65,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -99,8 +99,8 @@ class ErrorResponseBuilderTest extends UnitTestCase
         $result = $this->responseBuilder->make($code = 'foo', $message = 'bar');
 
         $this->assertSame($this->responseBuilder, $result);
-        $this->assertEquals($code, $result->get()->code());
-        $this->assertEquals($message, $result->get()->message());
+        $this->assertSame($code, $result->get()->code());
+        $this->assertSame($message, $result->get()->message());
     }
 
     /**
@@ -117,9 +117,9 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make(new InvalidArgumentException)->get();
 
-        $this->assertEquals($code, $result->code());
-        $this->assertEquals($message, $result->message());
-        $this->assertEquals($status, $result->status());
+        $this->assertSame($code, $result->code());
+        $this->assertSame($message, $result->message());
+        $this->assertSame($status, $result->status());
     }
 
     /**
@@ -134,9 +134,9 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make(new InvalidArgumentException)->get();
 
-        $this->assertEquals($code = 'invalid_argument', $result->code());
-        $this->assertEquals($message, $result->message());
-        $this->assertEquals(500, $result->status());
+        $this->assertSame($code = 'invalid_argument', $result->code());
+        $this->assertSame($message, $result->message());
+        $this->assertSame(500, $result->status());
     }
 
     /**
@@ -153,9 +153,9 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make(new InvalidArgumentException($message = 'bar'))->get();
 
-        $this->assertEquals($code, $result->code());
-        $this->assertEquals($message, $result->message());
-        $this->assertEquals($status, $result->status());
+        $this->assertSame($code, $result->code());
+        $this->assertSame($message, $result->message());
+        $this->assertSame($status, $result->status());
     }
 
     /**
@@ -172,9 +172,9 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make($code, new InvalidArgumentException)->get();
 
-        $this->assertEquals($code, $result->code());
-        $this->assertEquals($message, $result->message());
-        $this->assertEquals($status, $result->status());
+        $this->assertSame($code, $result->code());
+        $this->assertSame($message, $result->message());
+        $this->assertSame($status, $result->status());
     }
 
     /**
@@ -186,7 +186,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->validator($validator->reveal())->get();
 
-        $this->assertEquals($validator->reveal(), $result->validator());
+        $this->assertSame($validator->reveal(), $result->validator());
     }
 
     /**
@@ -198,7 +198,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->respond($status = 400, $headers = ['x-foo' => 1]);
 
-        $this->assertEquals($response, $result);
+        $this->assertSame($response, $result);
         $this->responseFactory->make(['message' => null], $status, $headers)->shouldHaveBeenCalledOnce();
     }
 
@@ -211,7 +211,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->respond();
 
-        $this->assertEquals($response, $result);
+        $this->assertSame($response, $result);
         $this->responseFactory->make(['message' => null], 500, [])->shouldHaveBeenCalledOnce();
     }
 
@@ -224,7 +224,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->toResponse(mock(Request::class));
 
-        $this->assertEquals($response, $result);
+        $this->assertSame($response, $result);
         $this->responseFactory->make(['message' => null], 500, [])->shouldHaveBeenCalledOnce();
     }
 
@@ -238,7 +238,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->toArray();
 
-        $this->assertEquals($data, $result);
+        $this->assertSame($data, $result);
     }
 
     /**
@@ -264,7 +264,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->toJson(JSON_PRETTY_PRINT);
 
-        $this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), $result);
+        $this->assertSame(json_encode($data, JSON_PRETTY_PRINT), $result);
     }
 
     /**
@@ -277,7 +277,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make()->toArray();
 
-        $this->assertEquals($data, $result);
+        $this->assertSame($data, $result);
     }
 
     /**

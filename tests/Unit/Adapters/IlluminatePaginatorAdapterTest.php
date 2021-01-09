@@ -33,7 +33,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,7 +48,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
     {
         $this->paginator->currentPage()->willReturn($page = 2);
 
-        $this->assertEquals($page, $this->adapter->currentPage());
+        $this->assertSame($page, $this->adapter->currentPage());
     }
 
     /**
@@ -58,7 +58,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
     {
         $this->paginator->lastPage()->willReturn($page = 3);
 
-        $this->assertEquals($page, $this->adapter->lastPage());
+        $this->assertSame($page, $this->adapter->lastPage());
     }
 
     /**
@@ -68,7 +68,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
     {
         $this->paginator->total()->willReturn($count = 30);
 
-        $this->assertEquals($count, $this->adapter->total());
+        $this->assertSame($count, $this->adapter->total());
     }
 
     /**
@@ -78,7 +78,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
     {
         $this->paginator->items()->willReturn($items = Collection::make(range(0, 9)));
 
-        $this->assertEquals(count($items), $this->adapter->count());
+        $this->assertSame(count($items), $this->adapter->count());
     }
 
     /**
@@ -88,7 +88,7 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
     {
         $this->paginator->perPage()->willReturn($count = 10);
 
-        $this->assertEquals($count, $this->adapter->perPage());
+        $this->assertSame($count, $this->adapter->perPage());
     }
 
     /**
@@ -98,6 +98,6 @@ class IlluminatePaginatorAdapterTest extends UnitTestCase
     {
         $this->paginator->url($page = 2)->willReturn($url = 'foo');
 
-        $this->assertEquals($url, $this->adapter->url($page));
+        $this->assertSame($url, $this->adapter->url($page));
     }
 }

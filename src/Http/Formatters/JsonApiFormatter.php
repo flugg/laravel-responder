@@ -60,7 +60,7 @@ class JsonApiFormatter implements Formatter
      */
     protected function resource(Item $resource): array
     {
-        if (!isset($resource['id'])) {
+        if (! isset($resource['id'])) {
             throw new InvalidArgumentException('JSON API resource objects must have an ID');
         }
 

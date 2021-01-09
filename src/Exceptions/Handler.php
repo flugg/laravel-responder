@@ -52,11 +52,23 @@ class Handler implements ExceptionHandler
     }
 
     /**
+     * Forward method calls to the original exception handler.
+     *
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
+     */
+    public function __call(string $method, array $parameters)
+    {
+        return $this->handler->{$method}(...$parameters);
+    }
+
+    /**
      * Report or log an exception.
      *
      * @param \Throwable $e
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function report(Throwable $e): void
     {
@@ -79,8 +91,8 @@ class Handler implements ExceptionHandler
      *
      * @param \Illuminate\Http\Request $request
      * @param \Throwable $e
-     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Throwable
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function render($request, Throwable $e): Response
     {
@@ -104,18 +116,6 @@ class Handler implements ExceptionHandler
     }
 
     /**
-     * Forward method calls to the original exception handler.
-     *
-     * @param string $method
-     * @param array $parameters
-     * @return mixed
-     */
-    public function __call(string $method, array $parameters)
-    {
-        return $this->handler->{$method}(...$parameters);
-    }
-
-    /**
      * Check if the exception should be converted to an error response.
      *
      * @param \Throwable $exception
@@ -125,7 +125,7 @@ class Handler implements ExceptionHandler
     {
         foreach ($this->config->get('responder.exceptions') as $class => $error) {
             if ($exception instanceof $class) {
-                return !($this->config->get('app.debug') && $error['status'] >= 500);
+                return ! ($this->config->get('app.debug') && $error['status'] >= 500);
             }
         }
 
@@ -136,8 +136,8 @@ class Handler implements ExceptionHandler
      * Convert the exception to an error message.
      *
      * @param \Throwable $exception
-     * @return \Illuminate\Http\JsonResponse
      * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return \Illuminate\Http\JsonResponse
      */
     protected function convertException(Throwable $exception): JsonResponse
     {

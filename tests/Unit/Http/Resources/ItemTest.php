@@ -25,7 +25,7 @@ class ItemTest extends UnitTestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,9 +39,9 @@ class ItemTest extends UnitTestCase
     {
         $resource = new Item($data = ['foo' => 1], $key = 'bar', $relations = ['baz' => new Item()]);
 
-        $this->assertEquals($data, $resource->data());
-        $this->assertEquals($key, $resource->key());
-        $this->assertEquals($relations, $resource->relations());
+        $this->assertSame($data, $resource->data());
+        $this->assertSame($key, $resource->key());
+        $this->assertSame($relations, $resource->relations());
     }
 
     /**
@@ -52,7 +52,7 @@ class ItemTest extends UnitTestCase
         $result = $this->item->setKey($key = 'foo');
 
         $this->assertSame($this->item, $result);
-        $this->assertEquals($key, $this->item->key());
+        $this->assertSame($key, $this->item->key());
     }
 
     /**
@@ -63,7 +63,7 @@ class ItemTest extends UnitTestCase
         $result = $this->item->setData($data = ['foo' => 1]);
 
         $this->assertSame($this->item, $result);
-        $this->assertEquals($data, $this->item->data());
+        $this->assertSame($data, $this->item->data());
     }
 
     /**
@@ -73,7 +73,7 @@ class ItemTest extends UnitTestCase
     {
         $this->item->setRelations($relations = ['foo' => new Item(), 'bar' => new Collection()]);
 
-        $this->assertEquals($relations, $this->item->relations());
+        $this->assertSame($relations, $this->item->relations());
     }
 
     /**
@@ -83,7 +83,7 @@ class ItemTest extends UnitTestCase
     {
         $this->item->setData($data = ['foo' => 1]);
 
-        $this->assertEquals($data, $this->item->toArray());
+        $this->assertSame($data, $this->item->toArray());
     }
 
     /**
@@ -95,13 +95,13 @@ class ItemTest extends UnitTestCase
 
         $this->assertTrue(isset($this->item['foo']));
         $this->assertFalse(isset($this->item['bar']));
-        $this->assertEquals(1, $this->item['foo']);
+        $this->assertSame(1, $this->item['foo']);
 
         unset($this->item['foo']);
         $this->item['bar'] = 2;
 
         $this->assertFalse(isset($this->item['foo']));
         $this->assertTrue(isset($this->item['bar']));
-        $this->assertEquals(2, $this->item['bar']);
+        $this->assertSame(2, $this->item['bar']);
     }
 }

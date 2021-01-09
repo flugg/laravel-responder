@@ -15,14 +15,14 @@ class QueryBuilderNormalizer extends EloquentNormalizer implements Normalizer
     /**
      * The data being normalized.
      *
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
+     * @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected $data;
 
     /**
      * Create a new response normalizer instance.
      *
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $data
+     * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder $data
      */
     public function __construct($data)
     {
