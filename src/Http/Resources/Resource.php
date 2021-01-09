@@ -28,9 +28,9 @@ abstract class Resource
      * Set the resource key.
      *
      * @param string|null $key
-     * @return $this
+     * @return self
      */
-    public function setKey(?string $key)
+    public function setKey(?string $key): self
     {
         $this->key = $key;
 

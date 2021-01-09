@@ -40,9 +40,9 @@ class Collection extends Resource
      * Set a list of resource items in collection.
      *
      * @param \Flugg\Responder\Http\Resources\Item[] $items
-     * @return $this
+     * @return self
      */
-    public function setItems(array $items)
+    public function setItems(array $items): self
     {
         $this->items = $items;
 

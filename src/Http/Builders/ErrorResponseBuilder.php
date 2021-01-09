@@ -54,9 +54,9 @@ class ErrorResponseBuilder extends ResponseBuilder
      *
      * @param int|string|\Exception|null $code
      * @param string|\Exception|null $message
-     * @return $this
+     * @return self
      */
-    public function make($code = null, $message = null)
+    public function make($code = null, $message = null): self
     {
         if (($exception = $code) instanceof Exception) {
             $this->response = $this->makeResponseFromException($exception);
@@ -73,9 +73,9 @@ class ErrorResponseBuilder extends ResponseBuilder
      * Attach a validator to the error response.
      *
      * @param \Flugg\Responder\Contracts\Validation\Validator $validator
-     * @return $this
+     * @return self
      */
-    public function validator(Validator $validator)
+    public function validator(Validator $validator): self
     {
         $this->response->setValidator($validator);
 

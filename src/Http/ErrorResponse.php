@@ -71,9 +71,9 @@ class ErrorResponse extends Response
      * Set the error code.
      *
      * @param int|string $code
-     * @return $this
+     * @return self
      */
-    public function setCode($code)
+    public function setCode($code): self
     {
         $this->code = $code;
 
@@ -84,9 +84,9 @@ class ErrorResponse extends Response
      * Set the error message.
      *
      * @param string|null $message
-     * @return $this
+     * @return self
      */
-    public function setMessage(?string $message)
+    public function setMessage(?string $message): self
     {
         $this->message = $message;
 
@@ -97,9 +97,9 @@ class ErrorResponse extends Response
      * Set the validator attached to the response.
      *
      * @param \Flugg\Responder\Contracts\Validation\Validator $validator
-     * @return $this
+     * @return self
      */
-    public function setValidator(Validator $validator)
+    public function setValidator(Validator $validator): self
     {
         $this->validator = $validator;
 

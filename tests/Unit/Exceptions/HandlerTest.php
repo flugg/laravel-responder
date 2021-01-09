@@ -110,6 +110,7 @@ class HandlerTest extends UnitTestCase
         $validator = $this->prophesize(Validator::class);
         $exception = new ValidationException($validator->reveal());
         $responseBuilder = $this->mockErrorResponseBuilder($response = new JsonResponse());
+        $responseBuilder->validator(Argument::cetera())->willReturn($responseBuilder);
         $this->responder->error($exception)->willReturn($responseBuilder);
         $this->config->get('responder.exceptions')->willReturn([ValidationException::class => []]);
         $this->config->get('app.debug')->willReturn(false);
