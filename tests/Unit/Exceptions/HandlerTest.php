@@ -32,7 +32,7 @@ class HandlerTest extends UnitTestCase
     protected $exceptionHandler;
 
     /**
-     * Mock of a [\Illuminate\Contracts\Config\Repository] interface.
+     * Mock of an [\Illuminate\Contracts\Config\Repository] interface.
      *
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
