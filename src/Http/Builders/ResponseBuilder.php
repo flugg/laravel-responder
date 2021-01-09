@@ -3,7 +3,6 @@
 namespace Flugg\Responder\Http\Builders;
 
 use Flugg\Responder\Contracts\Http\ResponseFactory;
-use Flugg\Responder\Http\Response;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;

@@ -61,7 +61,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
      *
      * @return void
      */
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

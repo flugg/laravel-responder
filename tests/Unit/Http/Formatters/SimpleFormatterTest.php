@@ -2,10 +2,7 @@
 
 namespace Flugg\Responder\Tests\Unit\Http\Formatters;
 
-use Flugg\Responder\Contracts\Validation\Validator;
 use Flugg\Responder\Http\Formatters\SimpleFormatter;
-use Flugg\Responder\Http\Resources\Collection;
-use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Tests\UnitTestCase;
 
 /**
@@ -27,7 +24,7 @@ class SimpleFormatterTest extends UnitTestCase
      *
      * @return void
      */
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
