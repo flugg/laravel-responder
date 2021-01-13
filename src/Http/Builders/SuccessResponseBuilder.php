@@ -6,6 +6,7 @@ use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidDataException;
 use Flugg\Responder\Http\Resources\Item;
+use Flugg\Responder\Http\Resources\Primitive;
 use Flugg\Responder\Http\SuccessResponse;
 
 /**
@@ -24,17 +25,20 @@ class SuccessResponseBuilder extends ResponseBuilder
      * Build a success response.
      *
      * @param mixed $data
+     * @param string|null $resourceKey
      * @throws \Flugg\Responder\Exceptions\InvalidDataException
      * @return $this
      */
-    public function make($data = [])
+    public function make($data = null, ?string $resourceKey = null)
     {
-        if (is_array($data)) {
-            $this->response = (new SuccessResponse)->setResource(new Item($data));
-        } elseif (is_object($data)) {
-            $this->response = $this->normalizeData($data);
+        if (is_object($data)) {
+            $this->response = $this->normalizeData($data, $resourceKey);
+        } elseif (is_array($data)) {
+            $this->response = (new SuccessResponse)->setResource(new Item($data, $resourceKey));
+        } elseif (is_scalar($data)) {
+            $this->response = (new SuccessResponse)->setResource(new Primitive($data, $resourceKey));
         } else {
-            throw new InvalidDataException;
+            $this->response = new SuccessResponse;
         }
 
         return $this;
@@ -71,7 +75,7 @@ class SuccessResponseBuilder extends ResponseBuilder
      *
      * @return \Flugg\Responder\Http\SuccessResponse
      */
-    public function get(): SuccessResponse
+    public function get()
     {
         return $this->response;
     }
@@ -80,14 +84,21 @@ class SuccessResponseBuilder extends ResponseBuilder
      * Normalize the data into a success response value object.
      *
      * @param object $data
+     * @param string|null $resourceKey
      * @throws \Flugg\Responder\Exceptions\InvalidDataException
      * @return \Flugg\Responder\Http\SuccessResponse
      */
-    protected function normalizeData(object $data): SuccessResponse
+    protected function normalizeData(object $data, ?string $resourceKey): SuccessResponse
     {
         foreach ($this->config->get('responder.normalizers') as $class => $normalizer) {
             if ($data instanceof $class) {
-                return $this->container->makeWith($normalizer, ['data' => $data])->normalize();
+                $response = $this->container->makeWith($normalizer, ['data' => $data])->normalize();
+
+                return tap($response, function (SuccessResponse $response) use ($resourceKey) {
+                    if ($resourceKey) {
+                        $response->resource()->setKey($resourceKey);
+                    }
+                });
             }
         }
 
@@ -99,12 +110,8 @@ class SuccessResponseBuilder extends ResponseBuilder
      *
      * @return array
      */
-    protected function format(): array
+    protected function data(): array
     {
-        if (! $this->formatter) {
-            return $this->response->resource()->toArray();
-        }
-
         return $this->formatter->success($this->response);
     }
 }

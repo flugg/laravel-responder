@@ -8,14 +8,14 @@ use Illuminate\Http\JsonResponse;
 use Laravel\Lumen\Http\ResponseFactory;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Factories\LumenResponseFactory] class.
+ * Unit tests for the [LumenResponseFactory] class.
  *
  * @see \Flugg\Responder\Http\Factories\LumenResponseFactory
  */
 class LumenResponseFactoryTest extends UnitTestCase
 {
     /**
-     * Mock of Lumen's response factory.
+     * Mock of a [\Laravel\Lumen\Http\ResponseFactory] class.
      *
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
@@ -37,7 +37,7 @@ class LumenResponseFactoryTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->baseResponseFactory = $this->prophesize(ResponseFactory::class);
+        $this->baseResponseFactory = $this->mock(ResponseFactory::class);
         $this->responseFactory = new LumenResponseFactory($this->baseResponseFactory->reveal());
     }
 

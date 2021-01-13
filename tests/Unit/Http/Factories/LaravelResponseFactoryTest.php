@@ -37,7 +37,7 @@ class LaravelResponseFactoryTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->baseResponseFactory = $this->prophesize(ResponseFactory::class);
+        $this->baseResponseFactory = $this->mock(ResponseFactory::class);
         $this->responseFactory = new LaravelResponseFactory($this->baseResponseFactory->reveal());
     }
 

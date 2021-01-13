@@ -28,7 +28,7 @@ class ErrorMessageRegistryTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->messageRegistry = new ErrorMessageRegistry();
+        $this->messageRegistry = new ErrorMessageRegistry;
     }
 
     /**

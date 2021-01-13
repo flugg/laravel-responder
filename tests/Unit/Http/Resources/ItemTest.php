@@ -29,7 +29,7 @@ class ItemTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->item = new Item();
+        $this->item = new Item;
     }
 
     /**
@@ -37,7 +37,7 @@ class ItemTest extends UnitTestCase
      */
     public function testInitializePropertiesInConstructor()
     {
-        $resource = new Item($data = ['foo' => 1], $key = 'bar', $relations = ['baz' => new Item()]);
+        $resource = new Item($data = ['foo' => 1], $key = 'bar', $relations = ['baz' => new Item]);
 
         $this->assertSame($data, $resource->data());
         $this->assertSame($key, $resource->key());
@@ -71,37 +71,19 @@ class ItemTest extends UnitTestCase
      */
     public function testSetAndGetRelations()
     {
-        $this->item->setRelations($relations = ['foo' => new Item(), 'bar' => new Collection()]);
+        $this->item->setRelations($relations = ['foo' => new Item, 'bar' => new Collection]);
 
         $this->assertSame($relations, $this->item->relations());
     }
 
     /**
-     * Assert that [toArray] returns the data as an array.
+     * Assert that you can fetch data from the resource using object notation.
      */
-    public function testToArrayMethodReturnsData()
-    {
-        $this->item->setData($data = ['foo' => 1]);
-
-        $this->assertSame($data, $this->item->toArray());
-    }
-
-    /**
-     * Assert that you can fetch data from the resource using array access methods.
-     */
-    public function testArrayAccessMethodsAccessesData()
+    public function testAccessDataAsProperties()
     {
         $this->item->setData(['foo' => 1]);
 
-        $this->assertTrue(isset($this->item['foo']));
-        $this->assertFalse(isset($this->item['bar']));
-        $this->assertSame(1, $this->item['foo']);
-
-        unset($this->item['foo']);
-        $this->item['bar'] = 2;
-
-        $this->assertFalse(isset($this->item['foo']));
-        $this->assertTrue(isset($this->item['bar']));
-        $this->assertSame(2, $this->item['bar']);
+        $this->assertTrue(isset($this->item->foo));
+        $this->assertSame(1, $this->item->foo);
     }
 }

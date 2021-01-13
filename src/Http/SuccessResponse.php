@@ -21,9 +21,9 @@ class SuccessResponse extends Response
     /**
      * Resource attached to the response.
      *
-     * @var \Flugg\Responder\Http\Resources\Resource
+     * @var \Flugg\Responder\Http\Resources\Resource|null
      */
-    protected $resource;
+    protected $resource = null;
 
     /**
      * Paginator attached to the response.
@@ -42,9 +42,9 @@ class SuccessResponse extends Response
     /**
      * Get the response resource.
      *
-     * @return \Flugg\Responder\Http\Resources\Resource
+     * @return \Flugg\Responder\Http\Resources\Resource|null
      */
-    public function resource(): Resource
+    public function resource(): ?Resource
     {
         return $this->resource;
     }

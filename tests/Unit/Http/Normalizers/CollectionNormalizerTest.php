@@ -6,96 +6,65 @@ use Flugg\Responder\Http\Normalizers\CollectionNormalizer;
 use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
-use Flugg\Responder\Tests\ModelWithGetResourceKey;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as IlluminateCollection;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Normalizers\CollectionNormalizer] class.
+ * Unit tests for the [CollectionNormalizer] class.
  *
  * @see \Flugg\Responder\Http\Normalizers\CollectionNormalizer
  */
 class CollectionNormalizerTest extends UnitTestCase
 {
     /**
-     * Assert that [normalize] normalizes collection to a success response value object.
+     * Assert that [normalize] normalizes collection to a success response.
      */
     public function testNormalizeMethodNormalizesCollection()
     {
-        $collection = mock(IlluminateCollection::class);
-        $collection->allows('toArray')->andReturns($data = ['foo' => 1]);
-        $normalizer = new CollectionNormalizer($collection);
+        $collection = IlluminateCollection::make($data = ['foo' => 1, 'bar' => 2]);
 
-        $result = $normalizer->normalize();
+        $result = (new CollectionNormalizer($collection))->normalize();
 
         $this->assertInstanceOf(SuccessResponse::class, $result);
-        $this->assertInstanceOf(Item::class, $result->resource());
         $this->assertSame(200, $result->status());
-        $this->assertSame($data, $result->resource()->toArray());
+        $this->assertInstanceOf(Item::class, $result->resource());
+        $this->assertSame($data, $result->resource()->data());
         $this->assertNull($result->resource()->key());
     }
 
     /**
-     * Assert that [normalize] normalizes Eloquent collection to a success response value object.
+     * Assert that [normalize] normalizes Eloquent collection to a success response.
      */
     public function testNormalizeMethodNormalizesEloquentCollection()
     {
-        $collection = mock(EloquentCollection::class);
-        $collection->allows([
-            'isEmpty' => false,
-            'all' => [$model1 = mock(Model::class), $model2 = mock(Model::class)],
-            'first' => $model1,
+        $collection = EloquentCollection::make([
+            $this->mockModel($data1 = ['foo' => 1], $table = 'foo')->reveal(),
+            $this->mockModel($data2 = ['bar' => 2], $table)->reveal(),
         ]);
-        $model1->allows([
-            'getTable' => $key = 'foo',
-            'getRelations' => [],
-            'withoutRelations' => $model1,
-            'toArray' => $data1 = ['foo' => 1],
-        ]);
-        $model2->allows([
-            'getTable' => 'bar',
-            'getRelations' => [],
-            'withoutRelations' => $model2,
-            'toArray' => $data2 = ['bar' => 2],
-        ]);
-        $normalizer = new CollectionNormalizer($collection);
 
-        $result = $normalizer->normalize();
-        $resource = $result->resource();
+        $result = (new CollectionNormalizer($collection))->normalize();
 
         $this->assertInstanceOf(SuccessResponse::class, $result);
-        $this->assertInstanceOf(Collection::class, $resource);
         $this->assertSame(200, $result->status());
-        $this->assertSame([$data1, $data2], $resource->toArray());
-        $this->assertSame($key, $result->resource()->key());
-        if ($resource instanceof Collection) {
-            $this->assertCount(2, $resource->items());
-        }
+        $this->assertInstanceOf(Collection::class, $result->resource());
+        $this->assertCount(2, $result->resource()->items());
+        $this->assertSame($data1, $result->resource()[0]->data());
+        $this->assertSame($data2, $result->resource()[1]->data());
+        $this->assertSame($table, $result->resource()->key());
     }
 
     /**
-     * Assert that [normalize] sets resource key to the results of [getResourceKey] on first model.
+     * Assert that [normalize] sets resource key to the results of [getResourceKey] from first model.
      */
-    public function testNormalizeMethodSetsResourceKeyUsingMethodOnFirstModel()
+    public function testNormalizeMethodSetsResourceKeyUsingFirstModel()
     {
-        $collection = mock(EloquentCollection::class);
-        $collection->allows([
-            'isEmpty' => false,
-            'all' => [$model = mock(ModelWithGetResourceKey::class)],
-            'first' => $model,
+        $collection = EloquentCollection::make([
+            $this->mockModel([], 'foo', [], $key = 'bar')->reveal(),
+            $this->mockModel([], 'baz')->reveal(),
         ]);
-        $model->allows([
-            'getResourceKey' => $key = 'foo',
-            'getTable' => 'bar',
-            'getRelations' => [],
-            'withoutRelations' => $model,
-            'toArray' => [],
-        ]);
-        $normalizer = new CollectionNormalizer($collection);
 
-        $result = $normalizer->normalize();
+        $result = (new CollectionNormalizer($collection))->normalize();
 
         $this->assertSame($key, $result->resource()->key());
     }
@@ -105,14 +74,9 @@ class CollectionNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodSetsResourceKeyToNullWhenEmpty()
     {
-        $collection = mock(EloquentCollection::class);
-        $collection->allows([
-            'isEmpty' => true,
-            'all' => [],
-        ]);
-        $normalizer = new CollectionNormalizer($collection);
+        $collection = EloquentCollection::make([]);
 
-        $result = $normalizer->normalize();
+        $result = (new CollectionNormalizer($collection))->normalize();
 
         $this->assertNull($result->resource()->key());
     }
@@ -122,33 +86,16 @@ class CollectionNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesEloquentCollectionWithItemRelation()
     {
-        $collection = mock(EloquentCollection::class);
-        $collection->allows([
-            'isEmpty' => false,
-            'all' => [$model = mock(Model::class)],
-            'first' => $model,
+        $collection = EloquentCollection::make([
+            $this->mockModel([], 'foo', [
+                'bar' => $this->mockModel($relatedData = ['foo' => 1], 'bar'),
+            ])->reveal(),
+            $this->mockModel([], 'baz')->reveal(),
         ]);
-        $model->allows([
-            'getTable' => 'foo',
-            'getRelations' => ['bar' => $relation = mock(Model::class)],
-            'withoutRelations' => $model,
-            'toArray' => [],
-        ]);
-        $relation->allows([
-            'getTable' => 'bar',
-            'getRelations' => [],
-            'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 2],
-        ]);
-        $normalizer = new CollectionNormalizer($collection);
 
-        $result = $normalizer->normalize();
-        $resource = $result->resource();
+        $result = (new CollectionNormalizer($collection))->normalize();
 
-        $this->assertInstanceOf(Collection::class, $resource);
-        if ($resource instanceof Collection) {
-            $this->assertSame($relatedData, $resource->items()[0]->relations()['bar']->toArray());
-        }
+        $this->assertSame($relatedData, $result->resource()[0]->relations()['bar']->data());
     }
 
     /**
@@ -156,37 +103,17 @@ class CollectionNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesEloquentCollectionWithCollectionRelation()
     {
-        $collection = mock(EloquentCollection::class);
-        $collection->allows([
-            'isEmpty' => false,
-            'all' => [$model = mock(Model::class)],
-            'first' => $model,
+        $collection = EloquentCollection::make([
+            $this->mockModel([], 'foo', [
+                'bar' => EloquentCollection::make([
+                    $this->mockModel($relatedData = ['foo' => 1], 'bar')->reveal(),
+                ]),
+            ])->reveal(),
+            $this->mockModel([], 'baz')->reveal(),
         ]);
-        $model->allows([
-            'getTable' => 'foo',
-            'getRelations' => ['bar' => $relatedCollection = mock(EloquentCollection::class)],
-            'withoutRelations' => $model,
-            'toArray' => [],
-        ]);
-        $relatedCollection->allows([
-            'isEmpty' => false,
-            'all' => [$relation = mock(Model::class)],
-            'first' => $relation,
-        ]);
-        $relation->allows([
-            'getTable' => 'bar',
-            'getRelations' => [],
-            'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 2],
-        ]);
-        $normalizer = new CollectionNormalizer($collection);
 
-        $result = $normalizer->normalize();
-        $resource = $result->resource();
+        $result = (new CollectionNormalizer($collection))->normalize();
 
-        $this->assertInstanceOf(Collection::class, $resource);
-        if ($resource instanceof Collection) {
-            $this->assertSame([$relatedData], $resource->items()[0]->relations()['bar']->toArray());
-        }
+        $this->assertSame($relatedData, $result->resource()[0]->relations()['bar'][0]->data());
     }
 }

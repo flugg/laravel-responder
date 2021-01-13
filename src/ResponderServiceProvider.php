@@ -45,7 +45,6 @@ class ResponderServiceProvider extends ServiceProvider
      * Bootstrap the application events.
      *
      * @return void
-     * @codeCoverageIgnore
      */
     public function boot(): void
     {
@@ -65,9 +64,9 @@ class ResponderServiceProvider extends ServiceProvider
      */
     protected function registerErrorMessageRegistry(): void
     {
-        $this->app->singleton(ErrorMessageRegistryContract::class, function () {
-            return tap($this->app->make(ErrorMessageRegistry::class), function (ErrorMessageRegistry $messageRegistry) {
-                $messageRegistry->register(config('responder.error_messages'));
+        $this->app->singleton(ErrorMessageRegistryContract::class, function ($app) {
+            return tap($this->app->make(ErrorMessageRegistry::class), function (ErrorMessageRegistry $messageRegistry) use ($app) {
+                $messageRegistry->register($app->config->get('responder.error_messages'));
             });
         });
     }
@@ -79,11 +78,10 @@ class ResponderServiceProvider extends ServiceProvider
      */
     protected function registerResponseFactory(): void
     {
-        $this->app->singleton(ResponseFactory::class, function () {
-            $class = $this->app instanceof Lumen ? LumenResponseFactory::class : LaravelResponseFactory::class;
-            $factory = $this->app->make($class);
+        $this->app->singleton(ResponseFactory::class, function ($app) {
+            $factory = $this->app->make($this->app instanceof Lumen ? LumenResponseFactory::class : LaravelResponseFactory::class);
 
-            foreach ((config('responder.decorators') ?? []) as $decorator) {
+            foreach (($app->config->get('responder.decorators') ?? []) as $decorator) {
                 $factory = new $decorator($factory);
             }
 
@@ -98,8 +96,8 @@ class ResponderServiceProvider extends ServiceProvider
      */
     protected function registerResponseFormatter(): void
     {
-        $this->app->singleton(Formatter::class, function () {
-            return ($class = config('responder.formatter')) ? $this->app->make($class) : null;
+        $this->app->singleton(Formatter::class, function ($app) {
+            return $app->make($app->config->get('responder.formatter'));
         });
 
         foreach ([SuccessResponseBuilder::class, ErrorResponseBuilder::class] as $class) {

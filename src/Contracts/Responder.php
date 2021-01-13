@@ -16,7 +16,7 @@ interface Responder
      * @param mixed $data
      * @return \Flugg\Responder\Http\Builders\SuccessResponseBuilder
      */
-    public function success($data = []): SuccessResponseBuilder;
+    public function success($data = null): SuccessResponseBuilder;
 
     /**
      * Build an error response.

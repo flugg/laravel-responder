@@ -9,6 +9,8 @@ use Flugg\Responder\Contracts\Validation\Validator;
 use Flugg\Responder\Http\ErrorResponse;
 use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\Resources\Item;
+use Flugg\Responder\Http\Resources\Primitive;
+use Flugg\Responder\Http\Resources\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Illuminate\Support\Collection as IlluminateCollection;
 
@@ -26,11 +28,8 @@ class SimpleFormatter implements Formatter
     public function success(SuccessResponse $response): array
     {
         $resource = $response->resource();
-        $data = array_merge([
-            ($resource->key() ?: 'data') => $resource instanceof Item
-                ? $this->item($resource)
-                : ($resource instanceof Collection ? $this->collection($resource) : []),
-        ], $response->meta());
+        $resourceKey = ($resource ? $resource->key() : null) ?: 'data';
+        $data = array_merge([$resourceKey => $this->data($resource)], $response->meta());
 
         if ($paginator = $response->paginator()) {
             $data['pagination'] = $this->paginator($paginator);
@@ -49,11 +48,7 @@ class SimpleFormatter implements Formatter
      */
     public function error(ErrorResponse $response): array
     {
-        $data = array_merge([
-            'error' => [
-                'code' => $response->code(),
-            ],
-        ], $response->meta());
+        $data = array_merge(['error' => ['code' => $response->code()]], $response->meta());
 
         if ($message = $response->message()) {
             $data['error']['message'] = $message;
@@ -64,6 +59,25 @@ class SimpleFormatter implements Formatter
         }
 
         return $data;
+    }
+
+    /**
+     * Format success data structure from a resource.
+     *
+     * @param \Flugg\Responder\Http\Resources\Resource|null $resource
+     * @return mixed
+     */
+    protected function data(?Resource $resource)
+    {
+        if ($resource instanceof Item) {
+            return $this->item($resource);
+        } elseif ($resource instanceof Collection) {
+            return $this->collection($resource);
+        } elseif ($resource instanceof Primitive) {
+            return $resource->data();
+        }
+
+        return null;
     }
 
     /**

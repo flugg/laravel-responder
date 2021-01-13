@@ -41,7 +41,7 @@ class SuccessResponseTest extends UnitTestCase
      */
     public function testSetAndGetResource()
     {
-        $resource = $this->prophesize(Resource::class);
+        $resource = $this->mock(Resource::class);
 
         $result = $this->response->setResource($resource->reveal());
 
@@ -54,7 +54,7 @@ class SuccessResponseTest extends UnitTestCase
      */
     public function testSetAndGetPaginator()
     {
-        $paginator = $this->prophesize(Paginator::class);
+        $paginator = $this->mock(Paginator::class);
 
         $this->response->setPaginator($paginator->reveal());
 
@@ -66,7 +66,7 @@ class SuccessResponseTest extends UnitTestCase
      */
     public function testSetAndGetCursor()
     {
-        $paginator = $this->prophesize(CursorPaginator::class);
+        $paginator = $this->mock(CursorPaginator::class);
 
         $this->response->setCursor($paginator->reveal());
 

@@ -30,7 +30,7 @@ class ResolveResponderServiceTest extends IntegrationTestCase
      */
     public function testResolveFromHelperFunction()
     {
-        $responder = $this->mock(ResponderContract::class);
+        $responder = $this->spy(ResponderContract::class);
 
         $result = responder();
 
@@ -42,7 +42,7 @@ class ResolveResponderServiceTest extends IntegrationTestCase
      */
     public function testResolveFromFacade()
     {
-        $responder = $this->mock(ResponderContract::class);
+        $responder = $this->spy(ResponderContract::class);
 
         $result = ResponderFacade::getFacadeRoot();
 
@@ -54,9 +54,9 @@ class ResolveResponderServiceTest extends IntegrationTestCase
      */
     public function testResolveFromTrait()
     {
-        $successResponseBuilder = $this->mock(SuccessResponseBuilder::class);
+        $successResponseBuilder = $this->spy(SuccessResponseBuilder::class);
         $successResponseBuilder->allows('make')->andReturnSelf();
-        $errorResponseBuilder = $this->mock(ErrorResponseBuilder::class);
+        $errorResponseBuilder = $this->spy(ErrorResponseBuilder::class);
         $errorResponseBuilder->allows('make')->andReturnSelf();
         $trait = $this->getMockForTrait(MakesJsonResponses::class);
 

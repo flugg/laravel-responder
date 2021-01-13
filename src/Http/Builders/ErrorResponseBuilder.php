@@ -4,6 +4,7 @@ namespace Flugg\Responder\Http\Builders;
 
 use Exception;
 use Flugg\Responder\Contracts\ErrorMessageRegistry;
+use Flugg\Responder\Contracts\Http\Formatter;
 use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Flugg\Responder\Contracts\Validation\Validator;
 use Flugg\Responder\Http\ErrorResponse;
@@ -34,19 +35,21 @@ class ErrorResponseBuilder extends ResponseBuilder
      * Create a new response builder instance.
      *
      * @param \Flugg\Responder\Contracts\Http\ResponseFactory $responseFactory
-     * @param \Illuminate\Contracts\Container\Container $container
+     * @param \Flugg\Responder\Contracts\Http\Formatter $formatter
      * @param \Illuminate\Contracts\Config\Repository $config
+     * @param \Illuminate\Contracts\Container\Container $container
      * @param \Flugg\Responder\Contracts\ErrorMessageRegistry $messageRegistry
      */
     public function __construct(
         ResponseFactory $responseFactory,
-        Container $container,
+        Formatter $formatter,
         Repository $config,
+        Container $container,
         ErrorMessageRegistry $messageRegistry
     ) {
         $this->messageRegistry = $messageRegistry;
 
-        parent::__construct($responseFactory, $container, $config);
+        parent::__construct($responseFactory, $formatter, $config, $container);
     }
 
     /**
@@ -87,7 +90,7 @@ class ErrorResponseBuilder extends ResponseBuilder
      *
      * @return \Flugg\Responder\Http\ErrorResponse
      */
-    public function get(): ErrorResponse
+    public function get()
     {
         return $this->response;
     }
@@ -128,12 +131,8 @@ class ErrorResponseBuilder extends ResponseBuilder
      *
      * @return array
      */
-    protected function format(): array
+    protected function data(): array
     {
-        if (! $this->formatter) {
-            return ['message' => $this->response->message()];
-        }
-
         return $this->formatter->error($this->response);
     }
 }

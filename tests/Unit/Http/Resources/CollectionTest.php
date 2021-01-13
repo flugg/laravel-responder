@@ -29,7 +29,7 @@ class CollectionTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->collection = new Collection();
+        $this->collection = new Collection;
     }
 
     /**
@@ -59,19 +59,44 @@ class CollectionTest extends UnitTestCase
      */
     public function testSetAndGetItems()
     {
-        $result = $this->collection->setItems($items = [new Item(), new Item()]);
+        $result = $this->collection->setItems($items = [new Item, new Item]);
 
         $this->assertSame($this->collection, $result);
         $this->assertSame($items, $this->collection->items());
     }
 
     /**
-     * Assert that [toArray] returns the data as an array.
+     * Assert that you can access items with array notation.
      */
-    public function testToArrayMethodReturnsData()
+    public function testAccessItemsWithArrayNotation()
     {
-        $this->collection->setItems([$item1 = new Item(), $item2 = new Item()]);
+        $this->collection->setItems([$item1 = new Item, $item2 = new Item]);
 
-        $this->assertSame([$item1->toArray(), $item2->toArray()], $this->collection->toArray());
+        $this->assertTrue(isset($this->collection[0]));
+        $this->assertTrue(isset($this->collection[1]));
+        $this->assertFalse(isset($this->collection[2]));
+        $this->assertSame($item1, $this->collection[0]);
+        $this->assertSame($item2, $this->collection[1]);
+    }
+
+    /**
+     * Assert that you can set items with array notation.
+     */
+    public function testSetItemsWithArrayNotation()
+    {
+        $this->collection[0] = ($item = new Item);
+
+        $this->assertSame($item, $this->collection[0]);
+    }
+
+    /**
+     * Assert that you can unset items with array notation.
+     */
+    public function testUnsetItemsWithArrayNotation()
+    {
+        $this->collection[0] = (new Item);
+        unset($this->collection[0]);
+
+        $this->assertCount(0, $this->collection->items());
     }
 }

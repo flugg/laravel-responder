@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder\Http\Builders;
 
+use Flugg\Responder\Contracts\Http\Formatter;
 use Flugg\Responder\Contracts\Http\ResponseFactory;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
@@ -25,11 +26,11 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable,
     protected $responseFactory;
 
     /**
-     * A service container.
+     * Response formatter.
      *
-     * @var \Illuminate\Contracts\Container\Container
+     * @var \Flugg\Responder\Contracts\Http\Formatter
      */
-    protected $container;
+    protected $formatter;
 
     /**
      * Config repository.
@@ -39,6 +40,13 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable,
     protected $config;
 
     /**
+     * A service container.
+     *
+     * @var \Illuminate\Contracts\Container\Container
+     */
+    protected $container;
+
+    /**
      * Response value object.
      *
      * @var \Flugg\Responder\Http\Response
@@ -46,30 +54,25 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable,
     protected $response;
 
     /**
-     * Response formatter.
-     *
-     * @var \Flugg\Responder\Contracts\Http\Formatter|null
-     */
-    protected $formatter;
-
-    /**
      * Create a new response builder instance.
      *
      * @param \Flugg\Responder\Contracts\Http\ResponseFactory $responseFactory
-     * @param \Illuminate\Contracts\Container\Container $container
+     * @param \Flugg\Responder\Contracts\Http\Formatter $formatter
      * @param \Illuminate\Contracts\Config\Repository $config
+     * @param \Illuminate\Contracts\Container\Container $container
      */
-    public function __construct(ResponseFactory $responseFactory, Container $container, Repository $config)
+    public function __construct(ResponseFactory $responseFactory, Formatter $formatter, Repository $config, Container $container)
     {
         $this->responseFactory = $responseFactory;
-        $this->container = $container;
+        $this->formatter = $formatter;
         $this->config = $config;
+        $this->container = $container;
     }
 
     /**
      * Set a response formatter.
      *
-     * @param \Flugg\Responder\Contracts\Http\Formatter|string|null $formatter
+     * @param \Flugg\Responder\Contracts\Http\Formatter|string $formatter
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @return $this
      */
@@ -111,18 +114,6 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable,
     }
 
     /**
-     * Create an HTTP response that represents the object.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function toResponse($request): JsonResponse
-    {
-        return $this->respond();
-    }
-
-    /**
      * Respond with a JSON response.
      *
      * @param int|null $status
@@ -138,7 +129,19 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable,
 
         $this->response->setHeaders(array_merge($this->response->headers(), $headers));
 
-        return $this->responseFactory->make($this->format(), $this->response->status(), $this->response->headers());
+        return $this->responseFactory->make($this->data(), $this->response->status(), $this->response->headers());
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toResponse($request): JsonResponse
+    {
+        return $this->respond();
     }
 
     /**
@@ -187,16 +190,9 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable,
     }
 
     /**
-     * Retrieve the response data transer object.
-     *
-     * @return \Flugg\Responder\Http\Response
-     */
-    abstract public function get();
-
-    /**
      * Format the response data.
      *
      * @return array
      */
-    abstract protected function format(): array;
+    abstract protected function data(): array;
 }

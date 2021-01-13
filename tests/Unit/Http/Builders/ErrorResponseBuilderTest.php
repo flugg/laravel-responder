@@ -13,7 +13,6 @@ use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Prophecy\Argument;
@@ -33,11 +32,11 @@ class ErrorResponseBuilderTest extends UnitTestCase
     protected $responseFactory;
 
     /**
-     * Mock of an [\Illuminate\Contracts\Container\Container] interface.
+     * Mock of a [\Flugg\Responder\Contracts\Http\Formatter] interface.
      *
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
-    protected $container;
+    protected $formatter;
 
     /**
      * Mock of an [\Illuminate\Contracts\Config\Repository] class.
@@ -45,6 +44,13 @@ class ErrorResponseBuilderTest extends UnitTestCase
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $config;
+
+    /**
+     * Mock of an [\Illuminate\Contracts\Container\Container] interface.
+     *
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
+    protected $container;
 
     /**
      * Mock of a [\Flugg\Responder\Contracts\ErrorMessageRegistry] interface.
@@ -69,14 +75,16 @@ class ErrorResponseBuilderTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->responseFactory = $this->prophesize(ResponseFactory::class);
-        $this->container = $this->prophesize(Container::class);
-        $this->config = $this->prophesize(Repository::class);
-        $this->messageRegistry = $this->prophesize(ErrorMessageRegistry::class);
+        $this->responseFactory = $this->mock(ResponseFactory::class);
+        $this->formatter = $this->mock(Formatter::class);
+        $this->config = $this->mock(Repository::class);
+        $this->container = $this->mock(Container::class);
+        $this->messageRegistry = $this->mock(ErrorMessageRegistry::class);
         $this->responseBuilder = new ErrorResponseBuilder(
             $this->responseFactory->reveal(),
-            $this->container->reveal(),
+            $this->formatter->reveal(),
             $this->config->reveal(),
+            $this->container->reveal(),
             $this->messageRegistry->reveal()
         );
     }
@@ -182,7 +190,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
      */
     public function testValidatorMethodSetsValidatorOnResponseObject()
     {
-        $validator = $this->prophesize(Validator::class);
+        $validator = $this->mock(Validator::class);
 
         $result = $this->responseBuilder->make()->validator($validator->reveal())->get();
 
@@ -195,11 +203,14 @@ class ErrorResponseBuilderTest extends UnitTestCase
     public function testRespondMethodMakesResponse()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn($response = new JsonResponse);
+        $this->formatter->error(Argument::cetera())->willReturn($data = ['foo' => 1]);
+        $responseBuilder = $this->responseBuilder->make();
 
-        $result = $this->responseBuilder->make()->respond($status = 400, $headers = ['x-foo' => 1]);
+        $result = $responseBuilder->respond($status = 400, $headers = ['x-foo' => 1]);
 
         $this->assertSame($response, $result);
-        $this->responseFactory->make(['message' => null], $status, $headers)->shouldHaveBeenCalledOnce();
+        $this->responseFactory->make($data, $status, $headers)->shouldHaveBeenCalledOnce();
+        $this->formatter->error($responseBuilder->get())->shouldHaveBeenCalledOnce();
     }
 
     /**
@@ -208,11 +219,12 @@ class ErrorResponseBuilderTest extends UnitTestCase
     public function testRespondMethodDefaultsToStatusCode500()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn($response = new JsonResponse);
+        $this->formatter->error(Argument::cetera())->willReturn($data = []);
 
         $result = $this->responseBuilder->make()->respond();
 
         $this->assertSame($response, $result);
-        $this->responseFactory->make(['message' => null], 500, [])->shouldHaveBeenCalledOnce();
+        $this->responseFactory->make($data, 500, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
@@ -221,11 +233,12 @@ class ErrorResponseBuilderTest extends UnitTestCase
     public function testToResponseMethodMakesResponse()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn($response = new JsonResponse);
+        $this->formatter->error(Argument::cetera())->willReturn($data = ['foo' => 1]);
 
-        $result = $this->responseBuilder->make()->toResponse(mock(Request::class));
+        $result = $this->responseBuilder->make()->toResponse($this->mockRequest());
 
         $this->assertSame($response, $result);
-        $this->responseFactory->make(['message' => null], 500, [])->shouldHaveBeenCalledOnce();
+        $this->responseFactory->make($data, 500, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
@@ -233,8 +246,8 @@ class ErrorResponseBuilderTest extends UnitTestCase
      */
     public function testToArrayMethodReturnsArray()
     {
-        $response = new JsonResponse($data = ['foo' => 1]);
-        $this->responseFactory->make(Argument::cetera())->willReturn($response);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse($data = ['foo' => 1]));
+        $this->formatter->error(Argument::cetera())->willReturn([]);
 
         $result = $this->responseBuilder->make()->toArray();
 
@@ -246,8 +259,8 @@ class ErrorResponseBuilderTest extends UnitTestCase
      */
     public function testToCollectionMethodReturnsCollection()
     {
-        $response = new JsonResponse($data = ['foo' => 1]);
-        $this->responseFactory->make(Argument::cetera())->willReturn($response);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse($data = ['foo' => 1]));
+        $this->formatter->error(Argument::cetera())->willReturn([]);
 
         $result = $this->responseBuilder->make()->toCollection();
 
@@ -259,8 +272,8 @@ class ErrorResponseBuilderTest extends UnitTestCase
      */
     public function testToJsonMethodReturnsResponseAsJson()
     {
-        $response = new JsonResponse($data = ['foo' => 1]);
-        $this->responseFactory->make(Argument::cetera())->willReturn($response);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse($data = ['foo' => 1]));
+        $this->formatter->error(Argument::cetera())->willReturn([]);
 
         $result = $this->responseBuilder->make()->toJson(JSON_PRETTY_PRINT);
 
@@ -272,8 +285,8 @@ class ErrorResponseBuilderTest extends UnitTestCase
      */
     public function testJsonSerializeMethodReturnsResponseAsArray()
     {
-        $response = new JsonResponse($data = ['foo' => 1]);
-        $this->responseFactory->make(Argument::cetera())->willReturn($response);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse($data = ['foo' => 1]));
+        $this->formatter->error(Argument::cetera())->willReturn([]);
 
         $result = $this->responseBuilder->make()->toArray();
 
@@ -285,7 +298,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
      */
     public function testFormatterMethodSetsFormatter()
     {
-        $formatter = $this->prophesize(Formatter::class);
+        $formatter = $this->mock(Formatter::class);
         $formatter->error(Argument::any())->willReturn($data = ['foo' => 1]);
         $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
 
@@ -299,7 +312,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
      */
     public function testFormatterMethodResolvesFormatterFromContainer()
     {
-        $formatter = $this->prophesize(Formatter::class);
+        $formatter = $this->mock(Formatter::class);
         $formatter->error(Argument::any())->willReturn($data = ['foo' => 1]);
         $this->container->make($binding = 'foo')->willReturn($formatter);
         $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
@@ -315,6 +328,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
     public function testDecorateMethodDecoratesResponseFactory()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+        $this->formatter->error(Argument::cetera())->willReturn([]);
 
         $this->responseBuilder->make()->decorate(IncreaseStatusByOneDecorator::class)->respond();
 
@@ -327,6 +341,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
     public function testDecorateMethodAcceptsMultipleDecorators()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+        $this->formatter->error(Argument::cetera())->willReturn([]);
 
         $this->responseBuilder->make()->decorate([
             IncreaseStatusByOneDecorator::class,
@@ -342,14 +357,8 @@ class ErrorResponseBuilderTest extends UnitTestCase
      */
     public function testMetaMethodSetsMetadata()
     {
-        $formatter = $this->prophesize(Formatter::class);
-        $formatter->error(Argument::any())->will(function ($args) {
-            return ['meta' => $args[0]->meta()];
-        });
-        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+        $result = $this->responseBuilder->make()->meta($meta = ['foo' => 1])->get();
 
-        $this->responseBuilder->make()->meta($meta = ['foo' => 1])->formatter($formatter->reveal())->respond();
-
-        $this->responseFactory->make(['meta' => $meta], 500, [])->shouldHaveBeenCalledOnce();
+        $this->assertSame($meta, $result->meta());
     }
 }

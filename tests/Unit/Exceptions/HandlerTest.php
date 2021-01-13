@@ -6,6 +6,7 @@ use Exception;
 use Flugg\Responder\Adapters\IlluminateValidatorAdapter;
 use Flugg\Responder\Contracts\Responder;
 use Flugg\Responder\Exceptions\Handler;
+use Flugg\Responder\Http\Builders\ErrorResponseBuilder;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -61,9 +62,9 @@ class HandlerTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->exceptionHandler = $this->prophesize(ExceptionHandler::class);
-        $this->config = $this->prophesize(Repository::class);
-        $this->responder = $this->prophesize(Responder::class);
+        $this->exceptionHandler = $this->mock(ExceptionHandler::class);
+        $this->config = $this->mock(Repository::class);
+        $this->responder = $this->mock(Responder::class);
         $this->handler = new Handler($this->exceptionHandler->reveal(), $this->config->reveal(), $this->responder->reveal());
     }
 
@@ -74,7 +75,8 @@ class HandlerTest extends UnitTestCase
     {
         $request = $this->mockRequest();
         $exception = new LogicException();
-        $responseBuilder = $this->mockErrorResponseBuilder($response = new JsonResponse());
+        $responseBuilder = $this->mock(ErrorResponseBuilder::class);
+        $responseBuilder->respond()->willReturn($response = new JsonResponse());
         $this->responder->error($exception)->willReturn($responseBuilder);
         $this->config->get('responder.exceptions')->willReturn([LogicException::class => []]);
         $this->config->get('app.debug')->willReturn(false);
@@ -91,7 +93,8 @@ class HandlerTest extends UnitTestCase
     {
         $request = $this->mockRequest();
         $exception = new FileException();
-        $responseBuilder = $this->mockErrorResponseBuilder($response = new JsonResponse());
+        $responseBuilder = $this->mock(ErrorResponseBuilder::class);
+        $responseBuilder->respond()->willReturn($response = new JsonResponse());
         $this->responder->error($exception)->willReturn($responseBuilder);
         $this->config->get('responder.exceptions')->willReturn([Exception::class => []]);
         $this->config->get('app.debug')->willReturn(false);
@@ -107,9 +110,10 @@ class HandlerTest extends UnitTestCase
     public function testRenderMethodConvertsValidationExceptionsWithValidator()
     {
         $request = $this->mockRequest();
-        $validator = $this->prophesize(Validator::class);
+        $validator = $this->mock(Validator::class);
         $exception = new ValidationException($validator->reveal());
-        $responseBuilder = $this->mockErrorResponseBuilder($response = new JsonResponse());
+        $responseBuilder = $this->mock(ErrorResponseBuilder::class);
+        $responseBuilder->respond()->willReturn($response = new JsonResponse());
         $responseBuilder->validator(Argument::cetera())->willReturn($responseBuilder);
         $this->responder->error($exception)->willReturn($responseBuilder);
         $this->config->get('responder.exceptions')->willReturn([ValidationException::class => []]);
@@ -128,7 +132,8 @@ class HandlerTest extends UnitTestCase
     {
         $request = $this->mockRequest();
         $exception = new LogicException();
-        $responseBuilder = $this->mockErrorResponseBuilder($response = new JsonResponse());
+        $responseBuilder = $this->mock(ErrorResponseBuilder::class);
+        $responseBuilder->respond()->willReturn($response = new JsonResponse());
         $this->responder->error($exception)->willReturn($responseBuilder);
         $this->config->get('responder.exceptions')->willReturn([LogicException::class => ['status' => 400]]);
         $this->config->get('app.debug')->willReturn(true);
@@ -215,7 +220,7 @@ class HandlerTest extends UnitTestCase
      */
     public function testRenderForConsoleMethodIsForwarded()
     {
-        $output = $this->prophesize(OutputInterface::class);
+        $output = $this->mock(OutputInterface::class);
         $exception = new LogicException();
 
         $this->handler->renderForConsole($output->reveal(), $exception);
@@ -228,7 +233,7 @@ class HandlerTest extends UnitTestCase
      */
     public function testOtherMethodsAreForwarded()
     {
-        $exceptionHandler = $this->prophesize(ClassWithFooMethod::class);
+        $exceptionHandler = $this->mock(ClassWithFooMethod::class);
         $exceptionHandler->willImplement(ExceptionHandler::class);
         $exceptionHandler->foo($foo = 1)->willReturn($bar = 2);
         $this->handler = new Handler($exceptionHandler->reveal(), $this->config->reveal(), $this->responder->reveal());

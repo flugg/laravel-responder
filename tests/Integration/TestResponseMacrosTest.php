@@ -4,6 +4,7 @@ namespace Flugg\Responder\Tests\Integration;
 
 use Flugg\Responder\Tests\IntegrationTestCase;
 use Illuminate\Testing\TestResponse;
+use Mockery;
 
 /**
  * Integration tests for testing macros.
@@ -26,7 +27,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
     {
         parent::setUp();
 
-        $this->testResponse = mock(TestResponse::class)->makePartial();
+        $this->testResponse = Mockery::mock(TestResponse::class)->makePartial();
     }
 
     /**
@@ -42,7 +43,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
         $this->assertSame($this->testResponse, $result);
         $this->testResponse->shouldHaveReceived('assertExactJson')->with([
             'data' => $data,
-        ]);
+        ])->once();
     }
 
     /**
@@ -61,7 +62,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
                 'code' => $code,
                 'message' => $message,
             ],
-        ]);
+        ])->once();
     }
 
     /**
@@ -92,6 +93,6 @@ class TestResponseMacrosTest extends IntegrationTestCase
                     ],
                 ],
             ],
-        ]);
+        ])->once();
     }
 }

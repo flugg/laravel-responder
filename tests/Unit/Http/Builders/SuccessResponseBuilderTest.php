@@ -10,13 +10,14 @@ use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidDataException;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Http\Resources\Item;
+use Flugg\Responder\Http\Resources\Primitive;
+use Flugg\Responder\Http\Resources\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\IncreaseStatusByOneDecorator;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Prophecy\Argument;
 use stdClass;
@@ -36,11 +37,11 @@ class SuccessResponseBuilderTest extends UnitTestCase
     protected $responseFactory;
 
     /**
-     * Mock of an [\Illuminate\Contracts\Container\Container] interface.
+     * Mock of a [\Flugg\Responder\Contracts\Http\Formatter] interface.
      *
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
-    protected $container;
+    protected $formatter;
 
     /**
      * Mock of an [\Illuminate\Contracts\Config\Repository] class.
@@ -48,6 +49,13 @@ class SuccessResponseBuilderTest extends UnitTestCase
      * @var \Prophecy\Prophecy\ObjectProphecy
      */
     protected $config;
+
+    /**
+     * Mock of an [\Illuminate\Contracts\Container\Container] interface.
+     *
+     * @var \Prophecy\Prophecy\ObjectProphecy
+     */
+    protected $container;
 
     /**
      * Class being tested.
@@ -65,13 +73,15 @@ class SuccessResponseBuilderTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->responseFactory = $this->prophesize(ResponseFactory::class);
-        $this->container = $this->prophesize(Container::class);
-        $this->config = $this->prophesize(Repository::class);
+        $this->responseFactory = $this->mock(ResponseFactory::class);
+        $this->formatter = $this->mock(Formatter::class);
+        $this->container = $this->mock(Container::class);
+        $this->config = $this->mock(Repository::class);
         $this->responseBuilder = new SuccessResponseBuilder(
             $this->responseFactory->reveal(),
+            $this->formatter->reveal(),
+            $this->config->reveal(),
             $this->container->reveal(),
-            $this->config->reveal()
         );
     }
 
@@ -86,23 +96,11 @@ class SuccessResponseBuilderTest extends UnitTestCase
     }
 
     /**
-     * Assert that [make] creates a resource from an array and sets it on response object.
-     */
-    public function testMakeMethodCreatesResourceFromArray()
-    {
-        $result = $this->responseBuilder->make($data = ['foo' => 1]);
-
-        $this->assertSame($this->responseBuilder, $result);
-        $this->assertInstanceOf(Item::class, $result->get()->resource());
-        $this->assertSame($data, $result->get()->resource()->toArray());
-    }
-
-    /**
-     * Assert that [make] .
+     * Assert that [make] creates a response by normalizing the data using configured normalizer.
      */
     public function testMakeMethodNormalizesDataUsingConfiguredNormalizer()
     {
-        $normalizer = $this->prophesize(Normalizer::class);
+        $normalizer = $this->mock(Normalizer::class);
         $normalizer->normalize()->willReturn($response = new SuccessResponse);
         $this->config->get('responder.normalizers')->willReturn([stdClass::class => get_class($normalizer->reveal())]);
         $this->container->makeWith(Argument::cetera())->willReturn($normalizer->reveal());
@@ -114,19 +112,64 @@ class SuccessResponseBuilderTest extends UnitTestCase
     }
 
     /**
-     * Assert that [make] throws an exception when given non-supported data types.
+     * Assert that [make] accepts a resource key which overrides resource key set on normalized response.
      */
-    public function testMakeMethodThrowsExceptionForInvalidDataType()
+    public function testMakeMethodResourceKeyParameterOverridesNormalizedResponse()
     {
-        $this->expectException(InvalidDataException::class);
+        $response = (new SuccessResponse)->setResource(new Item([], 'foo'));
+        $normalizer = $this->mock(Normalizer::class);
+        $normalizer->normalize()->willReturn($response);
+        $this->config->get('responder.normalizers')->willReturn([stdClass::class => get_class($normalizer->reveal())]);
+        $this->container->makeWith(Argument::cetera())->willReturn($normalizer->reveal());
 
-        $this->responseBuilder->make(123);
+        $this->responseBuilder->make(new stdClass, $key = 'bar')->get();
+
+        $this->assertSame($key, $response->resource()->key());
     }
 
     /**
-     * Assert that [make] throws an exception when given data with no normalizer configured.
+     * Assert that [make] creates an item resource from an array and sets it on response object.
      */
-    public function testMakeMethodThrowsExceptionForDataWithoutNormalizer()
+    public function testMakeMethodCreatesResourceFromArray()
+    {
+        $result = $this->responseBuilder->make($data = ['foo' => 1], $key = 'bar');
+
+        $this->assertSame($this->responseBuilder, $result);
+        $this->assertInstanceOf(Item::class, $result->get()->resource());
+        $this->assertSame($data, $result->get()->resource()->data());
+        $this->assertSame($key, $result->get()->resource()->key());
+    }
+
+    /**
+     * Assert that [make] creates a primitve resource from a scalar and sets it on response object.
+     */
+    public function testMakeMethodCreatesResourceFromScalar()
+    {
+        foreach ([true, 1.0, 1, 'foo'] as $data) {
+            $result = $this->responseBuilder->make($data, $key = 'bar');
+
+            $this->assertSame($this->responseBuilder, $result);
+            $this->assertInstanceOf(Primitive::class, $result->get()->resource());
+            $this->assertSame($data, $result->get()->resource()->data());
+            $this->assertSame($key, $result->get()->resource()->key());
+        }
+    }
+
+    /**
+     * Assert that [make] doesn't create a resource when given null and sets it on response object.
+     */
+    public function testMakeMethodCreatesResourceFromNull()
+    {
+        $result = $this->responseBuilder->make(null);
+
+        $this->assertSame($this->responseBuilder, $result);
+        $this->assertNull($result->get()->resource());
+    }
+
+    /**
+     * Assert that [make] throws an exception when given object with no normalizer configured.
+     */
+    public function testMakeMethodThrowsExceptionForObjectWithoutNormalizer()
     {
         $this->expectException(InvalidDataException::class);
         $this->config->get('responder.normalizers')->willReturn([]);
@@ -139,7 +182,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testPaginatorMethodSetsPaginatorOnResponseObject()
     {
-        $paginator = $this->prophesize(Paginator::class);
+        $paginator = $this->mock(Paginator::class);
 
         $result = $this->responseBuilder->make()->paginator($paginator->reveal())->get();
 
@@ -151,7 +194,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testCursorMethodSetsCursorPaginatorOnResponseObject()
     {
-        $paginator = $this->prophesize(CursorPaginator::class);
+        $paginator = $this->mock(CursorPaginator::class);
 
         $result = $this->responseBuilder->make()->cursor($paginator->reveal())->get();
 
@@ -164,11 +207,14 @@ class SuccessResponseBuilderTest extends UnitTestCase
     public function testRespondMethodMakesResponse()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn($response = new JsonResponse);
+        $this->formatter->success(Argument::cetera())->willReturn($data = ['foo' => 1]);
+        $responseBuilder = $this->responseBuilder->make();
 
-        $result = $this->responseBuilder->make()->respond($status = 300, $headers = ['x-foo' => 1]);
+        $result = $responseBuilder->respond($status = 300, $headers = ['x-foo' => 1]);
 
         $this->assertSame($response, $result);
-        $this->responseFactory->make([], $status, $headers)->shouldHaveBeenCalledOnce();
+        $this->responseFactory->make($data, $status, $headers)->shouldHaveBeenCalledOnce();
+        $this->formatter->success($responseBuilder->get())->shouldHaveBeenCalledOnce();
     }
 
     /**
@@ -177,11 +223,12 @@ class SuccessResponseBuilderTest extends UnitTestCase
     public function testRespondMethodDefaultsToStatusCode200()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn($response = new JsonResponse);
+        $this->formatter->success(Argument::cetera())->willReturn($data = []);
 
         $result = $this->responseBuilder->make()->respond();
 
         $this->assertSame($response, $result);
-        $this->responseFactory->make([], 200, [])->shouldHaveBeenCalledOnce();
+        $this->responseFactory->make($data, 200, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
@@ -190,11 +237,12 @@ class SuccessResponseBuilderTest extends UnitTestCase
     public function testToResponseMethodMakesResponse()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn($response = new JsonResponse);
+        $this->formatter->success(Argument::cetera())->willReturn($data = ['foo' => 1]);
 
-        $result = $this->responseBuilder->make()->toResponse(mock(Request::class));
+        $result = $this->responseBuilder->make()->toResponse($this->mockRequest());
 
         $this->assertSame($response, $result);
-        $this->responseFactory->make([], 200, [])->shouldHaveBeenCalledOnce();
+        $this->responseFactory->make($data, 200, [])->shouldHaveBeenCalledOnce();
     }
 
     /**
@@ -202,8 +250,8 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testToArrayMethodReturnsArray()
     {
-        $response = new JsonResponse($data = ['foo' => 1]);
-        $this->responseFactory->make(Argument::cetera())->willReturn($response);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse($data = ['foo' => 1]));
+        $this->formatter->success(Argument::cetera())->willReturn([]);
 
         $result = $this->responseBuilder->make()->toArray();
 
@@ -215,8 +263,8 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testToCollectionMethodReturnsCollection()
     {
-        $response = new JsonResponse($data = ['foo' => 1]);
-        $this->responseFactory->make(Argument::cetera())->willReturn($response);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse($data = ['foo' => 1]));
+        $this->formatter->success(Argument::cetera())->willReturn([]);
 
         $result = $this->responseBuilder->make()->toCollection();
 
@@ -228,8 +276,8 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testToJsonMethodReturnsResponseAsJson()
     {
-        $response = new JsonResponse($data = ['foo' => 1]);
-        $this->responseFactory->make(Argument::cetera())->willReturn($response);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse($data = ['foo' => 1]));
+        $this->formatter->success(Argument::cetera())->willReturn([]);
 
         $result = $this->responseBuilder->make()->toJson(JSON_PRETTY_PRINT);
 
@@ -241,8 +289,8 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testJsonSerializeMethodReturnsResponseAsArray()
     {
-        $response = new JsonResponse($data = ['foo' => 1]);
-        $this->responseFactory->make(Argument::cetera())->willReturn($response);
+        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse($data = ['foo' => 1]));
+        $this->formatter->success(Argument::cetera())->willReturn([]);
 
         $result = $this->responseBuilder->make()->toArray();
 
@@ -254,7 +302,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testFormatterMethodSetsFormatter()
     {
-        $formatter = $this->prophesize(Formatter::class);
+        $formatter = $this->mock(Formatter::class);
         $formatter->success(Argument::any())->willReturn($data = ['foo' => 1]);
         $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
 
@@ -268,7 +316,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testFormatterMethodResolvesFormatterFromContainer()
     {
-        $formatter = $this->prophesize(Formatter::class);
+        $formatter = $this->mock(Formatter::class);
         $formatter->success(Argument::any())->willReturn($data = ['foo' => 1]);
         $this->container->make($binding = 'foo')->willReturn($formatter);
         $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
@@ -284,6 +332,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
     public function testDecorateMethodDecoratesResponseFactory()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+        $this->formatter->success(Argument::cetera())->willReturn([]);
 
         $this->responseBuilder->make()->decorate(IncreaseStatusByOneDecorator::class)->respond();
 
@@ -296,6 +345,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
     public function testDecorateMethodAcceptsMultipleDecorators()
     {
         $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+        $this->formatter->success(Argument::cetera())->willReturn([]);
 
         $this->responseBuilder->make()->decorate([
             IncreaseStatusByOneDecorator::class,
@@ -311,14 +361,8 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testMetaMethodSetsMetadata()
     {
-        $formatter = $this->prophesize(Formatter::class);
-        $formatter->success(Argument::any())->will(function ($args) {
-            return ['meta' => $args[0]->meta()];
-        });
-        $this->responseFactory->make(Argument::cetera())->willReturn(new JsonResponse);
+        $result = $this->responseBuilder->make()->meta($meta = ['foo' => 1])->get();
 
-        $this->responseBuilder->make()->meta($meta = ['foo' => 1])->formatter($formatter->reveal())->respond();
-
-        $this->responseFactory->make(['meta' => $meta], 200, [])->shouldHaveBeenCalledOnce();
+        $this->assertSame($meta, $result->meta());
     }
 }

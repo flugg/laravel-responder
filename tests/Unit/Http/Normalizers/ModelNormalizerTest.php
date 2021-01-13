@@ -5,39 +5,30 @@ namespace Flugg\Responder\Tests\Unit\Http\Normalizers;
 use Flugg\Responder\Http\Normalizers\ModelNormalizer;
 use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
-use Flugg\Responder\Tests\ModelWithGetResourceKey;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Database\Eloquent\Model;
 
 /**
- * Unit tests for the [Flugg\Responder\Http\Normalizers\ModelNormalizer] class.
+ * Unit tests for the [ModelNormalizer] class.
  *
  * @see \Flugg\Responder\Http\Normalizers\ModelNormalizer
  */
 class ModelNormalizerTest extends UnitTestCase
 {
     /**
-     * Assert that [normalize] normalizes Eloquent model to a success response value object.
+     * Assert that [normalize] normalizes Eloquent model to a success response.
      */
     public function testNormalizeMethodNormalizesModel()
     {
-        $model = mock(Model::class);
-        $model->allows([
-            'getTable' => $key = 'foo',
-            'getRelations' => [],
-            'withoutRelations' => $model,
-            'toArray' => $data = ['foo' => 1],
-        ]);
-        $normalizer = new ModelNormalizer($model);
+        $model = $this->mockModel($data = ['foo' => 1], $table = 'foo');
 
-        $result = $normalizer->normalize();
+        $result = (new ModelNormalizer($model->reveal()))->normalize();
 
         $this->assertInstanceOf(SuccessResponse::class, $result);
-        $this->assertInstanceOf(Item::class, $result->resource());
         $this->assertSame(200, $result->status());
-        $this->assertSame($data, $result->resource()->toArray());
-        $this->assertSame($key, $result->resource()->key());
+        $this->assertInstanceOf(Item::class, $result->resource());
+        $this->assertSame($data, $result->resource()->data());
+        $this->assertSame($table, $result->resource()->key());
     }
 
     /**
@@ -45,17 +36,10 @@ class ModelNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodSetsCreatedStatusCodeForRecentlyCreatedModels()
     {
-        $model = mock(Model::class);
-        $model->allows([
-            'getTable' => 'foo',
-            'getRelations' => [],
-            'withoutRelations' => $model,
-            'toArray' => [],
-        ]);
-        $model->wasRecentlyCreated = 201;
-        $normalizer = new ModelNormalizer($model);
+        $model = $this->mockModel([], 'foo');
+        $model->wasRecentlyCreated = true;
 
-        $result = $normalizer->normalize();
+        $result = (new ModelNormalizer($model->reveal()))->normalize();
 
         $this->assertSame(201, $result->status());
     }
@@ -65,17 +49,9 @@ class ModelNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodSetsResourceKeyUsingMethodOnModel()
     {
-        $model = mock(ModelWithGetResourceKey::class);
-        $model->allows([
-            'getResourceKey' => $key = 'foo',
-            'getTable' => 'bar',
-            'getRelations' => [],
-            'withoutRelations' => $model,
-            'toArray' => [],
-        ]);
-        $normalizer = new ModelNormalizer($model);
+        $model = $this->mockModel([], 'foo', [], $key = 'bar');
 
-        $result = $normalizer->normalize();
+        $result = (new ModelNormalizer($model->reveal()))->normalize();
 
         $this->assertSame($key, $result->resource()->key());
     }
@@ -85,28 +61,13 @@ class ModelNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesModelWithItemRelation()
     {
-        $model = mock(Model::class);
-        $model->allows([
-            'getTable' => 'foo',
-            'getRelations' => ['bar' => $relation = mock(Model::class)],
-            'withoutRelations' => $model,
-            'toArray' => [],
+        $model = $this->mockModel([], 'foo', [
+            'bar' => $this->mockModel($relatedData = ['foo' => 1], 'bar'),
         ]);
-        $relation->allows([
-            'getTable' => 'bar',
-            'getRelations' => [],
-            'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 2],
-        ]);
-        $normalizer = new ModelNormalizer($model);
 
-        $result = $normalizer->normalize();
-        $resource = $result->resource();
+        $result = (new ModelNormalizer($model->reveal()))->normalize();
 
-        $this->assertInstanceOf(Item::class, $resource);
-        if ($resource instanceof Item) {
-            $this->assertSame($relatedData, $resource->relations()['bar']->toArray());
-        }
+        $this->assertSame($relatedData, $result->resource()->relations()['bar']->data());
     }
 
     /**
@@ -114,32 +75,14 @@ class ModelNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesModelWithCollectionRelation()
     {
-        $model = mock(Model::class);
-        $model->allows([
-            'getTable' => 'foo',
-            'getRelations' => ['bar' => $relatedCollection = mock(EloquentCollection::class)],
-            'withoutRelations' => $model,
-            'toArray' => [],
+        $model = $this->mockModel([], 'foo', [
+            'bar' => EloquentCollection::make([
+                $this->mockModel($relatedData = ['foo' => 1], 'bar')->reveal(),
+            ]),
         ]);
-        $relatedCollection->allows([
-            'isEmpty' => false,
-            'all' => [$relation = mock(Model::class)],
-            'first' => $relation,
-        ]);
-        $relation->allows([
-            'getTable' => 'bar',
-            'getRelations' => [],
-            'withoutRelations' => $relation,
-            'toArray' => $relatedData = ['bar' => 2],
-        ]);
-        $normalizer = new ModelNormalizer($model);
 
-        $result = $normalizer->normalize();
-        $resource = $result->resource();
+        $result = (new ModelNormalizer($model->reveal()))->normalize();
 
-        $this->assertInstanceOf(Item::class, $resource);
-        if ($resource instanceof Item) {
-            $this->assertSame([$relatedData], $resource->relations()['bar']->toArray());
-        }
+        $this->assertSame($relatedData, $result->resource()->relations()['bar'][0]->data());
     }
 }

@@ -2,7 +2,12 @@
 
 namespace Flugg\Responder\Tests\Unit\Http\Formatters;
 
+use Flugg\Responder\Http\ErrorResponse;
 use Flugg\Responder\Http\Formatters\SimpleFormatter;
+use Flugg\Responder\Http\Resources\Collection;
+use Flugg\Responder\Http\Resources\Item;
+use Flugg\Responder\Http\Resources\Primitive;
+use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
 
 /**
@@ -36,10 +41,10 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodFormatsSuccessResponsesWithItem()
     {
-        $item = $this->mockItem($data = ['foo' => 1], $key = 'baz');
-        $response = $this->mockSuccessResponse($item, $meta = ['bar' => 2]);
+        $item = new Item($data = ['foo' => 1], $key = 'bar');
+        $response = (new SuccessResponse)->setResource($item)->setMeta($meta = ['baz' => 2]);
 
-        $result = $this->formatter->success($response->reveal());
+        $result = $this->formatter->success($response);
 
         $this->assertSame(array_merge([
             $key => $data,
@@ -51,16 +56,47 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodFormatsSuccessResponsesWithCollection()
     {
-        $collection = $this->mockCollection([
-            $this->mockItem($data1 = ['foo' => 1]),
-            $this->mockItem($data2 = ['bar' => 2]),
+        $collection = new Collection([
+            new Item($data1 = ['foo' => 1]),
+            new Item($data2 = ['bar' => 2]),
         ], $key = 'baz');
-        $response = $this->mockSuccessResponse($collection, $meta = ['bar' => 2]);
+        $response = (new SuccessResponse)->setResource($collection)->setMeta($meta = ['baz' => 2]);
 
-        $result = $this->formatter->success($response->reveal());
+        $result = $this->formatter->success($response);
 
         $this->assertSame(array_merge([
             $key => [$data1, $data2],
+        ], $meta), $result);
+    }
+
+    /**
+     * Assert that [success] formats success responses with a primitive resource.
+     */
+    public function testSuccessMethodFormatsSuccessResponsesWithPrimitive()
+    {
+        foreach ([true, 1.0, 1, 'foo'] as $data) {
+            $primitive = new Primitive($data, $key = 'bar');
+            $response = (new SuccessResponse)->setResource($primitive)->setMeta($meta = ['baz' => 2]);
+
+            $result = $this->formatter->success($response);
+
+            $this->assertSame(array_merge([
+                $key => $data,
+            ], $meta), $result);
+        }
+    }
+
+    /**
+     * Assert that [success] formats success responses with no resource set.
+     */
+    public function testSuccessMethodFormatsSuccessResponsesWithNoResource()
+    {
+        $response = (new SuccessResponse)->setMeta($meta = ['foo' => 1]);
+
+        $result = $this->formatter->success($response);
+
+        $this->assertSame(array_merge([
+            'data' => null,
         ], $meta), $result);
     }
 
@@ -69,10 +105,10 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodWrapperDefaultsToData()
     {
-        $item = $this->mockItem($data = ['foo' => 1]);
-        $response = $this->mockSuccessResponse($item, $meta = ['bar' => 2]);
+        $item = new Item($data = ['foo' => 1]);
+        $response = (new SuccessResponse)->setResource($item)->setMeta($meta = ['bar' => 2]);
 
-        $result = $this->formatter->success($response->reveal());
+        $result = $this->formatter->success($response);
 
         $this->assertSame(array_merge([
             'data' => $data,
@@ -84,17 +120,17 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodFormatsRelations()
     {
-        $item = $this->mockItem($data = ['foo' => 1], null, [
-            'foo' => $this->mockItem($relatedItemData = ['foo' => 1], null, [
-                'bar' => $this->mockItem($nestedItemData = ['bar' => 2]),
+        $item = new Item($data = ['foo' => 1], null, [
+            'foo' => new Item($relatedItemData = ['foo' => 1], null, [
+                'bar' => new Item($nestedItemData = ['bar' => 2]),
             ]),
-            'bar' => $this->mockCollection([
-                'baz' => $this->mockItem($collectionItemData = ['baz' => 3]),
+            'bar' => new Collection([
+                'baz' => new Item($collectionItemData = ['baz' => 3]),
             ]),
         ]);
-        $response = $this->mockSuccessResponse($item, $meta = ['bar' => 2]);
+        $response = (new SuccessResponse)->setResource($item)->setMeta($meta = ['bar' => 2]);
 
-        $result = $this->formatter->success($response->reveal());
+        $result = $this->formatter->success($response);
 
         $this->assertSame(array_merge([
             'data' => array_merge($data, [
@@ -113,18 +149,17 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodAttachesPagination()
     {
-        $item = $this->mockItem($data = ['foo' => 1], $key = 'baz');
+        $item = new Item($data = []);
         $paginator = $this->mockPaginator($count = 10, $total = 15, $perPage = 5, $currentPage = 2, $lastPage = 3);
         $paginator->url(1)->willReturn($firstPageUrl = 'example.com?page=1');
         $paginator->url(2)->willReturn($selfUrl = 'example.com?page=2');
         $paginator->url(3)->willReturn($lastPageUrl = 'example.com?page=3');
-        $response = $this->mockSuccessResponse($item);
-        $response->paginator()->willReturn($paginator);
+        $response = (new SuccessResponse)->setResource($item)->setPaginator($paginator->reveal());
 
-        $result = $this->formatter->success($response->reveal());
+        $result = $this->formatter->success($response);
 
         $this->assertSame([
-            $key => $data,
+            'data' => $data,
             'pagination' => [
                 'count' => $count,
                 'total' => $total,
@@ -147,18 +182,17 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSucessMethodOmitsPreviousAndNextLinksWhenNotSet()
     {
-        $item = $this->mockItem($data = ['foo' => 1], $key = 'baz');
+        $item = new Item($data = []);
         $paginator = $this->mockPaginator($count = 5, $total = 5, $perPage = 5, $currentPage = 1, $lastPage = 1);
         $paginator->url(1)->willReturn($url = 'example.com?page=1');
         $paginator->url(2)->willReturn($url);
         $paginator->url(3)->willReturn($url);
-        $response = $this->mockSuccessResponse($item);
-        $response->paginator()->willReturn($paginator);
+        $response = (new SuccessResponse)->setResource($item)->setPaginator($paginator->reveal());
 
-        $result = $this->formatter->success($response->reveal());
+        $result = $this->formatter->success($response);
 
         $this->assertSame([
-            $key => $data,
+            'data' => $data,
             'pagination' => [
                 'count' => $count,
                 'total' => $total,
@@ -179,15 +213,14 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodAttachesCursorPagination()
     {
-        $item = $this->mockItem($data = ['foo' => 1], $key = 'baz');
-        $paginator = $this->mockCursor($count = 30, $current = 10, $previous = 5, $next = 15);
-        $response = $this->mockSuccessResponse($item);
-        $response->cursor()->willReturn($paginator);
+        $item = new Item($data = []);
+        $cursor = $this->mockCursor($count = 30, $current = 10, $previous = 5, $next = 15);
+        $response = (new SuccessResponse)->setResource($item)->setCursor($cursor->reveal());
 
-        $result = $this->formatter->success($response->reveal());
+        $result = $this->formatter->success($response);
 
         $this->assertSame([
-            $key => $data,
+            'data' => $data,
             'cursor' => [
                 'current' => $current,
                 'previous' => $previous,
@@ -202,9 +235,12 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testErrorMethodFormatsErrorResponses()
     {
-        $response = $this->mockErrorResponse($code = 'foo', $message = 'A foo error.', $meta = ['foo' => 1]);
+        $response = (new ErrorResponse)
+            ->setCode($code = 'foo')
+            ->setMessage($message = 'A foo error.')
+            ->setMeta($meta = ['foo' => 1]);
 
-        $result = $this->formatter->error($response->reveal());
+        $result = $this->formatter->error($response);
 
         $this->assertSame(array_merge([
             'error' => [
@@ -219,9 +255,9 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testErrorMethodOmitsUndefinedMessage()
     {
-        $response = $this->mockErrorResponse($code = 'foo');
+        $response = (new ErrorResponse)->setCode($code = 'foo');
 
-        $result = $this->formatter->error($response->reveal());
+        $result = $this->formatter->error($response);
 
         $this->assertSame([
             'error' => [
@@ -244,10 +280,9 @@ class SimpleFormatterTest extends UnitTestCase
                 'bar.baz.required' => $requiredMessage = 'Required field',
             ]
         );
-        $response = $this->mockErrorResponse($code = 'foo');
-        $response->validator()->willReturn($validator);
+        $response = (new ErrorResponse)->setCode($code = 'foo')->setValidator($validator->reveal());
 
-        $result = $this->formatter->error($response->reveal());
+        $result = $this->formatter->error($response);
 
         $this->assertSame([
             'error' => [

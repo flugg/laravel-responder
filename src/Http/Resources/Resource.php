@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Http\Resources;
 
 /**
- * Abstract data transfer object class for a resource item or collection.
+ * Abstract class for a resource.
  */
 abstract class Resource
 {
@@ -36,11 +36,4 @@ abstract class Resource
 
         return $this;
     }
-
-    /**
-     * Convert the resource to an array.
-     *
-     * @return array
-     */
-    abstract public function toArray(): array;
 }

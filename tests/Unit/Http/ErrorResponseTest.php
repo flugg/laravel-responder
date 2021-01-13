@@ -60,7 +60,7 @@ class ErrorResponseTest extends UnitTestCase
      */
     public function testSetAndGetValidator()
     {
-        $validator = $this->prophesize(Validator::class);
+        $validator = $this->mock(Validator::class);
 
         $this->response->setValidator($validator->reveal());
 

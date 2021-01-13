@@ -3,8 +3,6 @@
 namespace Flugg\Responder\Tests;
 
 use Flugg\Responder\ResponderServiceProvider;
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Orchestra\Testbench\TestCase;
 
 /**
@@ -12,20 +10,6 @@ use Orchestra\Testbench\TestCase;
  */
 abstract class IntegrationTestCase extends TestCase
 {
-    use MockeryPHPUnitIntegration;
-
-    /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        Mockery::globalHelpers();
-    }
-
     /**
      * Define environment variables.
      *
@@ -34,11 +18,7 @@ abstract class IntegrationTestCase extends TestCase
      */
     protected function getEnvironmentSetUp($app): void
     {
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
+        //
     }
 
     /**

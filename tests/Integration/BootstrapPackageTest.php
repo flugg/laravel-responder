@@ -15,8 +15,13 @@ use Flugg\Responder\Http\Factories\LaravelResponseFactory;
 use Flugg\Responder\Http\Formatters\JsonApiFormatter;
 use Flugg\Responder\Http\Formatters\SimpleFormatter;
 use Flugg\Responder\Responder;
+use Flugg\Responder\ResponderServiceProvider;
 use Flugg\Responder\Tests\IntegrationTestCase;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Arr;
+use Illuminate\Support\ServiceProvider;
+use Laravel\Lumen\Application;
+use Mockery;
 
 /**
  * Integration tests for testing the bootstrapping of the package.
@@ -90,18 +95,6 @@ class BootstrapPackageTest extends IntegrationTestCase
     }
 
     /**
-     * Assert that the [ResponseFactory] binding can be null.
-     */
-    public function testResponseFormatterCanBeNull()
-    {
-        config()->set('responder.formatter', null);
-
-        $result = $this->app->make(Formatter::class);
-
-        $this->assertNull($result);
-    }
-
-    /**
      * Assert that success response builders are extended to include configured formatter.
      */
     public function testSuccessResponseBuildersAreExtendedWithResponseFormatter()
@@ -111,7 +104,7 @@ class BootstrapPackageTest extends IntegrationTestCase
 
         $responseBuilder->respond();
 
-        $formatter->shouldHaveReceived('success');
+        $formatter->shouldHaveReceived('success')->once();
     }
 
     /**
@@ -124,7 +117,7 @@ class BootstrapPackageTest extends IntegrationTestCase
 
         $responseBuilder->respond();
 
-        $formatter->shouldHaveReceived('error');
+        $formatter->shouldHaveReceived('error')->once();
     }
 
     /**
@@ -189,5 +182,30 @@ class BootstrapPackageTest extends IntegrationTestCase
         $result = $this->app->make(ExceptionHandler::class);
 
         $this->assertInstanceOf(Handler::class, $result);
+    }
+
+    /**
+     * Assert that the config file is published in a Laravel environment.
+     */
+    public function testPublishConfigInLaravel()
+    {
+        $publishes = ServiceProvider::$publishes[ResponderServiceProvider::class];
+        $configGroup = ServiceProvider::$publishGroups['config'];
+
+        $this->assertFileEquals(dirname(__FILE__).'/../../config/responder.php', array_key_first($publishes));
+        $this->assertSame(config_path('responder.php'), Arr::first($publishes));
+        $this->assertSame([array_key_first($publishes) => Arr::first($publishes)], $configGroup);
+    }
+
+    /**
+     * Assert that the package is configured in a Lumen environment.
+     */
+    public function testPublishConfigInLumen()
+    {
+        $serviceProvider = new ResponderServiceProvider($app = Mockery::spy(new Application));
+
+        $serviceProvider->boot();
+
+        $app->shouldHaveReceived('configure')->with('responder')->once();
     }
 }

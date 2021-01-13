@@ -2,12 +2,10 @@
 
 namespace Flugg\Responder\Http\Resources;
 
-use ArrayAccess;
-
 /**
  * Class for a resource, representing an entitiy in the response data.
  */
-class Item extends Resource implements ArrayAccess
+class Item extends Resource
 {
     /**
      * Resource data.
@@ -35,6 +33,28 @@ class Item extends Resource implements ArrayAccess
         $this->data = $data;
         $this->key = $key;
         $this->relations = $relations;
+    }
+
+    /**
+     * Determine if an attribute exists on the resource.
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function __isset(string $key): bool
+    {
+        return key_exists($key, array_merge($this->data(), $this->relations()));
+    }
+
+    /**
+     * Dynamically get attributes from the resource's data, including relations.
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function __get(string $key)
+    {
+        return array_merge($this->data(), $this->relations())[$key];
     }
 
     /**
@@ -81,60 +101,5 @@ class Item extends Resource implements ArrayAccess
         $this->relations = $relations;
 
         return $this;
-    }
-
-    /**
-     * Convert the resource item to an array.
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->data();
-    }
-
-    /**
-     * Determine if the given attribute exists.
-     *
-     * @param mixed $offset
-     * @return bool
-     */
-    public function offsetExists($offset): bool
-    {
-        return isset($this->data[$offset]);
-    }
-
-    /**
-     * Get the value for a given offset.
-     *
-     * @param mixed $offset
-     * @return mixed
-     */
-    public function offsetGet($offset)
-    {
-        return $this->data[$offset];
-    }
-
-    /**
-     * Set the value for a given offset.
-     *
-     * @param mixed $offset
-     * @param mixed $value
-     * @return void
-     */
-    public function offsetSet($offset, $value): void
-    {
-        $this->data[$offset] = $value;
-    }
-
-    /**
-     * Unset the value for a given offset.
-     *
-     * @param mixed $offset
-     * @return void
-     */
-    public function offsetUnset($offset): void
-    {
-        unset($this->data[$offset]);
     }
 }

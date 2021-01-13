@@ -2,10 +2,12 @@
 
 namespace Flugg\Responder\Http\Resources;
 
+use ArrayAccess;
+
 /**
  * Class for a resource collection, representing a list of entities in the response data.
  */
-class Collection extends Resource
+class Collection extends Resource implements ArrayAccess
 {
     /**
      * List of resource items in collection.
@@ -50,14 +52,47 @@ class Collection extends Resource
     }
 
     /**
-     * Convert the resource collection to an array.
+     * Determine if the given attribute exists.
      *
-     * @return array
+     * @param mixed $offset
+     * @return bool
      */
-    public function toArray(): array
+    public function offsetExists($offset): bool
     {
-        return array_map(function ($item) {
-            return $item->toArray();
-        }, $this->items());
+        return isset($this->items[$offset]);
+    }
+
+    /**
+     * Get the value for a given offset.
+     *
+     * @param mixed $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->items[$offset];
+    }
+
+    /**
+     * Set the value for a given offset.
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     * @return void
+     */
+    public function offsetSet($offset, $value): void
+    {
+        $this->items[$offset] = $value;
+    }
+
+    /**
+     * Unset the value for a given offset.
+     *
+     * @param mixed $offset
+     * @return void
+     */
+    public function offsetUnset($offset): void
+    {
+        unset($this->items[$offset]);
     }
 }

@@ -37,7 +37,7 @@ class PrettyPrintDecoratorTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->responseFactory = $this->prophesize(ResponseFactory::class);
+        $this->responseFactory = $this->mock(ResponseFactory::class);
         $this->responseDecorator = new PrettyPrintDecorator($this->responseFactory->reveal());
     }
 

@@ -46,7 +46,7 @@ class Responder implements ResponderContract
      * @throws \Flugg\Responder\Exceptions\InvalidDataException
      * @return \Flugg\Responder\Http\Builders\SuccessResponseBuilder
      */
-    public function success($data = []): SuccessResponseBuilder
+    public function success($data = null): SuccessResponseBuilder
     {
         return $this->successResponseBuilder->make($data);
     }
