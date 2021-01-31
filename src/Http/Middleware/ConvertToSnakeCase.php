@@ -3,6 +3,7 @@
 namespace Flugg\Responder\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
+use Illuminate\Support\Str;
 
 /**
  * A middleware class responsible for converting incoming parameter keys to snake case.
@@ -34,7 +35,7 @@ class ConvertToSnakeCase extends TransformsRequest
         $parameters = [];
 
         foreach ($data as $key => $value) {
-            $parameters[in_array($keyPrefix.$key, $this->except) ? $keyPrefix.$key : snake_case($keyPrefix.$key)] = $value;
+            $parameters[in_array($keyPrefix.$key, $this->except) ? $keyPrefix.$key : Str::snake($keyPrefix.$key)] = $value;
         }
 
         return $parameters;
