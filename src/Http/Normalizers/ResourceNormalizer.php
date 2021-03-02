@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Resources\MissingValue;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as IlluminateCollection;
 
@@ -54,12 +54,11 @@ class ResourceNormalizer implements Normalizer
      */
     public function normalize(): SuccessResponse
     {
-        $response = (new SuccessResponse)
-            ->setResource(
-                $this->data instanceof ResourceCollection
+        $response = (new SuccessResponse(
+            $this->data instanceof ResourceCollection
                     ? $this->buildCollection($this->data)
                     : $this->buildResource($this->data)
-            )
+        ))
             ->setStatus($this->data->response()->status())
             ->setHeaders($this->data->response()->headers->all())
             ->setMeta(array_merge_recursive($this->data->with($this->request), $this->data->additional));
