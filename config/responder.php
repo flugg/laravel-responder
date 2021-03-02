@@ -51,14 +51,15 @@ return [
     */
 
     'normalizers' => [
-        \Illuminate\Contracts\Support\Arrayable::class => ArrayableNormalizer::class,
-        \Illuminate\Database\Eloquent\Builder::class => QueryBuilderNormalizer::class,
-        \Illuminate\Database\Eloquent\Collection::class => CollectionNormalizer::class,
+        \Illuminate\Support\Collection::class => CollectionNormalizer::class,
         \Illuminate\Database\Eloquent\Model::class => ModelNormalizer::class,
+        \Illuminate\Database\Eloquent\Collection::class => CollectionNormalizer::class,
         \Illuminate\Database\Eloquent\Relations\Relation::class => RelationNormalizer::class,
+        \Illuminate\Database\Eloquent\Builder::class => QueryBuilderNormalizer::class,
         \Illuminate\Database\Query\Builder::class => QueryBuilderNormalizer::class,
         \Illuminate\Http\Resources\Json\JsonResource::class => ResourceNormalizer::class,
-        \Illuminate\Pagination\LengthAwarePaginator::class => PaginatorNormalizer::class,
+        \Illuminate\Contracts\Pagination\LengthAwarePaginator::class => PaginatorNormalizer::class,
+        \Illuminate\Contracts\Support\Arrayable::class => ArrayableNormalizer::class,
     ],
 
     /*
