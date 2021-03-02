@@ -91,7 +91,7 @@ class_alias(Flugg\Responder\Facades\Responder::class, 'Responder');
 
 ---
 
-Seeing there is no `vendor:publish` command in Lumen, you will have to create your own `config/responder.php` file if you want to configure the package.
+There is no `vendor:publish` command in Lumen, so you'll have to create your own `config/responder.php` file if you want to configure the package.
 
 ---
 
