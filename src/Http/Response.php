@@ -2,8 +2,6 @@
 
 namespace Flugg\Responder\Http;
 
-use Flugg\Responder\Exceptions\InvalidStatusCodeException;
-
 /**
  * Abstract data transfer object class for a response.
  */
@@ -64,15 +62,10 @@ abstract class Response
      * Set the response status code.
      *
      * @param int $status
-     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
      * @return $this
      */
     public function setStatus(int $status)
     {
-        if (! $this->isValidStatusCode($status)) {
-            throw new InvalidStatusCodeException;
-        }
-
         $this->status = $status;
 
         return $this;
@@ -103,12 +96,4 @@ abstract class Response
 
         return $this;
     }
-
-    /**
-     * Check if the status code is valid.
-     *
-     * @param int $status
-     * @return bool
-     */
-    abstract protected function isValidStatusCode(int $status): bool;
 }

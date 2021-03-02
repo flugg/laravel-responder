@@ -3,6 +3,7 @@
 namespace Flugg\Responder\Http;
 
 use Flugg\Responder\Contracts\Validation\Validator;
+use Flugg\Responder\Exceptions\InvalidStatusCodeException;
 
 /**
  * Data transfer object class for an error response.
@@ -19,7 +20,7 @@ class ErrorResponse extends Response
     /**
      * Error code representing the error response.
      *
-     * @var int|string
+     * @var int|string|null
      */
     protected $code;
 
@@ -38,9 +39,21 @@ class ErrorResponse extends Response
     protected $validator = null;
 
     /**
+     * Create a new response instance.
+     *
+     * @param int|string|null $code
+     * @param string|null $message
+     */
+    public function __construct($code = null, ?string $message = null)
+    {
+        $this->code = $code;
+        $this->message = $message;
+    }
+
+    /**
      * Get the error code.
      *
-     * @return int|string
+     * @return int|string|null
      */
     public function code()
     {
@@ -68,9 +81,25 @@ class ErrorResponse extends Response
     }
 
     /**
+     * Set the response status code.
+     *
+     * @param int $status
+     * @throws \Flugg\Responder\Exceptions\InvalidStatusCodeException
+     * @return $this
+     */
+    public function setStatus(int $status)
+    {
+        if ($status < 400 || $status >= 600) {
+            throw new InvalidStatusCodeException;
+        }
+
+        return parent::setStatus($status);
+    }
+
+    /**
      * Set the error code.
      *
-     * @param int|string $code
+     * @param int|string|null $code
      * @return $this
      */
     public function setCode($code)
@@ -104,16 +133,5 @@ class ErrorResponse extends Response
         $this->validator = $validator;
 
         return $this;
-    }
-
-    /**
-     * Check if the status code is valid.
-     *
-     * @param int $status
-     * @return bool
-     */
-    protected function isValidStatusCode(int $status): bool
-    {
-        return $status >= 400 && $status < 600;
     }
 }
