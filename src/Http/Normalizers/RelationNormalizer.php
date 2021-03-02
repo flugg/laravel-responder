@@ -43,7 +43,7 @@ class RelationNormalizer extends EloquentNormalizer implements Normalizer
             ? $this->buildResource($this->data->first())
             : $this->buildCollection($this->data->get());
 
-        return (new SuccessResponse)->setResource($resource);
+        return (new SuccessResponse($resource));
     }
 
     /**

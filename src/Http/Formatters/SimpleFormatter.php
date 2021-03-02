@@ -13,6 +13,7 @@ use Flugg\Responder\Http\Resources\Primitive;
 use Flugg\Responder\Http\Resources\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Illuminate\Support\Collection as IlluminateCollection;
+use InvalidArgumentException;
 
 /**
  * Simple response formatter.
@@ -28,8 +29,7 @@ class SimpleFormatter implements Formatter
     public function success(SuccessResponse $response): array
     {
         $resource = $response->resource();
-        $resourceKey = ($resource ? $resource->key() : null) ?: 'data';
-        $data = array_merge([$resourceKey => $this->data($resource)], $response->meta());
+        $data = array_merge(['data' => $this->data($resource)], $response->meta());
 
         if ($paginator = $response->paginator()) {
             $data['pagination'] = $this->paginator($paginator);
@@ -64,10 +64,10 @@ class SimpleFormatter implements Formatter
     /**
      * Format success data structure from a resource.
      *
-     * @param \Flugg\Responder\Http\Resources\Resource|null $resource
+     * @param \Flugg\Responder\Http\Resources\Resource $resource
      * @return mixed
      */
-    protected function data(?Resource $resource)
+    protected function data(Resource $resource)
     {
         if ($resource instanceof Item) {
             return $this->item($resource);
@@ -77,7 +77,7 @@ class SimpleFormatter implements Formatter
             return $resource->data();
         }
 
-        return null;
+        throw new InvalidArgumentException('Unsupported resource class');
     }
 
     /**
