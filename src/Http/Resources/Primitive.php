@@ -10,17 +10,17 @@ class Primitive extends Resource
     /**
      * Resource data.
      *
-     * @var bool|float|int|string
+     * @var bool|float|int|string|null
      */
     protected $data;
 
     /**
      * Create a new resource item instance.
      *
-     * @param bool|float|int|string $data
+     * @param bool|float|int|string|null $data
      * @param string|null $key
      */
-    public function __construct($data = [], ?string $key = null)
+    public function __construct($data = null, ?string $key = null)
     {
         $this->data = $data;
         $this->key = $key;

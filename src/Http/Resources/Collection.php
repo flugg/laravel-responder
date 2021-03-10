@@ -24,7 +24,10 @@ class Collection extends Resource implements ArrayAccess
      */
     public function __construct(array $items = [], ?string $key = null)
     {
-        $this->items = $items;
+        $this->items = array_map(function (Item $item) use ($key) {
+            return $item->setKey($key);
+        }, $items);
+
         $this->key = $key;
     }
 
