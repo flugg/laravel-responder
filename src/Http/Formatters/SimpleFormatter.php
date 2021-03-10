@@ -28,8 +28,7 @@ class SimpleFormatter implements Formatter
      */
     public function success(SuccessResponse $response): array
     {
-        $resource = $response->resource();
-        $data = array_merge(['data' => $this->data($resource)], $response->meta());
+        $data = array_merge(['data' => $this->data($response->resource())], $response->meta());
 
         if ($paginator = $response->paginator()) {
             $data['pagination'] = $this->paginator($paginator);
@@ -95,7 +94,7 @@ class SimpleFormatter implements Formatter
     }
 
     /**
-     * Format an item collection.
+     * Format a resource collection.
      *
      * @param \Flugg\Responder\Http\Resources\Collection $collection
      * @return array
