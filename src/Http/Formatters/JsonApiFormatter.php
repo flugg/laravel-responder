@@ -89,6 +89,9 @@ class JsonApiFormatter implements Formatter
                 return array_merge($included, [$this->include($relation)]);
             }, []);
         } elseif ($resource instanceof Collection) {
+            return array_reduce($resource->items(), function ($included, $item) {
+                return array_merge($included, [$this->include($item)]);
+            }, []);
         }
     }
 
