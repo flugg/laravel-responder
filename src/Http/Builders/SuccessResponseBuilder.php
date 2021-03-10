@@ -34,11 +34,9 @@ class SuccessResponseBuilder extends ResponseBuilder
         if (is_object($data)) {
             $this->response = $this->normalizeData($data, $resourceKey);
         } elseif (is_array($data)) {
-            $this->response = (new SuccessResponse)->setResource(new Item($data, $resourceKey));
-        } elseif (is_scalar($data)) {
-            $this->response = (new SuccessResponse)->setResource(new Primitive($data, $resourceKey));
+            $this->response = (new SuccessResponse(new Item($data, $resourceKey)));
         } else {
-            $this->response = new SuccessResponse;
+            $this->response = (new SuccessResponse(new Primitive($data, $resourceKey)));
         }
 
         return $this;

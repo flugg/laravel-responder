@@ -66,7 +66,9 @@ class ErrorResponseBuilder extends ResponseBuilder
         } elseif (($exception = $message) instanceof Exception) {
             $this->response = $this->makeResponseFromException($exception, $code);
         } else {
-            $this->response = (new ErrorResponse)->setCode($code)->setMessage($message);
+            $this->response = (new ErrorResponse)
+                ->setCode($code)
+                ->setMessage($message ?: $this->messageRegistry->resolve($code));
         }
 
         return $this;
