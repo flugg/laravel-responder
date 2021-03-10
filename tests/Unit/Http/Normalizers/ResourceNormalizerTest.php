@@ -8,9 +8,8 @@ use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Response;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection as IlluminateCollection;
 
 /**
  * Unit tests for the [ResourceNormalizer] class.
@@ -249,12 +248,12 @@ class ResourceNormalizerTest extends UnitTestCase
     {
         $request = $this->mockRequest();
         $response = new Response(null, 200, ['x-foo' => 1]);
-        $models = IlluminateCollection::make([
+        $models = [
             $model1 = $this->mockModel([], $table = 'foo')->reveal(),
             $model2 = $this->mockModel([], $table)->reveal(),
-        ]);
+        ];
         $paginator = $this->mock(LengthAwarePaginator::class);
-        $paginator->getCollection()->willReturn($models);
+        $paginator->items()->willReturn($models);
         $collection = $this->mockResourceCollection([
             $this->mockJsonResource($model1, [])->reveal(),
             $this->mockJsonResource($model2, [])->reveal(),

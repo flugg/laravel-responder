@@ -26,19 +26,19 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 class RelationNormalizerTest extends UnitTestCase
 {
     /** List of one-to-one relationship classes. */
-    protected $oneToOneRelations = [BelongsTo::class, HasOne::class, MorphOne::class, MorphTo::class];
+    protected $singularRelations = [BelongsTo::class, HasOne::class, MorphOne::class, MorphTo::class];
 
-    /** List of many-to-many relationship classes. */
-    protected $manyToManyRelations = [BelongsToMany::class, HasMany::class, HasManyThrough::class, MorphMany::class, MorphToMany::class];
+    /** List of one-to-many and many-to-many relationship classes. */
+    protected $pluralRelations = [BelongsToMany::class, HasMany::class, HasManyThrough::class, MorphMany::class, MorphToMany::class];
 
     /**
      * Assert that [normalize] normalizes one-to-one Eloquent relation to a success response.
      */
-    public function testNormalizeMethodNormalizesOneToOneRelation()
+    public function testNormalizeMethodNormalizesSingularRelation()
     {
-        foreach ($this->oneToOneRelations as $class) {
+        foreach ($this->singularRelations as $class) {
             $model = $this->mockModel($data = ['foo' => 1], $table = 'foo');
-            $relation = $this->mockOneToOneRelation($class, $model);
+            $relation = $this->mockSingularRelation($class, $model);
 
             $result = (new RelationNormalizer($relation->reveal()))->normalize();
 
@@ -55,9 +55,9 @@ class RelationNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodSetsResourceKeyUsingMethodOnModel()
     {
-        foreach ($this->oneToOneRelations as $class) {
+        foreach ($this->singularRelations as $class) {
             $model = $this->mockModel([], 'foo', [], $key = 'bar');
-            $relation = $this->mockOneToOneRelation($class, $model);
+            $relation = $this->mockSingularRelation($class, $model);
 
             $result = (new RelationNormalizer($relation->reveal()))->normalize();
 
@@ -70,11 +70,11 @@ class RelationNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesModelWithItemRelation()
     {
-        foreach ($this->oneToOneRelations as $class) {
+        foreach ($this->singularRelations as $class) {
             $model = $this->mockModel([], 'foo', [
                 'bar' => $this->mockModel($relatedData = ['foo' => 1], 'bar'),
             ]);
-            $relation = $this->mockOneToOneRelation($class, $model);
+            $relation = $this->mockSingularRelation($class, $model);
 
             $result = (new RelationNormalizer($relation->reveal()))->normalize();
 
@@ -87,13 +87,13 @@ class RelationNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesModelWithCollectionRelation()
     {
-        foreach ($this->oneToOneRelations as $class) {
+        foreach ($this->singularRelations as $class) {
             $model = $this->mockModel([], 'foo', [
                 'bar' => EloquentCollection::make([
                     $this->mockModel($relatedData = ['foo' => 1], 'bar')->reveal(),
                 ]),
             ]);
-            $relation = $this->mockOneToOneRelation($class, $model);
+            $relation = $this->mockSingularRelation($class, $model);
 
             $result = (new RelationNormalizer($relation->reveal()))->normalize();
 
@@ -102,16 +102,16 @@ class RelationNormalizerTest extends UnitTestCase
     }
 
     /**
-     * Assert that [normalize] normalizes many-to-many Eloquent relation to a success response.
+     * Assert that [normalize] normalizes one-to-many and many-to-many Eloquent relation to a success response.
      */
-    public function testNormalizeMethodNormalizesManyToManyRelation()
+    public function testNormalizeMethodNormalizesPluralRelation()
     {
-        foreach ($this->manyToManyRelations as $class) {
+        foreach ($this->pluralRelations as $class) {
             $collection = EloquentCollection::make([
                 $this->mockModel($data1 = ['foo' => 1], $table = 'foo')->reveal(),
                 $this->mockModel($data2 = ['bar' => 2], $table)->reveal(),
             ]);
-            $relation = $this->mockManyToManyRelation($class, $collection);
+            $relation = $this->mockPluralRelation($class, $collection);
 
             $result = (new RelationNormalizer($relation->reveal()))->normalize();
 
@@ -130,12 +130,12 @@ class RelationNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodSetsResourceKeyUsingFirstModel()
     {
-        foreach ($this->manyToManyRelations as $class) {
+        foreach ($this->pluralRelations as $class) {
             $collection = EloquentCollection::make([
                 $this->mockModel([], 'foo', [], $key = 'bar')->reveal(),
                 $this->mockModel([], 'baz')->reveal(),
             ]);
-            $relation = $this->mockManyToManyRelation($class, $collection);
+            $relation = $this->mockPluralRelation($class, $collection);
 
             $result = (new RelationNormalizer($relation->reveal()))->normalize();
 
@@ -148,8 +148,8 @@ class RelationNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodSetsResourceKeyToNullWhenEmpty()
     {
-        foreach ($this->manyToManyRelations as $class) {
-            $relation = $this->mockManyToManyRelation($class, EloquentCollection::make());
+        foreach ($this->pluralRelations as $class) {
+            $relation = $this->mockPluralRelation($class, EloquentCollection::make());
 
             $result = (new RelationNormalizer($relation->reveal()))->normalize();
 
@@ -162,14 +162,14 @@ class RelationNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesEloquentCollectionWithItemRelation()
     {
-        foreach ($this->manyToManyRelations as $class) {
+        foreach ($this->pluralRelations as $class) {
             $collection = EloquentCollection::make([
                 $this->mockModel([], 'foo', [
                     'bar' => $this->mockModel($relatedData = ['foo' => 1], 'bar'),
                 ])->reveal(),
                 $this->mockModel([], 'baz')->reveal(),
             ]);
-            $relation = $this->mockManyToManyRelation($class, $collection);
+            $relation = $this->mockPluralRelation($class, $collection);
 
             $result = (new RelationNormalizer($relation->reveal()))->normalize();
 
@@ -182,7 +182,7 @@ class RelationNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesEloquentCollectionWithCollectionRelation()
     {
-        foreach ($this->manyToManyRelations as $class) {
+        foreach ($this->pluralRelations as $class) {
             $collection = EloquentCollection::make([
                 $this->mockModel([], 'foo', [
                     'bar' => EloquentCollection::make([
@@ -191,7 +191,7 @@ class RelationNormalizerTest extends UnitTestCase
                 ])->reveal(),
                 $this->mockModel([], 'baz')->reveal(),
             ]);
-            $relation = $this->mockManyToManyRelation($class, $collection);
+            $relation = $this->mockPluralRelation($class, $collection);
 
             $result = (new RelationNormalizer($relation->reveal()))->normalize();
 

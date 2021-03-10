@@ -36,7 +36,7 @@ class ErrorMessageRegistryTest extends UnitTestCase
      */
     public function testResolveMethodReturnsMessage()
     {
-        $this->messageRegistry->register($code = 'error_occurred', $message = 'An error has occurred.');
+        $this->messageRegistry->register($code = 'foo', $message = 'bar');
 
         $result = $this->messageRegistry->resolve($code);
 

@@ -3,26 +3,27 @@
 namespace Flugg\Responder\Tests\Unit\Http\Formatters;
 
 use Flugg\Responder\Http\ErrorResponse;
-use Flugg\Responder\Http\Formatters\SimpleFormatter;
+use Flugg\Responder\Http\Formatters\JsonApiFormatter;
 use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\Resources\Primitive;
 use Flugg\Responder\Http\Resources\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 /**
- * Unit tests for the [SimpleFormatter] class.
+ * Unit tests for the [JsonApiFormatter] class.
  *
- * @see \Flugg\Responder\Http\Formatters\SimpleFormatter
+ * @see \Flugg\Responder\Http\Formatters\JsonApiFormatter
  */
-class SimpleFormatterTest extends UnitTestCase
+class JsonApiFormatterTest extends UnitTestCase
 {
     /**
      * Class being tested.
      *
-     * @var \Flugg\Responder\Http\Formatters\SimpleFormatter
+     * @var \Flugg\Responder\Http\Formatters\JsonApiFormatter
      */
     protected $formatter;
 
@@ -35,7 +36,7 @@ class SimpleFormatterTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->formatter = new SimpleFormatter;
+        $this->formatter = new JsonApiFormatter;
     }
 
     /**
@@ -43,14 +44,19 @@ class SimpleFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodFormatsSuccessResponsesWithItem()
     {
-        $item = new Item($data = ['foo' => 1]);
+        $item = new Item($data = ['id' => 1, 'foo' => 2], $key = 'bar');
         $response = (new SuccessResponse($item))->setMeta($meta = ['bar' => 2]);
 
         $result = $this->formatter->success($response);
 
-        $this->assertSame(array_merge([
-            'data' => $data,
-        ], $meta), $result);
+        $this->assertSame([
+            'data' => [
+                'type' => $key,
+                'id' => $data['id'],
+                'attributes' => Arr::except($data, 'id'),
+            ],
+            'meta' => $meta,
+        ], $result);
     }
 
     /**
@@ -59,33 +65,42 @@ class SimpleFormatterTest extends UnitTestCase
     public function testSuccessMethodFormatsSuccessResponsesWithCollection()
     {
         $collection = new Collection([
-            new Item($data1 = ['foo' => 1]),
-            new Item($data2 = ['bar' => 2]),
-        ]);
+            new Item($data1 = ['id' => 1, 'foo' => 2]),
+            new Item($data2 = ['id' => 3, 'bar' => 4]),
+        ], $key = 'baz');
         $response = (new SuccessResponse($collection))->setMeta($meta = ['baz' => 3]);
 
         $result = $this->formatter->success($response);
 
-        $this->assertSame(array_merge([
-            'data' => [$data1, $data2],
-        ], $meta), $result);
+        $this->assertSame([
+            'data' => [
+                [
+                    'type' => $key,
+                    'id' => $data1['id'],
+                    'attributes' => Arr::except($data1, 'id'),
+                ],
+                [
+                    'type' => $key,
+                    'id' => $data2['id'],
+                    'attributes' => Arr::except($data2, 'id'),
+                ],
+            ],
+            'meta' => $meta,
+        ], $result);
     }
 
     /**
-     * Assert that [success] formats success responses with a primitive resource.
+     * Assert that [success] throws an exception when given a primitive resource class.
      */
-    public function testSuccessMethodFormatsSuccessResponsesWithPrimitive()
+    public function testSuccessMethodThrowsExceptionForPrimitiveResource()
     {
-        foreach ([true, 1.0, 1, 'foo', null] as $data) {
-            $primitive = new Primitive($data);
-            $response = (new SuccessResponse($primitive))->setMeta($meta = ['baz' => 2]);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported resource class');
 
-            $result = $this->formatter->success($response);
+        $primitive = new Primitive(123);
+        $response = (new SuccessResponse($primitive));
 
-            $this->assertSame(array_merge([
-                'data' => $data,
-            ], $meta), $result);
-        }
+        $this->formatter->success($response);
     }
 
     /**
@@ -103,47 +118,80 @@ class SimpleFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that [success] always formats success responses with a "data" wrapper.
-     */
-    public function testSuccessMethodWrapperDefaultsToData()
-    {
-        $item = new Item($data = ['foo' => 1], 'bar');
-        $response = (new SuccessResponse($item))->setMeta($meta = ['baz' => 2]);
-
-        $result = $this->formatter->success($response);
-
-        $this->assertSame(array_merge([
-            'data' => $data,
-        ], $meta), $result);
-    }
-
-    /**
      * Assert that [success] formats success responses with related resources.
      */
     public function testSuccessMethodFormatsRelations()
     {
-        $item = new Item($data = ['foo' => 1], null, [
-            'foo' => new Item($relatedItemData = ['foo' => 1], null, [
-                'bar' => new Item($nestedItemData = ['bar' => 2]),
+        $item = new Item($data = ['id' => 1, 'foo' => 2], $key = 'foo', [
+            'foo' => new Item($relatedItemData = ['id' => 3, 'foo' => 4], $relatedItemKey = 'bar', [
+                'bar' => new Item($nestedItemData = ['id' => 5, 'bar' => 6], $nestedItemKey = 'baz'),
             ]),
             'bar' => new Collection([
-                new Item($collectionItemData = ['baz' => 3]),
-            ]),
+                new Item($collectionItemData1 = ['id' => 7, 'baz' => 8]),
+                new Item($collectionItemData2 = ['id' => 9, 'qux' => 10]),
+            ], $collectionKey = 'qux'),
         ]);
-        $response = (new SuccessResponse($item))->setMeta($meta = ['bar' => 2]);
+        $response = (new SuccessResponse($item));
 
         $result = $this->formatter->success($response);
 
-        $this->assertSame(array_merge([
-            'data' => array_merge($data, [
-                'foo' => array_merge($relatedItemData, [
-                    'bar' => $nestedItemData,
-                ]),
-                'bar' => [
-                    $collectionItemData,
+        $this->assertSame([
+            'data' => [
+                'type' => $key,
+                'id' => $data['id'],
+                'attributes' => Arr::except($data, 'id'),
+                'relationships' => [
+                    'foo' => [
+                        'data' => [
+                            'type' => $relatedItemKey,
+                            'id' => $relatedItemData['id'],
+                        ],
+                    ],
+                    'bar' => [
+                        'data' => [
+                            [
+                                'type' => $collectionKey,
+                                'id' => $collectionItemData1['id'],
+                            ],
+                            [
+                                'type' => $collectionKey,
+                                'id' => $collectionItemData2['id'],
+                            ],
+                        ],
+                    ],
                 ],
-            ]),
-        ], $meta), $result);
+            ],
+            'included' => [
+                [
+                    'type' => $relatedItemKey,
+                    'id' => $relatedItemData['id'],
+                    'attributes' => Arr::except($relatedItemData, 'id'),
+                    'relationships' => [
+                        'bar' => [
+                            'data' => [
+                                'type' => $nestedItemKey,
+                                'id' => $nestedItemData['id'],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => $nestedItemKey,
+                    'id' => $nestedItemData['id'],
+                    'attributes' => Arr::except($nestedItemData, 'id'),
+                ],
+                [
+                    'type' => $collectionKey,
+                    'id' => $collectionItemData1['id'],
+                    'attributes' => Arr::except($collectionItemData1, 'id'),
+                ],
+                [
+                    'type' => $collectionKey,
+                    'id' => $collectionItemData2['id'],
+                    'attributes' => Arr::except($collectionItemData2, 'id'),
+                ],
+            ],
+        ], $result);
     }
 
     /**

@@ -7,9 +7,8 @@ use Flugg\Responder\Http\Normalizers\PaginatorNormalizer;
 use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection as IlluminateCollection;
 
 /**
  * Unit tests for the [PaginatorNormalizer] class.
@@ -23,12 +22,12 @@ class PaginatorNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesPaginator()
     {
-        $collection = IlluminateCollection::make([
+        $items = [
             $this->mockModel($data1 = ['foo' => 1], $table = 'foo')->reveal(),
             $this->mockModel($data2 = ['bar' => 2], $table)->reveal(),
-        ]);
+        ];
         $paginator = $this->mock(LengthAwarePaginator::class);
-        $paginator->getCollection()->willReturn($collection);
+        $paginator->items()->willReturn($items);
 
         $result = (new PaginatorNormalizer($paginator->reveal()))->normalize();
 
@@ -47,12 +46,12 @@ class PaginatorNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodSetsResourceKeyUsingFirstModel()
     {
-        $collection = IlluminateCollection::make([
+        $items = [
             $this->mockModel([], 'foo', [], $key = 'bar')->reveal(),
             $this->mockModel([], 'baz')->reveal(),
-        ]);
+        ];
         $paginator = $this->mock(LengthAwarePaginator::class);
-        $paginator->getCollection()->willReturn($collection);
+        $paginator->items()->willReturn($items);
 
         $result = (new PaginatorNormalizer($paginator->reveal()))->normalize();
 
@@ -65,7 +64,7 @@ class PaginatorNormalizerTest extends UnitTestCase
     public function testNormalizeMethodSetsResourceKeyToNullWhenNoResults()
     {
         $paginator = $this->mock(LengthAwarePaginator::class);
-        $paginator->getCollection()->willReturn(IlluminateCollection::make());
+        $paginator->items()->willReturn([]);
 
         $result = (new PaginatorNormalizer($paginator->reveal()))->normalize();
 
@@ -77,14 +76,14 @@ class PaginatorNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesEloquentCollectionWithItemRelation()
     {
-        $collection = IlluminateCollection::make([
+        $items = [
             $this->mockModel([], 'foo', [
                 'bar' => $this->mockModel($relatedData = ['foo' => 1], 'bar'),
             ])->reveal(),
             $this->mockModel([], 'baz')->reveal(),
-        ]);
+        ];
         $paginator = $this->mock(LengthAwarePaginator::class);
-        $paginator->getCollection()->willReturn($collection);
+        $paginator->items()->willReturn($items);
 
         $result = (new PaginatorNormalizer($paginator->reveal()))->normalize();
 
@@ -96,16 +95,16 @@ class PaginatorNormalizerTest extends UnitTestCase
      */
     public function testNormalizeMethodNormalizesEloquentCollectionWithCollectionRelation()
     {
-        $collection = IlluminateCollection::make([
+        $items = [
             $this->mockModel([], 'foo', [
                 'bar' => EloquentCollection::make([
                     $this->mockModel($relatedData = ['foo' => 1], 'bar')->reveal(),
                 ]),
             ])->reveal(),
             $this->mockModel([], 'baz')->reveal(),
-        ]);
+        ];
         $paginator = $this->mock(LengthAwarePaginator::class);
-        $paginator->getCollection()->willReturn($collection);
+        $paginator->items()->willReturn($items);
 
         $result = (new PaginatorNormalizer($paginator->reveal()))->normalize();
 

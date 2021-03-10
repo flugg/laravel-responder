@@ -101,7 +101,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
     public function testMakeMethodNormalizesDataUsingConfiguredNormalizer()
     {
         $normalizer = $this->mock(Normalizer::class);
-        $normalizer->normalize()->willReturn($response = new SuccessResponse);
+        $normalizer->normalize()->willReturn($response = new SuccessResponse(new Item));
         $this->config->get('responder.normalizers')->willReturn([stdClass::class => get_class($normalizer->reveal())]);
         $this->container->makeWith(Argument::cetera())->willReturn($normalizer->reveal());
 
@@ -116,9 +116,8 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testMakeMethodResourceKeyParameterOverridesNormalizedResponse()
     {
-        $response = (new SuccessResponse)->setResource(new Item([], 'foo'));
         $normalizer = $this->mock(Normalizer::class);
-        $normalizer->normalize()->willReturn($response);
+        $normalizer->normalize()->willReturn($response = (new SuccessResponse(new Item([], 'foo'))));
         $this->config->get('responder.normalizers')->willReturn([stdClass::class => get_class($normalizer->reveal())]);
         $this->container->makeWith(Argument::cetera())->willReturn($normalizer->reveal());
 
@@ -145,7 +144,7 @@ class SuccessResponseBuilderTest extends UnitTestCase
      */
     public function testMakeMethodCreatesResourceFromScalar()
     {
-        foreach ([true, 1.0, 1, 'foo'] as $data) {
+        foreach ([true, 1.0, 1, 'foo', null] as $data) {
             $result = $this->responseBuilder->make($data, $key = 'bar');
 
             $this->assertSame($this->responseBuilder, $result);
@@ -153,17 +152,6 @@ class SuccessResponseBuilderTest extends UnitTestCase
             $this->assertSame($data, $result->get()->resource()->data());
             $this->assertSame($key, $result->get()->resource()->key());
         }
-    }
-
-    /**
-     * Assert that [make] doesn't create a resource when given null and sets it on response object.
-     */
-    public function testMakeMethodCreatesResourceFromNull()
-    {
-        $result = $this->responseBuilder->make(null);
-
-        $this->assertSame($this->responseBuilder, $result);
-        $this->assertNull($result->get()->resource());
     }
 
     /**

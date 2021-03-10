@@ -136,7 +136,7 @@ abstract class UnitTestCase extends TestCase
      * @param \Illuminate\Database\Eloquent\Model|\Prophecy\Prophecy\ObjectProphecy $model
      * @return \Prophecy\Prophecy\ObjectProphecy
      */
-    protected function mockOneToOneRelation(string $relationClass, $model): ObjectProphecy
+    protected function mockSingularRelation(string $relationClass, $model): ObjectProphecy
     {
         return tap($this->mock($relationClass), function (ObjectProphecy $relation) use ($model) {
             $relation->willImplement(ExtendsQueryBuilder::class);
@@ -145,13 +145,13 @@ abstract class UnitTestCase extends TestCase
     }
 
     /**
-     * Make a Prophecy mock of a many-to-many [\Illuminate\Database\Eloquent\Relations\Relation] class.
+     * Make a Prophecy mock of a one-to-many or many-to-many [\Illuminate\Database\Eloquent\Relations\Relation] class.
      *
      * @param string $relationClass
      * @param \Illuminate\Database\Eloquent\Collection|\Prophecy\Prophecy\ObjectProphecy $collection
      * @return \Prophecy\Prophecy\ObjectProphecy
      */
-    protected function mockManyToManyRelation(string $relationClass, $collection): ObjectProphecy
+    protected function mockPluralRelation(string $relationClass, $collection): ObjectProphecy
     {
         return tap($this->mock($relationClass), function (ObjectProphecy $relation) use ($collection) {
             $relation->willImplement(ExtendsQueryBuilder::class);

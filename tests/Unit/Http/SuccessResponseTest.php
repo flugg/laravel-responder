@@ -6,6 +6,8 @@ use Flugg\Responder\Contracts\Pagination\Cursor;
 use Flugg\Responder\Contracts\Pagination\CursorPaginator;
 use Flugg\Responder\Contracts\Pagination\Paginator;
 use Flugg\Responder\Exceptions\InvalidStatusCodeException;
+use Flugg\Responder\Http\Resources\Collection;
+use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\Resources\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
@@ -33,7 +35,17 @@ class SuccessResponseTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->response = new SuccessResponse;
+        $this->response = new SuccessResponse(new Item);
+    }
+
+    /**
+     * Assert that the constructor sets resource.
+     */
+    public function testInitializePropertiesInConstructor()
+    {
+        $response = new SuccessResponse($item = new Item);
+
+        $this->assertSame($item, $response->resource());
     }
 
     /**
@@ -41,12 +53,10 @@ class SuccessResponseTest extends UnitTestCase
      */
     public function testSetAndGetResource()
     {
-        $resource = $this->mock(Resource::class);
-
-        $result = $this->response->setResource($resource->reveal());
+        $result = $this->response->setResource($collection = new Collection);
 
         $this->assertSame($this->response, $result);
-        $this->assertSame($resource->reveal(), $this->response->resource());
+        $this->assertSame($collection, $this->response->resource());
     }
 
     /**

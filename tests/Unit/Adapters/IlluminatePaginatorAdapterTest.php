@@ -4,7 +4,7 @@ namespace Flugg\Responder\Tests\Unit\Adapters;
 
 use Flugg\Responder\Adapters\IlluminatePaginatorAdapter;
 use Flugg\Responder\Tests\UnitTestCase;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 /**
@@ -15,7 +15,7 @@ use Illuminate\Support\Collection;
 class IlluminatePaginatorAdapterTest extends UnitTestCase
 {
     /**
-     * Mock of an [\Illuminate\Pagination\LengthAwarePaginator] class.
+     * Mock of an [\Illuminate\Contracts\Pagination\LengthAwarePaginator] class.
      *
      * @var \Prophecy\Prophecy\ObjectProphecy
      */

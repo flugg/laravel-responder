@@ -36,7 +36,7 @@ class PrimitiveTest extends UnitTestCase
      */
     public function testInitializePropertiesInConstructor()
     {
-        foreach ([true, 1.0, 1, 'foo'] as $data) {
+        foreach ([true, 1.0, 1, 'foo', null] as $data) {
             $resource = new Primitive($data, $key = 'bar');
 
             $this->assertSame($data, $resource->data());

@@ -87,7 +87,7 @@ class BootstrapPackageTest extends IntegrationTestCase
      */
     public function testResponseFormatterCanBeConfigured()
     {
-        config()->set('responder.formatter', JsonApiFormatter::class);
+        config(['responder.formatter' => JsonApiFormatter::class]);
 
         $result = $this->app->make(Formatter::class);
 
@@ -146,7 +146,7 @@ class BootstrapPackageTest extends IntegrationTestCase
      */
     public function testResponseFactoryCanBeDecorated()
     {
-        config()->set('responder.decorators', [PrettyPrintDecorator::class]);
+        config(['responder.decorators' => [PrettyPrintDecorator::class]]);
 
         $result = $this->app->make(ResponseFactory::class);
 

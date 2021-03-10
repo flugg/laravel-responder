@@ -112,7 +112,21 @@ class ErrorResponseBuilderTest extends UnitTestCase
     }
 
     /**
-     * Assert that [make] resolves an error code and message from config when given an exception.
+     * Assert that [make] sets error code and resolves message from error message registry.
+     */
+    public function testMakeMethodSetsErrorCodeAndResolvesMessageFromConfig()
+    {
+        $this->messageRegistry->resolve($code = 'foo')->willReturn($message = 'bar');
+
+        $result = $this->responseBuilder->make($code);
+
+        $this->assertSame($this->responseBuilder, $result);
+        $this->assertSame($code, $result->get()->code());
+        $this->assertSame($message, $result->get()->message());
+    }
+
+    /**
+     * Assert that [make] sets error code and resolves message from error message registry when given an exception.
      */
     public function testMakeMethodAcceptsAnException()
     {
@@ -142,7 +156,7 @@ class ErrorResponseBuilderTest extends UnitTestCase
 
         $result = $this->responseBuilder->make(new InvalidArgumentException)->get();
 
-        $this->assertSame($code = 'invalid_argument', $result->code());
+        $this->assertSame($code, $result->code());
         $this->assertSame($message, $result->message());
         $this->assertSame(500, $result->status());
     }

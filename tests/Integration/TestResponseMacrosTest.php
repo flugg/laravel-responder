@@ -54,7 +54,7 @@ class TestResponseMacrosTest extends IntegrationTestCase
         $this->testResponse->allows('getStatusCode')->andReturn(500);
         $this->testResponse->allows('assertExactJson')->andReturn();
 
-        $result = $this->testResponse->assertError($code = 'error_occured', $message = 'An error has occured.');
+        $result = $this->testResponse->assertError($code = 'foo', $message = 'bar');
 
         $this->assertSame($this->testResponse, $result);
         $this->testResponse->shouldHaveReceived('assertExactJson')->with([

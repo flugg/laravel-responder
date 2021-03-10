@@ -37,10 +37,21 @@ class CollectionTest extends UnitTestCase
      */
     public function testInitializePropertiesInConstructor()
     {
-        $collection = new Collection($items = ['foo' => 1], $key = 'foo');
+        $collection = new Collection($items = [new Item, new Item], $key = 'foo');
 
         $this->assertSame($items, $collection->items());
         $this->assertSame($key, $collection->key());
+    }
+
+    /**
+     * Assert that the constructor sets key on nested items to the same as the collection.
+     */
+    public function testSetNestedKeysInConstructor()
+    {
+        new Collection([$item1 = new Item([], 'foo'), $item2 = new Item([], 'bar')], $key = 'baz');
+
+        $this->assertSame($key, $item1->key());
+        $this->assertSame($key, $item2->key());
     }
 
     /**

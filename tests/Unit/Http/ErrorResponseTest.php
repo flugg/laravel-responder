@@ -34,11 +34,22 @@ class ErrorResponseTest extends UnitTestCase
     }
 
     /**
+     * Assert that the constructor sets data and resource key.
+     */
+    public function testInitializePropertiesInConstructor()
+    {
+        $response = new ErrorResponse($code = 'foo', $message = 'bar');
+
+        $this->assertSame($code, $response->code());
+        $this->assertSame($message, $response->message());
+    }
+
+    /**
      * Assert that [setCode] and [code] sets and gets error code respectively.
      */
     public function testSetAndGetCode()
     {
-        $result = $this->response->setCode($code = 'error_occured');
+        $result = $this->response->setCode($code = 'foo');
 
         $this->assertSame($this->response, $result);
         $this->assertSame($code, $this->response->code());
@@ -49,7 +60,7 @@ class ErrorResponseTest extends UnitTestCase
      */
     public function testSetAndGetMessage()
     {
-        $result = $this->response->setMessage($message = 'An error has occured.');
+        $result = $this->response->setMessage($message = 'bar');
 
         $this->assertSame($this->response, $result);
         $this->assertSame($message, $this->response->message());
