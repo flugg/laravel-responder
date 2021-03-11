@@ -54,10 +54,9 @@ class JsonApiFormatter implements Formatter
      */
     public function error(ErrorResponse $response): array
     {
-        $data = ['errors' =>
-            ($validator = $response->validator())
-                ? $this->validator($validator, $response)
-                : [$this->errorObject($response)],
+        $data = ['errors' => ($validator = $response->validator())
+            ? $this->validator($validator, $response)
+            : [$this->errorObject($response)],
         ];
 
         if ($meta = $response->meta()) {

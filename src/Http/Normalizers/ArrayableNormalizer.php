@@ -36,6 +36,6 @@ class ArrayableNormalizer implements Normalizer
      */
     public function normalize(): SuccessResponse
     {
-        return (new SuccessResponse(new Item($this->data->toArray())));
+        return new SuccessResponse(new Item($this->data->toArray()));
     }
 }
