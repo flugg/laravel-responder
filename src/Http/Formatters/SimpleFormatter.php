@@ -126,7 +126,7 @@ class SimpleFormatter implements Formatter
         ];
 
         if ($currentPage > 1) {
-            $pagination['links']['prev'] = $paginator->url($currentPage - 1);
+            $pagination['links']['previous'] = $paginator->url($currentPage - 1);
         }
 
         if ($currentPage < $lastPage) {

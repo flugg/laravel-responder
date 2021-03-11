@@ -12,7 +12,6 @@ use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\Resources\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection as IlluminateCollection;
 use InvalidArgumentException;
 
 /**
@@ -38,6 +37,12 @@ class JsonApiFormatter implements Formatter
             $data['meta'] = $meta;
         }
 
+        if ($paginator = $response->paginator()) {
+            $data['pagination'] = $this->paginator($paginator);
+        } elseif ($paginator = $response->cursor()) {
+            $data['cursor'] = $this->cursor($paginator);
+        }
+
         return $data;
     }
 
@@ -49,13 +54,17 @@ class JsonApiFormatter implements Formatter
      */
     public function error(ErrorResponse $response): array
     {
-        $error = ['code' => $response->code()];
+        $data = ['errors' =>
+            ($validator = $response->validator())
+                ? $this->validator($validator, $response)
+                : [$this->errorObject($response)],
+        ];
 
-        if ($message = $response->message()) {
-            $error['message'] = $message;
+        if ($meta = $response->meta()) {
+            $data['meta'] = $meta;
         }
 
-        return array_merge(['error' => $error], $response->meta());
+        return $data;
     }
 
     /**
@@ -72,42 +81,19 @@ class JsonApiFormatter implements Formatter
             return array_map([$this, 'resource'], $resource->items());
         }
 
-        throw new InvalidArgumentException("Unsupported resource class [{get_class($resource)}]");
-    }
-
-    /**
-     * Format included resources.
-     *
-     * @param \Flugg\Responder\Http\Resources\Resource $resource
-     * @return array
-     */
-    protected function included(Resource $resource): array
-    {
-        $included = [];
-        $resources = $resource instanceof Item ? $resource->relations() :
-            ($resource instanceof Collection ? $resource->items() : []);
-
-        foreach ($resources as $relation) {
-            $included = array_merge(
-                $included,
-                $relation instanceof Item ? [$this->resource($relation)] : [],
-                $this->included($relation)
-            );
-        }
-
-        return $included;
+        throw new InvalidArgumentException(sprintf('Unsupported resource class [%s]', get_class($resource)));
     }
 
     /**
      * Format a JSON API resource object.
      *
-     * @param Item $resource
+     * @param \Flugg\Responder\Http\Resources\Item $resource
      * @return array
      */
     protected function resource(Item $resource): array
     {
         $identifier = $this->resourceIdentifier($resource);
-        $identifier['data'] = Arr::except($resource->data(), 'id');
+        $identifier['attributes'] = Arr::except($resource->data(), 'id');
 
         if (count($resource->relations())) {
             $identifier['relationships'] = $this->relationships($resource);
@@ -119,7 +105,7 @@ class JsonApiFormatter implements Formatter
     /**
      * Format a JSON API resource identifier object.
      *
-     * @param Item $resource
+     * @param \Flugg\Responder\Http\Resources\Item $resource
      * @return array
      */
     protected function resourceIdentifier(Item $resource): array
@@ -142,16 +128,65 @@ class JsonApiFormatter implements Formatter
      */
     protected function relationships(Item $resource): array
     {
-        return IlluminateCollection::make($resource->relations())
-            ->mapWithKeys(function ($value, $key) {
-                if ($value instanceof Item) {
-                    return [$key => ['data' => $this->relationships($value)]];
-                } elseif ($value instanceof Collection) {
-                    return array_map([$this, 'resourceIdentifier'], $value->items());
-                } else {
-                    throw new InvalidArgumentException("Unsupported nested resource class [{get_class($value)}]");
-                }
-            })->toArray();
+        return array_map(function (Resource $relation) {
+            if ($relation instanceof Item) {
+                return ['data' => $this->resourceIdentifier($relation)];
+            } elseif ($relation instanceof Collection) {
+                return ['data' => array_map([$this, 'resourceIdentifier'], $relation->items())];
+            } else {
+                throw new InvalidArgumentException(sprintf('Unsupported nested resource class [%s]', get_class($relation)));
+            }
+        }, $resource->relations());
+    }
+
+    /**
+     * Format included resources.
+     *
+     * @param \Flugg\Responder\Http\Resources\Resource $resource
+     * @param array $included
+     * @return array
+     */
+    protected function included(Resource $resource, array $included = []): array
+    {
+        if ($resource instanceof Item) {
+            return $this->extractRelations($resource, $included);
+        } else {
+            return $this->extractItems($resource, $included);
+        }
+    }
+
+    /**
+     * Extract related resources from the resource.
+     *
+     * @param \Flugg\Responder\Http\Resources\Item $resource
+     * @param array $included
+     * @return array
+     */
+    protected function extractRelations(Item $resource, array $included): array
+    {
+        return array_reduce($resource->relations(), function ($previous, $relation) {
+            return array_merge(
+                $relation instanceof Item ? [$this->resource($relation)] : [],
+                $this->included($relation, $previous),
+            );
+        }, $included);
+    }
+
+    /**
+     * Extract resources from the resource collection.
+     *
+     * @param \Flugg\Responder\Http\Resources\Collection $collection
+     * @param array $included
+     * @return array
+     */
+    protected function extractItems(Collection $collection, array $included): array
+    {
+        return array_reduce($collection->items(), function ($previous, $item) use ($included) {
+            return array_merge(
+                $this->included($item, $previous),
+                ! empty($included) ? [$this->resource($item)] : []
+            );
+        }, $included);
     }
 
     /**
@@ -203,24 +238,41 @@ class JsonApiFormatter implements Formatter
     }
 
     /**
+     * Format an error object.
+     *
+     * @param \Flugg\Responder\Http\ErrorResponse $response
+     * @return array
+     */
+    protected function errorObject(ErrorResponse $response): array
+    {
+        $error = ['code' => $response->code()];
+
+        if ($message = $response->message()) {
+            $error['title'] = $message;
+        }
+
+        return $error;
+    }
+
+    /**
      * Format validator metadata.
      *
      * @param \Flugg\Responder\Contracts\Validation\Validator $validator
+     * @param \Flugg\Responder\Http\ErrorResponse $response
      * @return array
      */
-    protected function validator(Validator $validator): array
+    protected function validator(Validator $validator, ErrorResponse $response): array
     {
-        return [
-            'fields' => array_reduce($validator->failed(), function ($fields, $field) use ($validator) {
-                return array_merge($fields, [
-                    $field => array_map(function ($rule) use ($field, $validator) {
-                        return [
-                            'rule' => $rule,
-                            'message' => $validator->messages()["$field.$rule"],
-                        ];
-                    }, $validator->errors()[$field]),
-                ]);
-            }, []),
-        ];
+        return array_reduce($validator->failed(), function ($errors, $field) use ($validator, $response) {
+            return array_merge(
+                $errors,
+                array_map(function ($rule) use ($response, $field, $validator) {
+                    return array_merge($this->errorObject($response), [
+                        'detail' => $validator->messages()["$field.$rule"],
+                        'source' => $field,
+                    ]);
+                }, $validator->errors()[$field]),
+            );
+        }, []);
     }
 }

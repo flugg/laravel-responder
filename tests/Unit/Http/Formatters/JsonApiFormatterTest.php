@@ -40,6 +40,20 @@ class JsonApiFormatterTest extends UnitTestCase
     }
 
     /**
+     * Assert that [success] throws exception when a resource is missing an id field.
+     */
+    public function testSuccessMethodThrowsExceptionForMissingId()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('JSON API resource objects must have an ID');
+
+        $item = new Item(['foo' => 2], 'bar');
+        $response = (new SuccessResponse($item))->setMeta($meta = ['bar' => 2]);
+
+        $result = $this->formatter->success($response);
+    }
+
+    /**
      * Assert that [success] formats success responses with an item resource.
      */
     public function testSuccessMethodFormatsSuccessResponsesWithItem()
@@ -118,9 +132,25 @@ class JsonApiFormatterTest extends UnitTestCase
     }
 
     /**
-     * Assert that [success] formats success responses with related resources.
+     * Assert that [success] throws an exception when given an invalid related resource class.
      */
-    public function testSuccessMethodFormatsRelations()
+    public function testSuccessMethodThrowsExceptionForInvalidRelatedResource()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported nested resource class');
+
+        $item = new Item(['id' => 1, 'foo' => 2], 'foo', [
+            'foo' => $this->mock(Resource::class)->reveal(),
+        ]);
+        $response = (new SuccessResponse($item));
+
+        $this->formatter->success($response);
+    }
+
+    /**
+     * Assert that [success] formats success responses with a resource item and related resources.
+     */
+    public function testSuccessMethodFormatsRelationsWithItem()
     {
         $item = new Item($data = ['id' => 1, 'foo' => 2], $key = 'foo', [
             'foo' => new Item($relatedItemData = ['id' => 3, 'foo' => 4], $relatedItemKey = 'bar', [
@@ -195,11 +225,72 @@ class JsonApiFormatterTest extends UnitTestCase
     }
 
     /**
+     * Assert that [success] formats success responses with a resource collection and related resources.
+     */
+    public function testSuccessMethodFormatsRelationsWithCollection()
+    {
+        $item = new Collection([
+            new Item($collectionItemData1 = ['id' => 1, 'foo' => 2], null, [
+                'foo' => new Item($relatedItemData = ['id' => 3, 'foo' => 4], $relatedItemKey = 'bar', [
+                    'bar' => new Item($nestedItemData = ['id' => 5, 'bar' => 6], $nestedItemKey = 'baz'),
+                ]),
+            ]),
+            new Item($collectionItemData2 = ['id' => 7, 'qux' => 8]),
+        ], $key = 'foo');
+        $response = (new SuccessResponse($item));
+
+        $result = $this->formatter->success($response);
+
+        $this->assertSame([
+            'data' => [
+                [
+                    'type' => $key,
+                    'id' => $collectionItemData1['id'],
+                    'attributes' => Arr::except($collectionItemData1, 'id'),
+                    'relationships' => [
+                        'foo' => [
+                            'data' => [
+                                'type' => $relatedItemKey,
+                                'id' => $relatedItemData['id'],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => $key,
+                    'id' => $collectionItemData2['id'],
+                    'attributes' => Arr::except($collectionItemData2, 'id'),
+                ],
+            ],
+            'included' => [
+                [
+                    'type' => $relatedItemKey,
+                    'id' => $relatedItemData['id'],
+                    'attributes' => Arr::except($relatedItemData, 'id'),
+                    'relationships' => [
+                        'bar' => [
+                            'data' => [
+                                'type' => $nestedItemKey,
+                                'id' => $nestedItemData['id'],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => $nestedItemKey,
+                    'id' => $nestedItemData['id'],
+                    'attributes' => Arr::except($nestedItemData, 'id'),
+                ],
+            ],
+        ], $result);
+    }
+
+    /**
      * Assert that [success] method attaches pagination metadata to response data.
      */
     public function testSuccessMethodAttachesPagination()
     {
-        $item = new Item($data = []);
+        $item = new Item($data = ['id' => 1], $key = 'bar');
         $paginator = $this->mockPaginator($count = 10, $total = 15, $perPage = 5, $currentPage = 2, $lastPage = 3);
         $paginator->url(1)->willReturn($firstPageUrl = 'example.com?page=1');
         $paginator->url(2)->willReturn($selfUrl = 'example.com?page=2');
@@ -209,13 +300,17 @@ class JsonApiFormatterTest extends UnitTestCase
         $result = $this->formatter->success($response);
 
         $this->assertSame([
-            'data' => $data,
+            'data' => [
+                'type' => $key,
+                'id' => $data['id'],
+                'attributes' => [],
+            ],
             'pagination' => [
                 'count' => $count,
                 'total' => $total,
-                'perPage' => $perPage,
-                'currentPage' => $currentPage,
-                'lastPage' => $lastPage,
+                'per_page' => $perPage,
+                'current_page' => $currentPage,
+                'total_pages' => $lastPage,
                 'links' => [
                     'self' => $selfUrl,
                     'first' => $firstPageUrl,
@@ -232,7 +327,7 @@ class JsonApiFormatterTest extends UnitTestCase
      */
     public function testSucessMethodOmitsPreviousAndNextLinksWhenNotSet()
     {
-        $item = new Item($data = []);
+        $item = new Item($data = ['id' => 1], $key = 'bar');
         $paginator = $this->mockPaginator($count = 5, $total = 5, $perPage = 5, $currentPage = 1, $lastPage = 1);
         $paginator->url(1)->willReturn($url = 'example.com?page=1');
         $paginator->url(2)->willReturn($url);
@@ -242,13 +337,17 @@ class JsonApiFormatterTest extends UnitTestCase
         $result = $this->formatter->success($response);
 
         $this->assertSame([
-            'data' => $data,
+            'data' => [
+                'type' => $key,
+                'id' => $data['id'],
+                'attributes' => [],
+            ],
             'pagination' => [
                 'count' => $count,
                 'total' => $total,
-                'perPage' => $perPage,
-                'currentPage' => $currentPage,
-                'lastPage' => $lastPage,
+                'per_page' => $perPage,
+                'current_page' => $currentPage,
+                'total_pages' => $lastPage,
                 'links' => [
                     'self' => $url,
                     'first' => $url,
@@ -263,14 +362,18 @@ class JsonApiFormatterTest extends UnitTestCase
      */
     public function testSuccessMethodAttachesCursorPagination()
     {
-        $item = new Item($data = []);
+        $item = new Item($data = ['id' => 1], $key = 'bar');
         $cursor = $this->mockCursor($count = 30, $current = 10, $previous = 5, $next = 15);
         $response = (new SuccessResponse($item))->setCursor($cursor->reveal());
 
         $result = $this->formatter->success($response);
 
         $this->assertSame([
-            'data' => $data,
+            'data' => [
+                'type' => $key,
+                'id' => $data['id'],
+                'attributes' => [],
+            ],
             'cursor' => [
                 'current' => $current,
                 'previous' => $previous,
@@ -292,12 +395,10 @@ class JsonApiFormatterTest extends UnitTestCase
 
         $result = $this->formatter->error($response);
 
-        $this->assertSame(array_merge([
-            'error' => [
-                'code' => $code,
-                'message' => $message,
-            ],
-        ], $meta), $result);
+        $this->assertSame([
+            'errors' => [['code' => $code, 'title' => $message]],
+            'meta' => $meta,
+        ], $result);
     }
 
     /**
@@ -310,9 +411,7 @@ class JsonApiFormatterTest extends UnitTestCase
         $result = $this->formatter->error($response);
 
         $this->assertSame([
-            'error' => [
-                'code' => $code,
-            ],
+            'errors' => [['code' => $code]],
         ], $result);
     }
 
@@ -330,21 +429,32 @@ class JsonApiFormatterTest extends UnitTestCase
                 'bar.baz.required' => $requiredMessage = 'Required field',
             ]
         );
-        $response = (new ErrorResponse)->setCode($code = 'foo')->setValidator($validator->reveal());
+        $response = (new ErrorResponse)
+            ->setCode($code = 'foo')
+            ->setMessage($message = 'bar')
+            ->setValidator($validator->reveal());
 
         $result = $this->formatter->error($response);
 
         $this->assertSame([
-            'error' => [
-                'code' => $code,
-                'fields' => [
-                    'foo' => [
-                        ['rule' => 'min', 'message' => $minMessage],
-                        ['rule' => 'email', 'message' => $emailMessage],
-                    ],
-                    'bar.baz' => [
-                        ['rule' => 'required', 'message' => $requiredMessage],
-                    ],
+            'errors' => [
+                [
+                    'code' => $code,
+                    'title' => $message,
+                    'detail' => $minMessage,
+                    'source' => 'foo',
+                ],
+                [
+                    'code' => $code,
+                    'title' => $message,
+                    'detail' => $emailMessage,
+                    'source' => 'foo',
+                ],
+                [
+                    'code' => $code,
+                    'title' => $message,
+                    'detail' => $requiredMessage,
+                    'source' => 'bar.baz',
                 ],
             ],
         ], $result);

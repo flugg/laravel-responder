@@ -104,7 +104,7 @@ class ResourceNormalizerTest extends UnitTestCase
         $resource = $this->mockJsonResource($this->mockModel([], $table1 = 'foo'), $data1 = ['id' => 1], [
             ($key1 = 'foo') => $this->mockResourceCollection([
                 $this->mockJsonResource($this->mockModel([], $table2 = 'bar'), $data2 = ['id' => 2])->reveal(),
-                $this->mockJsonResource($this->mockModel([], $table3 = 'baz'), $data3 = ['id' => 3])->reveal(),
+                $this->mockJsonResource($this->mockModel([], $table2), $data3 = ['id' => 3])->reveal(),
             ])->reveal(),
         ]);
         $resource->response()->willReturn(new Response);
@@ -116,7 +116,7 @@ class ResourceNormalizerTest extends UnitTestCase
         $this->assertSame($data2, $result->resource()->relations()[$key1][0]->data());
         $this->assertSame($table2, $result->resource()->relations()[$key1][0]->key());
         $this->assertSame($data3, $result->resource()->relations()[$key1][1]->data());
-        $this->assertSame($table3, $result->resource()->relations()[$key1][1]->key());
+        $this->assertSame($table2, $result->resource()->relations()[$key1][1]->key());
     }
 
     /**

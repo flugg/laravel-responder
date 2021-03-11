@@ -172,7 +172,7 @@ class SimpleFormatterTest extends UnitTestCase
                     'self' => $selfUrl,
                     'first' => $firstPageUrl,
                     'last' => $lastPageUrl,
-                    'prev' => $firstPageUrl,
+                    'previous' => $firstPageUrl,
                     'next' => $lastPageUrl,
                 ],
             ],
