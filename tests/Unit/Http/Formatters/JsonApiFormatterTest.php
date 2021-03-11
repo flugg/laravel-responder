@@ -126,7 +126,7 @@ class JsonApiFormatterTest extends UnitTestCase
             'foo' => new Item($relatedItemData = ['id' => 3, 'foo' => 4], $relatedItemKey = 'bar', [
                 'bar' => new Item($nestedItemData = ['id' => 5, 'bar' => 6], $nestedItemKey = 'baz'),
             ]),
-            'bar' => new Collection([
+            'baz' => new Collection([
                 new Item($collectionItemData1 = ['id' => 7, 'baz' => 8]),
                 new Item($collectionItemData2 = ['id' => 9, 'qux' => 10]),
             ], $collectionKey = 'qux'),
@@ -147,7 +147,7 @@ class JsonApiFormatterTest extends UnitTestCase
                             'id' => $relatedItemData['id'],
                         ],
                     ],
-                    'bar' => [
+                    'baz' => [
                         'data' => [
                             [
                                 'type' => $collectionKey,

@@ -33,7 +33,6 @@ class JsonApiFormatter implements Formatter
         if ($included = $this->included($response->resource())) {
             $data['included'] = $included;
         }
-        dd($included);
 
         if ($meta = $response->meta()) {
             $data['meta'] = $meta;
@@ -73,7 +72,7 @@ class JsonApiFormatter implements Formatter
             return array_map([$this, 'resource'], $resource->items());
         }
 
-        throw new InvalidArgumentException('Unsupported resource class');
+        throw new InvalidArgumentException("Unsupported resource class [{get_class($resource)}]");
     }
 
     /**
@@ -84,39 +83,19 @@ class JsonApiFormatter implements Formatter
      */
     protected function included(Resource $resource): array
     {
-        if ($resource instanceof Item) {
-            return array_reduce(array_values($resource->relations()), function ($included, $relation) {
-                return array_merge($included, [$this->include($relation)]);
-            }, []);
-        } elseif ($resource instanceof Collection) {
-            return array_reduce($resource->items(), function ($included, $item) {
-                return array_merge($included, [$this->include($item)]);
-            }, []);
-        }
-    }
+        $included = [];
+        $resources = $resource instanceof Item ? $resource->relations() :
+            ($resource instanceof Collection ? $resource->items() : []);
 
-    /**
-     * Format an included resource object.
-     *
-     * @param \Flugg\Responder\Http\Resources\Resource $resource
-     * @return array
-     */
-    protected function include(Resource $resource): array
-    {
-        if ($resource instanceof Item) {
-            return array_merge(
-                $this->resource($resource),
-                array_reduce(array_values($resource->relations()), function ($included, $relation) {
-                    return array_merge($included, [$this->include($relation)]);
-                }, [])
+        foreach ($resources as $relation) {
+            $included = array_merge(
+                $included,
+                $relation instanceof Item ? [$this->resource($relation)] : [],
+                $this->included($relation)
             );
-        } elseif ($resource instanceof Collection) {
-            return array_reduce($resource->items(), function ($included, $item) {
-                return array_merge($included, [$this->include($item)]);
-            }, []);
         }
 
-        throw new InvalidArgumentException('Unsupported resource class');
+        return $included;
     }
 
     /**
@@ -127,39 +106,14 @@ class JsonApiFormatter implements Formatter
      */
     protected function resource(Item $resource): array
     {
-        if (! isset($resource->id)) {
-            throw new InvalidArgumentException('JSON API resource objects must have an ID');
-        }
-
-        $data = array_merge($this->resourceIdentifier($resource), [
-            'attributes' => Arr::except($resource->data(), 'id'),
-        ]);
+        $identifier = $this->resourceIdentifier($resource);
+        $identifier['data'] = Arr::except($resource->data(), 'id');
 
         if (count($resource->relations())) {
-            $data['relationships'] = IlluminateCollection::make($resource->relations())
-                ->mapWithKeys(function ($value, $key) {
-                    return [$key => ['data' => $this->relationship($value)]];
-                })->toArray();
+            $identifier['relationships'] = $this->relationships($resource);
         }
 
-        return $data;
-    }
-
-    /**
-     * Format relationship data from a resource.
-     *
-     * @param \Flugg\Responder\Http\Resources\Resource $resource
-     * @return array
-     */
-    protected function relationship(Resource $resource): array
-    {
-        if ($resource instanceof Item) {
-            return $this->resourceIdentifier($resource);
-        } elseif ($resource instanceof Collection) {
-            return array_map([$this, 'resourceIdentifier'], $resource->items());
-        }
-
-        throw new InvalidArgumentException('Unsupported resource class');
+        return $identifier;
     }
 
     /**
@@ -170,10 +124,34 @@ class JsonApiFormatter implements Formatter
      */
     protected function resourceIdentifier(Item $resource): array
     {
+        if (! isset($resource->id)) {
+            throw new InvalidArgumentException('JSON API resource objects must have an ID');
+        }
+
         return [
             'type' => $resource->key(),
             'id' => $resource->id,
         ];
+    }
+
+    /**
+     * Format relationship data from a resource.
+     *
+     * @param \Flugg\Responder\Http\Resources\Resource $resource
+     * @return array
+     */
+    protected function relationships(Item $resource): array
+    {
+        return IlluminateCollection::make($resource->relations())
+            ->mapWithKeys(function ($value, $key) {
+                if ($value instanceof Item) {
+                    return [$key => ['data' => $this->relationships($value)]];
+                } elseif ($value instanceof Collection) {
+                    return array_map([$this, 'resourceIdentifier'], $value->items());
+                } else {
+                    throw new InvalidArgumentException("Unsupported nested resource class [{get_class($value)}]");
+                }
+            })->toArray();
     }
 
     /**
