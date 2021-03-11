@@ -3,7 +3,7 @@
 namespace Flugg\Responder\Http\Resources;
 
 /**
- * Class for a resource, representing an entitiy in the response data.
+ * Class for a resource, representing an entity in the response data.
  */
 class Item extends Resource
 {
