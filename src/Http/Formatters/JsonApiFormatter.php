@@ -12,6 +12,7 @@ use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\Resources\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection as IlluminateCollection;
 use InvalidArgumentException;
 
 /**
@@ -30,7 +31,7 @@ class JsonApiFormatter implements Formatter
         $data = ['data' => $this->data($response->resource())];
 
         if ($included = $this->included($response->resource())) {
-            $data['included'] = $included;
+            $data['included'] = $this->cleanUpIncluded($included);
         }
 
         if ($meta = $response->meta()) {
@@ -165,8 +166,8 @@ class JsonApiFormatter implements Formatter
     {
         return array_reduce($resource->relations(), function ($previous, $relation) {
             return array_merge(
-                $relation instanceof Item ? [$this->resource($relation)] : [],
                 $this->included($relation, $previous),
+                $relation instanceof Item ? [$this->resource($relation)] : [],
             );
         }, $included);
     }
@@ -186,6 +187,19 @@ class JsonApiFormatter implements Formatter
                 ! empty($included) ? [$this->resource($item)] : []
             );
         }, $included);
+    }
+
+    /**
+     * Clean up the list of included resources by sorting by type and ID and removing duplicates.
+     *
+     * @param array $included
+     * @return array
+     */
+    protected function cleanUpIncluded(array $included): array
+    {
+        return IlluminateCollection::make($included)->unique(function ($resource) {
+            return $resource['type'].$resource['id'];
+        })->sortBy('id')->sortBy('type')->values()->toArray();
     }
 
     /**
