@@ -6,6 +6,7 @@
     <a href="LICENSE.md"><img src="https://img.shields.io/badge/license-MIT-brightgreen.svg" alt="Software License"></a>
     <a href='https://github.com/flugg/laravel-responder/actions?query=workflow%3A"Run+tests"'><img src="https://img.shields.io/github/workflow/status/flugg/laravel-responder/Run%20tests/feature/api-resources?label=tests" alt="Tests Status"></a>
     <a href="https://www.codacy.com/gh/flugg/laravel-responder/dashboard"><img src="https://img.shields.io/codacy/coverage/1f14a6f74861492d8d8433019182f5a5/feature/api-resources?branch=feature%2Fapi-resources" alt="Test Coverage"></a>
+    <a href="https://github.styleci.io/repos/61958636"><img src="https://github.styleci.io/repos/61958636/shield?style=flat&branch=6.x" alt="StyleCI"></a>
     <a href="https://www.codacy.com/gh/flugg/laravel-responder/dashboard"><img src="https://img.shields.io/codacy/grade/1f14a6f74861492d8d8433019182f5a5/feature/api-resources?branch=feature%2Fapi-resources" alt="Code Quality"></a>
 </p>
 
