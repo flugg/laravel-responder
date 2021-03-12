@@ -5,8 +5,8 @@ namespace Flugg\Responder\Http\Normalizers;
 use Flugg\Responder\Contracts\Http\Normalizer;
 use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\Resources\Item;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection as IlluminateCollection;
 
 /**
  * Abstract class for normalizing Eloquent classes to success responses.
@@ -30,10 +30,10 @@ abstract class EloquentNormalizer implements Normalizer
     /**
      * Build a collection of resources from an Eloquent collection.
      *
-     * @param \Illuminate\Support\Collection $collection
+     * @param \Illuminate\Database\Eloquent\Collection $collection
      * @return \Flugg\Responder\Http\Resources\Collection
      */
-    protected function buildCollection(IlluminateCollection $collection): Collection
+    protected function buildCollection(EloquentCollection $collection): Collection
     {
         $resourceKey = ! $collection->isEmpty() ? $this->resolveResourceKey($collection->first()) : null;
 
@@ -63,12 +63,8 @@ abstract class EloquentNormalizer implements Normalizer
      */
     protected function extractRelations(Model $model): array
     {
-        return IlluminateCollection::make($model->getRelations())->mapWithKeys(function ($relation, $relationKey) {
-            return [
-                $relationKey => $relation instanceof Model
-                    ? $this->buildResource($relation)
-                    : $this->buildCollection($relation),
-            ];
-        })->toArray();
+        return array_map(function ($relation) {
+            return $relation instanceof Model ? $this->buildResource($relation) : $this->buildCollection($relation);
+        }, $model->getRelations());
     }
 }

@@ -9,7 +9,6 @@ use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\UnitTestCase;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Response;
 
 /**
  * Unit tests for the [ResourceNormalizer] class.
@@ -24,22 +23,34 @@ class ResourceNormalizerTest extends UnitTestCase
     public function testNormalizeMethodNormalizesResource()
     {
         $request = $this->mockRequest();
-        $response = new Response(null, 200, ['x-foo' => 1]);
         $model = $this->mockModel([], $table = 'foo');
         $resource = $this->mockJsonResource($model, $data = ['foo' => 1], []);
         $resource->with($request->reveal())->willReturn($with = ['foo' => ['bar' => 2]]);
         $resource->additional = $additional = ['foo' => ['baz' => 3]];
-        $resource->response()->willReturn($response);
 
         $result = (new ResourceNormalizer($resource->reveal(), $request->reveal()))->normalize();
 
         $this->assertInstanceOf(SuccessResponse::class, $result);
-        $this->assertSame($response->status(), $result->status());
-        $this->assertSame($response->headers->all(), $result->headers());
+        $this->assertSame(200, $result->status());
         $this->assertInstanceOf(Item::class, $result->resource());
         $this->assertSame($data, $result->resource()->data());
         $this->assertSame($table, $result->resource()->key());
         $this->assertSame(array_merge_recursive($with, $additional), $result->meta());
+    }
+
+    /**
+     * Assert that [normalize] sets 201 status code for recently created models.
+     */
+    public function testNormalizeMethodSetsCreatedStatusCodeForRecentlyCreatedModels()
+    {
+        $request = $this->mockRequest();
+        $model = $this->mockModel([], 'foo');
+        $model->wasRecentlyCreated = true;
+        $resource = $this->mockJsonResource($model, []);
+
+        $result = (new ResourceNormalizer($resource->reveal(), $request->reveal()))->normalize();
+
+        $this->assertSame(201, $result->status());
     }
 
     /**
@@ -50,7 +61,6 @@ class ResourceNormalizerTest extends UnitTestCase
         $request = $this->mockRequest();
         $model = $this->mockModel([], 'foo');
         $resource = $this->mockJsonResource($model, [], [], $key = 'bar');
-        $resource->response()->willReturn(new Response);
 
         $result = (new ResourceNormalizer($resource->reveal(), $request->reveal()))->normalize();
 
@@ -65,7 +75,6 @@ class ResourceNormalizerTest extends UnitTestCase
         $request = $this->mockRequest();
         $model = $this->mockModel([], 'foo', [], $key = 'bar');
         $resource = $this->mockJsonResource($model, [], []);
-        $resource->response()->willReturn(new Response);
 
         $result = (new ResourceNormalizer($resource->reveal(), $request->reveal()))->normalize();
 
@@ -83,7 +92,6 @@ class ResourceNormalizerTest extends UnitTestCase
                 ($key2 = 'bar') => $this->mockJsonResource($this->mockModel([], $table3 = 'baz'), $data3 = ['id' => 3])->reveal(),
             ])->reveal(),
         ]);
-        $resource->response()->willReturn(new Response);
 
         $result = (new ResourceNormalizer($resource->reveal(), $request->reveal()))->normalize();
 
@@ -107,7 +115,6 @@ class ResourceNormalizerTest extends UnitTestCase
                 $this->mockJsonResource($this->mockModel([], $table2), $data3 = ['id' => 3])->reveal(),
             ])->reveal(),
         ]);
-        $resource->response()->willReturn(new Response);
 
         $result = (new ResourceNormalizer($resource->reveal(), $request->reveal()))->normalize();
 
@@ -125,20 +132,17 @@ class ResourceNormalizerTest extends UnitTestCase
     public function testNormalizeMethodNormalizesResourceCollection()
     {
         $request = $this->mockRequest();
-        $response = new Response(null, 200, ['x-foo' => 1]);
         $collection = $this->mockResourceCollection([
             $this->mockJsonResource($this->mockModel([], $table = 'foo'), $data1 = ['id' => 2])->reveal(),
             $this->mockJsonResource($this->mockModel([], $table), $data2 = ['id' => 3])->reveal(),
         ]);
         $collection->with($request->reveal())->willReturn($with = ['foo' => ['bar' => 2]]);
         $collection->additional = $additional = ['foo' => ['baz' => 3]];
-        $collection->response()->willReturn($response);
 
         $result = (new ResourceNormalizer($collection->reveal(), $request->reveal()))->normalize();
 
         $this->assertInstanceOf(SuccessResponse::class, $result);
-        $this->assertSame($response->status(), $result->status());
-        $this->assertSame($response->headers->all(), $result->headers());
+        $this->assertSame(200, $result->status());
         $this->assertInstanceOf(Collection::class, $result->resource());
         $this->assertSame($data1, $result->resource()[0]->data());
         $this->assertSame($data2, $result->resource()[1]->data());
@@ -156,7 +160,6 @@ class ResourceNormalizerTest extends UnitTestCase
             $this->mockJsonResource($this->mockModel([], 'foo'), [], [], $key = 'bar')->reveal(),
             $this->mockJsonResource($this->mockModel([], 'baz'), [])->reveal(),
         ]);
-        $collection->response()->willReturn(new Response);
 
         $result = (new ResourceNormalizer($collection->reveal(), $request->reveal()))->normalize();
 
@@ -173,7 +176,6 @@ class ResourceNormalizerTest extends UnitTestCase
             $this->mockJsonResource($this->mockModel([], 'foo', [], $key = 'bar'), [])->reveal(),
             $this->mockJsonResource($this->mockModel([], 'baz'), [])->reveal(),
         ]);
-        $collection->response()->willReturn(new Response);
 
         $result = (new ResourceNormalizer($collection->reveal(), $request->reveal()))->normalize();
 
@@ -187,7 +189,6 @@ class ResourceNormalizerTest extends UnitTestCase
     {
         $request = $this->mockRequest();
         $collection = $this->mockResourceCollection([]);
-        $collection->response()->willReturn(new Response);
 
         $result = (new ResourceNormalizer($collection->reveal(), $request->reveal()))->normalize();
 
@@ -205,7 +206,6 @@ class ResourceNormalizerTest extends UnitTestCase
                 ($key = 'foo') => $this->mockJsonResource($this->mockModel([], $table2 = 'bar'), $data2 = ['id' => 2])->reveal(),
             ])->reveal(),
         ]);
-        $collection->response()->willReturn(new Response);
 
         $result = (new ResourceNormalizer($collection->reveal(), $request->reveal()))->normalize();
 
@@ -229,7 +229,6 @@ class ResourceNormalizerTest extends UnitTestCase
                 ])->reveal(),
             ])->reveal(),
         ]);
-        $collection->response()->willReturn(new Response);
 
         $result = (new ResourceNormalizer($collection->reveal(), $request->reveal()))->normalize();
 
@@ -247,7 +246,6 @@ class ResourceNormalizerTest extends UnitTestCase
     public function testNormalizeMethodNormalizesResourceCollectionWithPaginator()
     {
         $request = $this->mockRequest();
-        $response = new Response(null, 200, ['x-foo' => 1]);
         $models = [
             $model1 = $this->mockModel([], $table = 'foo')->reveal(),
             $model2 = $this->mockModel([], $table)->reveal(),
@@ -259,7 +257,6 @@ class ResourceNormalizerTest extends UnitTestCase
             $this->mockJsonResource($model2, [])->reveal(),
         ]);
         $collection->resource = $paginator->reveal();
-        $collection->response()->willReturn($response);
 
         $result = (new ResourceNormalizer($collection->reveal(), $request->reveal()))->normalize();
 

@@ -150,7 +150,7 @@ class JsonApiFormatterTest extends UnitTestCase
     /**
      * Assert that [success] formats success responses with a resource item and related resources.
      */
-    public function testSuccessMethodFormatsRelationsWithItem()
+    public function testSuccessMethodFormatsItemWithRelations()
     {
         $item = new Item($data = ['id' => 1, 'foo' => 2], $key = 'foo', [
             'foo' => new Item($relatedItemData = ['id' => 3, 'foo' => 4], $relatedItemKey = 'bar', [
@@ -227,7 +227,7 @@ class JsonApiFormatterTest extends UnitTestCase
     /**
      * Assert that [success] formats success responses with a resource collection and related resources.
      */
-    public function testSuccessMethodFormatsRelationsWithCollection()
+    public function testSuccessMethodFormatsCollectionWithRelations()
     {
         $item = new Collection([
             new Item($collectionItemData1 = ['id' => 1, 'foo' => 2], null, [
@@ -236,7 +236,7 @@ class JsonApiFormatterTest extends UnitTestCase
                 ]),
             ]),
             new Item($collectionItemData2 = ['id' => 7, 'qux' => 8]),
-        ], $key = 'foo');
+        ], $key = 'a');
         $response = (new SuccessResponse($item));
 
         $result = $this->formatter->success($response);
@@ -280,6 +280,201 @@ class JsonApiFormatterTest extends UnitTestCase
                     'type' => $nestedItemKey,
                     'id' => $nestedItemData['id'],
                     'attributes' => Arr::except($nestedItemData, 'id'),
+                ],
+            ],
+        ], $result);
+    }
+
+    /**
+     * Assert that [success] removes any duplicates from the includes list.
+     */
+    public function testSuccessMethodOnlyReturnsUniqueIncludes()
+    {
+        $relatedItem = new Item($relatedItemData = ['id' => 1, 'foo' => 2], $relatedItemKey = 'foo');
+        $item = new Collection([
+            new Item($collectionItemData1 = ['id' => 3, 'bar' => 4], null, ['foo' => $relatedItem]),
+            new Item($collectionItemData2 = ['id' => 5, 'baz' => 6], null, ['bar' => $relatedItem]),
+            new Item($collectionItemData3 = ['id' => 7, 'bar' => 8], null, ['baz' => $relatedItem]),
+        ], $key = 'bar');
+        $response = (new SuccessResponse($item));
+
+        $result = $this->formatter->success($response);
+
+        $this->assertSame([
+            'data' => [
+                [
+                    'type' => $key,
+                    'id' => $collectionItemData1['id'],
+                    'attributes' => Arr::except($collectionItemData1, 'id'),
+                    'relationships' => [
+                        'foo' => [
+                            'data' => [
+                                'type' => $relatedItemKey,
+                                'id' => $relatedItemData['id'],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => $key,
+                    'id' => $collectionItemData2['id'],
+                    'attributes' => Arr::except($collectionItemData2, 'id'),
+                    'relationships' => [
+                        'bar' => [
+                            'data' => [
+                                'type' => $relatedItemKey,
+                                'id' => $relatedItemData['id'],
+                            ],
+                        ],
+                    ],
+                ],
+                ['type' => $key,
+                    'id' => $collectionItemData3['id'],
+                    'attributes' => Arr::except($collectionItemData3, 'id'),
+                    'relationships' => [
+                        'baz' => [
+                            'data' => [
+                                'type' => $relatedItemKey,
+                                'id' => $relatedItemData['id'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'included' => [
+                [
+                    'type' => $relatedItemKey,
+                    'id' => $relatedItemData['id'],
+                    'attributes' => Arr::except($relatedItemData, 'id'),
+                ],
+            ],
+        ], $result);
+    }
+
+    /**
+     * Assert that [success] sorts all included resources alphabetically by type and ID.
+     */
+    public function testSuccessMethodSortsIncludedResources()
+    {
+        $item = new Item(['id' => 1], 'foo', [
+            'foo' => new Item(['id' => 2], 'a', [
+                'bar' => new Item(['id' => 3], 'b'),
+            ]),
+            'baz' => new Collection([
+                new Item(['id' => 3]),
+                new Item(['id' => 1], null, [
+                    'qux' => new Item(['id' => 3], 'a'),
+                ]),
+                new Item(['id' => 2]),
+            ], 'c'),
+            'qux' => new Item(['id' => 4], 'b', [
+                'bar' => new Item(['id' => 1], 'a'),
+            ]),
+        ]);
+        $response = (new SuccessResponse($item));
+
+        $result = $this->formatter->success($response);
+
+        $this->assertSame([
+            'data' => [
+                'type' => 'foo',
+                'id' => 1,
+                'attributes' => [],
+                'relationships' => [
+                    'foo' => [
+                        'data' => [
+                            'type' => 'a',
+                            'id' => 2,
+                        ],
+                    ],
+                    'baz' => [
+                        'data' => [
+                            [
+                                'type' => 'c',
+                                'id' => 3,
+                            ],
+                            [
+                                'type' => 'c',
+                                'id' => 1,
+                            ],
+                            [
+                                'type' => 'c',
+                                'id' => 2,
+                            ],
+                        ],
+                    ],
+                    'qux' => [
+                        'data' => [
+                            'type' => 'b',
+                            'id' => 4,
+                        ],
+                    ],
+                ],
+            ],
+            'included' => [
+                [
+                    'type' => 'a',
+                    'id' => 1,
+                    'attributes' => [],
+                ],
+                [
+                    'type' => 'a',
+                    'id' => 2,
+                    'attributes' => [],
+                    'relationships' => [
+                        'bar' => [
+                            'data' => [
+                                'type' => 'b',
+                                'id' => 3,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'a',
+                    'id' => 3,
+                    'attributes' => [],
+                ],
+                [
+                    'type' => 'b',
+                    'id' => 3,
+                    'attributes' => [],
+                ],
+                [
+                    'type' => 'b',
+                    'id' => 4,
+                    'attributes' => [],
+                    'relationships' => [
+                        'bar' => [
+                            'data' => [
+                                'type' => 'a',
+                                'id' => 1,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'c',
+                    'id' => 1,
+                    'attributes' => [],
+                    'relationships' => [
+                        'qux' => [
+                            'data' => [
+                                'type' => 'a',
+                                'id' => 3,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'c',
+                    'id' => 2,
+                    'attributes' => [],
+                ],
+                [
+                    'type' => 'c',
+                    'id' => 3,
+                    'attributes' => [],
                 ],
             ],
         ], $result);

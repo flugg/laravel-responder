@@ -8,12 +8,12 @@ use Flugg\Responder\Http\Resources\Collection;
 use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\SuccessResponse;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection as IlluminateCollection;
 
 /**
  * Class for normalizing API resources to success responses.
@@ -59,8 +59,7 @@ class ResourceNormalizer implements Normalizer
                     ? $this->buildCollection($this->data)
                     : $this->buildResource($this->data)
         ))
-            ->setStatus($this->data->response()->status())
-            ->setHeaders($this->data->response()->headers->all())
+            ->setStatus($this->calculateStatus($this->data))
             ->setMeta(array_merge_recursive($this->data->with($this->request), $this->data->additional));
 
         if ($this->data->resource instanceof LengthAwarePaginator) {
@@ -123,14 +122,23 @@ class ResourceNormalizer implements Normalizer
      */
     protected function extractRelations(JsonResource $resource): array
     {
-        return IlluminateCollection::make($resource->toArray($this->request))->filter(function ($value) {
+        $relations = array_filter($resource->toArray($this->request), function ($value) {
             return $value instanceof JsonResource && ! $value->resource instanceof MissingValue;
-        })->mapWithKeys(function ($relation, $relationKey) {
-            return [
-                $relationKey => $relation instanceof ResourceCollection
-                    ? $this->buildCollection($relation)
-                    : $this->buildResource($relation),
-            ];
-        })->toArray();
+        });
+
+        return array_map(function ($relation) {
+            return $relation instanceof ResourceCollection ? $this->buildCollection($relation) : $this->buildResource($relation);
+        }, $relations);
+    }
+
+    /**
+     * Calculate the appropriate status code for the response.
+     *
+     * @param \Illuminate\Http\Resources\Json\JsonResource $resource
+     * @return int
+     */
+    protected function calculateStatus(JsonResource $resource): int
+    {
+        return $resource->resource instanceof Model && $resource->resource->wasRecentlyCreated ? 201 : 200;
     }
 }
