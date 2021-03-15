@@ -1,4 +1,4 @@
-<p align="center"><img src="https://user-images.githubusercontent.com/1271812/103592890-8c6ef200-4ef4-11eb-935e-f0a52fed4021.png" width="500px"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/1271812/111231999-824f2b00-85ea-11eb-9afc-c0176529a234.png" width="500px"></p>
 
 <p align="center">
     <a href="https://github.com/flugger/laravel-responder/releases"><img src="https://img.shields.io/github/v/tag/flugger/laravel-responder?label=version" alt="Latest Stable Version"></a>
