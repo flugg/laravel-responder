@@ -11,7 +11,6 @@ use Flugg\Responder\Exceptions\InvalidDataException;
 use Flugg\Responder\Http\Builders\SuccessResponseBuilder;
 use Flugg\Responder\Http\Resources\Item;
 use Flugg\Responder\Http\Resources\Primitive;
-use Flugg\Responder\Http\Resources\Resource;
 use Flugg\Responder\Http\SuccessResponse;
 use Flugg\Responder\Tests\IncreaseStatusByOneDecorator;
 use Flugg\Responder\Tests\UnitTestCase;

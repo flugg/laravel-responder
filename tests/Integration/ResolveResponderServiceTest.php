@@ -60,10 +60,12 @@ class ResolveResponderServiceTest extends IntegrationTestCase
         $errorResponseBuilder->allows('make')->andReturnSelf();
         $trait = $this->getMockForTrait(MakesJsonResponses::class);
 
-        $successResult = $trait->success([]);
-        $errorResult = $trait->error([]);
+        $successResult = $trait->success($data = [], $key = 'foo');
+        $errorResult = $trait->error($code = 'bar', $message = 'baz');
 
         $this->assertSame($successResponseBuilder, $successResult);
         $this->assertSame($errorResponseBuilder, $errorResult);
+        $successResponseBuilder->shouldHaveReceived('make')->with($data, $key)->once();
+        $errorResponseBuilder->shouldHaveReceived('make')->with($code, $message)->once();
     }
 }

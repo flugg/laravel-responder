@@ -15,11 +15,12 @@ trait MakesJsonResponses
      * Build a success response.
      *
      * @param mixed $data
+     * @param string|null $resourceKey
      * @return \Flugg\Responder\Http\Builders\SuccessResponseBuilder
      */
-    public function success($data = null): SuccessResponseBuilder
+    public function success($data = null, ?string $resourceKey = null): SuccessResponseBuilder
     {
-        return app(Responder::class)->success($data);
+        return app(Responder::class)->success($data, $resourceKey);
     }
 
     /**

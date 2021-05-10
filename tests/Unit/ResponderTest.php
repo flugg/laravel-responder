@@ -54,10 +54,10 @@ class ResponderTest extends UnitTestCase
      */
     public function testSuccessMethodForwardsCallToSuccessResponseBuilder()
     {
-        $data = ['foo' => 1];
-        $this->successResponseBuilder->make($data)->willReturn($this->successResponseBuilder);
+        [$data, $key] = [['foo' => 1], 'bar'];
+        $this->successResponseBuilder->make($data, $key)->willReturn($this->successResponseBuilder);
 
-        $result = $this->responder->success($data);
+        $result = $this->responder->success($data, $key);
 
         $this->assertSame($this->successResponseBuilder->reveal(), $result);
     }

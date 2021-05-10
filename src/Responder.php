@@ -43,12 +43,13 @@ class Responder implements ResponderContract
      * Build a success response.
      *
      * @param mixed $data
+     * @param string|null $resourceKey
      * @throws \Flugg\Responder\Exceptions\InvalidDataException
      * @return \Flugg\Responder\Http\Builders\SuccessResponseBuilder
      */
-    public function success($data = null): SuccessResponseBuilder
+    public function success($data = null, ?string $resourceKey = null): SuccessResponseBuilder
     {
-        return $this->successResponseBuilder->make($data);
+        return $this->successResponseBuilder->make($data, $resourceKey);
     }
 
     /**
