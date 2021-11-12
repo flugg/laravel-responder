@@ -22,7 +22,7 @@
         "php": "^7.0|^8.0",
         "illuminate/contracts": "^5.1|^6.0|^7.0|^8.0",
         "illuminate/support": "^5.1|^6.0|^7.0|^8.0",
-        "league/fractal": "^0.17.0"
+        "league/fractal": "^0.19.0"
     },
     "require-dev": {
         "illuminate/database": "^5.1|^6.0|^7.0|^8.0",
