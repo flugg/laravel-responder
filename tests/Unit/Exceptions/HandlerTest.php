@@ -125,7 +125,9 @@ class HandlerTest extends TestCase
      */
     public function testRenderMethodConvertsValidationExceptions()
     {
-        $exception = new ValidationException($validator = Mockery::mock(Validator::class));
+        $validator = Mockery::mock(Validator::class);
+        $validator->shouldReceive('errors')->andReturn(collect(['foo' => 'bar']));
+        $exception = new ValidationException($validator);
         $this->expectException(ValidationFailedException::class);
 
         $this->handler->render($this->request, $exception);

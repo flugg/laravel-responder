@@ -30,9 +30,9 @@ abstract class HttpException extends BaseHttpException
     /**
      * An error message.
      *
-     * @var string|null
+     * @var string
      */
-    protected $message = null;
+    protected $message = '';
 
     /**
      * Additional error data.
