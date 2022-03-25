@@ -1,3 +1,9 @@
+# 3.2.0 (2022-03-25)
+
+### Features
+
+* Add Laravel 9.0 support
+
 # 3.1.3 (2021-01-07)
 
 ### Features
