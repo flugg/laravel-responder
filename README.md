@@ -14,7 +14,7 @@ Laravel Responder is a package for building API responses in Laravel and Lumen. 
 
 ---
 
-## **2021 Update: Version 4.0 Released!** 🔥
+## **2022 Update: Version 4.0 Released!** 🔥
 
 _The package has been rewritten from scratch with a focus on simplifying the code. Now, instead of utilizing [Fractal](https://fractal.thephpleague.com) behind the scenes, the package instead relies on Laravel's own [API Resources](https://laravel.com/docs/master/eloquent-resources). Make sure to check out the [changelog](CHANGELOG.md) and the new documentation to get an overview of all the hot new features._
 
