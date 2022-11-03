@@ -1,6 +1,6 @@
 <?php
 
-namespace Flugg\Responder\Traits;
+namespace Flugg\Responder\Http\Requests;
 
 /**
  * Use this trait in your base form request to convert all camel cased parameters to
@@ -85,10 +85,10 @@ trait ConvertsParameters
      * @param  mixed $input
      * @return array
      */
-    protected function castBooleans($input):array
+    protected function castBooleans($input)
     {
         if ($this->castToBooleanIsDisabled()) {
-            return [];
+            return;
         }
 
         $casted = [];

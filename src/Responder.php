@@ -6,6 +6,7 @@ use Flugg\Responder\ErrorResponse;
 use Flugg\Responder\Http\ErrorResponseBuilder;
 use Flugg\Responder\Http\SuccessResponseBuilder;
 use Flugg\Responder\SuccessResponse;
+use Illuminate\Config\Repository;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -18,48 +19,57 @@ use Illuminate\Http\JsonResponse;
 class Responder
 {
     /**
-     * The response builder used to build success responses.
+     * The configuration repository used to rerieve optional exception codes.
      *
-     * @var \Flugg\Responder\Http\SuccessResponseBuilder
+     * @var \Illuminate\Config\Repository
      */
-    protected $successResponse;
+    protected $config;
 
     /**
      * The response builder used to build error responses.
      *
      * @var \Flugg\Responder\Http\ErrorResponseBuilder
      */
-    protected $errorResponse;
+    protected $errorResponseBuilder;
+
+    /**
+     * The response builder used to build success responses.
+     *
+     * @var \Flugg\Responder\Http\SuccessResponseBuilder
+     */
+    protected $successResponseBuilder;
 
     /**
      * Constructor.
      *
-     * @param \Flugg\Responder\Http\ErrorResponseBuilder   $errorResponse
-     * @param \Flugg\Responder\Http\SuccessResponseBuilder $successResponse
+     * @param \Illuminate\Config\Repository                $config
+     * @param \Flugg\Responder\Http\ErrorResponseBuilder   $errorResponseBuilder
+     * @param \Flugg\Responder\Http\SuccessResponseBuilder $successResponseBuilder
      */
-    public function __construct(SuccessResponseBuilder $successResponse, ErrorResponseBuilder $errorResponse)
+    public function __construct(Repository $config, ErrorResponseBuilder $errorResponseBuilder, SuccessResponseBuilder $successResponseBuilder)
     {
-        $this->successResponse = $successResponse;
-        $this->errorResponse = $errorResponse;
+        $this->config = $config;
+        $this->errorResponseBuilder = $errorResponseBuilder;
+        $this->successResponseBuilder = $successResponseBuilder;
     }
 
     /**
      * Generate an error JSON response.
      *
-     * @param  mixed|null $errorCode
+     * @param  string|null $errorCode
      * @param  int|null    $statusCode
      * @param  mixed       $message
      * @return \Illuminate\Http\JsonResponse
      */
-    public function error($errorCode = null, int $statusCode = null, $message = null):JsonResponse
+    public function error(string $errorCode = null, int $statusCode = null, $message = null):JsonResponse
     {
-        if ($exception = config("responder.exceptions.$errorCode")) {
+        if ($exception = $this->config->get("responder.exceptions.$errorCode")) {
             if (class_exists($exception)) {
                 throw new $exception();
             }
         }
 
-        return $this->errorResponse->setError($errorCode, $message)->respond($statusCode);
+        return $this->errorResponseBuilder->setError($errorCode, $message)->respond($statusCode);
     }
 
     /**
@@ -80,7 +90,7 @@ class Responder
             list($statusCode, $meta) = [200, $statusCode];
         }
 
-        return $this->successResponse->transform($data)->addMeta($meta)->respond($statusCode);
+        return $this->successResponseBuilder->transform($data)->addMeta($meta)->respond($statusCode);
     }
 
     /**
@@ -92,6 +102,6 @@ class Responder
      */
     public function transform($data = null, $transformer = null):SuccessResponseBuilder
     {
-        return $this->successResponse->transform($data, $transformer);
+        return $this->successResponseBuilder->transform($data, $transformer);
     }
 }

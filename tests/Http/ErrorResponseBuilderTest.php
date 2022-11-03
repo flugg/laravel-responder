@@ -2,13 +2,12 @@
 
 namespace Flugg\Responder\Tests\Unit;
 
-use Flugg\Responder\Http\ErrorResponseBuilder;
 use Flugg\Responder\Tests\TestCase;
 use Illuminate\Http\JsonResponse;
 use InvalidArgumentException;
 
 /**
- * Collection of unit tests testing [\Flugg\Responder\Http\ErrorResponseBuilder].
+ * Collection of unit tests for the [\Flugg\Responder\Http\ErrorResponseBuilder].
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
@@ -17,25 +16,13 @@ use InvalidArgumentException;
 class ErrorResponseBuilderTest extends TestCase
 {
     /**
-     * Test that you can resolve an instance of [\Flugg\Responder\ErrorResponseBuilder]
-     * from the service container.
-     *
-     * @test
-     */
-    public function youCanResolveASuccessResponseBuilderFromTheContainer()
-    {
-        // Act...
-        $responseBuilder = $this->app->make('responder.error');
-
-        // Assert...
-        $this->assertInstanceOf(ErrorResponseBuilder::class, $responseBuilder);
-    }
-
-    /**
      * Test that the [respond] method converts the error response into an instance of
      * [\Illuminate\Http\JsonResponse] with a default status code of 500.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::respond
+     * @covers \Flugg\Responder\Http\ResponseBuilder::respond
+     * @covers \Flugg\Responder\Http\ResponseBuilder::includeStatusCode
      */
     public function respondMethodShouldReturnAJsonResponse()
     {
@@ -44,35 +31,19 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Act...
         $response = $responseBuilder->respond();
-        $responseArray = json_decode($response->content(), true);
 
         // Assert...
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals($response->status(), 500);
-        $this->assertArrayHasKey('success', $responseArray);
-        $this->assertEquals(false, $responseArray['success']);
-    }
-
-    /**
-     * Test that the [respond] method does not respond with success flag
-     *
-     * @test
-     */
-    public function respondMethodShouldNotOutputSuccessFlagWhenDisabled()
-    {
-        $this->app['config']->set('responder.include_success_flag', false);
-        $responseBuilder = $this->app->make('responder.error');
-
-        $response = $responseBuilder->respond();
-        $responseArray = json_decode($response->content(), true);
-
-        $this->assertArrayNotHasKey('success', $responseArray);
     }
 
     /**
      * Test that the [respond] method allows passing a status code as the first parameter.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::respond
+     * @covers \Flugg\Responder\Http\ResponseBuilder::respond
+     * @covers \Flugg\Responder\Http\ResponseBuilder::includeStatusCode
      */
     public function respondMethodShouldAllowSettingStatusCode()
     {
@@ -91,6 +62,9 @@ class ErrorResponseBuilderTest extends TestCase
      * to the [respond] method.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::respond
+     * @covers \Flugg\Responder\Http\ResponseBuilder::respond
+     * @covers \Flugg\Responder\Http\ResponseBuilder::includeStatusCode
      */
     public function respondMethodShouldAllowSettingHeaders()
     {
@@ -111,6 +85,8 @@ class ErrorResponseBuilderTest extends TestCase
      * an alternative, more explicit way of setting the status code.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::setStatus
+     * @covers \Flugg\Responder\Http\ResponseBuilder::setStatus
      */
     public function setStatusMethodShouldSetStatusCode()
     {
@@ -129,6 +105,8 @@ class ErrorResponseBuilderTest extends TestCase
      * code given is not a valid error HTTP status code.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::setStatus
+     * @covers \Flugg\Responder\Http\ResponseBuilder::setStatus
      */
     public function setStatusMethodShouldFailIfStatusCodeIsInvalid()
     {
@@ -145,6 +123,8 @@ class ErrorResponseBuilderTest extends TestCase
      * method chaining.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::setStatus
+     * @covers \Flugg\Responder\Http\ResponseBuilder::setStatus
      */
     public function setStatusMethodShouldReturnItself()
     {
@@ -159,29 +139,10 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
-     * Test that the [toArray] method serializes the data given, using the default serializer
-     * and no data.
-     *
-     * @test
-     */
-    public function toArrayMethodShouldSerializeData()
-    {
-        // Arrange...
-        $responseBuilder = $this->app->make('responder.error');
-
-        // Act...
-        $array = $responseBuilder->toArray();
-
-        // Assert...
-        $this->assertEquals([
-            'error' => null
-        ], $array);
-    }
-
-    /**
      * Test that error data is added when an error code is set using the [setError] method.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::setError
      */
     public function setErrorMethodShouldAddErrorData()
     {
@@ -193,6 +154,7 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
+            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => null
@@ -204,6 +166,7 @@ class ErrorResponseBuilderTest extends TestCase
      * Test that the [setError] method attempts to resolve an error message from the translator.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::setError
      */
     public function setErrorMethodShouldResolveErrorMessageFromTranslator()
     {
@@ -216,6 +179,7 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
+            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => 'Testing error'
@@ -228,6 +192,7 @@ class ErrorResponseBuilderTest extends TestCase
      * when resolving the error message.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::setError
      */
     public function setErrorMethodShouldAllowAddingParametersToMessage()
     {
@@ -241,6 +206,7 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
+            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => 'Testing error foo'
@@ -254,6 +220,7 @@ class ErrorResponseBuilderTest extends TestCase
      * array of parameters, which will override the error message and set it explicitly.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::setError
      */
     public function setErrorMethodShouldAllowOverridingErrorMessage()
     {
@@ -266,6 +233,7 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals([
+            'success' => false,
             'error' => [
                 'code' => 'testing_error',
                 'message' => 'Testing error 2'
@@ -274,9 +242,34 @@ class ErrorResponseBuilderTest extends TestCase
     }
 
     /**
+     * Test that the [toArray] method serializes the data given, using the default serializer
+     * and no data.
+     *
+     * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::toArray
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::buildErrorData
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::resolveMessage
+     */
+    public function toArrayMethodShouldSerializeData()
+    {
+        // Arrange...
+        $responseBuilder = $this->app->make('responder.error');
+
+        // Act...
+        $array = $responseBuilder->setError('foo')->toArray();
+
+        // Assert...
+        $this->assertEquals([
+            'success' => false,
+            'error' => null
+        ], $array);
+    }
+
+    /**
      * Test that the [toCollection] serializes the data into a collection.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::toCollection
      */
     public function toCollectionMethodShouldReturnACollection()
     {
@@ -288,6 +281,7 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals(collect([
+            'success' => false,
             'error' => null
         ]), $collection);
     }
@@ -296,6 +290,7 @@ class ErrorResponseBuilderTest extends TestCase
      * Test that the [toJson] serializes the data into a JSON string.
      *
      * @test
+     * @covers \Flugg\Responder\Http\ErrorResponseBuilder::toJson
      */
     public function toJsonMethodShouldReturnJson()
     {
@@ -307,6 +302,7 @@ class ErrorResponseBuilderTest extends TestCase
 
         // Assert...
         $this->assertEquals(json_encode([
+            'success' => false,
             'error' => null
         ]), $json);
     }

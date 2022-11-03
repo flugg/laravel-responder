@@ -2,6 +2,7 @@
 
 namespace Flugg\Responder;
 
+use Flugg\Responder\Pagination\CursorPaginator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use League\Fractal\Pagination\Cursor;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Collection as CollectionResource;
 use League\Fractal\Resource\Item as ItemResource;
@@ -31,23 +33,34 @@ class ResourceFactory
      *
      * @var array
      */
-    const MAKE_METHODS = [
+    protected $methods = [
         Builder::class => 'makeFromBuilder',
         Collection::class => 'makeFromCollection',
         Pivot::class => 'makeFromPivot',
         Model::class => 'makeFromModel',
         Paginator::class => 'makeFromPaginator',
-        Relation::class => 'makeFromRelation'
+        CursorPaginator::class => 'makeFromCursor',
+        Relation::class => 'makeFromRelation',
     ];
+
+    /**
+     * List of given request parameters.
+     *
+     * @var array
+     */
+    protected $parameters;
 
     /**
      * Build a resource instance from the given data.
      *
      * @param  mixed|null $data
+     * @param  array      $parameters
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    public function make($data = null)
+    public function make($data = null, array $parameters = [])
     {
+        $this->parameters = $parameters;
+
         if (is_null($data)) {
             return new NullResource();
         } elseif (is_array($data)) {
@@ -68,7 +81,7 @@ class ResourceFactory
      */
     protected function getMakeMethod($data):string
     {
-        foreach (static::MAKE_METHODS as $class => $method) {
+        foreach ($this->methods as $class => $method) {
             if ($data instanceof $class) {
                 return $method;
             }
@@ -96,7 +109,7 @@ class ResourceFactory
      */
     protected function makeFromArray(array $array):ResourceInterface
     {
-        return empty($array) ? new NullResource() : new CollectionResource($array);
+        return new CollectionResource($array);
     }
 
     /**
@@ -107,7 +120,7 @@ class ResourceFactory
      */
     protected function makeFromCollection(Collection $collection):ResourceInterface
     {
-        return static::makeFromArray($collection->all());
+        return new CollectionResource($collection);
     }
 
     /**
@@ -132,10 +145,24 @@ class ResourceFactory
         $resource = static::makeFromCollection($paginator->getCollection());
 
         if ($resource instanceof CollectionResource) {
-            $queryParams = array_diff_key(app('request')->all(), array_flip(['page']));
-            $paginator->appends($queryParams);
+            $resource->setPaginator(new IlluminatePaginatorAdapter($paginator->appends($this->parameters)));
+        }
 
-            $resource->setPaginator(new IlluminatePaginatorAdapter($paginator));
+        return $resource;
+    }
+
+    /**
+     * Make resource from a cursor paginator.
+     *
+     * @param  \Flugg\Responder\Pagination\CursorPaginator $paginator
+     * @return \League\Fractal\Resource\ResourceInterface
+     */
+    protected function makeFromCursor(CursorPaginator $paginator):ResourceInterface
+    {
+        $resource = static::makeFromCollection($paginator->getCollection());
+
+        if ($resource instanceof CollectionResource) {
+            $resource->setCursor(new Cursor($paginator->cursor(), null, $paginator->nextCursor(), $paginator->count()));
         }
 
         return $resource;

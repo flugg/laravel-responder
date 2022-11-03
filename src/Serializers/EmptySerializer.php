@@ -2,18 +2,17 @@
 
 namespace Flugg\Responder\Serializers;
 
+use League\Fractal\Pagination\CursorInterface;
 use League\Fractal\Pagination\PaginatorInterface;
-use League\Fractal\Resource\ResourceInterface;
-use League\Fractal\Serializer\ArraySerializer;
 
 /**
- * This class is the package's own implementation of Fractal's serializers.
+ * This class is an empty serializer which just outputs the data directly.
  *
  * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ApiSerializer extends ArraySerializer
+class EmptySerializer extends ApiSerializer
 {
     /**
      * Serialize a collection.
@@ -24,7 +23,7 @@ class ApiSerializer extends ArraySerializer
      */
     public function collection($resourceKey, array $data)
     {
-        return $this->item($resourceKey, $data);
+        return $data;
     }
 
     /**
@@ -36,9 +35,7 @@ class ApiSerializer extends ArraySerializer
      */
     public function item($resourceKey, array $data)
     {
-        return array_merge($this->null(), [
-            'data' => $data
-        ]);
+        return $data;
     }
 
     /**
@@ -48,10 +45,7 @@ class ApiSerializer extends ArraySerializer
      */
     public function null()
     {
-        return [
-            'success' => true,
-            'data' => null
-        ];
+        return [];
     }
 
     /**
@@ -62,7 +56,7 @@ class ApiSerializer extends ArraySerializer
      */
     public function meta(array $meta)
     {
-        return $meta;
+        return [];
     }
 
     /**
@@ -74,28 +68,19 @@ class ApiSerializer extends ArraySerializer
      */
     public function paginator(PaginatorInterface $paginator)
     {
-        $pagination = parent::paginator($paginator)['pagination'];
-
-        $data = [
-            'total' => $pagination['total'],
-            'count' => $pagination['count'],
-            'perPage' => $pagination['per_page'],
-            'currentPage' => $pagination['current_page'],
-            'totalPages' => $pagination['total_pages'],
-            'links' => $pagination['links'],
-        ];
-
-        return ['pagination' => $data];
+        return [];
     }
 
     /**
-     * Indicates if includes should be side-loaded.
+     * Serialize the cursor.
      *
-     * @return bool
+     * @param CursorInterface $cursor
+     *
+     * @return array
      */
-    public function sideloadIncludes()
+    public function cursor(CursorInterface $cursor)
     {
-        return true;
+        return [];
     }
 
     /**
@@ -107,25 +92,6 @@ class ApiSerializer extends ArraySerializer
      */
     public function mergeIncludes($transformedData, $includedData)
     {
-        $keys = array_keys($includedData);
-
-        foreach ($keys as $key) {
-            $includedData[$key] = $includedData[$key]['data'];
-        }
-
         return array_merge($transformedData, $includedData);
-    }
-
-    /**
-     * Serialize the included data.
-     *
-     * @param ResourceInterface $resource
-     * @param array             $data
-     *
-     * @return array
-     */
-    public function includedData(ResourceInterface $resource, array $data)
-    {
-        return [];
     }
 }

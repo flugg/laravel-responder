@@ -6,7 +6,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
-use JsonSerializable;
 
 /**
  * This class is an abstract response builder and hold common functionality the success-
@@ -16,29 +15,21 @@ use JsonSerializable;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
+abstract class ResponseBuilder implements Arrayable, Jsonable
 {
-
-    /**
-     * Flag indicating if success flag should be added to the serialized data.
-     *
-     * @var bool
-     */
-    protected $includeSuccessFlag;
-
-    /**
-     * Flag indicating if status code should be added to the serialized data.
-     *
-     * @var bool
-     */
-    protected $includeStatusCode;
-
     /**
      * The HTTP status code for the response.
      *
      * @var int
      */
     protected $statusCode;
+
+    /**
+     * Flag indicating if status code should be outputted with the serialized data.
+     *
+     * @var bool
+     */
+    protected $outputStatusCode = false;
 
     /**
      * Response factory used to generate JSON responses.
@@ -70,9 +61,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
             $this->setStatus($statusCode);
         }
 
-        $data = $this->toArray();
-        $data = $this->includeStatusCode($data);
-        $data = $this->includeSuccessFlag($data);
+        $data = $this->includeStatusCode($this->toArray());
 
         return $this->responseFactory->json($data, $this->statusCode, $headers);
     }
@@ -83,7 +72,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
      * @param  int $statusCode
      * @return self
      */
-    public function setStatus(int $statusCode):ResponseBuilder
+    public function setStatus(int $statusCode)
     {
         $this->statusCode = $statusCode;
 
@@ -91,34 +80,14 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Return response success flag
-     *
-     * @return bool
-     */
-    abstract protected function isSuccessResponse():bool;
-
-    /**
-     * Set a flag indicating if success should be added to the response.
-     *
-     * @param  bool $includeSuccessFlag
-     * @return self
-     */
-    public function setIncludeSuccessFlag(bool $includeSuccessFlag):ResponseBuilder
-    {
-        $this->includeSuccessFlag = $includeSuccessFlag;
-
-        return $this;
-    }
-
-    /**
      * Set a flag indicating if status code should be added to the response.
      *
-     * @param  bool $includeStatusCode
+     * @param  bool $enabled
      * @return self
      */
-    public function setIncludeStatusCode(bool $includeStatusCode):ResponseBuilder
+    public function outputStatusCode($enabled = true)
     {
-        $this->includeStatusCode = $includeStatusCode;
+        $this->outputStatusCode = $enabled;
 
         return $this;
     }
@@ -139,19 +108,9 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
      * @param  int $options
      * @return string
      */
-    public function toJson($options = 0)
+    public function toJson($options = 0):string
     {
-        return json_encode($this->jsonSerialize(), $options);
-    }
-
-    /**
-     * Convert the object into something JSON serializable.
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return $this->toArray();
+        return json_encode($this->toArray(), $options);
     }
 
     /**
@@ -167,24 +126,9 @@ abstract class ResponseBuilder implements Arrayable, Jsonable, JsonSerializable
      * @param  array $data
      * @return array
      */
-    protected function includeSuccessFlag(array $data):array
-    {
-        if (! $this->includeSuccessFlag) {
-            return $data;
-        }
-
-        return array_merge(['success' => $this->isSuccessResponse()], $data);
-    }
-
-    /**
-     * Include a status code to the serialized data if enabled.
-     *
-     * @param  array $data
-     * @return array
-     */
     protected function includeStatusCode(array $data):array
     {
-        if (! $this->includeStatusCode) {
+        if (! $this->outputStatusCode) {
             return $data;
         }
 
