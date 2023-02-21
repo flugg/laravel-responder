@@ -19,7 +19,7 @@ trait OverridesFractal
      *
      * @return array
      */
-    public function getAvailableIncludes()
+    public function getAvailableIncludes() : array
     {
         if ($this->relations == ['*']) {
             return $this->resolveScopedIncludes($this->getCurrentScope());
@@ -33,7 +33,7 @@ trait OverridesFractal
      *
      * @return array
      */
-    public function getDefaultIncludes()
+    public function getDefaultIncludes() : array
     {
         return array_keys($this->normalizeRelations($this->load));
     }
