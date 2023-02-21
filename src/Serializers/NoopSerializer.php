@@ -24,7 +24,7 @@ class NoopSerializer extends SuccessSerializer
      * @param  array  $data
      * @return array
      */
-    public function collection($resourceKey, array $data)
+    public function collection($resourceKey, array $data): array
     {
         return $data;
     }
@@ -36,7 +36,7 @@ class NoopSerializer extends SuccessSerializer
      * @param  array  $data
      * @return array
      */
-    public function item($resourceKey, array $data)
+    public function item($resourceKey, array $data): array
     {
         return $data;
     }
@@ -46,7 +46,7 @@ class NoopSerializer extends SuccessSerializer
      *
      * @return array
      */
-    public function null()
+    public function null(): array
     {
         return null;
     }
@@ -57,7 +57,7 @@ class NoopSerializer extends SuccessSerializer
      * @param  array $meta
      * @return array
      */
-    public function meta(array $meta)
+    public function meta(array $meta): array
     {
         return [];
     }
@@ -68,7 +68,7 @@ class NoopSerializer extends SuccessSerializer
      * @param  \League\Fractal\Pagination\PaginatorInterface $paginator
      * @return array
      */
-    public function paginator(PaginatorInterface $paginator)
+    public function paginator(PaginatorInterface $paginator): array
     {
         return [];
     }
@@ -79,7 +79,7 @@ class NoopSerializer extends SuccessSerializer
      * @param  \League\Fractal\Pagination\CursorInterface $cursor
      * @return array
      */
-    public function cursor(CursorInterface $cursor)
+    public function cursor(CursorInterface $cursor): array
     {
         return [];
     }
@@ -91,7 +91,7 @@ class NoopSerializer extends SuccessSerializer
      * @param  array $includedData
      * @return array
      */
-    public function mergeIncludes($transformedData, $includedData)
+    public function mergeIncludes($transformedData, $includedData): array
     {
         return array_merge($transformedData, $includedData);
     }

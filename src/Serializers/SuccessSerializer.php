@@ -22,7 +22,7 @@ class SuccessSerializer extends ArraySerializer
      * @param  array  $data
      * @return array
      */
-    public function collection($resourceKey, array $data)
+    public function collection($resourceKey, array $data): array
     {
         return ['data' => $data];
     }
@@ -34,7 +34,7 @@ class SuccessSerializer extends ArraySerializer
      * @param  array  $data
      * @return array
      */
-    public function item($resourceKey, array $data)
+    public function item($resourceKey, array $data): array
     {
         return ['data' => $data];
     }
@@ -44,7 +44,7 @@ class SuccessSerializer extends ArraySerializer
      *
      * @return array
      */
-    public function null()
+    public function null(): array
     {
         return ['data' => null];
     }
@@ -55,7 +55,7 @@ class SuccessSerializer extends ArraySerializer
      * @param  array $meta
      * @return array
      */
-    public function meta(array $meta)
+    public function meta(array $meta): array
     {
         return $meta;
     }
@@ -66,7 +66,7 @@ class SuccessSerializer extends ArraySerializer
      * @param  \League\Fractal\Pagination\PaginatorInterface $paginator
      * @return array
      */
-    public function paginator(PaginatorInterface $paginator)
+    public function paginator(PaginatorInterface $paginator): array
     {
         $pagination = parent::paginator($paginator)['pagination'];
 
@@ -88,7 +88,7 @@ class SuccessSerializer extends ArraySerializer
      * @param  \League\Fractal\Pagination\CursorInterface $cursor
      * @return array
      */
-    public function cursor(CursorInterface $cursor)
+    public function cursor(CursorInterface $cursor): array
     {
         return [
             'cursor' => [
@@ -107,7 +107,7 @@ class SuccessSerializer extends ArraySerializer
      * @param  array $includedData
      * @return array
      */
-    public function mergeIncludes($transformedData, $includedData)
+    public function mergeIncludes($transformedData, $includedData): array
     {
         foreach (array_keys($includedData) as $key) {
             $includedData[$key] = $includedData[$key]['data'];
