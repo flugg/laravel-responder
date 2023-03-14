@@ -1,3 +1,10 @@
+# 3.3.0 (2023-03-14)
+
+### Features
+
+* Add Laravel 10.0 support
+* Add Fractal 0.20 support
+
 # 3.2.0 (2022-03-25)
 
 ### Features
