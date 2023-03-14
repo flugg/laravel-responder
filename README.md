@@ -1,4 +1,4 @@
-<p align="center"><img src="http://designiack.no/package-logo.png" width="396" height="111"></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/1271812/111231999-824f2b00-85ea-11eb-9afc-c0176529a234.png" width="500px"></p>
 
 <p align="center">
     <a href="https://github.com/flugger/laravel-responder"><img src="https://poser.pugx.org/flugger/laravel-responder/v/stable?format=flat-square" alt="Latest Stable Version"></a>
