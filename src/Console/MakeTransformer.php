@@ -90,7 +90,7 @@ class MakeTransformer extends GeneratorCommand
      */
     protected function resolveModelFromClassName()
     {
-        return 'App\\' . str_replace('Transformer', '', Arr::last(explode('/', $this->getNameInput())));
+        return 'App\\Models\\' . str_replace('Transformer', '', Arr::last(explode('/', $this->getNameInput())));
     }
 
     /**
