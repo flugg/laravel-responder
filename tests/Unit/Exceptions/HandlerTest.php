@@ -15,6 +15,7 @@ use Flugg\Responder\Tests\TestCase;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\RelationNotFoundException as BaseRelationNotFoundException;
@@ -126,7 +127,10 @@ class HandlerTest extends TestCase
     public function testRenderMethodConvertsValidationExceptions()
     {
         $validator = Mockery::mock(Validator::class);
-        $validator->shouldReceive('errors')->andReturn(collect(['foo' => 'bar']));
+        $validator->shouldReceive('errors')->andReturn(collect([['foo' => 'bar']]));
+        $translator = Mockery::mock(Translator::class);
+        $translator->shouldReceive('get')->andReturn('foo');
+        $validator->shouldReceive('getTranslator')->andReturn($translator);
         $exception = new ValidationException($validator);
         $this->expectException(ValidationFailedException::class);
 
@@ -161,9 +165,9 @@ class HandlerTest extends TestCase
      */
     public function testItShouldNotConvertNonHttpExceptions()
     {
-        $this->request->shouldReceive('expectsJson')->andReturn(false);
+        $request = Request::createFromGlobals();
 
-        $result = $this->handler->render($this->request, $exception = new Exception);
+        $result = $this->handler->render($request, $exception = new Exception);
 
         $this->assertInstanceOf(Response::class, $result);
     }

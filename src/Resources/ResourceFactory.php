@@ -156,6 +156,6 @@ class ResourceFactory implements ResourceFactoryContract
      */
     protected function resolveResourceKey($data, string $resourceKey = null)
     {
-        return isset($resourceKey) ? $resourceKey : $this->resourceKeyResolver->resolve($data);
+        return ! empty($resourceKey) ? $resourceKey : $this->resourceKeyResolver->resolve($data);
     }
 }
