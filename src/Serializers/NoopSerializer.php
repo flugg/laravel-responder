@@ -48,7 +48,7 @@ class NoopSerializer extends SuccessSerializer
      */
     public function null(): array
     {
-        return null;
+        return [];
     }
 
     /**
