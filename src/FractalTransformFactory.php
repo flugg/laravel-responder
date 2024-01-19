@@ -70,7 +70,7 @@ class FractalTransformFactory implements TransformFactory
         ], $options);
 
         if (! empty($options['fieldsets'])) {
-            if (is_null($resourceKey = $resource->getResourceKey())) {
+            if (empty($resourceKey = $resource->getResourceKey())) {
                 throw new LogicException('Filtering fields using sparse fieldsets require resource key to be set.');
             }
 

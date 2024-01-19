@@ -160,7 +160,7 @@ class ProductNameTransformer extends Transformer
 
 class ResourceKeySerializer extends SuccessSerializer
 {
-    public function item($resourceKey, array $data)
+    public function item($resourceKey, array $data): array
     {
         return [$resourceKey => $data];
     }

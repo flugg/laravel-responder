@@ -42,9 +42,9 @@ class SuccessSerializer extends ArraySerializer
     /**
      * Serialize null resources.
      *
-     * @return array
+     * @return null|array
      */
-    public function null(): array
+    public function null(): ?array
     {
         return ['data' => null];
     }
