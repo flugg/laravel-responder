@@ -320,6 +320,6 @@ class TransformBuilder
             return array_merge($eagerLoads, [$identifier => $requested[$relation] ?: function () { }]);
         }, []);
 
-        $data->load($relations);
+        $data->loadMissing($relations);
     }
 }
