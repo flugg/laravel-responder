@@ -30,6 +30,16 @@ trait HasRelationships
     protected $load = [];
 
     /**
+     * Get list of available relations.
+     *
+     * @return array
+     */
+    public function getRelations(): array
+    {
+        return $this->relations;
+    }
+
+    /**
      * Get a list of whitelisted relations that are requested, including nested relations.
      *
      * @param  array $requested
