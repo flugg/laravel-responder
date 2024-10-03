@@ -28,7 +28,7 @@ use stdClass;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformBuilderTest extends TestCase
+final class TransformBuilderTest extends TestCase
 {
     /**
      * A mock of a [ResourceFactory] class.
@@ -77,7 +77,7 @@ class TransformBuilderTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -92,7 +92,7 @@ class TransformBuilderTest extends TestCase
     /**
      * Assert that the [resource] method uses the [ResourceFactory] to create resources.
      */
-    public function testResourceMethodUsesResourceFactory()
+    public function testResourceMethodUsesResourceFactory(): void
     {
         $result = $this->builder->resource($data = ['foo' => 1], $transformer = $this->mockTransformer(), $resourceKey = 'foo');
 
@@ -104,7 +104,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [resource] method sets cursor on the resource if data is an instance
      * of [CursorPaginator].
      */
-    public function testResourceMethodSetsCursorOnResource()
+    public function testResourceMethodSetsCursorOnResource(): void
     {
         $cursor = Mockery::mock(Cursor::class);
         $this->paginatorFactory->shouldReceive('makeCursor')->andReturn($cursor);
@@ -118,7 +118,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [resource] method sets paginator on the resource if data is an instance
      * of [LengthAwarePaginator].
      */
-    public function testResourceMethodSetsPagintorOnResource()
+    public function testResourceMethodSetsPagintorOnResource(): void
     {
         $paginator = Mockery::mock(IlluminatePaginatorAdapter::class);
         $this->paginatorFactory->shouldReceive('make')->andReturn($paginator);
@@ -131,7 +131,7 @@ class TransformBuilderTest extends TestCase
     /**
      * Assert that the [cursor] method allows manually setting cursor on resource.
      */
-    public function testCursorMethodSetsCursorsOnResource()
+    public function testCursorMethodSetsCursorsOnResource(): void
     {
         $cursor = Mockery::mock(Cursor::class);
         $this->paginatorFactory->shouldReceive('makeCursor')->andReturn($cursor);
@@ -144,7 +144,7 @@ class TransformBuilderTest extends TestCase
     /**
      * Assert that the [paginator] method allows manually setting paginator on resource.
      */
-    public function testPaginatorMethodSetsPaginatorsOnResource()
+    public function testPaginatorMethodSetsPaginatorsOnResource(): void
     {
         $paginator = Mockery::mock(IlluminatePaginatorAdapter::class);
         $this->paginatorFactory->shouldReceive('make')->andReturn($paginator);
@@ -157,7 +157,7 @@ class TransformBuilderTest extends TestCase
     /**
      * Assert that the [meta] method adds meta data to the resource.
      */
-    public function testMetaMethodAddsMetaDataToResource()
+    public function testMetaMethodAddsMetaDataToResource(): void
     {
         $result = $this->builder->resource()->meta($meta = ['foo' => 1]);
 
@@ -168,7 +168,7 @@ class TransformBuilderTest extends TestCase
     /**
      * Assert that the [transform] method transforms data using [TransformFactory].
      */
-    public function testTransformMethodUsesTransformFactoryToTransformData()
+    public function testTransformMethodUsesTransformFactoryToTransformData(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn($data = ['foo' => 123]);
 
@@ -186,7 +186,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [serializer] method sets the serializer that is sent to the
      * [TransformFactory].
      */
-    public function testSerializerMethodSetsSerializerSentToTransformFactory()
+    public function testSerializerMethodSetsSerializerSentToTransformFactory(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -202,7 +202,7 @@ class TransformBuilderTest extends TestCase
     /**
      * Assert that the [serializer] method allows class name strings.
      */
-    public function testSerializerMethodAllowsClassNameStrings()
+    public function testSerializerMethodAllowsClassNameStrings(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -219,7 +219,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [serializer] method throws [InvalidSuccessSerializerException] exception when
      * given an invalid serializer.
      */
-    public function testSerializerMethodThrowsExceptionWhenGivenInvalidSerializer()
+    public function testSerializerMethodThrowsExceptionWhenGivenInvalidSerializer(): void
     {
         $this->expectException(InvalidSuccessSerializerException::class);
 
@@ -230,7 +230,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [with] method sets the included relationships that are sent to the
      * [TransformFactory].
      */
-    public function testWithMethodSetsIncludedRelationsSentToFactory()
+    public function testWithMethodSetsIncludedRelationsSentToFactory(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -247,7 +247,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [with] method allows to be called multiple times and accepts strings
      * as parameters.
      */
-    public function testWithMethodAllowsMultipleCallsAndStrings()
+    public function testWithMethodAllowsMultipleCallsAndStrings(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -264,7 +264,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [without] method sets the excluded relationships that are sent to the
      * [TransformFactory].
      */
-    public function testWithoutMethodSetsExcludedRelationsSentToFactory()
+    public function testWithoutMethodSetsExcludedRelationsSentToFactory(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -281,7 +281,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [with] method allows to be called multiple times and accepts strings
      * as parameters.
      */
-    public function testWithoutMethodAllowsMultipleCallsAndStrings()
+    public function testWithoutMethodAllowsMultipleCallsAndStrings(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -298,7 +298,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [transform] method extracts default relationships from transformer and
      * automatically eager loads all relationships.
      */
-    public function testTransformMethodExtractsAndEagerLoadsRelations()
+    public function testTransformMethodExtractsAndEagerLoadsRelations(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
@@ -324,7 +324,7 @@ class TransformBuilderTest extends TestCase
      * automatically eager loads all relationships even when the relation name contains
      * inclusion parameters separated with a colon.
      */
-    public function testTransformMethodExtractsAndEagerLoadsRelationsWithParameters()
+    public function testTransformMethodExtractsAndEagerLoadsRelationsWithParameters(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
@@ -348,7 +348,7 @@ class TransformBuilderTest extends TestCase
     /**
      * Assert that the [transform] method doesn't eager load relations not present in the $relations list.
      */
-    public function testTransformMethodDoesntEagerLoadNonListedRelations()
+    public function testTransformMethodDoesntEagerLoadNonListedRelations(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
@@ -372,7 +372,7 @@ class TransformBuilderTest extends TestCase
     /**
      * Assert that the [transform] method doesn't eager load relations which has an include method.
      */
-    public function testTransformMethodDoesntEagerLoadRelationsWithAnIncludeMethod()
+    public function testTransformMethodDoesntEagerLoadRelationsWithAnIncludeMethod(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
@@ -400,7 +400,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [only] method sets the filtered fields that are sent to the
      * [TransformFactory].
      */
-    public function testOnlyMethodSetsFilteredFieldsSentToFactory()
+    public function testOnlyMethodSetsFilteredFieldsSentToFactory(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
@@ -417,7 +417,7 @@ class TransformBuilderTest extends TestCase
      * Assert that the [only] method allows to be called multiple times and accepts strings
      * as parameters.
      */
-    public function testOnlyMethodAllowsMultipleCallsAndStrings()
+    public function testOnlyMethodAllowsMultipleCallsAndStrings(): void
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 

@@ -14,13 +14,13 @@ use LogicException;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class CursorPaginatorTest extends TestCase
+final class CursorPaginatorTest extends TestCase
 {
     /**
      * Assert that the [previous], [cursor] and [next] methods allow you to get information
      * about the cursor.
      */
-    public function testYouCanGetCursorInformationFromPaginator()
+    public function testYouCanGetCursorInformationFromPaginator(): void
     {
         $paginator = new CursorPaginator(null, $cursor = 2, $previousCursor = 1, $nextCursor = 3);
 
@@ -32,7 +32,7 @@ class CursorPaginatorTest extends TestCase
     /**
      * Assert that the [items] and [get] methods allow you to get data from paginator.
      */
-    public function testYouCanGetDataFromPaginator()
+    public function testYouCanGetDataFromPaginator(): void
     {
         $paginator = new CursorPaginator($data = ['foo', 'bar'], null, null, null);
 
@@ -43,7 +43,7 @@ class CursorPaginatorTest extends TestCase
     /**
      * Assert that the [set] method allows you to get override the cursor data.
      */
-    public function testSetMethodAllowsYouToOverrideData()
+    public function testSetMethodAllowsYouToOverrideData(): void
     {
         $paginator = new CursorPaginator(['foo', 'bar'], null, null, null);
 
@@ -57,7 +57,7 @@ class CursorPaginatorTest extends TestCase
      * Assert that the [resolveCursor] method throws a [LogicException] exception if no
      * resolver has been set.
      */
-    public function testResolveCursorMethodThrowsExceptionIfNoResolverIsFound()
+    public function testResolveCursorMethodThrowsExceptionIfNoResolverIsFound(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Could not resolve cursor with the name [foo].');
@@ -68,7 +68,7 @@ class CursorPaginatorTest extends TestCase
     /**
      * Assert that the [cursorResolver] sets a resolver for the [resolveCursor] method.
      */
-    public function testYouCanSetACursorResolver()
+    public function testYouCanSetACursorResolver(): void
     {
         CursorPaginator::cursorResolver($resolver = function ($cursor) {
             return $cursor;

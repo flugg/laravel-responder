@@ -14,7 +14,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ResponderTest extends TestCase
+final class ResponderTest extends TestCase
 {
     /**
      * A mock of a [Responder] service class.
@@ -28,7 +28,7 @@ class ResponderTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class ResponderTest extends TestCase
      * Assert that the parameters sent to the [error] method is forwarded to the
      * responder service.
      */
-    public function testErrorMethodShouldCallOnResponder()
+    public function testErrorMethodShouldCallOnResponder(): void
     {
         $this->responder->shouldReceive('error')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
 
@@ -54,7 +54,7 @@ class ResponderTest extends TestCase
      * Assert that the parameters sent to the [success] method is forwarded to the
      * responder service.
      */
-    public function testSuccessMethodShouldCallOnResponder()
+    public function testSuccessMethodShouldCallOnResponder(): void
     {
         $this->responder->shouldReceive('success')->andReturn($responseBuilder = $this->mockSuccessResponseBuilder());
 

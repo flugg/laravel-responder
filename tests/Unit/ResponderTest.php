@@ -12,7 +12,7 @@ use Flugg\Responder\Tests\TestCase;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ResponderTest extends TestCase
+final class ResponderTest extends TestCase
 {
     /**
      * A mock of a [SuccessResponseBuilder] class.
@@ -40,7 +40,7 @@ class ResponderTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,7 +53,7 @@ class ResponderTest extends TestCase
      * Assert that the parameters sent to the [success] method is forwarded to the success
      * response builder.
      */
-    public function testSuccessMethodShouldCallOnSuccessResponseBuilder()
+    public function testSuccessMethodShouldCallOnSuccessResponseBuilder(): void
     {
         $result = $this->responder->success($data = ['foo' => 1], $transformer = $this->mockTransformer(), $resourceKey = 'foo');
 
@@ -65,7 +65,7 @@ class ResponderTest extends TestCase
      * Assert that the parameters sent to the [error] method is forwarded to the error
      * response builder.
      */
-    public function testErrorMethodShouldCallOnErrorResponseBuilder()
+    public function testErrorMethodShouldCallOnErrorResponseBuilder(): void
     {
         $error = 'error_occured';
         $message = 'An error has occured.';

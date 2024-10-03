@@ -17,7 +17,7 @@ use InvalidArgumentException;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class SuccessResponseBuilderTest extends TestCase
+final class SuccessResponseBuilderTest extends TestCase
 {
     /**
      * A mock of a [ResponseFactory] class.
@@ -45,7 +45,7 @@ class SuccessResponseBuilderTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -58,7 +58,7 @@ class SuccessResponseBuilderTest extends TestCase
      * Assert that the parameters sent to the [transform] method is forwarded to the
      * [TransformBuilder].
      */
-    public function testTransformMethodShouldMakeResources()
+    public function testTransformMethodShouldMakeResources(): void
     {
         $builder = $this->responseBuilder->transform($data = ['foo' => 1], $transformer = $this->mockTransformer(), $key = 'foo');
 
@@ -69,7 +69,7 @@ class SuccessResponseBuilderTest extends TestCase
     /**
      * Assert that the [respond] generates JSON responses using the [ResponseFactory].
      */
-    public function testRespondMethodShouldMakeJsonResponses()
+    public function testRespondMethodShouldMakeJsonResponses(): void
     {
         $response = new JsonResponse($data = ['foo' => 1], $status = 201, $headers = ['x-foo' => 1]);
         $this->transformBuilder->shouldReceive('transform')->andReturn($data);
@@ -85,7 +85,7 @@ class SuccessResponseBuilderTest extends TestCase
      * Assert that the [respond] method throws an [InvalidArgumentException] exception if
      * status code is not a valid success code.
      */
-    public function testRespondMethodThrowsExceptionIfGivenInvalidStatusCode()
+    public function testRespondMethodThrowsExceptionIfGivenInvalidStatusCode(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -96,7 +96,7 @@ class SuccessResponseBuilderTest extends TestCase
      * Assert that the [toArray] method formats the success output using the [TransformBuilder]
      * and returns the result as an array.
      */
-    public function testToArrayMethodShouldFormatErrorUsingErrorFactory()
+    public function testToArrayMethodShouldFormatErrorUsingErrorFactory(): void
     {
         $this->transformBuilder->shouldReceive('transform')->andReturn($data = ['foo' => 1]);
 
@@ -110,7 +110,7 @@ class SuccessResponseBuilderTest extends TestCase
      * Assert that the [toCollection] method formats the success output using the [TransformBuilder]
      * and returns the result as a collection.
      */
-    public function testToCollectionMethodShouldFormatErrorAndReturnCollection()
+    public function testToCollectionMethodShouldFormatErrorAndReturnCollection(): void
     {
         $this->transformBuilder->shouldReceive('transform')->andReturn($data = ['foo' => 1]);
 
@@ -124,7 +124,7 @@ class SuccessResponseBuilderTest extends TestCase
      * Assert that the [toJson] method formats the success output using the [TransformBuilder] and
      * returns the result as JSON.
      */
-    public function testToJsonMethodShouldFormatErrorAndReturnJson()
+    public function testToJsonMethodShouldFormatErrorAndReturnJson(): void
     {
         $this->transformBuilder->shouldReceive('transform')->andReturn($data = ['foo' => 1]);
 
@@ -137,7 +137,7 @@ class SuccessResponseBuilderTest extends TestCase
     /**
      * Assert that the [toJson] method accepts an argument for setting encoding options.
      */
-    public function testToJsonMethodShouldAllowSettingEncodingOptions()
+    public function testToJsonMethodShouldAllowSettingEncodingOptions(): void
     {
         $this->transformBuilder->shouldReceive('transform')->andReturn($data = ['foo' => 1]);
 
@@ -149,7 +149,7 @@ class SuccessResponseBuilderTest extends TestCase
     /**
      * Assert that the data sent to the [meta] method is forwarded to the [TransformBuilder].
      */
-    public function testMetaMethodShouldAddMetaToTransformBuilder()
+    public function testMetaMethodShouldAddMetaToTransformBuilder(): void
     {
         $responseBuilder = $this->responseBuilder->meta($meta = ['foo' => 1]);
 
@@ -160,7 +160,7 @@ class SuccessResponseBuilderTest extends TestCase
     /**
      * Assert that the serializer sent to the [serializer] method is forwarded to the [TransformBuilder].
      */
-    public function testSerializerMethodShouldSetSerializerOnTransformBuilder()
+    public function testSerializerMethodShouldSetSerializerOnTransformBuilder(): void
     {
         $responseBuilder = $this->responseBuilder->serializer($serializer = JsonSerializer::class);
 
@@ -171,7 +171,7 @@ class SuccessResponseBuilderTest extends TestCase
     /**
      * Assert that the relations sent to the [with] method is forwarded to the [TransformBuilder].
      */
-    public function testWithMethodShouldAddRelationsToTransformBuilder()
+    public function testWithMethodShouldAddRelationsToTransformBuilder(): void
     {
         $responseBuilder = $this->responseBuilder->with($relations = ['foo', 'bar']);
 
@@ -182,7 +182,7 @@ class SuccessResponseBuilderTest extends TestCase
     /**
      * Assert that the [with] method allows passing multiple strings instead of an array.
      */
-    public function testWithMethodShouldAllowMultipleStringArguments()
+    public function testWithMethodShouldAllowMultipleStringArguments(): void
     {
         $this->responseBuilder->with(...$relations = ['foo', 'bar']);
 
@@ -192,7 +192,7 @@ class SuccessResponseBuilderTest extends TestCase
     /**
      * Assert that the relations sent to the [without] method is forwarded to the [TransformBuilder].
      */
-    public function testWithoutMethodShouldAddRelationsToTheTransformBuilder()
+    public function testWithoutMethodShouldAddRelationsToTheTransformBuilder(): void
     {
         $responseBuilder = $this->responseBuilder->without($relations = ['foo', 'bar']);
 
@@ -203,7 +203,7 @@ class SuccessResponseBuilderTest extends TestCase
     /**
      * Assert that the [without] method allows passing multiple strings instead of an array.
      */
-    public function testWithoutMethodShouldAllowMultipleStringArguments()
+    public function testWithoutMethodShouldAllowMultipleStringArguments(): void
     {
         $this->responseBuilder->without(...$relations = ['foo', 'bar']);
 
@@ -214,7 +214,7 @@ class SuccessResponseBuilderTest extends TestCase
      * Assert that the [__call] method should throw a [BadMethodCallException] exception if
      * given an unknown method name.
      */
-    public function testUnknownMethodsShouldThrowException()
+    public function testUnknownMethodsShouldThrowException(): void
     {
         $this->expectException(BadMethodCallException::class);
 

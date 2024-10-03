@@ -12,7 +12,7 @@ use Flugg\Responder\Tests\TestCase;
  * @author  Paolo Caleffi <p.caleffi@dreamonkey.com>
  * @license The MIT License
  */
-class PrettyPrintDecoratorTest extends TestCase
+final class PrettyPrintDecoratorTest extends TestCase
 {
     /**
      * A mock of a [ResponseFactory] class.
@@ -33,7 +33,7 @@ class PrettyPrintDecoratorTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class PrettyPrintDecoratorTest extends TestCase
      * Assert that the [make] method decorates the response data setting the pretty print
      * JSON option.
      */
-    public function testMakeMethodShouldPrettyPrintResponseData()
+    public function testMakeMethodShouldPrettyPrintResponseData(): void
     {
         $response = $this->responseDecorator->make($data = ['foo' => ['bar', 'baz' => 1]], $status = 201);
 

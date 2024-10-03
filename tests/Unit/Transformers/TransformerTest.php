@@ -18,7 +18,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformerTest extends TestCase
+final class TransformerTest extends TestCase
 {
     /**
      * The [Transformer] class being tested.
@@ -32,7 +32,7 @@ class TransformerTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ class TransformerTest extends TestCase
     /**
      * Assert that the [getAvailableIncludes] method returns set relations.
      */
-    public function testGetAvailableIncludesMethodReturnsRelations()
+    public function testGetAvailableIncludesMethodReturnsRelations(): void
     {
         $transformer = new TransformerWithWhitelist;
 
@@ -54,7 +54,7 @@ class TransformerTest extends TestCase
     /**
      * Assert that the [getAvailableIncludes] method returns resolved relations when wildcard is set.
      */
-    public function testGetAvailableIncludesMethodReturnsResolvedRelationsOnWildcard()
+    public function testGetAvailableIncludesMethodReturnsResolvedRelationsOnWildcard(): void
     {
         $transformer = new TransformerWithWildcard;
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
@@ -70,7 +70,7 @@ class TransformerTest extends TestCase
     /**
      * Assert that the [getDefaultIncludes] method returns default relation names.
      */
-    public function testGetDefaultIncludesMethodReturnsResolvedRelationsOnWildcard()
+    public function testGetDefaultIncludesMethodReturnsResolvedRelationsOnWildcard(): void
     {
         $transformer = new TransformerWithDefaultRelations;
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
@@ -87,7 +87,7 @@ class TransformerTest extends TestCase
      * Assert that the [processIncludedResources] method makes a resource from include method
      * if one exists.
      */
-    public function testProcessIncludedResourcesMethodMakesResource()
+    public function testProcessIncludedResourcesMethodMakesResource(): void
     {
         $transformer = new TransformerWithIncludeMethod;
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
@@ -111,7 +111,7 @@ class TransformerTest extends TestCase
      * Assert that the [processIncludedResources] method makes a resource implicitly if the
      * data is an Eloquent model.
      */
-    public function testProcessIncludedResourcesMethodMakesResourceImplicitlyWhenGivenModel()
+    public function testProcessIncludedResourcesMethodMakesResourceImplicitlyWhenGivenModel(): void
     {
         $transformer = new TransformerWithIncludeMethod;
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
@@ -137,7 +137,7 @@ class TransformerTest extends TestCase
      * Assert that the [processIncludedResources] method makes a resource implicitly if the
      * data is an Eloquent model.
      */
-    public function testProcessIncludedResourcesMethodThrowsExceptionWhenNoRelationCanBeResolved()
+    public function testProcessIncludedResourcesMethodThrowsExceptionWhenNoRelationCanBeResolved(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Relation [foo] not found in [' . TransformerWithWhitelist::class . '].');

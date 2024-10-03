@@ -22,12 +22,12 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class FilterResponseFieldsTest extends TestCase
+final class FilterResponseFieldsTest extends TestCase
 {
     /**
      * Assert that you can filter fields with the sparse fieldset feature.
      */
-    public function testItFiltersFields()
+    public function testItFiltersFields(): void
     {
         $response = responder()->success($this->product)->only('name')->respond();
 
@@ -37,7 +37,7 @@ class FilterResponseFieldsTest extends TestCase
     /**
      * Assert that you can filter fields on relationships.
      */
-    public function testItFiltersFieldsOfRelations()
+    public function testItFiltersFieldsOfRelations(): void
     {
         $response = responder()->success($this->product, ProductTransformer::class)->with('shipments')->only([
                 'products' => ['name'],
@@ -52,7 +52,7 @@ class FilterResponseFieldsTest extends TestCase
     /**
      * Assert that you can filter fields on nested relationships.
      */
-    public function testItFiltersFieldsOfNestedRelations()
+    public function testItFiltersFieldsOfNestedRelations(): void
     {
         $response = responder()
             ->success($this->product, ProductTransformer::class)
@@ -77,7 +77,7 @@ class FilterResponseFieldsTest extends TestCase
     /**
      * Assert that you can filter response fields using the configured query string parameter.
      */
-    public function testFieldFieldsWithQueryStringParameter()
+    public function testFieldFieldsWithQueryStringParameter(): void
     {
         $this->app->instance(Request::class, $request = Mockery::mock(Request::class));
         $request->shouldReceive('input')->with('only', [])->andReturn([

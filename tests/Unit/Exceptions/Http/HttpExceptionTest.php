@@ -13,7 +13,7 @@ use Flugg\Responder\Tests\TestCase;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class HttpExceptionTest extends TestCase
+final class HttpExceptionTest extends TestCase
 {
     /**
      * A stub of the package's [Handler] class.
@@ -27,7 +27,7 @@ class HttpExceptionTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +44,7 @@ class HttpExceptionTest extends TestCase
     /**
      * Assert that the [statusCode] method returns the set status code.
      */
-    public function testStatusCodeMethodReturnsStatusCode()
+    public function testStatusCodeMethodReturnsStatusCode(): void
     {
         $status = $this->exception->statusCode();
 
@@ -54,7 +54,7 @@ class HttpExceptionTest extends TestCase
     /**
      * Assert that the [errorCode] method returns the set error code.
      */
-    public function testErrorCodeMethodReturnsErrorCode()
+    public function testErrorCodeMethodReturnsErrorCode(): void
     {
         $errorCode = $this->exception->errorCode();
 
@@ -64,7 +64,7 @@ class HttpExceptionTest extends TestCase
     /**
      * Assert that the [message] method returns the set error message.
      */
-    public function testMessageMethodReturnsErrorMessage()
+    public function testMessageMethodReturnsErrorMessage(): void
     {
         $message = $this->exception->message();
 
@@ -74,7 +74,7 @@ class HttpExceptionTest extends TestCase
     /**
      * Assert that the [data] method returns the set error data.
      */
-    public function testDataMethodReturnsErrorData()
+    public function testDataMethodReturnsErrorData(): void
     {
         $data = $this->exception->data();
 
@@ -84,7 +84,7 @@ class HttpExceptionTest extends TestCase
     /**
      * Assert that the [headers] method returns the attached headers.
      */
-    public function testHeadersMethodReturnsHeaders()
+    public function testHeadersMethodReturnsHeaders(): void
     {
         $data = $this->exception->headers();
 

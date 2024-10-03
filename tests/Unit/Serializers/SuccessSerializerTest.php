@@ -15,7 +15,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class SuccessSerializerTest extends TestCase
+final class SuccessSerializerTest extends TestCase
 {
     /**
      * The [SuccessSerializer] class being tested.
@@ -29,7 +29,7 @@ class SuccessSerializerTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ class SuccessSerializerTest extends TestCase
     /**
      * Assert that the [collection] method wraps the data in a [data] field.
      */
-    public function testCollectionMethodShouldWrapDataInADataField()
+    public function testCollectionMethodShouldWrapDataInADataField(): void
     {
         $result = $this->serializer->collection(null, $data = ['foo' => 1]);
 
@@ -49,7 +49,7 @@ class SuccessSerializerTest extends TestCase
     /**
      * Assert that the [item] method wraps the data in a [data] field.
      */
-    public function testItemMethodShouldWrapDataInADataField()
+    public function testItemMethodShouldWrapDataInADataField(): void
     {
         $result = $this->serializer->item(null, $data = ['foo' => 1]);
 
@@ -59,7 +59,7 @@ class SuccessSerializerTest extends TestCase
     /**
      * Assert that the [null] method wraps [null] in a [data] field.
      */
-    public function testNullMethodShouldWrapNullInADataField()
+    public function testNullMethodShouldWrapNullInADataField(): void
     {
         $result = $this->serializer->null();
 
@@ -69,7 +69,7 @@ class SuccessSerializerTest extends TestCase
     /**
      * Assert that the [meta] method returns the given data untouched.
      */
-    public function testMetaMethodShouldReturnDataDirectly()
+    public function testMetaMethodShouldReturnDataDirectly(): void
     {
         $result = $this->serializer->meta($meta = ['foo' => 1]);
 
@@ -79,7 +79,7 @@ class SuccessSerializerTest extends TestCase
     /**
      * Assert that the [paginator] method returns a formatted pagination meta data.
      */
-    public function testPaginatorMethodShouldReturnAFormattedArray()
+    public function testPaginatorMethodShouldReturnAFormattedArray(): void
     {
         $paginator = Mockery::mock(PaginatorInterface::class);
         $paginator->shouldReceive('getTotal')->andReturn($total = 15);
@@ -109,7 +109,7 @@ class SuccessSerializerTest extends TestCase
     /**
      * Assert that the [paginator] method returns a formatted cursor meta data.
      */
-    public function testCursorMethodShouldReturnAFormattedArray()
+    public function testCursorMethodShouldReturnAFormattedArray(): void
     {
         $cursor = Mockery::mock(CursorInterface::class);
         $cursor->shouldReceive('getPrev')->andReturn($previous = 1);
@@ -131,7 +131,7 @@ class SuccessSerializerTest extends TestCase
     /**
      * Assert that the [mergeIncludes] method merges relations and strips away extra data fields.
      */
-    public function testMergeIncludesMethodShouldMergeRelationsAndStripDataFields()
+    public function testMergeIncludesMethodShouldMergeRelationsAndStripDataFields(): void
     {
         $result = $this->serializer->mergeIncludes($data = ['foo' => 1], $relations = ['bar' => ['data' => 2]]);
 

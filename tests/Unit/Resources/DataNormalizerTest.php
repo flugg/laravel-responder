@@ -21,7 +21,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class DataNormalizerTest extends TestCase
+final class DataNormalizerTest extends TestCase
 {
     /**
      * The [DataNormalizer] class being tested.
@@ -35,7 +35,7 @@ class DataNormalizerTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class DataNormalizerTest extends TestCase
     /**
      * Assert the the [normalize] method converts query builder instances to collections.
      */
-    public function testNormalizeMethodShouldConvertQueryBuildersToCollections()
+    public function testNormalizeMethodShouldConvertQueryBuildersToCollections(): void
     {
         $builder = Mockery::mock(Builder::class);
         $builder->shouldReceive('get')->andReturn($collection = new Collection);
@@ -58,7 +58,7 @@ class DataNormalizerTest extends TestCase
     /**
      * Assert the the [normalize] method converts paginator instances to collections.
      */
-    public function testNormalizeMethodShouldConvertPaginatorsToCollections()
+    public function testNormalizeMethodShouldConvertPaginatorsToCollections(): void
     {
         $paginator = Mockery::mock(Paginator::class);
         $paginator->shouldReceive('getCollection')->andReturn($collection = new Collection);
@@ -71,7 +71,7 @@ class DataNormalizerTest extends TestCase
     /**
      * Assert the the [normalize] method converts cursor paginator instances to collections.
      */
-    public function testNormalizeMethodShouldConvertCursorPaginatorsToCollections()
+    public function testNormalizeMethodShouldConvertCursorPaginatorsToCollections(): void
     {
         $paginator = Mockery::mock(CursorPaginator::class);
         $paginator->shouldReceive('get')->andReturn($collection = new Collection);
@@ -84,7 +84,7 @@ class DataNormalizerTest extends TestCase
     /**
      * Assert the the [normalize] method converts relationship instances to collections.
      */
-    public function testNormalizeMethodShouldConvertRelationsToCollections()
+    public function testNormalizeMethodShouldConvertRelationsToCollections(): void
     {
         $relation = Mockery::mock(HasMany::class);
         $relation->shouldReceive('get')->andReturn($collection = new Collection);
@@ -97,7 +97,7 @@ class DataNormalizerTest extends TestCase
     /**
      * Assert the the [normalize] method converts singular relationship instances to models.
      */
-    public function testNormalizeMethodShouldConvertSingularRelationsToModels()
+    public function testNormalizeMethodShouldConvertSingularRelationsToModels(): void
     {
         $relation = Mockery::mock(HasOne::class);
         $relation->shouldReceive('first')->andReturn($model = Mockery::mock(Model::class));
@@ -110,7 +110,7 @@ class DataNormalizerTest extends TestCase
     /**
      * Assert that the [normalize] methods leaves other data types untouched.
      */
-    public function testNormalizeMethodShouldReturnDataDirectlyIfUnknownType()
+    public function testNormalizeMethodShouldReturnDataDirectlyIfUnknownType(): void
     {
         $data = $this->normalizer->normalize($array = ['foo' => 123]);
 

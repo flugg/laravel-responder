@@ -12,7 +12,7 @@ use Flugg\Responder\Tests\TestCase;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class EscapeHtmlDecoratorTest extends TestCase
+final class EscapeHtmlDecoratorTest extends TestCase
 {
     /**
      * A mock of a [ResponseFactory] class.
@@ -33,7 +33,7 @@ class EscapeHtmlDecoratorTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +44,7 @@ class EscapeHtmlDecoratorTest extends TestCase
     /**
      * Assert that the [make] method decorates the response data escaping any HTML tags.
      */
-    public function testMakeMethodShouldEscapeHtmlTagsInResponseData()
+    public function testMakeMethodShouldEscapeHtmlTagsInResponseData(): void
     {
         $response = $this->responseDecorator->make($data = ['foo' => '<html></html>'], $status = 201);
 

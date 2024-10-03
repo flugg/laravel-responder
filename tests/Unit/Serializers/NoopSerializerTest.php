@@ -15,7 +15,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class NoopSerializerTest extends TestCase
+final class NoopSerializerTest extends TestCase
 {
     /**
      * The [NoopSerializer] class being tested.
@@ -29,7 +29,7 @@ class NoopSerializerTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ class NoopSerializerTest extends TestCase
     /**
      * Assert that the [collection] method returns the given data untouched.
      */
-    public function testCollectionMethodShouldReturnDataDirectly()
+    public function testCollectionMethodShouldReturnDataDirectly(): void
     {
         $result = $this->serializer->collection(null, $data = ['foo' => 1]);
 
@@ -49,7 +49,7 @@ class NoopSerializerTest extends TestCase
     /**
      * Assert that the [item] method returns the given data untouched.
      */
-    public function testItemMethodShouldReturnDataDirectly()
+    public function testItemMethodShouldReturnDataDirectly(): void
     {
         $result = $this->serializer->item(null, $data = ['foo' => 1]);
 
@@ -59,7 +59,7 @@ class NoopSerializerTest extends TestCase
     /**
      * Assert that the [null] method returns null.
      */
-    public function testNullMethodShouldReturnNull()
+    public function testNullMethodShouldReturnNull(): void
     {
         $result = $this->serializer->null();
 
@@ -69,7 +69,7 @@ class NoopSerializerTest extends TestCase
     /**
      * Assert that the [meta] method returns an empty array.
      */
-    public function testMetaMethodShouldReturnAnEmptyArray()
+    public function testMetaMethodShouldReturnAnEmptyArray(): void
     {
         $result = $this->serializer->meta($meta = ['foo' => 1]);
 
@@ -79,7 +79,7 @@ class NoopSerializerTest extends TestCase
     /**
      * Assert that the [paginator] method returns an empty array.
      */
-    public function testPaginatorMethodShouldReturnAnEmptyArray()
+    public function testPaginatorMethodShouldReturnAnEmptyArray(): void
     {
         $result = $this->serializer->paginator($paginator = Mockery::mock(PaginatorInterface::class));
 
@@ -89,7 +89,7 @@ class NoopSerializerTest extends TestCase
     /**
      * Assert that the [cursor] method returns an empty array.
      */
-    public function testCursorMethodShouldReturnAnEmptyArray()
+    public function testCursorMethodShouldReturnAnEmptyArray(): void
     {
         $result = $this->serializer->cursor($cursor = Mockery::mock(CursorInterface::class));
 
@@ -99,7 +99,7 @@ class NoopSerializerTest extends TestCase
     /**
      * Assert that the [mergeIncludes] method merges relations.
      */
-    public function testMergeIncludesMethodShouldMergeRelations()
+    public function testMergeIncludesMethodShouldMergeRelations(): void
     {
         $result = $this->serializer->mergeIncludes($data = ['foo' => 1], $relations = ['bar' => 2]);
 

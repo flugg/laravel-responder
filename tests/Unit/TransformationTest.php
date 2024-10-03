@@ -14,7 +14,7 @@ use Flugg\Responder\Transformer;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformationTest extends TestCase
+final class TransformationTest extends TestCase
 {
     /**
      * A mock of a [TransformBuilder] class.
@@ -35,7 +35,7 @@ class TransformationTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -47,7 +47,7 @@ class TransformationTest extends TestCase
      * Assert that the parameters sent to the [transform] method is forwarded to the
      * transform builder.
      */
-    public function testTransformMethodShouldCallOnTransformBuilder()
+    public function testTransformMethodShouldCallOnTransformBuilder(): void
     {
         $transformer = $transformer = $this->mockTransformer();
         $transformation = $this->transformation->make($data = ['foo' => 1], $transformer, $resourceKey = 'foo');

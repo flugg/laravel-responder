@@ -19,12 +19,12 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class IncludeRelationTest extends TestCase
+final class IncludeRelationTest extends TestCase
 {
     /**
      * Assert that you can include associated resources.
      */
-    public function testIncludeRelations()
+    public function testIncludeRelations(): void
     {
         $response = responder()->success($this->product, ProductTransformer::class)->with('shipments')->respond();
 
@@ -36,7 +36,7 @@ class IncludeRelationTest extends TestCase
     /**
      * Assert that it for safety reasons wont include relations if no transformer is provided.
      */
-    public function testItWontIncludeRelationsWithoutATransformerSpecified()
+    public function testItWontIncludeRelationsWithoutATransformerSpecified(): void
     {
         $response = responder()->success($this->product)->with('shipments')->respond();
 
@@ -47,7 +47,7 @@ class IncludeRelationTest extends TestCase
      * Assert that you cannot include relationships not specified in the $relations property
      * of a transformer class when given a dedicated transformer.
      */
-    public function testItOnlyIncludesWhitelistedRelations()
+    public function testItOnlyIncludesWhitelistedRelations(): void
     {
         $response = responder()
             ->success($this->product, ProductWithShipmentsWhitelistedTransformer::class)
@@ -63,7 +63,7 @@ class IncludeRelationTest extends TestCase
      * Assert that it doesn't end up with a circular dependency when extracting whitelisted
      * relationships from the transformers.
      */
-    public function testIncludeCircularRelations()
+    public function testIncludeCircularRelations(): void
     {
         $response = responder()
             ->success($this->product, ProductWithOrdersWhitelistedTransformer::class)
@@ -82,7 +82,7 @@ class IncludeRelationTest extends TestCase
     /**
      * Assert that you can include associated resources including a query constraint.
      */
-    public function testIncludeRelationsWithQueryConstraints()
+    public function testIncludeRelationsWithQueryConstraints(): void
     {
         $shipment = $this->product->shipments()->create(['created_at' => Carbon::tomorrow()]);
 
@@ -100,7 +100,7 @@ class IncludeRelationTest extends TestCase
     /**
      * Assert that you can include associated resources including their nested resources again.
      */
-    public function testIncludeNestedRelations()
+    public function testIncludeNestedRelations(): void
     {
         $response = responder()
             ->success($this->product, ProductTransformer::class)
@@ -121,7 +121,7 @@ class IncludeRelationTest extends TestCase
      * Assert that when you include a nested relation with a query string constraint, that's
      * not applied for the parent relation.
      */
-    public function testIncludeNestedRelationsWithQueryConstraints()
+    public function testIncludeNestedRelationsWithQueryConstraints(): void
     {
         $product = Mockery::mock($this->product);
 
@@ -139,7 +139,7 @@ class IncludeRelationTest extends TestCase
     /**
      * Assert that you can include associated resources using the configured query string parameter.
      */
-    public function testIncludeRelationsWithQueryStringParameter()
+    public function testIncludeRelationsWithQueryStringParameter(): void
     {
         $this->app->instance(Request::class, $request = Mockery::mock(Request::class));
         $request->shouldReceive('input')->with('with', [])->andReturn('shipments,orders.customer');
@@ -162,7 +162,7 @@ class IncludeRelationTest extends TestCase
      * Assert that it automatically includes relationships declared in the $load property
      * of a transformer class when given a dedicated transformer.
      */
-    public function testIncludeRelationsByDefault()
+    public function testIncludeRelationsByDefault(): void
     {
         $response = responder()->success($this->product, ProductWithShipmentsAutoloadedTransformer::class)->respond();
 
@@ -180,7 +180,7 @@ class IncludeRelationTest extends TestCase
      * Assert that it automatically includes relationships declared in the $load property
      * of a transformer class resolved from a nested transformer.
      */
-    public function testIncludeRelationsByDefaultFromNestedTransformer()
+    public function testIncludeRelationsByDefaultFromNestedTransformer(): void
     {
         $response = responder()
             ->success($this->product, ProductWithOrdersWhitelistedAndCustomerAutoloadedTransformer::class)
@@ -199,7 +199,7 @@ class IncludeRelationTest extends TestCase
     /**
      * Assert that you can exclude relationships defined as autoloading in the transformer.
      */
-    public function testExcludeDefaultRelations()
+    public function testExcludeDefaultRelations(): void
     {
         $response = responder()
             ->success($this->product, ProductWithShipmentsAutoloadedTransformer::class)
@@ -214,7 +214,7 @@ class IncludeRelationTest extends TestCase
     /**
      * Assert that it automatically eager loads whitelisted and requested relationship.
      */
-    public function testItEagerLoadsRelations()
+    public function testItEagerLoadsRelations(): void
     {
         $product = Mockery::mock($this->product);
 
@@ -232,7 +232,7 @@ class IncludeRelationTest extends TestCase
      * Assert that it converts snake cased relations to camel case before loading them
      * from the model.
      */
-    public function testItConvertsSnakeCasedRelationsToCamelCase()
+    public function testItConvertsSnakeCasedRelationsToCamelCase(): void
     {
         $product = Mockery::mock($this->product);
         $product->shouldReceive('load')->andReturnSelf();
@@ -251,7 +251,7 @@ class IncludeRelationTest extends TestCase
      * Assert that it would not converts snake cased relations to camel case before loading them
      * from the model if the config use_camel_case_relations set to false
      */
-    public function testItNotConvertsSnakeCasedRelationsToCamelCase()
+    public function testItNotConvertsSnakeCasedRelationsToCamelCase(): void
     {
         config(['responder.use_camel_case_relations' => false]);
         $product = Mockery::mock($this->product);
@@ -271,7 +271,7 @@ class IncludeRelationTest extends TestCase
      * Assert that it loads relations from an "include" method on the transformer if it's
      * defined.
      */
-    public function testItIncludesRelationsFromIncludeMethod()
+    public function testItIncludesRelationsFromIncludeMethod(): void
     {
         $product = Mockery::mock($this->product);
 
@@ -293,7 +293,7 @@ class IncludeRelationTest extends TestCase
      * Assert that it loads relations from an "include" method on the transformer if it's
      * defined.
      */
-    public function testItSendsParametersToTheIncludeMethod()
+    public function testItSendsParametersToTheIncludeMethod(): void
     {
         $response = responder()
             ->success($this->product, ProductWithIncludeMethodAndParametersTransformer::class)
@@ -309,7 +309,7 @@ class IncludeRelationTest extends TestCase
      * Assert that it loads relations with query constraints from a "load" method
      * on the transformer if it's defined.
      */
-    public function testIncludeRelationsWithQueryConstraintsFromLoadMethod()
+    public function testIncludeRelationsWithQueryConstraintsFromLoadMethod(): void
     {
         $shipment = $this->product->shipments()->create(['created_at' => Carbon::tomorrow()]);
 
@@ -327,7 +327,7 @@ class IncludeRelationTest extends TestCase
      * Assert that you can filter relations after they've been loaded with a "filter"
      * method on the transformer.
      */
-    public function testFilterRelationsWithFilterMethod()
+    public function testFilterRelationsWithFilterMethod(): void
     {
         $shipment = $this->product->shipments()->create(['created_at' => Carbon::tomorrow()]);
 

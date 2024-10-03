@@ -16,12 +16,12 @@ use Illuminate\Support\Collection;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class CreateResponseTest extends TestCase
+final class CreateResponseTest extends TestCase
 {
     /**
      * Assert that you can create responses using an injected responder service.
      */
-    public function testCreateResponses()
+    public function testCreateResponses(): void
     {
         $responder = resolve(Responder::class);
 
@@ -35,7 +35,7 @@ class CreateResponseTest extends TestCase
     /**
      * Assert that you can create responses using the responder helper function.
      */
-    public function testCreateResponsesWithHelper()
+    public function testCreateResponsesWithHelper(): void
     {
         $successResponse = responder()->success()->respond();
         $errorResponse = responder()->error()->respond();
@@ -47,7 +47,7 @@ class CreateResponseTest extends TestCase
     /**
      * Assert that you can create responses using the responder helper function.
      */
-    public function testCreateResponsesWithFacade()
+    public function testCreateResponsesWithFacade(): void
     {
         $successResponse = ResponderFacade::success()->respond();
         $errorResponse = ResponderFacade::error()->respond();
@@ -59,7 +59,7 @@ class CreateResponseTest extends TestCase
     /**
      * Assert that you can create responses using the responder helper function.
      */
-    public function testCreateResponsesWithTrait()
+    public function testCreateResponsesWithTrait(): void
     {
         $trait = $this->getObjectForTrait(MakesResponses::class);
 
@@ -73,7 +73,7 @@ class CreateResponseTest extends TestCase
     /**
      * Assert that you can set the status code for the response.
      */
-    public function testSetStatusCode()
+    public function testSetStatusCode(): void
     {
         $successResponse = responder()->success()->respond(201);
         $errorResponse = responder()->error()->respond(404);
@@ -85,7 +85,7 @@ class CreateResponseTest extends TestCase
     /**
      * Assert that you can set headers for the response.
      */
-    public function testSetHeaders()
+    public function testSetHeaders(): void
     {
         $successResponse = responder()->success()->respond(null, ['x-foo' => true]);
         $errorResponse = responder()->error()->respond(null, ['x-foo' => false]);
@@ -97,7 +97,7 @@ class CreateResponseTest extends TestCase
     /**
      * Assert that you can cast the response data to an array.
      */
-    public function testCastToArray()
+    public function testCastToArray(): void
     {
         $success = responder()->success()->toArray();
         $error = responder()->error()->toArray();
@@ -109,7 +109,7 @@ class CreateResponseTest extends TestCase
     /**
      * Assert that you can cast the response data to a collection.
      */
-    public function testCastToCollection()
+    public function testCastToCollection(): void
     {
         $success = responder()->success()->toCollection();
         $error = responder()->error()->toCollection();
@@ -121,7 +121,7 @@ class CreateResponseTest extends TestCase
     /**
      * Assert that you can cast the response data to a JSON string.
      */
-    public function testCastToJson()
+    public function testCastToJson(): void
     {
         $success = responder()->success()->toJson();
         $error = responder()->error()->toJson();

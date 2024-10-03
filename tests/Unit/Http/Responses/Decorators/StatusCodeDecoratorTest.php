@@ -12,7 +12,7 @@ use Flugg\Responder\Tests\TestCase;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class StatusCodeDecoratorTest extends TestCase
+final class StatusCodeDecoratorTest extends TestCase
 {
     /**
      * A mock of a [ResponseFactory] class.
@@ -33,7 +33,7 @@ class StatusCodeDecoratorTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class StatusCodeDecoratorTest extends TestCase
      * Assert that the [make] method decorates the response data with information about
      * status code.
      */
-    public function testMakeMethodShouldAppendStatusCodeFieldToResponseData()
+    public function testMakeMethodShouldAppendStatusCodeFieldToResponseData(): void
     {
         $response = $this->responseDecorator->make($data = ['foo' => 1], $status = 201);
 

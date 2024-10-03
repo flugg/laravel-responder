@@ -18,12 +18,12 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class PaginatorFactoryTest extends TestCase
+final class PaginatorFactoryTest extends TestCase
 {
     /**
      * Assert that the [make] method creates a paginator adapter from a [LengthAwarePaginator].
      */
-    public function testMakeMethodShouldCreatePaginatorAdapters()
+    public function testMakeMethodShouldCreatePaginatorAdapters(): void
     {
         $factory = new PaginatorFactory($parameters = ['foo' => 1]);
         $paginator = Mockery::mock(LengthAwarePaginator::class);
@@ -38,7 +38,7 @@ class PaginatorFactoryTest extends TestCase
     /**
      * Assert that the [make] method creates a [Cursor] object from a [CursorPaginator].
      */
-    public function testMakeMethodCreatesAFractalCursor()
+    public function testMakeMethodCreatesAFractalCursor(): void
     {
         $factory = new PaginatorFactory($parameters = ['foo' => 1]);
         $paginator = Mockery::mock(CursorPaginator::class);

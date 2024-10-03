@@ -12,7 +12,7 @@ use Flugg\Responder\Tests\TestCase;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ErrorSerializerTest extends TestCase
+final class ErrorSerializerTest extends TestCase
 {
     /**
      * The [ErrorSerializer] class being tested.
@@ -26,7 +26,7 @@ class ErrorSerializerTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,7 +36,7 @@ class ErrorSerializerTest extends TestCase
     /**
      * Assert that the [format] method serializes the error data.
      */
-    public function testFormatMethodSerializesErrorData()
+    public function testFormatMethodSerializesErrorData(): void
     {
         $formattedData = $this->serializer->format($code = 'test_error', $message = 'A test error has occured.', $data = ['foo' => 1]);
 

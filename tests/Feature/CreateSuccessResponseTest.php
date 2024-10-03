@@ -15,12 +15,12 @@ use stdClass;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class CreateSuccessResponseTest extends TestCase
+final class CreateSuccessResponseTest extends TestCase
 {
     /**
      * Assert that you can create success responses with no response data.
      */
-    public function testCreateResponsesWithoutData()
+    public function testCreateResponsesWithoutData(): void
     {
         $response = responder()->success()->respond();
 
@@ -30,7 +30,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with response data.
      */
-    public function testCreateResponsesWithBasicArray()
+    public function testCreateResponsesWithBasicArray(): void
     {
         $response = responder()->success($data = ['foo', 'bar'])->respond();
 
@@ -40,7 +40,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with associative arrays.
      */
-    public function testCreateResponsesWithAssociativeArray()
+    public function testCreateResponsesWithAssociativeArray(): void
     {
         $response = responder()->success($data = [
             'foo' => 123,
@@ -53,7 +53,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with associative arrays containing objects.
      */
-    public function testCreateResponsesWithAssociativeArrayContainingObjects()
+    public function testCreateResponsesWithAssociativeArrayContainingObjects(): void
     {
         $response = responder()->success($data = [
             'foo' => new stdClass(),
@@ -68,7 +68,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with model as data.
      */
-    public function testCreateResponsesWithModel()
+    public function testCreateResponsesWithModel(): void
     {
         $response = responder()->success($this->product)->respond();
 
@@ -78,7 +78,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with an array of models as data.
      */
-    public function testCreateResponsesWithArrayOfModels()
+    public function testCreateResponsesWithArrayOfModels(): void
     {
         $response = responder()->success($products = [$this->product])->respond();
 
@@ -90,7 +90,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with a collection of models as data.
      */
-    public function testCreateResponsesWithCollectionOfModels()
+    public function testCreateResponsesWithCollectionOfModels(): void
     {
         $response = responder()->success($products = collect([$this->product]))->respond();
 
@@ -100,7 +100,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with a query builder as data.
      */
-    public function testCreateResponsesWithQueryBuilder()
+    public function testCreateResponsesWithQueryBuilder(): void
     {
         $response = responder()->success($this->product->newQuery())->respond();
 
@@ -110,7 +110,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with a relation query as data.
      */
-    public function testCreateResponsesWithRelationQuery()
+    public function testCreateResponsesWithRelationQuery(): void
     {
         $response = responder()->success($this->product->shipments())->respond();
 
@@ -120,7 +120,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with a singular relation query as data.
      */
-    public function testCreateResponsesWithSingularRelationQuery()
+    public function testCreateResponsesWithSingularRelationQuery(): void
     {
         $response = responder()->success($this->shipment->product())->respond();
 
@@ -130,7 +130,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with paginator as data.
      */
-    public function testCreateResponsesWithPagination()
+    public function testCreateResponsesWithPagination(): void
     {
         $response = responder()->success($this->product->newQuery()->paginate())->respond();
 
@@ -150,7 +150,7 @@ class CreateSuccessResponseTest extends TestCase
      * Assert that you can create success responses with pagination where we apply the
      * pagination and data seperately.
      */
-    public function testCreateResponsesWithExplicitPaginator()
+    public function testCreateResponsesWithExplicitPaginator(): void
     {
         $adapter = new IlluminatePaginatorAdapter($this->product->newQuery()->paginate());
 
@@ -171,7 +171,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can create success responses with cursor pagination.
      */
-    public function testCreateResponsesWithCursorPagination()
+    public function testCreateResponsesWithCursorPagination(): void
     {
         $adapter = new Cursor($this->product->id, null, null, $count = Product::count());
 
@@ -190,7 +190,7 @@ class CreateSuccessResponseTest extends TestCase
     /**
      * Assert that you can add meta data to the response.
      */
-    public function testAddMetaData()
+    public function testAddMetaData(): void
     {
         $response = responder()->success()->meta($meta = ['foo' => 123])->respond();
 

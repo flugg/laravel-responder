@@ -23,7 +23,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ResourceFactoryTest extends TestCase
+final class ResourceFactoryTest extends TestCase
 {
     /**
      * A mock of a [DataNormalizer] class.
@@ -58,7 +58,7 @@ class ResourceFactoryTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -71,7 +71,7 @@ class ResourceFactoryTest extends TestCase
     /**
      * Assert that the [make] method makes a [NullResource] resource when given no arguments.
      */
-    public function testMakeMethodShouldMakeNullResourcesWhenGivenNoArguments()
+    public function testMakeMethodShouldMakeNullResourcesWhenGivenNoArguments(): void
     {
         $this->normalizer->shouldReceive('normalize')->andReturn(null);
 
@@ -84,7 +84,7 @@ class ResourceFactoryTest extends TestCase
     /**
      * Assert that the [make] method makes an [Item] resource when given a model.
      */
-    public function testMakeMethodShouldMakeItemResourcesWhenGivenModels()
+    public function testMakeMethodShouldMakeItemResourcesWhenGivenModels(): void
     {
         $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
         $this->normalizer->shouldReceive('normalize')->andReturn($data = Mockery::mock(Model::class));
@@ -103,7 +103,7 @@ class ResourceFactoryTest extends TestCase
      * Assert that the [make] method makes a [Collection] resource when given arrays
      * containing arrays or objects.
      */
-    public function testMakeMethodShouldMakeCollectionResourcesWhenGivenArraysWithNonScalars()
+    public function testMakeMethodShouldMakeCollectionResourcesWhenGivenArraysWithNonScalars(): void
     {
         $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
         $this->normalizer->shouldReceive('normalize')->andReturn($data = [
@@ -124,7 +124,7 @@ class ResourceFactoryTest extends TestCase
     /**
      * Assert that the [make] method makes a [Primitive] resource when given a scalar.
      */
-    public function testMakeMethodShouldMakePrimitiveResourcesWhenGivenAScalar()
+    public function testMakeMethodShouldMakePrimitiveResourcesWhenGivenAScalar(): void
     {
         $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
         $this->normalizer->shouldReceive('normalize')->andReturn($data = 'foo');
@@ -142,7 +142,7 @@ class ResourceFactoryTest extends TestCase
     /**
      * Assert that the [make] method makes a [Item] resource when given an array with scalars.
      */
-    public function testMakeMethodShouldMakeItemResourcesWhenGivenArraysWithScalars()
+    public function testMakeMethodShouldMakeItemResourcesWhenGivenArraysWithScalars(): void
     {
         $this->transformerResolver->shouldReceive('resolve')->andReturn($transformer = $this->mockTransformer());
         $this->normalizer->shouldReceive('normalize')->andReturn($data = ['foo' => 1, 'bar' => 2]);
@@ -156,7 +156,7 @@ class ResourceFactoryTest extends TestCase
      * Assert that the [make] method resolves a transformer using the [TransformerResolver]
      * if no transformer is given.
      */
-    public function testMakeMethodResolvesTransformerWhenNoneIsGiven()
+    public function testMakeMethodResolvesTransformerWhenNoneIsGiven(): void
     {
         $this->transformerResolver->shouldReceive('resolveFromData')
             ->andReturn($transformer = $this->mockTransformer());
@@ -172,7 +172,7 @@ class ResourceFactoryTest extends TestCase
     /**
      * Assert that the [make] method allows instances of [ResourceInterface] as data.
      */
-    public function testMakeMethodShouldAllowResources()
+    public function testMakeMethodShouldAllowResources(): void
     {
         $this->transformerResolver->shouldReceive('resolveFromData')
             ->andReturn($transformer = $this->mockTransformer());

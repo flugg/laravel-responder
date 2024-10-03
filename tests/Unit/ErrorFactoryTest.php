@@ -15,7 +15,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ErrorFactoryTest extends TestCase
+final class ErrorFactoryTest extends TestCase
 {
     /**
      * A mock of an [ErrorMessageResolver] class.
@@ -43,7 +43,7 @@ class ErrorFactoryTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,7 +55,7 @@ class ErrorFactoryTest extends TestCase
     /**
      * Assert that the [make] method uses the [ErrorSerializer] to serialize the error data.
      */
-    public function testMakeMethodSerializesErrorDataUsingTheSerializer()
+    public function testMakeMethodSerializesErrorDataUsingTheSerializer(): void
     {
         $this->serializer->shouldReceive('format')->andReturn($error = ['bar' => 2]);
 
@@ -69,7 +69,7 @@ class ErrorFactoryTest extends TestCase
      * Assert that the [make] method resolves a message using the [ErrorMessageResolver] when
      * none is given.
      */
-    public function testMakeMethodShouldResolveMessageFromMessageResolver()
+    public function testMakeMethodShouldResolveMessageFromMessageResolver(): void
     {
         $this->serializer->shouldReceive('format')->andReturn([]);
         $this->messageResolver->shouldReceive('resolve')->andReturn($message = 'A test error has occured.');
@@ -83,7 +83,7 @@ class ErrorFactoryTest extends TestCase
     /**
      * Assert that the [make] method allows skipping all parameters except serializer.
      */
-    public function testMakeMethodAllowsPassingOnlySerializer()
+    public function testMakeMethodAllowsPassingOnlySerializer(): void
     {
         $this->serializer->shouldReceive('format')->andReturn($error = ['foo' => 1]);
 

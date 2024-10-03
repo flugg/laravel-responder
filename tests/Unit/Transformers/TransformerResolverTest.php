@@ -19,7 +19,7 @@ use stdClass;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformerResolverTest extends TestCase
+final class TransformerResolverTest extends TestCase
 {
     /**
      * A mock of a [Container] class.
@@ -47,7 +47,7 @@ class TransformerResolverTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -59,7 +59,7 @@ class TransformerResolverTest extends TestCase
     /**
      * Assert that the [resolve] method resolves transformer from IoC container when given a string.
      */
-    public function testResolveMethodShouldResolveTransformerFromContainerIfGivenString()
+    public function testResolveMethodShouldResolveTransformerFromContainerIfGivenString(): void
     {
         $this->container->shouldReceive('make')->andReturn($transformer = $this->mockTransformer());
 
@@ -72,7 +72,7 @@ class TransformerResolverTest extends TestCase
     /**
      * Assert that the [resolve] method returns the transformer given if it's a valid transformer.
      */
-    public function testResolveMethodShouldReturnTransformerIfValid()
+    public function testResolveMethodShouldReturnTransformerIfValid(): void
     {
         $result = $this->resolver->resolve($transformer = $this->mockTransformer());
 
@@ -82,7 +82,7 @@ class TransformerResolverTest extends TestCase
     /**
      * Assert that the [resolve] method also returns the transformer given if it's a closure.
      */
-    public function testResolveMethodShouldReturnTransformerIfClosure()
+    public function testResolveMethodShouldReturnTransformerIfClosure(): void
     {
         $result = $this->resolver->resolve($transformer = function () { });
 
@@ -92,7 +92,7 @@ class TransformerResolverTest extends TestCase
     /**
      * Assert that the [resolve] method throws an [InvalidTransformerException] on invalid transformers.
      */
-    public function testResolveMethodShouldThrowExceptionIfGivenInvalidTransformer()
+    public function testResolveMethodShouldThrowExceptionIfGivenInvalidTransformer(): void
     {
         $this->expectException(InvalidTransformerException::class);
         $this->expectExceptionMessage('Transformer must be a callable or an instance of [Flugg\Responder\Transformers\Transformer].');
@@ -103,7 +103,7 @@ class TransformerResolverTest extends TestCase
     /**
      * Assert that the [resolveFromData] method resolves transformer from cache if binding is set.
      */
-    public function testResolveFromDataMethodShouldResolveTransformerFromBinding()
+    public function testResolveFromDataMethodShouldResolveTransformerFromBinding(): void
     {
         $model = Mockery::mock(Model::class);
         $this->resolver->bind(get_class($model), $transformer = $this->mockTransformer());
@@ -117,7 +117,7 @@ class TransformerResolverTest extends TestCase
      * Assert that the [resolveFromData] method resolves transformer from an element implementing the
      * [Transformable] contract if one is given.
      */
-    public function testResolveFromDataMethodShouldResolveTransformerFromTransformable()
+    public function testResolveFromDataMethodShouldResolveTransformerFromTransformable(): void
     {
         $model = Mockery::mock(Transformable::class);
         $model->shouldReceive('transformer')->andReturn($transformer = $this->mockTransformer());
@@ -132,7 +132,7 @@ class TransformerResolverTest extends TestCase
      * Assert that the [resolveFromData] method resolves an element implementing the [Transformable] contract
      * to resolve a transformer from, from a list of items.
      */
-    public function testResolveFromDataMethodShouldResolveTransformableFromCollection()
+    public function testResolveFromDataMethodShouldResolveTransformableFromCollection(): void
     {
         $model = Mockery::mock(Transformable::class);
         $model->shouldReceive('transformer')->andReturn($transformer = $this->mockTransformer());
@@ -147,7 +147,7 @@ class TransformerResolverTest extends TestCase
      * Assert that the [resolveFromData] method resolves an automatic closure transformer if no other
      * can be resolved.
      */
-    public function testResolveFromDataMethodShouldResolveAFallbackTransformer()
+    public function testResolveFromDataMethodShouldResolveAFallbackTransformer(): void
     {
         $model = Mockery::mock(Model::class);
         $this->container->shouldReceive('make')->andReturn($this->fallbackTransformer);

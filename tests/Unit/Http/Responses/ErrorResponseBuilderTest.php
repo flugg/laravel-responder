@@ -21,7 +21,7 @@ use stdClass;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ErrorResponseBuilderTest extends TestCase
+final class ErrorResponseBuilderTest extends TestCase
 {
     /**
      * A mock of a [ResponseFactory] class.
@@ -56,7 +56,7 @@ class ErrorResponseBuilderTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -69,7 +69,7 @@ class ErrorResponseBuilderTest extends TestCase
     /**
      * Assert that the [respond] generates JSON responses using the [ResponseFactory].
      */
-    public function testRespondMethodShouldMakeJsonResponses()
+    public function testRespondMethodShouldMakeJsonResponses(): void
     {
         $response = new JsonResponse($error = ['foo' => 1], $status = 400, $headers = ['x-foo' => 1]);
         $this->errorFactory->shouldReceive('make')->andReturn($error);
@@ -85,7 +85,7 @@ class ErrorResponseBuilderTest extends TestCase
      * Assert that the [respond] method throws an [InvalidArgumentException] exception if
      * status code is not a valid error code.
      */
-    public function testRespondMethodThrowsExceptionIfGivenInvalidStatusCode()
+    public function testRespondMethodThrowsExceptionIfGivenInvalidStatusCode(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -96,7 +96,7 @@ class ErrorResponseBuilderTest extends TestCase
      * Assert that the [toArray] method formats the error output using the [ErrorFactory] and
      * returns the result as an array.
      */
-    public function testToArrayMethodShouldFormatErrorUsingErrorFactory()
+    public function testToArrayMethodShouldFormatErrorUsingErrorFactory(): void
     {
         $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
 
@@ -109,7 +109,7 @@ class ErrorResponseBuilderTest extends TestCase
      * Assert that the [toCollection] method formats the error output using the [ErrorFactory]
      * and returns the result as a collection.
      */
-    public function testToCollectionMethodShouldFormatErrorAndReturnCollection()
+    public function testToCollectionMethodShouldFormatErrorAndReturnCollection(): void
     {
         $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
 
@@ -122,7 +122,7 @@ class ErrorResponseBuilderTest extends TestCase
      * Assert that the [toJson] method formats the error output using the [ErrorFactory] and
      * returns the result as JSON.
      */
-    public function testToJsonMethodShouldFormatErrorAndReturnJson()
+    public function testToJsonMethodShouldFormatErrorAndReturnJson(): void
     {
         $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
 
@@ -134,7 +134,7 @@ class ErrorResponseBuilderTest extends TestCase
     /**
      * Assert that the [toJson] method accepts an argument for setting encoding options.
      */
-    public function testToJsonMethodShouldAllowSettingEncodingOptions()
+    public function testToJsonMethodShouldAllowSettingEncodingOptions(): void
     {
         $this->errorFactory->shouldReceive('make')->andReturn($error = ['foo' => 1]);
 
@@ -147,7 +147,7 @@ class ErrorResponseBuilderTest extends TestCase
      * Assert that the [error] method sets the error code and message that is sent to the
      * [ErrorFactory].
      */
-    public function testErrorMethodSetsErrorCodeAndMessage()
+    public function testErrorMethodSetsErrorCodeAndMessage(): void
     {
         $this->errorFactory->shouldReceive('make')->andReturn([]);
 
@@ -159,7 +159,7 @@ class ErrorResponseBuilderTest extends TestCase
     /**
      * Assert that the [data] method adds error data that is sent to the [ErrorFactory].
      */
-    public function testDataMethodSetsErrorData()
+    public function testDataMethodSetsErrorData(): void
     {
         $this->errorFactory->shouldReceive('make')->andReturn([]);
 
@@ -171,7 +171,7 @@ class ErrorResponseBuilderTest extends TestCase
     /**
      * Assert that the [serializer] method sets the serializer that is sent to the [ErrorFactory].
      */
-    public function testSerializerMethodSetsErrorSerializer()
+    public function testSerializerMethodSetsErrorSerializer(): void
     {
         $this->errorFactory->shouldReceive('make')->andReturn([]);
 
@@ -183,7 +183,7 @@ class ErrorResponseBuilderTest extends TestCase
     /**
      * Assert that the [serializer] method allows class name strings.
      */
-    public function testSerializerMethodAllowsClassNameStrings()
+    public function testSerializerMethodAllowsClassNameStrings(): void
     {
         $this->errorFactory->shouldReceive('make')->andReturn([]);
 
@@ -196,7 +196,7 @@ class ErrorResponseBuilderTest extends TestCase
      * Assert that the [serializer] method throws [InvalidErrorSerializerException] exception when
      * given an invalid serializer.
      */
-    public function testSerializerMethodThrowsExceptionWhenGivenInvalidSerializer()
+    public function testSerializerMethodThrowsExceptionWhenGivenInvalidSerializer(): void
     {
         $this->expectException(InvalidErrorSerializerException::class);
 

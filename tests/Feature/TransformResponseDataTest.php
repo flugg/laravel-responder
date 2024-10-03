@@ -17,12 +17,12 @@ use Illuminate\Testing\Constraints\ArraySubset;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformResponseDataTest extends TestCase
+final class TransformResponseDataTest extends TestCase
 {
     /**
      * Assert that you can transform the response data using a basic closure transformer.
      */
-    public function testTransformDataUsingClosure()
+    public function testTransformDataUsingClosure(): void
     {
         $response = responder()->success($product = Product::create(['name' => 'foo']), function ($product) {
             return [
@@ -36,7 +36,7 @@ class TransformResponseDataTest extends TestCase
     /**
      * Assert that you can transform the response data using a dedicated transformer class.
      */
-    public function testTransformDataUsingTransformerClass()
+    public function testTransformDataUsingTransformerClass(): void
     {
         $response = responder()->success(Product::create(['name' => 'foo']), new ProductNameTransformer)->respond();
 
@@ -47,7 +47,7 @@ class TransformResponseDataTest extends TestCase
      * Assert that you can transform the response data using a transformer resolved from
      * class name.
      */
-    public function testTransformDataUsingTransformerClassName()
+    public function testTransformDataUsingTransformerClassName(): void
     {
         $response = responder()->success(Product::create(['name' => 'foo']), ProductNameTransformer::class)->respond();
 
@@ -58,7 +58,7 @@ class TransformResponseDataTest extends TestCase
      * Assert that you can transform the response data using a transformer binding using
      * a closure transformer.
      */
-    public function testTransformDataUsingTransformerBindingUsingClosure()
+    public function testTransformDataUsingTransformerBindingUsingClosure(): void
     {
         $response = responder()->success(ProductWithClosureTransformer::create(['name' => 'foo']))->respond();
 
@@ -69,7 +69,7 @@ class TransformResponseDataTest extends TestCase
      * Assert that you can transform the response data using a transformer binding with a
      * dedicated transformer class.
      */
-    public function testTransformDataUsingTransformerBindingUsingTransformerClass()
+    public function testTransformDataUsingTransformerBindingUsingTransformerClass(): void
     {
         $response = responder()->success((ProductWithTransformerClass::create(['name' => 'foo'])))->respond();
 
@@ -80,7 +80,7 @@ class TransformResponseDataTest extends TestCase
      * Assert that you can transform the response data using a transformer binding with a
      * dedicated transformer class resolved from the container using the class name.
      */
-    public function testTransformDataUsingTransformerBindingUsingTransformerClassName()
+    public function testTransformDataUsingTransformerBindingUsingTransformerClassName(): void
     {
         $response = responder()->success((ProductWithTransformerClassName::create(['name' => 'foo'])))->respond();
 
@@ -91,7 +91,7 @@ class TransformResponseDataTest extends TestCase
      * Assert that you can transform the response data using a transformer binding set
      * using the transformer resolver service directly.
      */
-    public function testTransformDataUsingTransformerBindingUsingTransformerResolver()
+    public function testTransformDataUsingTransformerBindingUsingTransformerResolver(): void
     {
         $this->app->make(TransformerResolver::class)->bind([
             Product::class => ProductNameTransformer::class,
@@ -106,7 +106,7 @@ class TransformResponseDataTest extends TestCase
      * Assert that it resolves a resource key from the table name. The resource key is only
      * accessible from the serializer, so we use a dummy serializer to assert for it.
      */
-    public function testItResolvesResourceKeyFromTableName()
+    public function testItResolvesResourceKeyFromTableName(): void
     {
         $response = responder()->success($this->product)->serializer(ResourceKeySerializer::class)->respond();
 
@@ -118,7 +118,7 @@ class TransformResponseDataTest extends TestCase
     /**
      * Assert that you can set the resource key for the transformation.
      */
-    public function testSetResourceKeyOnResponse()
+    public function testSetResourceKeyOnResponse(): void
     {
         $response = responder()
             ->success($this->product, null, 'foo')
@@ -134,7 +134,7 @@ class TransformResponseDataTest extends TestCase
     /**
      * Assert that you can set the resource key on the actual model.
      */
-    public function testSetResourceKeyOnModel()
+    public function testSetResourceKeyOnModel(): void
     {
         $response = responder()
             ->success($product = ProductWithResourceKey::create())

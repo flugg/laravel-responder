@@ -14,7 +14,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class ResolveResourceKeyTest extends TestCase
+final class ResolveResourceKeyTest extends TestCase
 {
     /**
      * The [ResourceKeyResolver] class being tested.
@@ -28,7 +28,7 @@ class ResolveResourceKeyTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ class ResolveResourceKeyTest extends TestCase
      * Assert that the [resolve] method resolves 'data' as resource key if it can't resolve
      * a resource key from the given data.
      */
-    public function testResolveMethodShouldResolveDefaultResourceKeyIfNoneIsFound()
+    public function testResolveMethodShouldResolveDefaultResourceKeyIfNoneIsFound(): void
     {
         $result = $this->resolver->resolve($data = []);
 
@@ -49,7 +49,7 @@ class ResolveResourceKeyTest extends TestCase
     /**
      * Assert that the [resolve] method resolves resource key from cache if binding is set.
      */
-    public function testResolveMethodShouldResolveResourceKeyFromBinding()
+    public function testResolveMethodShouldResolveResourceKeyFromBinding(): void
     {
         $model = Mockery::mock(Model::class);
         $this->resolver->bind(get_class($model), $resourceKey = 'foo');
@@ -62,7 +62,7 @@ class ResolveResourceKeyTest extends TestCase
     /**
      * Assert that the [resolve] method resolves transformable from a list of transformables.
      */
-    public function testResolveMethodShouldResolveTransformableFromArray()
+    public function testResolveMethodShouldResolveTransformableFromArray(): void
     {
         $data = [$model = Mockery::mock(Model::class)];
         $this->resolver->bind(get_class($model), $resourceKey = 'foo');
@@ -75,7 +75,7 @@ class ResolveResourceKeyTest extends TestCase
     /**
      * Assert that the [resolve] method resolves resource key from the model's table name.
      */
-    public function testResolveMethodShouldResolveResourceKeyFromModelsTable()
+    public function testResolveMethodShouldResolveResourceKeyFromModelsTable(): void
     {
         $model = Mockery::mock(Model::class);
         $model->shouldReceive('getTable')->andReturn($resourceKey = 'foo');
@@ -88,7 +88,7 @@ class ResolveResourceKeyTest extends TestCase
     /**
      * Assert that the [resolve] method resolves resource key from the [getResourceKey] method.
      */
-    public function testResolveMethodShouldResolveResourceKeyFromGetResourceKeyIfMethodExists()
+    public function testResolveMethodShouldResolveResourceKeyFromGetResourceKeyIfMethodExists(): void
     {
         $result = $this->resolver->resolve($model = new ModelWithResourceKey);
 

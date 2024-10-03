@@ -32,7 +32,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class HandlerTest extends TestCase
+final class HandlerTest extends TestCase
 {
     /**
      * A mock of a [Request] object.
@@ -60,7 +60,7 @@ class HandlerTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -76,7 +76,7 @@ class HandlerTest extends TestCase
      * Assert that the [render] method converts [AuthenticationException] exceptions to
      * the package's [UnauthenticatedException].
      */
-    public function testRenderMethodConvertsUnauthenticationExceptions()
+    public function testRenderMethodConvertsUnauthenticationExceptions(): void
     {
         $exception = new AuthenticationException;
         $this->expectException(UnauthenticatedException::class);
@@ -88,7 +88,7 @@ class HandlerTest extends TestCase
      * Assert that the [render] method converts [AuthorizationException] exceptions to
      * the package's [UnauthorizedException].
      */
-    public function testRenderMethodConvertsUnauthorizedExceptions()
+    public function testRenderMethodConvertsUnauthorizedExceptions(): void
     {
         $exception = new AuthorizationException;
         $this->expectException(UnauthorizedException::class);
@@ -100,7 +100,7 @@ class HandlerTest extends TestCase
      * Assert that the [render] method converts [ModelNotFoundException] exceptions to
      * the package's [PageNotFoundException].
      */
-    public function testRenderMethodConvertsModelNotFoundExceptions()
+    public function testRenderMethodConvertsModelNotFoundExceptions(): void
     {
         $exception = new ModelNotFoundException;
         $this->expectException(PageNotFoundException::class);
@@ -112,7 +112,7 @@ class HandlerTest extends TestCase
      * Assert that the [render] method converts [RelationNotFoundException] exceptions to
      * the package's [RelationNotFoundException].
      */
-    public function testRenderMethodConvertsRelationNotFoundExceptions()
+    public function testRenderMethodConvertsRelationNotFoundExceptions(): void
     {
         $exception = new BaseRelationNotFoundException;
         $this->expectException(RelationNotFoundException::class);
@@ -124,7 +124,7 @@ class HandlerTest extends TestCase
      * Assert that the [render] method converts [ValidationException] exceptions to
      * the package's [ValidationFailedException].
      */
-    public function testRenderMethodConvertsValidationExceptions()
+    public function testRenderMethodConvertsValidationExceptions(): void
     {
         $validator = Mockery::mock(Validator::class);
         $validator->shouldReceive('errors')->andReturn(collect([['foo' => 'bar']]));
@@ -140,7 +140,7 @@ class HandlerTest extends TestCase
     /**
      * Assert that the [render] method converts [HttpException] exceptions to responses.
      */
-    public function testRenderMethodConvertsHttpExceptionsToResponses()
+    public function testRenderMethodConvertsHttpExceptionsToResponses(): void
     {
         $exception = Mockery::mock(HttpException::class);
         $exception->shouldReceive('errorCode')->andReturn($errorCode = 'test_error');
@@ -163,7 +163,7 @@ class HandlerTest extends TestCase
     /**
      * Assert that the [render] method leaves other exceptions untouched.
      */
-    public function testItShouldNotConvertNonHttpExceptions()
+    public function testItShouldNotConvertNonHttpExceptions(): void
     {
         $request = Request::createFromGlobals();
 

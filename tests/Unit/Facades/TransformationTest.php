@@ -14,7 +14,7 @@ use Mockery;
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
-class TransformationTest extends TestCase
+final class TransformationTest extends TestCase
 {
     /**
      * A mock of a [Transformation] class.
@@ -28,7 +28,7 @@ class TransformationTest extends TestCase
      *
      * @return void
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class TransformationTest extends TestCase
      * Assert that the parameters sent to the [transform] method is forwarded to the
      * transformer service.
      */
-    public function testMakeMethodShouldCallOnTransformer()
+    public function testMakeMethodShouldCallOnTransformer(): void
     {
         $this->transformation->shouldReceive('make')->andReturn($transformBuilder = $this->mockTransformBuilder());
 
