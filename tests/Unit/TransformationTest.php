@@ -5,7 +5,6 @@ namespace Flugg\Responder\Tests\Unit;
 use Flugg\Responder\Serializers\NoopSerializer;
 use Flugg\Responder\Tests\TestCase;
 use Flugg\Responder\Transformation;
-use Flugg\Responder\Transformer;
 
 /**
  * Unit tests for the [Flugg\Responder\Transformation] class.

@@ -58,7 +58,7 @@ trait MakesResources
     {
         $transformer = $this->mappedTransformerClass($identifier);
 
-        if(config('responder.use_camel_case_relations')) {
+        if (config('responder.use_camel_case_relations')) {
             $identifier = Str::camel($identifier);
         }
 
@@ -110,7 +110,7 @@ trait MakesResources
      *
      * @return \Illuminate\Contracts\Container\Container
      */
-    protected abstract function resolveContainer(): Container;
+    abstract protected function resolveContainer(): Container;
 
     /**
      * Resolve relation data from a model.
@@ -119,7 +119,7 @@ trait MakesResources
      * @param  string                              $identifier
      * @return mixed
      */
-    protected abstract function resolveRelation(Model $model, string $identifier);
+    abstract protected function resolveRelation(Model $model, string $identifier);
 
     /**
      * Get a related transformer class mapped to a relation identifier.
@@ -127,5 +127,5 @@ trait MakesResources
      * @param  string $identifier
      * @return string
      */
-    protected abstract function mappedTransformerClass(string $identifier);
+    abstract protected function mappedTransformerClass(string $identifier);
 }

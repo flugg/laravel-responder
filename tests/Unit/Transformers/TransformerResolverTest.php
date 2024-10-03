@@ -7,7 +7,6 @@ use Flugg\Responder\Exceptions\InvalidTransformerException;
 use Flugg\Responder\Tests\TestCase;
 use Flugg\Responder\Transformers\TransformerResolver;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Mockery;
 use stdClass;

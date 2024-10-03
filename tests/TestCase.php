@@ -5,7 +5,6 @@ namespace Flugg\Responder\Tests;
 use Flugg\Responder\Contracts\ResponseFactory;
 use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
 use Flugg\Responder\Http\Responses\SuccessResponseBuilder;
-use Flugg\Responder\Resources\ResourceBuilder;
 use Flugg\Responder\ResponderServiceProvider;
 use Flugg\Responder\TransformBuilder;
 use Flugg\Responder\Transformers\Transformer;

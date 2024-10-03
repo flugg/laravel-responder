@@ -78,7 +78,7 @@ class TransformerResolver implements TransformerResolverContract
         }
 
         if (! is_callable($transformer) && ! $transformer instanceof Transformer) {
-            throw new InvalidTransformerException;
+            throw new InvalidTransformerException();
         }
 
         return $transformer;

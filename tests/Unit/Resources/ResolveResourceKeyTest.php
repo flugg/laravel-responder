@@ -32,7 +32,7 @@ final class ResolveResourceKeyTest extends TestCase
     {
         parent::setUp();
 
-        $this->resolver = new ResourceKeyResolver;
+        $this->resolver = new ResourceKeyResolver();
     }
 
     /**
@@ -90,7 +90,7 @@ final class ResolveResourceKeyTest extends TestCase
      */
     public function testResolveMethodShouldResolveResourceKeyFromGetResourceKeyIfMethodExists(): void
     {
-        $result = $this->resolver->resolve($model = new ModelWithResourceKey);
+        $result = $this->resolver->resolve($model = new ModelWithResourceKey());
 
         $this->assertEquals('foo', $result);
     }

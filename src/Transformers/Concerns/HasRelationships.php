@@ -203,7 +203,7 @@ trait HasRelationships
      */
     protected function resolveQueryConstraint(string $identifier)
     {
-        if(config('responder.use_camel_case_relations')) {
+        if (config('responder.use_camel_case_relations')) {
             $identifier = Str::camel($identifier);
         }
 
@@ -225,7 +225,7 @@ trait HasRelationships
      */
     protected function resolveRelation(Model $model, string $identifier)
     {
-        if(config('responder.use_camel_case_relations')) {
+        if (config('responder.use_camel_case_relations')) {
             $identifier = Str::camel($identifier);
         }
 
@@ -272,5 +272,5 @@ trait HasRelationships
      * @param  string $transformer
      * @return mixed
      */
-    protected abstract function resolveTransformer(string $transformer);
+    abstract protected function resolveTransformer(string $transformer);
 }

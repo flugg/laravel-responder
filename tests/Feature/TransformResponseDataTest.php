@@ -38,7 +38,7 @@ final class TransformResponseDataTest extends TestCase
      */
     public function testTransformDataUsingTransformerClass(): void
     {
-        $response = responder()->success(Product::create(['name' => 'foo']), new ProductNameTransformer)->respond();
+        $response = responder()->success(Product::create(['name' => 'foo']), new ProductNameTransformer())->respond();
 
         $this->assertEquals($this->responseData(['name' => 'FOO']), $response->getData(true));
     }
@@ -110,7 +110,8 @@ final class TransformResponseDataTest extends TestCase
     {
         $response = responder()->success($this->product)->serializer(ResourceKeySerializer::class)->respond();
 
-        $this->assertTrue((
+        $this->assertTrue(
+            (
             new ArraySubset(['products' => $this->product->toArray()]))->evaluate($response->getData(true), '', true)
         );
     }
@@ -182,7 +183,7 @@ class ProductWithTransformerClass extends Product implements Transformable
 {
     public function transformer()
     {
-        return new ProductNameTransformer;
+        return new ProductNameTransformer();
     }
 }
 

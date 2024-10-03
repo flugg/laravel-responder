@@ -25,10 +25,11 @@
         "league/fractal": "^0.20"
     },
     "require-dev": {
-        "illuminate/database": "^11.0",
-        "orchestra/testbench": "^9.0",
-        "mockery/mockery": "^1.0",
         "doctrine/dbal": "^3.5",
+        "illuminate/database": "^11.0",
+        "laravel/pint": "^1.18",
+        "mockery/mockery": "^1.0",
+        "orchestra/testbench": "^9.0",
         "phpunit/phpunit": "^10.0"
     },
     "autoload": {

@@ -3,7 +3,6 @@
 namespace Flugg\Responder\Tests\Unit;
 
 use Flugg\Responder\Contracts\TransformFactory;
-use Flugg\Responder\Exceptions\InvalidSerializerException;
 use Flugg\Responder\Exceptions\InvalidSuccessSerializerException;
 use Flugg\Responder\Pagination\CursorPaginator;
 use Flugg\Responder\Pagination\PaginatorFactory;
@@ -190,7 +189,7 @@ final class TransformBuilderTest extends TestCase
     {
         $this->transformFactory->shouldReceive('make')->andReturn([]);
 
-        $this->builder->resource()->serializer($serializer = new JsonApiSerializer)->transform();
+        $this->builder->resource()->serializer($serializer = new JsonApiSerializer())->transform();
 
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $serializer, [
             'includes' => [],
@@ -433,7 +432,11 @@ final class TransformBuilderTest extends TestCase
 
 class TransformerWithIncludeMethods extends Transformer
 {
-    public function includeBar() { }
+    public function includeBar()
+    {
+    }
 
-    public function includeBaz() { }
+    public function includeBaz()
+    {
+    }
 }

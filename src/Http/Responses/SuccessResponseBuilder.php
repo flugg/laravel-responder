@@ -83,7 +83,7 @@ class SuccessResponseBuilder extends ResponseBuilder
             return $this;
         }
 
-        throw new BadMethodCallException;
+        throw new BadMethodCallException();
     }
 
     /**

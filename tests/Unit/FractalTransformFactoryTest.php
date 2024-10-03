@@ -79,7 +79,7 @@ final class FractalTransformFactoryTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Filtering fields using sparse fieldsets require resource key to be set.');
 
-        $this->factory->make($resource = new NullResource, $serializer = Mockery::mock(SerializerAbstract::class), [
+        $this->factory->make($resource = new NullResource(), $serializer = Mockery::mock(SerializerAbstract::class), [
             'fieldsets' => $fieldsets = ['foo'],
         ]);
     }

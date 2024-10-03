@@ -2,12 +2,10 @@
 
 namespace Flugg\Responder\Tests\Unit\Resources;
 
-use Flugg\Responder\Pagination\CursorFactory;
 use Flugg\Responder\Resources\DataNormalizer;
 use Flugg\Responder\Resources\ResourceFactory;
 use Flugg\Responder\Resources\ResourceKeyResolver;
 use Flugg\Responder\Tests\TestCase;
-use Flugg\Responder\Transformers\TransformerManager;
 use Flugg\Responder\Transformers\TransformerResolver;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\Resource\Collection;

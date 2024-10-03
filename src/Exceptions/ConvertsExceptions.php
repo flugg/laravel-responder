@@ -49,7 +49,7 @@ trait ConvertsExceptions
                     $target($exception);
                 }
 
-                throw new $target;
+                throw new $target();
             }
         }
     }

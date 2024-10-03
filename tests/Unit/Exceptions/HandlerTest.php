@@ -78,7 +78,7 @@ final class HandlerTest extends TestCase
      */
     public function testRenderMethodConvertsUnauthenticationExceptions(): void
     {
-        $exception = new AuthenticationException;
+        $exception = new AuthenticationException();
         $this->expectException(UnauthenticatedException::class);
 
         $this->handler->render($this->request, $exception);
@@ -90,7 +90,7 @@ final class HandlerTest extends TestCase
      */
     public function testRenderMethodConvertsUnauthorizedExceptions(): void
     {
-        $exception = new AuthorizationException;
+        $exception = new AuthorizationException();
         $this->expectException(UnauthorizedException::class);
 
         $this->handler->render($this->request, $exception);
@@ -102,7 +102,7 @@ final class HandlerTest extends TestCase
      */
     public function testRenderMethodConvertsModelNotFoundExceptions(): void
     {
-        $exception = new ModelNotFoundException;
+        $exception = new ModelNotFoundException();
         $this->expectException(PageNotFoundException::class);
 
         $this->handler->render($this->request, $exception);
@@ -114,7 +114,7 @@ final class HandlerTest extends TestCase
      */
     public function testRenderMethodConvertsRelationNotFoundExceptions(): void
     {
-        $exception = new BaseRelationNotFoundException;
+        $exception = new BaseRelationNotFoundException();
         $this->expectException(RelationNotFoundException::class);
 
         $this->handler->render($this->request, $exception);
@@ -150,7 +150,7 @@ final class HandlerTest extends TestCase
         $exception->shouldReceive('getHeaders')->andReturn($headers = ['x-foo' => 123]);
         $this->app->instance(Responder::class, $responder = Mockery::mock(Responder::class));
         $responder->shouldReceive('error')->andReturn($responseBuilder = $this->mockErrorResponseBuilder());
-        $responseBuilder->shouldReceive('respond')->andReturn($response = new JsonResponse);
+        $responseBuilder->shouldReceive('respond')->andReturn($response = new JsonResponse());
 
         $result = $this->handler->render($this->request, $exception);
 
@@ -167,7 +167,7 @@ final class HandlerTest extends TestCase
     {
         $request = Request::createFromGlobals();
 
-        $result = $this->handler->render($request, $exception = new Exception);
+        $result = $this->handler->render($request, $exception = new Exception());
 
         $this->assertInstanceOf(Response::class, $result);
     }

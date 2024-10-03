@@ -33,7 +33,7 @@ final class NoopSerializerTest extends TestCase
     {
         parent::setUp();
 
-        $this->serializer = new NoopSerializer;
+        $this->serializer = new NoopSerializer();
     }
 
     /**

@@ -219,11 +219,11 @@ class TransformBuilder
     public function serializer($serializer)
     {
         if (is_string($serializer)) {
-            $serializer = new $serializer;
+            $serializer = new $serializer();
         }
 
         if (! $serializer instanceof SerializerAbstract) {
-            throw new InvalidSuccessSerializerException;
+            throw new InvalidSuccessSerializerException();
         }
 
         $this->serializer = $serializer;
@@ -240,7 +240,7 @@ class TransformBuilder
     {
         $this->prepareRelations($this->resource->getData(), $this->resource->getTransformer());
 
-        return $this->transformFactory->make($this->resource ?: new NullResource, $this->serializer, [
+        return $this->transformFactory->make($this->resource ?: new NullResource(), $this->serializer, [
             'includes' => $this->with,
             'excludes' => $this->without,
             'fieldsets' => $this->only,
@@ -309,7 +309,7 @@ class TransformBuilder
         $relations = collect(array_keys($requested))->reduce(function ($eagerLoads, $relation) use ($requested, $transformer) {
             $identifier = $this->stripParametersFromRelation($relation);
 
-            if(config('responder.use_camel_case_relations')) {
+            if (config('responder.use_camel_case_relations')) {
                 $identifier = Str::camel($identifier);
             }
 

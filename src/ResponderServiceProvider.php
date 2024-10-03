@@ -12,7 +12,6 @@ use Flugg\Responder\Contracts\Resources\ResourceKeyResolver as ResourceKeyResolv
 use Flugg\Responder\Contracts\Responder as ResponderContract;
 use Flugg\Responder\Contracts\ResponseFactory;
 use Flugg\Responder\Contracts\ResponseFactory as ResponseFactoryContract;
-use Flugg\Responder\Contracts\SimpleTransformer as SimpleTransformerContract;
 use Flugg\Responder\Contracts\Transformers\TransformerResolver as TransformerResolverContract;
 use Flugg\Responder\Contracts\TransformFactory as TransformFactoryContract;
 use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
@@ -158,7 +157,7 @@ class ResponderServiceProvider extends BaseServiceProvider
     protected function registerFractalBindings()
     {
         $this->app->bind(Manager::class, function ($app) {
-            return (new Manager)->setRecursionLimit($app->config['responder.recursion_limit']);
+            return (new Manager())->setRecursionLimit($app->config['responder.recursion_limit']);
         });
     }
 

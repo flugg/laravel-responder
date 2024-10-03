@@ -2,7 +2,6 @@
 
 namespace Flugg\Responder\Tests\Unit\Resources;
 
-use Flugg\Responder\Pagination\CursorFactory;
 use Flugg\Responder\Pagination\CursorPaginator;
 use Flugg\Responder\Resources\DataNormalizer;
 use Flugg\Responder\Tests\TestCase;
@@ -39,7 +38,7 @@ final class DataNormalizerTest extends TestCase
     {
         parent::setUp();
 
-        $this->normalizer = new DataNormalizer;
+        $this->normalizer = new DataNormalizer();
     }
 
     /**
@@ -48,7 +47,7 @@ final class DataNormalizerTest extends TestCase
     public function testNormalizeMethodShouldConvertQueryBuildersToCollections(): void
     {
         $builder = Mockery::mock(Builder::class);
-        $builder->shouldReceive('get')->andReturn($collection = new Collection);
+        $builder->shouldReceive('get')->andReturn($collection = new Collection());
 
         $data = $this->normalizer->normalize($builder);
 
@@ -61,7 +60,7 @@ final class DataNormalizerTest extends TestCase
     public function testNormalizeMethodShouldConvertPaginatorsToCollections(): void
     {
         $paginator = Mockery::mock(Paginator::class);
-        $paginator->shouldReceive('getCollection')->andReturn($collection = new Collection);
+        $paginator->shouldReceive('getCollection')->andReturn($collection = new Collection());
 
         $data = $this->normalizer->normalize($paginator);
 
@@ -74,7 +73,7 @@ final class DataNormalizerTest extends TestCase
     public function testNormalizeMethodShouldConvertCursorPaginatorsToCollections(): void
     {
         $paginator = Mockery::mock(CursorPaginator::class);
-        $paginator->shouldReceive('get')->andReturn($collection = new Collection);
+        $paginator->shouldReceive('get')->andReturn($collection = new Collection());
 
         $data = $this->normalizer->normalize($paginator);
 
@@ -87,7 +86,7 @@ final class DataNormalizerTest extends TestCase
     public function testNormalizeMethodShouldConvertRelationsToCollections(): void
     {
         $relation = Mockery::mock(HasMany::class);
-        $relation->shouldReceive('get')->andReturn($collection = new Collection);
+        $relation->shouldReceive('get')->andReturn($collection = new Collection());
 
         $data = $this->normalizer->normalize($relation);
 

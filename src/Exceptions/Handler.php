@@ -4,7 +4,6 @@ namespace Flugg\Responder\Exceptions;
 
 use Flugg\Responder\Exceptions\Http\HttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
 
 /**
  * An exception handler responsible for handling exceptions.

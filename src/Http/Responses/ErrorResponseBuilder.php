@@ -110,11 +110,11 @@ class ErrorResponseBuilder extends ResponseBuilder
     public function serializer($serializer)
     {
         if (is_string($serializer)) {
-            $serializer = new $serializer;
+            $serializer = new $serializer();
         }
 
         if (! $serializer instanceof ErrorSerializer) {
-            throw new InvalidErrorSerializerException;
+            throw new InvalidErrorSerializerException();
         }
 
         $this->serializer = $serializer;

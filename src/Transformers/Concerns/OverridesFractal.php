@@ -76,7 +76,7 @@ trait OverridesFractal
      *
      * @return \League\Fractal\Scope
      */
-    public abstract function getCurrentScope();
+    abstract public function getCurrentScope();
 
     /**
      * Normalize relations to force a key value structure.
@@ -84,7 +84,7 @@ trait OverridesFractal
      * @param  array $relations
      * @return array
      */
-    protected abstract function normalizeRelations(array $relations): array;
+    abstract protected function normalizeRelations(array $relations): array;
 
     /**
      * Include a related resource.
@@ -94,5 +94,5 @@ trait OverridesFractal
      * @param  array  $parameters
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    protected abstract function includeResource(string $identifier, $data, array $parameters): ResourceInterface;
+    abstract protected function includeResource(string $identifier, $data, array $parameters): ResourceInterface;
 }

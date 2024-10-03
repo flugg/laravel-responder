@@ -3,7 +3,6 @@
 namespace Flugg\Responder\Tests\Unit;
 
 use Flugg\Responder\Exceptions\Http\HttpException;
-use Flugg\Responder\Exceptions\Http\ResourceNotFoundException;
 use Flugg\Responder\Tests\TestCase;
 
 /**
@@ -31,8 +30,7 @@ final class HttpExceptionTest extends TestCase
     {
         parent::setUp();
 
-        $this->exception = new class extends HttpException
-        {
+        $this->exception = new class () extends HttpException {
             protected $status = 404;
             protected $errorCode = 'test_error';
             protected $message = 'An error has occured.';

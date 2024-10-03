@@ -44,7 +44,7 @@ final class TransformerTest extends TestCase
      */
     public function testGetAvailableIncludesMethodReturnsRelations(): void
     {
-        $transformer = new TransformerWithWhitelist;
+        $transformer = new TransformerWithWhitelist();
 
         $includes = $transformer->getAvailableIncludes();
 
@@ -56,7 +56,7 @@ final class TransformerTest extends TestCase
      */
     public function testGetAvailableIncludesMethodReturnsResolvedRelationsOnWildcard(): void
     {
-        $transformer = new TransformerWithWildcard;
+        $transformer = new TransformerWithWildcard();
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('getParentScopes')->andReturn([]);
         $scope->shouldReceive('getManager')->andReturn($manager = Mockery::mock(Manager::class));
@@ -72,7 +72,7 @@ final class TransformerTest extends TestCase
      */
     public function testGetDefaultIncludesMethodReturnsResolvedRelationsOnWildcard(): void
     {
-        $transformer = new TransformerWithDefaultRelations;
+        $transformer = new TransformerWithDefaultRelations();
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('getParentScopes')->andReturn([]);
         $scope->shouldReceive('getManager')->andReturn($manager = Mockery::mock(Manager::class));
@@ -89,7 +89,7 @@ final class TransformerTest extends TestCase
      */
     public function testProcessIncludedResourcesMethodMakesResource(): void
     {
-        $transformer = new TransformerWithIncludeMethod;
+        $transformer = new TransformerWithIncludeMethod();
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('getParentScopes')->andReturn([]);
         $scope->shouldReceive('isRequested')->andReturn(true);
@@ -113,7 +113,7 @@ final class TransformerTest extends TestCase
      */
     public function testProcessIncludedResourcesMethodMakesResourceImplicitlyWhenGivenModel(): void
     {
-        $transformer = new TransformerWithIncludeMethod;
+        $transformer = new TransformerWithIncludeMethod();
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('getParentScopes')->andReturn([]);
         $scope->shouldReceive('isRequested')->andReturn(true);
@@ -141,7 +141,7 @@ final class TransformerTest extends TestCase
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Relation [foo] not found in [' . TransformerWithWhitelist::class . '].');
-        $transformer = new TransformerWithWhitelist;
+        $transformer = new TransformerWithWhitelist();
         $transformer->setCurrentScope($scope = Mockery::mock(Scope::class));
         $scope->shouldReceive('getParentScopes')->andReturn([]);
         $scope->shouldReceive('isRequested')->andReturn(true);

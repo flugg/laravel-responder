@@ -6,7 +6,6 @@ use Flugg\Responder\Contracts\ErrorSerializer;
 use Flugg\Responder\ErrorFactory;
 use Flugg\Responder\Exceptions\InvalidErrorSerializerException;
 use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
-use Flugg\Responder\Serializers\JsonSerializer;
 use Flugg\Responder\Tests\TestCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
