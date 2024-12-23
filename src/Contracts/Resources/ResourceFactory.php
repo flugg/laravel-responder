@@ -21,5 +21,5 @@ interface ResourceFactory
      * @param  string|null                                                    $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    public function make($data = null, $transformer = null, string $resourceKey = null): ResourceInterface;
+    public function make($data = null, $transformer = null, ?string $resourceKey = null): ResourceInterface;
 }

@@ -65,7 +65,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
      * @param  array    $headers
      * @return \Illuminate\Http\JsonResponse
      */
-    public function respond(int $status = null, array $headers = []): JsonResponse
+    public function respond(?int $status = null, array $headers = []): JsonResponse
     {
         if (! is_null($status)) {
             $this->setStatusCode($status);

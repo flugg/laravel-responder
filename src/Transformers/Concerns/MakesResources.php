@@ -34,7 +34,7 @@ trait MakesResources
      * @param  string|null                                                    $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    protected function resource($data = null, $transformer = null, string $resourceKey = null): ResourceInterface
+    protected function resource($data = null, $transformer = null, ?string $resourceKey = null): ResourceInterface
     {
         if ($data instanceof ResourceInterface) {
             return $data;

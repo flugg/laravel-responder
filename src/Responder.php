@@ -49,7 +49,7 @@ class Responder implements ResponderContract
      * @param  string|null                                                    $resourceKey
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder
      */
-    public function success($data = null, $transformer = null, string $resourceKey = null): SuccessResponseBuilder
+    public function success($data = null, $transformer = null, ?string $resourceKey = null): SuccessResponseBuilder
     {
         return $this->successResponseBuilder->transform($data, $transformer, $resourceKey);
     }
@@ -61,7 +61,7 @@ class Responder implements ResponderContract
      * @param  string|null $message
      * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */
-    public function error($errorCode = null, string $message = null): ErrorResponseBuilder
+    public function error($errorCode = null, ?string $message = null): ErrorResponseBuilder
     {
         return $this->errorResponseBuilder->error($errorCode, $message);
     }

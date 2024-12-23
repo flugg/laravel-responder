@@ -65,7 +65,7 @@ class ResourceFactory implements ResourceFactoryContract
      * @param  string|null                                                    $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    public function make($data = null, $transformer = null, string $resourceKey = null): ResourceInterface
+    public function make($data = null, $transformer = null, ?string $resourceKey = null): ResourceInterface
     {
         if ($data instanceof ResourceInterface) {
             return $this->makeFromResource($data, $transformer, $resourceKey);
@@ -87,7 +87,7 @@ class ResourceFactory implements ResourceFactoryContract
      * @param  string|null                                                    $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    public function makeFromResource(ResourceInterface $resource, $transformer = null, string $resourceKey = null): ResourceInterface
+    public function makeFromResource(ResourceInterface $resource, $transformer = null, ?string $resourceKey = null): ResourceInterface
     {
         $transformer = $this->resolveTransformer($resource->getData(), $transformer ?: $resource->getTransformer());
         $resourceKey = $this->resolveResourceKey($resource->getData(), $resourceKey ?: $resource->getResourceKey());
@@ -103,7 +103,7 @@ class ResourceFactory implements ResourceFactoryContract
      * @param  string|null                                             $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    protected function instatiateResource($data, $transformer = null, string $resourceKey = null): ResourceInterface
+    protected function instatiateResource($data, $transformer = null, ?string $resourceKey = null): ResourceInterface
     {
         if (is_null($data)) {
             return new NullResource(null, null, $resourceKey);
@@ -154,7 +154,7 @@ class ResourceFactory implements ResourceFactoryContract
      * @param  string|null $resourceKey
      * @return null|string
      */
-    protected function resolveResourceKey($data, string $resourceKey = null)
+    protected function resolveResourceKey($data, ?string $resourceKey = null)
     {
         return ! empty($resourceKey) ? $resourceKey : $this->resourceKeyResolver->resolve($data);
     }

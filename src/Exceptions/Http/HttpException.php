@@ -54,7 +54,7 @@ abstract class HttpException extends BaseHttpException
      * @param string|null $message
      * @param array|null  $headers
      */
-    public function __construct(string $message = null, array $headers = null)
+    public function __construct(?string $message = null, ?array $headers = null)
     {
         parent::__construct($this->status, $message ?? $this->message, null, $headers ?? $this->headers);
     }

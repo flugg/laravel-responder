@@ -79,7 +79,7 @@ class ErrorResponseBuilder extends ResponseBuilder
      * @param  string|null $message
      * @return $this
      */
-    public function error($errorCode = null, string $message = null)
+    public function error($errorCode = null, ?string $message = null)
     {
         $this->errorCode = $errorCode;
         $this->message = $message;
@@ -93,7 +93,7 @@ class ErrorResponseBuilder extends ResponseBuilder
      * @param  array|null $data
      * @return $this
      */
-    public function data(array $data = null)
+    public function data(?array $data = null)
     {
         $this->data = array_merge((array) $this->data, (array) $data);
 

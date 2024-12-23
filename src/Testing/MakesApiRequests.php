@@ -129,7 +129,7 @@ trait MakesApiRequests
      * @param  int|null $status
      * @return $this
      */
-    protected function seeError(string $error, int $status = null)
+    protected function seeError(string $error, ?int $status = null)
     {
         if (! is_null($status)) {
             $this->seeStatusCode($status);
@@ -165,7 +165,7 @@ trait MakesApiRequests
      * @param  bool       $negate
      * @return $this
      */
-    abstract public function seeJson(array $data = null, $negate = false);
+    abstract public function seeJson(?array $data = null, $negate = false);
 
     /**
      * Assert that the JSON response has a given structure.
@@ -174,7 +174,7 @@ trait MakesApiRequests
      * @param  array|null $responseData
      * @return $this
      */
-    abstract public function seeJsonStructure(array $structure = null, $responseData = null);
+    abstract public function seeJsonStructure(?array $structure = null, $responseData = null);
 
     /**
      * Assert that the response is a superset of the given JSON.

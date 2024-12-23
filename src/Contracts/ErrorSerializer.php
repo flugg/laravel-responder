@@ -19,5 +19,5 @@ interface ErrorSerializer
      * @param  array|null  $data
      * @return array
      */
-    public function format($errorCode = null, string $message = null, array $data = null): array;
+    public function format($errorCode = null, ?string $message = null, ?array $data = null): array;
 }

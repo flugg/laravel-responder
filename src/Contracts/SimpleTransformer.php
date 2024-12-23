@@ -21,5 +21,5 @@ interface SimpleTransformer
      * @param  string|null                                                    $resourceKey
      * @return \Flugg\Responder\TransformBuilder
      */
-    public function make($data = null, $transformer = null, string $resourceKey = null): TransformBuilder;
+    public function make($data = null, $transformer = null, ?string $resourceKey = null): TransformBuilder;
 }

@@ -105,7 +105,7 @@ class TransformBuilder
      * @param  string|null                                                    $resourceKey
      * @return $this
      */
-    public function resource($data = null, $transformer = null, string $resourceKey = null)
+    public function resource($data = null, $transformer = null, ?string $resourceKey = null)
     {
         $this->resource = $this->resourceFactory->make($data, $transformer, $resourceKey);
 

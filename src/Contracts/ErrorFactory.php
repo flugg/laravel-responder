@@ -20,5 +20,5 @@ interface ErrorFactory
      * @param  array|null                                 $data
      * @return array
      */
-    public function make(ErrorSerializer $serializer, $errorCode = null, string $message = null, array $data = null): array;
+    public function make(ErrorSerializer $serializer, $errorCode = null, ?string $message = null, ?array $data = null): array;
 }

@@ -22,7 +22,7 @@ interface Responder
      * @param  string|null                                                    $resourceKey
      * @return \Flugg\Responder\Http\Responses\SuccessResponseBuilder
      */
-    public function success($data = null, $transformer = null, string $resourceKey = null): SuccessResponseBuilder;
+    public function success($data = null, $transformer = null, ?string $resourceKey = null): SuccessResponseBuilder;
 
     /**
      * Build an error response.
@@ -31,5 +31,5 @@ interface Responder
      * @param  string|null $message
      * @return \Flugg\Responder\Http\Responses\ErrorResponseBuilder
      */
-    public function error($errorCode = null, string $message = null): ErrorResponseBuilder;
+    public function error($errorCode = null, ?string $message = null): ErrorResponseBuilder;
 }

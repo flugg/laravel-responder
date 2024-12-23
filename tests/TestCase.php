@@ -266,7 +266,7 @@ abstract class TestCase extends BaseTestCase
      * @param  string|null $className
      * @return \Mockery\MockInterface
      */
-    protected function mockResource(string $className = null): MockInterface
+    protected function mockResource(?string $className = null): MockInterface
     {
         $resource = Mockery::mock($className ?: Collection::class);
 
