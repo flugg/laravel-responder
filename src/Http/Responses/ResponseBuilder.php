@@ -11,7 +11,6 @@ use Illuminate\Support\Collection;
 /**
  * An abstract builder class for building responses.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -34,7 +33,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
     /**
      * Construct the builder class.
      *
-     * @param \Flugg\Responder\Contracts\ResponseFactory $responseFactory
+     * @param  \Flugg\Responder\Contracts\ResponseFactory  $responseFactory
      */
     public function __construct(ResponseFactory $responseFactory)
     {
@@ -44,7 +43,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
     /**
      * Decorate the response with the given decorator.
      *
-     * @param  string[]|string $decorator
+     * @param  string[]|string  $decorator
      * @return $this
      */
     public function decorator($decorator)
@@ -53,7 +52,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
 
         foreach ($decorators as $decorator) {
             $this->responseFactory = new $decorator($this->responseFactory);
-        };
+        }
 
         return $this;
     }
@@ -61,8 +60,8 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
     /**
      * Respond with an HTTP response.
      *
-     * @param  int|null $status
-     * @param  array    $headers
+     * @param  int|null  $status
+     * @param  array  $headers
      * @return \Illuminate\Http\JsonResponse
      */
     public function respond(?int $status = null, array $headers = []): JsonResponse
@@ -97,7 +96,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
     /**
      * Convert the response to JSON.
      *
-     * @param  int $options
+     * @param  int  $options
      * @return string
      */
     public function toJson($options = 0): string
@@ -108,7 +107,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
     /**
      * Set the HTTP status code for the response.
      *
-     * @param  int $status
+     * @param  int  $status
      * @return void
      */
     protected function setStatusCode(int $status)
@@ -126,7 +125,7 @@ abstract class ResponseBuilder implements Arrayable, Jsonable
     /**
      * Convert the response to an array.
      *
-     * @param  int $status
+     * @param  int  $status
      * @return void
      */
     abstract protected function validateStatusCode(int $status);

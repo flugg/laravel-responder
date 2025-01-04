@@ -5,7 +5,6 @@ namespace Flugg\Responder\Tests;
 use Flugg\Responder\Contracts\ResponseFactory;
 use Flugg\Responder\Http\Responses\ErrorResponseBuilder;
 use Flugg\Responder\Http\Responses\SuccessResponseBuilder;
-use Flugg\Responder\Resources\ResourceBuilder;
 use Flugg\Responder\ResponderServiceProvider;
 use Flugg\Responder\TransformBuilder;
 use Flugg\Responder\Transformers\Transformer;
@@ -22,7 +21,6 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 /**
  * The base test case class, responsible for bootstrapping the testing environment.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -78,7 +76,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -136,7 +134,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Get package service providers.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      * @return array
      */
     protected function getPackageProviders($app)
@@ -150,8 +148,8 @@ abstract class TestCase extends BaseTestCase
      * Merge given data with the skeleton of a serialization using the default [SuccessSerializer].
      *
      * @param  null  $data
-     * @param  array $meta
-     * @param  int   $status
+     * @param  array  $meta
+     * @param  int  $status
      * @return array
      */
     protected function responseData($data = null, $meta = [], $status = 200): array
@@ -263,7 +261,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Create a mock of a [ResourceInterface].
      *
-     * @param  string|null $className
+     * @param  string|null  $className
      * @return \Mockery\MockInterface
      */
     protected function mockResource(?string $className = null): MockInterface

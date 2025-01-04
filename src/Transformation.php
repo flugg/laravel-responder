@@ -7,7 +7,6 @@ use Flugg\Responder\Serializers\NoopSerializer;
 /**
  * A class responsible for obtaining a transformation to transform data without serializing.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -23,7 +22,7 @@ class Transformation
     /**
      * Construct the service class.
      *
-     * @param \Flugg\Responder\TransformBuilder $transformBuilder
+     * @param  \Flugg\Responder\TransformBuilder  $transformBuilder
      */
     public function __construct(TransformBuilder $transformBuilder)
     {
@@ -33,9 +32,9 @@ class Transformation
     /**
      * Make a new transformation to transform data without serializing.
      *
-     * @param  mixed                                                          $data
-     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
-     * @param  string|null                                                    $resourceKey
+     * @param  mixed  $data
+     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null  $transformer
+     * @param  string|null  $resourceKey
      * @return \Flugg\Responder\TransformBuilder
      */
     public function make($data = null, $transformer = null, ?string $resourceKey = null): TransformBuilder

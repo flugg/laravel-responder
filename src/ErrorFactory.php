@@ -9,7 +9,6 @@ use Flugg\Responder\Contracts\ErrorSerializer;
 /**
  * A factory class responsible for creating error arrays.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -25,7 +24,7 @@ class ErrorFactory implements ErrorFactoryContract
     /**
      * Construct the factory class.
      *
-     * @param \Flugg\Responder\Contracts\ErrorMessageResolver $messageResolver
+     * @param  \Flugg\Responder\Contracts\ErrorMessageResolver  $messageResolver
      */
     public function __construct(ErrorMessageResolverContract $messageResolver)
     {
@@ -35,10 +34,10 @@ class ErrorFactory implements ErrorFactoryContract
     /**
      * Make an error array from the given error code and message.
      *
-     * @param  \Flugg\Responder\Contracts\ErrorSerializer $serializer
-     * @param  mixed|null                                 $errorCode
-     * @param  string|null                                $message
-     * @param  array|null                                 $data
+     * @param  \Flugg\Responder\Contracts\ErrorSerializer  $serializer
+     * @param  mixed|null  $errorCode
+     * @param  string|null  $message
+     * @param  array|null  $data
      * @return array
      */
     public function make(ErrorSerializer $serializer, $errorCode = null, ?string $message = null, ?array $data = null): array

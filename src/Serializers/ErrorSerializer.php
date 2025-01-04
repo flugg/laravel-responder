@@ -7,7 +7,6 @@ use Flugg\Responder\Contracts\ErrorSerializer as ErrorSerializerContract;
 /**
  * A serializer class responsible for formatting error data.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -17,7 +16,7 @@ class ErrorSerializer implements ErrorSerializerContract
      * Format the error data.
      *
      * @param  mixed|null  $errorCode
-     * @param  string|null $message
+     * @param  string|null  $message
      * @param  array|null  $data
      * @return array
      */
