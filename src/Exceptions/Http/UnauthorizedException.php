@@ -17,7 +17,7 @@ class UnauthorizedException extends HttpException
      *
      * @var int
      */
-    protected $status = 403;
+    protected $status = 401;
 
     /**
      * An error code.
