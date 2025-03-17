@@ -13,7 +13,6 @@ use League\Fractal\Serializer\SerializerAbstract;
 /**
  * A builder class for building success responses.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  *
@@ -43,8 +42,8 @@ class SuccessResponseBuilder extends ResponseBuilder
     /**
      * Construct the builder class.
      *
-     * @param \Flugg\Responder\Contracts\ResponseFactory $responseFactory
-     * @param \Flugg\Responder\TransformBuilder          $transformBuilder
+     * @param  \Flugg\Responder\Contracts\ResponseFactory  $responseFactory
+     * @param  \Flugg\Responder\TransformBuilder  $transformBuilder
      */
     public function __construct(ResponseFactory $responseFactory, TransformBuilder $transformBuilder)
     {
@@ -56,12 +55,12 @@ class SuccessResponseBuilder extends ResponseBuilder
     /**
      * Set resource data for the transformation.
      *
-     * @param  mixed                                                          $data
-     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
-     * @param  string|null                                                    $resourceKey
+     * @param  mixed  $data
+     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null  $transformer
+     * @param  string|null  $resourceKey
      * @return self
      */
-    public function transform($data = null, $transformer = null, string $resourceKey = null): SuccessResponseBuilder
+    public function transform($data = null, $transformer = null, ?string $resourceKey = null): SuccessResponseBuilder
     {
         $this->transformBuilder->resource($data, $transformer, $resourceKey);
 
@@ -71,7 +70,7 @@ class SuccessResponseBuilder extends ResponseBuilder
     /**
      * Dynamically send calls to the transform builder.
      *
-     * @param  string $name
+     * @param  string  $name
      * @param  array  $arguments
      * @return self|void
      */
@@ -99,8 +98,9 @@ class SuccessResponseBuilder extends ResponseBuilder
     /**
      * Validate the HTTP status code for the response.
      *
-     * @param  int $status
+     * @param  int  $status
      * @return void
+     *
      * @throws \InvalidArgumentException
      */
     protected function validateStatusCode(int $status)

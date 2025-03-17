@@ -7,7 +7,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 /**
  * An abstract exception responsible for holding error response data.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -51,16 +50,16 @@ abstract class HttpException extends BaseHttpException
     /**
      * Construct the exception class.
      *
-     * @param string|null $message
-     * @param array|null  $headers
+     * @param  string|null  $message
+     * @param  array|null  $headers
      */
-    public function __construct(string $message = null, array $headers = null)
+    public function __construct(?string $message = null, ?array $headers = null)
     {
         parent::__construct($this->status, $message ?? $this->message, null, $headers ?? $this->headers);
     }
 
     /**
-     * Retrieve the HTTP status code,
+     * Retrieve the HTTP status code,.
      *
      * @return int
      */

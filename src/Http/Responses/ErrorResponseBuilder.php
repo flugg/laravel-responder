@@ -11,7 +11,6 @@ use InvalidArgumentException;
 /**
  * A builder class for building error responses.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -62,8 +61,8 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Construct the builder class.
      *
-     * @param \Flugg\Responder\Contracts\ResponseFactory $responseFactory
-     * @param \Flugg\Responder\Contracts\ErrorFactory    $errorFactory
+     * @param  \Flugg\Responder\Contracts\ResponseFactory  $responseFactory
+     * @param  \Flugg\Responder\Contracts\ErrorFactory  $errorFactory
      */
     public function __construct(ResponseFactory $responseFactory, ErrorFactory $errorFactory)
     {
@@ -76,10 +75,10 @@ class ErrorResponseBuilder extends ResponseBuilder
      * Set the error code and message.
      *
      * @param  mixed|null  $errorCode
-     * @param  string|null $message
+     * @param  string|null  $message
      * @return $this
      */
-    public function error($errorCode = null, string $message = null)
+    public function error($errorCode = null, ?string $message = null)
     {
         $this->errorCode = $errorCode;
         $this->message = $message;
@@ -90,10 +89,10 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Add additional data to the error.
      *
-     * @param  array|null $data
+     * @param  array|null  $data
      * @return $this
      */
-    public function data(array $data = null)
+    public function data(?array $data = null)
     {
         $this->data = array_merge((array) $this->data, (array) $data);
 
@@ -103,8 +102,9 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Set the error serializer.
      *
-     * @param  \Flugg\Responder\Contracts\ErrorSerializer|string $serializer
+     * @param  \Flugg\Responder\Contracts\ErrorSerializer|string  $serializer
      * @return $this
+     *
      * @throws \Flugg\Responder\Exceptions\InvalidErrorSerializerException
      */
     public function serializer($serializer)
@@ -135,8 +135,9 @@ class ErrorResponseBuilder extends ResponseBuilder
     /**
      * Validate the HTTP status code for the response.
      *
-     * @param  int $status
+     * @param  int  $status
      * @return void
+     *
      * @throws \InvalidArgumentException
      */
     protected function validateStatusCode(int $status)

@@ -13,7 +13,6 @@ use LogicException;
 /**
  * A trait to be used by a transformer to make related resources.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -29,12 +28,12 @@ trait MakesResources
     /**
      * Make a resource.
      *
-     * @param  mixed                                                          $data
-     * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
-     * @param  string|null                                                    $resourceKey
+     * @param  mixed  $data
+     * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null  $transformer
+     * @param  string|null  $resourceKey
      * @return \League\Fractal\Resource\ResourceInterface
      */
-    protected function resource($data = null, $transformer = null, string $resourceKey = null): ResourceInterface
+    protected function resource($data = null, $transformer = null, ?string $resourceKey = null): ResourceInterface
     {
         if ($data instanceof ResourceInterface) {
             return $data;
@@ -48,26 +47,27 @@ trait MakesResources
     /**
      * Include a related resource.
      *
-     * @param  string $identifier
+     * @param  string  $identifier
      * @param  mixed  $data
      * @param  array  $parameters
      * @return \League\Fractal\Resource\ResourceInterface
+     *
      * @throws \LogicException
      */
     protected function includeResource(string $identifier, $data, array $parameters): ResourceInterface
     {
         $transformer = $this->mappedTransformerClass($identifier);
 
-        if(config('responder.use_camel_case_relations')) {
+        if (config('responder.use_camel_case_relations')) {
             $identifier = Str::camel($identifier);
         }
 
-        if (method_exists($this, $method = 'include' . ucfirst($identifier))) {
+        if (method_exists($this, $method = 'include'.ucfirst($identifier))) {
             $resource = $this->resource($this->$method($data, collect($parameters)), $transformer, $identifier);
         } elseif ($data instanceof Model) {
             $resource = $this->includeResourceFromModel($data, $identifier, $transformer);
         } else {
-            throw new LogicException('Relation [' . $identifier . '] not found in [' . get_class($this) . '].');
+            throw new LogicException('Relation ['.$identifier.'] not found in ['.get_class($this).'].');
         }
 
         return $resource;
@@ -76,9 +76,9 @@ trait MakesResources
     /**
      * Include a related resource from a model and cache the resource type for following calls.
      *
-     * @param  \Illuminate\Database\Eloquent\Model                            $model
-     * @param  string                                                         $identifier
-     * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null $transformer
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $identifier
+     * @param  \Flugg\Responder\Transformers\Transformer|string|callable|null  $transformer
      * @return \League\Fractal\Resource\ResourceInterface
      */
     protected function includeResourceFromModel(Model $model, string $identifier, $transformer = null): ResourceInterface
@@ -97,7 +97,7 @@ trait MakesResources
     /**
      * Indicates if the resource should be cached.
      *
-     * @param  mixed $data
+     * @param  mixed  $data
      * @return bool
      */
     protected function shouldCacheResource($data): bool
@@ -110,22 +110,22 @@ trait MakesResources
      *
      * @return \Illuminate\Contracts\Container\Container
      */
-    protected abstract function resolveContainer(): Container;
+    abstract protected function resolveContainer(): Container;
 
     /**
      * Resolve relation data from a model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
-     * @param  string                              $identifier
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $identifier
      * @return mixed
      */
-    protected abstract function resolveRelation(Model $model, string $identifier);
+    abstract protected function resolveRelation(Model $model, string $identifier);
 
     /**
      * Get a related transformer class mapped to a relation identifier.
      *
-     * @param  string $identifier
+     * @param  string  $identifier
      * @return string
      */
-    protected abstract function mappedTransformerClass(string $identifier);
+    abstract protected function mappedTransformerClass(string $identifier);
 }

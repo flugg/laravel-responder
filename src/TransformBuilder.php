@@ -21,7 +21,6 @@ use League\Fractal\Serializer\SerializerAbstract;
 /**
  * A builder class responsible for building transformed arrays.
  *
- * @package flugger/laravel-responder
  * @author  Alexander Tømmerås <flugged@gmail.com>
  * @license The MIT License
  */
@@ -86,9 +85,9 @@ class TransformBuilder
     /**
      * Construct the builder class.
      *
-     * @param \Flugg\Responder\Contracts\Resources\ResourceFactory   $resourceFactory
-     * @param \Flugg\Responder\Contracts\TransformFactory            $transformFactory
-     * @param \Flugg\Responder\Contracts\Pagination\PaginatorFactory $paginatorFactory
+     * @param  \Flugg\Responder\Contracts\Resources\ResourceFactory  $resourceFactory
+     * @param  \Flugg\Responder\Contracts\TransformFactory  $transformFactory
+     * @param  \Flugg\Responder\Contracts\Pagination\PaginatorFactory  $paginatorFactory
      */
     public function __construct(ResourceFactory $resourceFactory, TransformFactory $transformFactory, PaginatorFactory $paginatorFactory)
     {
@@ -100,12 +99,12 @@ class TransformBuilder
     /**
      * Make a resource from the given data and transformer and set the resource key.
      *
-     * @param  mixed                                                          $data
-     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
-     * @param  string|null                                                    $resourceKey
+     * @param  mixed  $data
+     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null  $transformer
+     * @param  string|null  $resourceKey
      * @return $this
      */
-    public function resource($data = null, $transformer = null, string $resourceKey = null)
+    public function resource($data = null, $transformer = null, ?string $resourceKey = null)
     {
         $this->resource = $this->resourceFactory->make($data, $transformer, $resourceKey);
 
@@ -121,7 +120,7 @@ class TransformBuilder
     /**
      * Manually set the cursor on the resource.
      *
-     * @param  \League\Fractal\Pagination\Cursor $cursor
+     * @param  \League\Fractal\Pagination\Cursor  $cursor
      * @return $this
      */
     public function cursor(Cursor $cursor)
@@ -136,7 +135,7 @@ class TransformBuilder
     /**
      * Manually set the paginator on the resource.
      *
-     * @param  \League\Fractal\Pagination\IlluminatePaginatorAdapter $paginator
+     * @param  \League\Fractal\Pagination\IlluminatePaginatorAdapter  $paginator
      * @return $this
      */
     public function paginator(IlluminatePaginatorAdapter $paginator)
@@ -151,7 +150,7 @@ class TransformBuilder
     /**
      * Add meta data appended to the response data.
      *
-     * @param  array $data
+     * @param  array  $data
      * @return $this
      */
     public function meta(array $data)
@@ -164,7 +163,7 @@ class TransformBuilder
     /**
      * Include relations to the transform.
      *
-     * @param  string[]|string $relations
+     * @param  string[]|string  $relations
      * @return $this
      */
     public function with($relations)
@@ -186,7 +185,7 @@ class TransformBuilder
     /**
      * Exclude relations from the transform.
      *
-     * @param  string[]|string $relations
+     * @param  string[]|string  $relations
      * @return $this
      */
     public function without($relations)
@@ -199,7 +198,7 @@ class TransformBuilder
     /**
      * Filter fields to output using sparse fieldsets.
      *
-     * @param  string[]|string $fields
+     * @param  string[]|string  $fields
      * @return $this
      */
     public function only($fields)
@@ -212,8 +211,9 @@ class TransformBuilder
     /**
      * Set the serializer.
      *
-     * @param  \League\Fractal\Serializer\SerializerAbstract|string $serializer
+     * @param  \League\Fractal\Serializer\SerializerAbstract|string  $serializer
      * @return $this
+     *
      * @throws \Flugg\Responder\Exceptions\InvalidSuccessSerializerException
      */
     public function serializer($serializer)
@@ -250,8 +250,8 @@ class TransformBuilder
     /**
      * Prepare requested relations for the transformation.
      *
-     * @param  mixed                                                          $data
-     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
+     * @param  mixed  $data
+     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null  $transformer
      * @return void
      */
     protected function prepareRelations($data, $transformer)
@@ -272,7 +272,7 @@ class TransformBuilder
     /**
      * Filter out relations that have been explicitly excluded using the [without] method.
      *
-     * @param  array $relations
+     * @param  array  $relations
      * @return array
      */
     protected function removeExcludedRelations(array $relations): array
@@ -286,7 +286,7 @@ class TransformBuilder
      * Strip parameter suffix from the relation string by only taking what is in front of
      * the colon.
      *
-     * @param  string $relation
+     * @param  string  $relation
      * @return string
      */
     protected function stripParametersFromRelation(string $relation): string
@@ -299,9 +299,9 @@ class TransformBuilder
      * in the transformers. We also strip away any parameters from the relation name
      * and normalize relations by swapping "null" constraints to empty closures.
      *
-     * @param  mixed                                                          $data
-     * @param  array                                                          $requested
-     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null $transformer
+     * @param  mixed  $data
+     * @param  array  $requested
+     * @param  \Flugg\Responder\Transformers\Transformer|callable|string|null  $transformer
      * @return void
      */
     protected function eagerLoadRelations($data, array $requested, $transformer)
@@ -309,15 +309,16 @@ class TransformBuilder
         $relations = collect(array_keys($requested))->reduce(function ($eagerLoads, $relation) use ($requested, $transformer) {
             $identifier = $this->stripParametersFromRelation($relation);
 
-            if(config('responder.use_camel_case_relations')) {
+            if (config('responder.use_camel_case_relations')) {
                 $identifier = Str::camel($identifier);
             }
 
-            if (method_exists($transformer, 'include' . ucfirst($identifier))) {
+            if (method_exists($transformer, 'include'.ucfirst($identifier))) {
                 return $eagerLoads;
             }
 
-            return array_merge($eagerLoads, [$identifier => $requested[$relation] ?: function () { }]);
+            return array_merge($eagerLoads, [$identifier => $requested[$relation] ?: function () {
+            }]);
         }, []);
 
         $data->loadMissing($relations);
