@@ -61,7 +61,9 @@ class CreateResponseTest extends TestCase
      */
     public function testCreateResponsesWithTrait()
     {
-        $trait = $this->getObjectForTrait(MakesResponses::class);
+        $trait = new class {
+            use MakesResponses;
+        };
 
         $successResponse = $trait->success()->respond();
         $errorResponse = $trait->error()->respond();

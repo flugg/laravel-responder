@@ -123,7 +123,9 @@ class IncludeRelationTest extends TestCase
      */
     public function testIncludeNestedRelationsWithQueryConstraints()
     {
-        $product = Mockery::mock($this->product);
+        $product = Mockery::mock($this->product)->makePartial();
+        $product->shouldReceive('load')->andReturnSelf();
+        $product->shouldReceive('loadMissing')->andReturnSelf();
 
         responder()->success($product, ProductTransformer::class)->with([
             'orders.customer' => function ($query) {
@@ -131,7 +133,7 @@ class IncludeRelationTest extends TestCase
             },
         ])->respond();
 
-        $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+        $product->shouldHaveReceived('loadMissing')->with(Mockery::on(function ($argument) {
             return Arr::has($argument, 'orders') && is_callable($argument['orders']) && count($argument) === 2;
         }))->once();
     }
@@ -216,14 +218,16 @@ class IncludeRelationTest extends TestCase
      */
     public function testItEagerLoadsRelations()
     {
-        $product = Mockery::mock($this->product);
+        $product = Mockery::mock($this->product)->makePartial();
+        $product->shouldReceive('load')->andReturnSelf();
+        $product->shouldReceive('loadMissing')->andReturnSelf();
 
         responder()
             ->success($product, ProductWithShipmentsWhitelistedTransformer::class)
             ->with('shipments', 'orders')
             ->respond();
 
-        $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+        $product->shouldHaveReceived('loadMissing')->with(Mockery::on(function ($argument) {
             return Arr::has($argument, 'shipments') && count($argument) === 1;
         }))->once();
     }
@@ -234,15 +238,16 @@ class IncludeRelationTest extends TestCase
      */
     public function testItConvertsSnakeCasedRelationsToCamelCase()
     {
-        $product = Mockery::mock($this->product);
+        $product = Mockery::mock($this->product)->makePartial();
         $product->shouldReceive('load')->andReturnSelf();
+        $product->shouldReceive('loadMissing')->andReturnSelf();
 
         responder()
             ->success($product, ProductWithSnakeCasedRelationsTransformer::class)
             ->with('whitelisted_shipments', 'default_orders')
             ->respond();
 
-        $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+        $product->shouldHaveReceived('loadMissing')->with(Mockery::on(function ($argument) {
             return Arr::has($argument, ['whitelistedShipments', 'defaultOrders']) && count($argument) === 2;
         }))->once();
     }
@@ -254,15 +259,16 @@ class IncludeRelationTest extends TestCase
     public function testItNotConvertsSnakeCasedRelationsToCamelCase()
     {
         config(['responder.use_camel_case_relations' => false]);
-        $product = Mockery::mock($this->product);
+        $product = Mockery::mock($this->product)->makePartial();
         $product->shouldReceive('load')->andReturnSelf();
+        $product->shouldReceive('loadMissing')->andReturnSelf();
 
         responder()
             ->success($product, ProductWithSnakeCasedRelationsTransformer::class)
             ->with('whitelisted_shipments', 'default_orders')
             ->respond();
 
-        $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+        $product->shouldHaveReceived('loadMissing')->with(Mockery::on(function ($argument) {
             return Arr::has($argument, ['whitelisted_shipments', 'default_orders']) && count($argument) === 2;
         }))->once();
     }
@@ -273,14 +279,16 @@ class IncludeRelationTest extends TestCase
      */
     public function testItIncludesRelationsFromIncludeMethod()
     {
-        $product = Mockery::mock($this->product);
+        $product = Mockery::mock($this->product)->makePartial();
+        $product->shouldReceive('load')->andReturnSelf();
+        $product->shouldReceive('loadMissing')->andReturnSelf();
 
         $response = responder()
             ->success($product, ProductWithIncludeMethodTransformer::class)
             ->with('shipments', 'orders')
             ->respond();
 
-        $product->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+        $product->shouldHaveReceived('loadMissing')->with(Mockery::on(function ($argument) {
             return Arr::has($argument, 'orders') && count($argument) === 1;
         }))->once();
         $this->assertEquals($this->responseData(array_merge($this->product->fresh()->toArray(), [

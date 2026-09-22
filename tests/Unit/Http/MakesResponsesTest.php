@@ -41,7 +41,9 @@ class MakesResponsesTest extends TestCase
 
         $this->responder = Mockery::mock(Responder::class);
         $this->app->instance(Responder::class, $this->responder);
-        $this->trait = $this->getMockForTrait(MakesResponses::class);
+        $this->trait = new class {
+            use MakesResponses;
+        };
     }
 
     /**

@@ -303,13 +303,14 @@ class TransformBuilderTest extends TestCase
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
         $model->shouldReceive('load')->andReturnSelf();
+        $model->shouldReceive('loadMissing')->andReturnSelf();
         $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
         $transformer->shouldReceive('relations')->andReturn(['foo' => null, 'bar' => null]);
         $transformer->shouldReceive('defaultRelations')->andReturn(['baz' => null]);
 
         $this->builder->resource()->with($relations = ['foo' => function () { }, 'bar'])->transform();
 
-        $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+        $model->shouldHaveReceived('loadMissing')->with(Mockery::on(function ($argument) {
             return Arr::has($argument, ['foo', 'bar', 'baz']);
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
@@ -329,13 +330,14 @@ class TransformBuilderTest extends TestCase
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
         $model->shouldReceive('load')->andReturnSelf();
+        $model->shouldReceive('loadMissing')->andReturnSelf();
         $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
         $transformer->shouldReceive('relations')->andReturn(['foo:first(aa|bb)' => null, 'bar:second(cc|dd)' => null]);
         $transformer->shouldReceive('defaultRelations')->andReturn([]);
 
         $this->builder->resource()->with(['foo:first(aa|bb)', 'bar:second(cc|dd)'])->transform();
 
-        $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+        $model->shouldHaveReceived('loadMissing')->with(Mockery::on(function ($argument) {
             return Arr::has($argument, ['foo', 'bar']);
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
@@ -353,13 +355,14 @@ class TransformBuilderTest extends TestCase
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
         $model->shouldReceive('load')->andReturnSelf();
+        $model->shouldReceive('loadMissing')->andReturnSelf();
         $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
         $transformer->shouldReceive('relations')->andReturn(['foo' => null]);
         $transformer->shouldReceive('defaultRelations')->andReturn([]);
 
         $this->builder->resource()->with(['foo', 'bar'])->transform();
 
-        $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+        $model->shouldHaveReceived('loadMissing')->with(Mockery::on(function ($argument) {
             return Arr::has($argument, 'foo') && count($argument) === 1;
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
@@ -377,6 +380,7 @@ class TransformBuilderTest extends TestCase
         $this->transformFactory->shouldReceive('make')->andReturn([]);
         $this->resource->shouldReceive('getData')->andReturn($model = Mockery::mock(Model::class));
         $model->shouldReceive('load')->andReturnSelf();
+        $model->shouldReceive('loadMissing')->andReturnSelf();
         $transformer = Mockery::mock(TransformerWithIncludeMethods::class);
         $this->resource->shouldReceive('getTransformer')->andReturn($transformer);
         $transformer->shouldReceive([
@@ -386,7 +390,7 @@ class TransformBuilderTest extends TestCase
 
         $this->builder->resource()->with($relations = ['foo', 'bar'])->transform();
 
-        $model->shouldHaveReceived('load')->with(Mockery::on(function ($argument) {
+        $model->shouldHaveReceived('loadMissing')->with(Mockery::on(function ($argument) {
             return Arr::has($argument, 'foo') && count($argument) === 1;
         }))->once();
         $this->transformFactory->shouldHaveReceived('make')->with($this->resource, $this->serializer, [
