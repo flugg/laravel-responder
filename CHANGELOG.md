@@ -1,3 +1,38 @@
+# 3.6.0 (2026-09-22)
+
+### Features
+
+* Add Laravel 13 support
+
+# 3.5.0 (2025-03-17)
+
+### Features
+
+* Add Laravel 12 support
+
+### Bug Fixes
+
+* Change `UnauthorizedException` HTTP status code from 403 to 401
+* Fix PHP 8.4 deprecation warnings for implicit nullable parameters
+
+# 3.4.0 (2024-03-04)
+
+### Features
+
+* Add Laravel 11 support
+
+### Bug Fixes
+
+* Fix duplicate relation loading by using `loadMissing` instead of `load`
+* Fix model namespace in the `make:transformer` command
+
+# 3.3.1 (2024-01-19)
+
+### Bug Fixes
+
+* Fix nullable return type on the `null` method of serializers
+* Fix empty resource key handling in `FractalTransformFactory` and `ResourceFactory`
+
 # 3.3.0 (2023-03-14)
 
 ### Features
