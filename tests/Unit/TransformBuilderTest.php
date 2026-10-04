@@ -13,6 +13,7 @@ use Flugg\Responder\Tests\TestCase;
 use Flugg\Responder\TransformBuilder;
 use Flugg\Responder\Transformers\Transformer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use League\Fractal\Pagination\Cursor;
@@ -318,6 +319,23 @@ class TransformBuilderTest extends TestCase
             'excludes' => [],
             'fieldsets' => [],
         ])->once();
+    }
+
+    /**
+     * Assert that the [transform] method doesn't try to eager load relationships on an
+     * Eloquent collection that doesn't contain models.
+     */
+    public function testTransformMethodDoesntEagerLoadRelationsOnCollectionsOfNonModels()
+    {
+        $this->transformFactory->shouldReceive('make')->andReturn([]);
+        $this->resource->shouldReceive('getData')->andReturn(new EloquentCollection([new stdClass]));
+        $this->resource->shouldReceive('getTransformer')->andReturn($transformer = Mockery::mock(Transformer::class));
+        $transformer->shouldReceive('relations')->andReturn([]);
+        $transformer->shouldReceive('defaultRelations')->andReturn([]);
+
+        $result = $this->builder->resource()->transform();
+
+        $this->assertEquals([], $result);
     }
 
     /**

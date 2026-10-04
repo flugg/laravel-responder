@@ -262,7 +262,7 @@ class TransformBuilder
             $this->with = array_merge($relations, $defaultRelations);
         }
 
-        if ($data instanceof Model || $data instanceof Collection) {
+        if ($data instanceof Model || ($data instanceof Collection && $data->first() instanceof Model)) {
             $this->eagerLoadRelations($data, $this->with, $transformer);
         }
 
